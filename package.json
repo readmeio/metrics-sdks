@@ -1,5 +1,5 @@
 {
-  "name": "readme-metrics",
+  "name": "@readme/metrics",
   "description": "Track your API metrics within ReadMe",
   "version": "0.0.0",
   "dependencies": {},
@@ -18,7 +18,7 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git@github.com:domharrington/readme-metrics.git"
+    "url": "git@github.com:readme/metrics.git"
   },
   "devDependencies": {
     "eslint": "^4.19.1",
