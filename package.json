@@ -1,0 +1,33 @@
+{
+  "name": "readme-metrics",
+  "description": "Track your API metrics within ReadMe",
+  "version": "0.0.0",
+  "dependencies": {},
+  "scripts": {
+    "lint": "eslint -f unix .",
+    "inspect": "jsinspect",
+    "prettier": "prettier --list-different \"./**/**.js\"",
+    "pretest": "npm run lint && npm run inspect && npm run prettier",
+    "test": "nyc mocha",
+    "posttest": "nyc check-coverage --statements 90 --branches 90 --functions 90 --lines 90"
+  },
+  "publishConfig": {
+    "registry": "http://registry.npmjs.org"
+  },
+  "author": "Dom Harrington <dom@readme.io>",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:domharrington/readme-metrics.git"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-plugin-import": "^2.11.0",
+    "jsinspect": "^0.12.7",
+    "mocha": "^5.0.0",
+    "nyc": "^11.7.1",
+    "prettier": "^1.12.1"
+  }
+}
