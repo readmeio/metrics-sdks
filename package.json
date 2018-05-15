@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "dependencies": {
     "config": "file:config",
-    "configly": "^4.1.0"
+    "configly": "^4.1.0",
+    "r2": "^2.0.1"
   },
   "scripts": {
     "lint": "eslint -f unix .",

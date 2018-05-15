@@ -11,7 +11,7 @@ const apiKey = 'OUW3RlI4gUCwWGpO10srIo2ufdWmMhMH';
 
 describe('@readme/metrics', () => {
   before(() => {
-    nock.disableNetConnect()
+    nock.disableNetConnect();
     nock.enableNetConnect('127.0.0.1');
   });
   after(() => nock.cleanAll());
@@ -28,11 +28,13 @@ describe('@readme/metrics', () => {
     }, 'You must provide a grouping function');
   });
 
-  it('should send a request to the metrics server', () => {
+  it('should send a request to the metrics server', function test(done) {
+    this.timeout(5000);
+
     const group = '5afa21b97011c63320226ef3';
 
     const mock = nock(config.host)
-      .post('/request', (body) => {
+      .post('/request', body => {
         assert.equal(body.group, group);
         return true;
       })
@@ -45,9 +47,12 @@ describe('@readme/metrics', () => {
       return next();
     });
     app.use(middleware(apiKey, req => req.user.group));
+    app.get('/test', (req, res) => res.sendStatus(200));
 
-    return request(app)
-      .get('/test')
-      .then(() => mock.done());
+    request(app).get('/test').expect(200).end((err) => {
+      if (err) return done(err);
+      mock.done()
+      return done();
+    });
   });
 });
