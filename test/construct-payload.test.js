@@ -6,11 +6,11 @@ const bodyParser = require('body-parser');
 
 const constructPayload = require('../lib/construct-payload');
 
-function createApp(options) {
+function createApp(options, existingPayload = { startedDateTime: new Date() }) {
   const app = express();
   app.use(bodyParser.json());
   app.post('/*', (req, res) => {
-    res.json(constructPayload(req, () => {}, options));
+    res.json(constructPayload(req, () => {}, options, existingPayload));
   });
 
   return app;
@@ -30,10 +30,30 @@ describe('constructPayload()', () => {
       }));
 
   it('#clientIPAddress', () =>
-    request(createApp({ blacklist: ['password'] }))
+    request(createApp())
       .post('/')
-      .send({ password: '123456' })
       .expect(({ body }) => {
         assert.equal(body.clientIPAddress, '::ffff:127.0.0.1');
       }));
+
+  it('#startedDateTime', () => {
+    const startedDateTime = new Date();
+
+    return request(createApp({}, { startedDateTime }))
+      .post('/')
+      .expect(({ body }) => {
+        assert.equal(new Date(body.request.log.entries[0].startedDateTime).toISOString(), startedDateTime.toISOString());
+      })
+    });
+
+  it('#time', () =>{
+    const startedDateTime = new Date();
+
+    return request(createApp({}, { startedDateTime }))
+      .post('/')
+      .expect(({ body }) => {
+        assert.equal(typeof body.request.log.entries[0].time, 'number');
+        assert(body.request.log.entries[0].time > 0);
+      });
+    });
 });

@@ -10,10 +10,12 @@ module.exports = (apiKey, group, options) => {
   const encoded = Buffer.from(`${apiKey}:`).toString('base64');
 
   return (req, res, next) => {
+    const startedDateTime = new Date();
+
     function send() {
       request.post(`${config.host}/request`, {
         headers: { authorization: `Basic ${encoded}` },
-        json: constructPayload(req, group, options),
+        json: constructPayload(req, group, options, { startedDateTime }),
       });
       cleanup(); // eslint-disable-line no-use-before-define
     }

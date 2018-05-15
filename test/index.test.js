@@ -36,6 +36,7 @@ describe('@readme/metrics', () => {
     const mock = nock(config.host)
       .post('/request', body => {
         assert.equal(body.group, group);
+        assert.equal(typeof body.request.log.entries[0].startedDateTime, 'string');
         return true;
       })
       .basicAuth({ user: apiKey })
