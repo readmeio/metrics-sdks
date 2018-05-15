@@ -14,6 +14,13 @@ npm install @readme/metrics
 
 ## Usage
 
+### Limitations
+- Currently only supports JSON. Adding a whitelist/blacklist for non-json bodies will not work (unless they're added to `req.body`)
+the same way that `body-parser` does it. The properties will be converted to JSON in the har format.
+- Needs more support for getting URL when behind a reverse proxy: x-forwarded-for, x-forwarded-proto etc
+- Needs more support for getting client ip address when behind a reverse proxy
+- Logs are "fire and forget" to the metrics server, so any failed requests (even for incorrect API key!) will currently fail
+
 ## Credits
 [Dom Harrington](https://github.com/domharrington/)
 
