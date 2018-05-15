@@ -13,7 +13,7 @@ module.exports = (apiKey, group) => {
         headers: { authorization: `Basic ${encoded}` },
         json: { group: group(req) },
       });
-      cleanup();
+      cleanup(); // eslint-disable-line no-use-before-define
     }
 
     function cleanup() {

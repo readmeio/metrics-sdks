@@ -49,8 +49,10 @@ describe('@readme/metrics', () => {
     app.use(middleware(apiKey, req => req.user.group));
     app.get('/test', (req, res) => res.sendStatus(200));
 
-    await request(app).get('/test').expect(200);
+    await request(app)
+      .get('/test')
+      .expect(200);
 
-    mock.done()
+    mock.done();
   });
 });
