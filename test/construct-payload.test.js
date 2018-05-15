@@ -23,7 +23,10 @@ describe('constructPayload()', () => {
       .send({ password: '123456' })
       .expect(({ body }) => {
         assert.equal(typeof body.request.log.entries[0].request, 'object');
-        assert(!body.request.log.entries[0].request.postData.text.match('password'), 'Should pass through options');
+        assert(
+          !body.request.log.entries[0].request.postData.text.match('password'),
+          'Should pass through options',
+        );
       }));
 
   it('#clientIPAddress', () =>
