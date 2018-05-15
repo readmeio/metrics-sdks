@@ -1,7 +1,9 @@
 const request = require('r2');
 const config = require('config');
 
-module.exports = (apiKey, group) => {
+const processRequest = require('./lib/process-request');
+
+module.exports = (apiKey, group, options) => {
   if (!apiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a grouping function');
 
@@ -11,7 +13,19 @@ module.exports = (apiKey, group) => {
     function send() {
       request.post(`${config.host}/request`, {
         headers: { authorization: `Basic ${encoded}` },
-        json: { group: group(req) },
+        json: {
+          group: group(req),
+          clientIPAddress: req.ip,
+          request: {
+            log: {
+              entries: [
+                {
+                  request: processRequest(req, options)
+                }
+              ],
+            },
+          },
+        },
       });
       cleanup(); // eslint-disable-line no-use-before-define
     }

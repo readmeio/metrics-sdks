@@ -4,6 +4,7 @@ const request = require('supertest');
 const assert = require('assert');
 const nock = require('nock');
 const config = require('config');
+const bodyParser = require('body-parser');
 
 const middleware = require('../');
 
@@ -36,6 +37,7 @@ describe('@readme/metrics', () => {
     const mock = nock(config.host)
       .post('/request', body => {
         assert.equal(body.group, group);
+        assert.equal(body.clientIPAddress, '::ffff:127.0.0.1');
         return true;
       })
       .basicAuth({ user: apiKey })
@@ -51,6 +53,29 @@ describe('@readme/metrics', () => {
 
     await request(app)
       .get('/test')
+      .expect(200);
+
+    mock.done();
+  });
+
+  it('should construct a har file from the request', async function test() {
+    this.timeout(5000);
+
+    const mock = nock(config.host)
+      .post('/request', body => {
+        assert.equal(typeof body.request.log.entries[0].request, 'object');
+        assert(!body.request.log.entries[0].request.postData.text.match('password'), 'Should pass through options');
+        return true;
+      }).reply(200);
+
+    const app = express();
+    app.use(bodyParser.json())
+    app.use(middleware(apiKey, () => {}, { blacklist: ['password'] }));
+    app.post('/test', (req, res) => res.sendStatus(200));
+
+    await request(app)
+      .post('/test')
+      .send({ password: '123456' })
       .expect(200);
 
     mock.done();
