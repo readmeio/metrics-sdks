@@ -28,7 +28,7 @@ describe('@readme/metrics', () => {
     }, 'You must provide a grouping function');
   });
 
-  it('should send a request to the metrics server', function test(done) {
+  it('should send a request to the metrics server', async function test() {
     this.timeout(5000);
 
     const group = '5afa21b97011c63320226ef3';
@@ -49,10 +49,8 @@ describe('@readme/metrics', () => {
     app.use(middleware(apiKey, req => req.user.group));
     app.get('/test', (req, res) => res.sendStatus(200));
 
-    request(app).get('/test').expect(200).end((err) => {
-      if (err) return done(err);
-      mock.done()
-      return done();
-    });
+    await request(app).get('/test').expect(200);
+
+    mock.done()
   });
 });
