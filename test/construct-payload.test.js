@@ -17,8 +17,9 @@ function createApp(options, existingPayload = { startedDateTime: new Date() }) {
 }
 
 describe('constructPayload()', () => {
-  it('should construct a har file from the request/response', () =>
-    request(createApp({ blacklist: ['password'] }))
+  it('should construct a har file from the request/response', function test() {
+    this.timeout(8000);
+    return request(createApp({ blacklist: ['password'] }))
       .post('/')
       .send({ password: '123456' })
       .expect(({ body }) => {
@@ -28,7 +29,8 @@ describe('constructPayload()', () => {
           !body.request.log.entries[0].request.postData.text.match('password'),
           'Should pass through options',
         );
-      }));
+      });
+  });
 
   it('#clientIPAddress', () =>
     request(createApp())
