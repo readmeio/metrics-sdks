@@ -3,6 +3,7 @@ const express = require('express');
 const request = require('supertest');
 const assert = require('assert');
 const bodyParser = require('body-parser');
+const packageJson = require('../package.json');
 
 const constructPayload = require('../lib/construct-payload');
 
@@ -31,6 +32,17 @@ describe('constructPayload()', () => {
         );
       });
   });
+
+  it('#creator', () =>
+    request(createApp())
+      .post('/')
+      .expect(({ body }) => {
+        assert.deepEqual(body.request.log.creator, {
+          name: packageJson.name,
+          version: packageJson.version,
+          comment: `${process.platform}/${process.version}`
+        });
+      }));
 
   it('#clientIPAddress', () =>
     request(createApp())
