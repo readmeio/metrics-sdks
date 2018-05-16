@@ -10,19 +10,20 @@ function createApp(options, existingPayload = { startedDateTime: new Date() }) {
   const app = express();
   app.use(bodyParser.json());
   app.post('/*', (req, res) => {
-    res.json(constructPayload(req, () => {}, options, existingPayload));
+    res.json(constructPayload(req, res, () => {}, options, existingPayload));
   });
 
   return app;
 }
 
 describe('constructPayload()', () => {
-  it('should construct a har file from the request', () =>
+  it('should construct a har file from the request/response', () =>
     request(createApp({ blacklist: ['password'] }))
       .post('/')
       .send({ password: '123456' })
       .expect(({ body }) => {
         assert.equal(typeof body.request.log.entries[0].request, 'object');
+        assert.equal(typeof body.request.log.entries[0].response, 'object');
         assert(
           !body.request.log.entries[0].request.postData.text.match('password'),
           'Should pass through options',
@@ -42,11 +43,14 @@ describe('constructPayload()', () => {
     return request(createApp({}, { startedDateTime }))
       .post('/')
       .expect(({ body }) => {
-        assert.equal(new Date(body.request.log.entries[0].startedDateTime).toISOString(), startedDateTime.toISOString());
-      })
-    });
+        assert.equal(
+          new Date(body.request.log.entries[0].startedDateTime).toISOString(),
+          startedDateTime.toISOString(),
+        );
+      });
+  });
 
-  it('#time', () =>{
+  it('#time', () => {
     const startedDateTime = new Date();
 
     return request(createApp({}, { startedDateTime }))
@@ -55,5 +59,5 @@ describe('constructPayload()', () => {
         assert.equal(typeof body.request.log.entries[0].time, 'number');
         assert(body.request.log.entries[0].time > 0);
       });
-    });
+  });
 });
