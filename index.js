@@ -15,7 +15,7 @@ module.exports = (apiKey, group, options) => {
     function send() {
       request.post(`${config.host}/request`, {
         headers: { authorization: `Basic ${encoded}` },
-        json: constructPayload(req, res, group, options, { startedDateTime }),
+        json: [constructPayload(req, res, group, options, { startedDateTime })],
       });
       cleanup(); // eslint-disable-line no-use-before-define
     }

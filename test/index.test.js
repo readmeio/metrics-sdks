@@ -34,7 +34,7 @@ describe('@readme/metrics', () => {
     const group = '5afa21b97011c63320226ef3';
 
     const mock = nock(config.host)
-      .post('/request', body => {
+      .post('/request', ([body]) => {
         assert.equal(body.group, group);
         assert.equal(typeof body.request.log.entries[0].startedDateTime, 'string');
         return true;
