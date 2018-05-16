@@ -15,46 +15,55 @@ function testResponse(assertion, response) {
     res.json(response);
   });
 
-  request(app).post('/').expect(200).end();
+  request(app)
+    .post('/')
+    .expect(200)
+    .end();
 }
 
 describe('processResponse()', () => {
   describe.skip('options', () => {
-    it('should strip blacklisted properties', (done) => {
-      testResponse((res) => {
-        assert.deepEqual(
-          processResponse(res, { blacklist: ['password', 'apiKey'] }).content.text,
-          JSON.stringify({ another: 'Hello world' }),
-        );
-        return done();
-      }, { password: '123456', apiKey: 'abcdef', another: 'Hello world' });
+    it('should strip blacklisted properties', done => {
+      testResponse(
+        res => {
+          assert.deepEqual(
+            processResponse(res, { blacklist: ['password', 'apiKey'] }).content.text,
+            JSON.stringify({ another: 'Hello world' }),
+          );
+          return done();
+        },
+        { password: '123456', apiKey: 'abcdef', another: 'Hello world' },
+      );
     });
 
-    it('should only send whitelisted properties', (done) => {
-      testResponse((res) => {
-        assert.deepEqual(
-          processResponse(res, { whitelist: ['password', 'apiKey'] }).content.text,
-          JSON.stringify({ password: '123456', apiKey: 'abcdef' }),
-        );
-        return done();
-      }, { password: '123456', apiKey: 'abcdef', another: 'Hello world' });
+    it('should only send whitelisted properties', done => {
+      testResponse(
+        res => {
+          assert.deepEqual(
+            processResponse(res, { whitelist: ['password', 'apiKey'] }).content.text,
+            JSON.stringify({ password: '123456', apiKey: 'abcdef' }),
+          );
+          return done();
+        },
+        { password: '123456', apiKey: 'abcdef', another: 'Hello world' },
+      );
     });
   });
 
-  it('#status', (done) =>
-    testResponse((res) => {
+  it('#status', done =>
+    testResponse(res => {
       assert.equal(processResponse(res).status, 200);
       return done();
     }));
 
-  it('#statusText', (done) =>
-    testResponse((res) => {
+  it('#statusText', done =>
+    testResponse(res => {
       assert.equal(processResponse(res).statusText, 'OK');
       return done();
     }));
 
-  it('#headers', (done) => {
-    testResponse((res) => {
+  it('#headers', done => {
+    testResponse(res => {
       assert.deepEqual(processResponse(res).headers.filter(header => header.name !== 'date'), [
         { name: 'x-powered-by', value: 'Express' },
         {
@@ -67,26 +76,23 @@ describe('processResponse()', () => {
   });
 
   describe('#content', () => {
-    it('#size', (done) => {
+    it('#size', done => {
       const body = { a: 1, b: 2, c: 3 };
-      testResponse((res) => {
+      testResponse(res => {
         assert.deepEqual(processResponse(res).content.size, JSON.stringify(body).length);
         return done();
       }, body);
     });
 
-    it('#mimeType', (done) =>
-      testResponse((res) => {
-        assert.deepEqual(
-          processResponse(res).content.mimeType,
-          'application/json; charset=utf-8',
-        );
+    it('#mimeType', done =>
+      testResponse(res => {
+        assert.deepEqual(processResponse(res).content.mimeType, 'application/json; charset=utf-8');
         return done();
       }));
 
-    it.skip('#text', (done) => {
+    it.skip('#text', done => {
       const body = { a: 1, b: 2, c: 3 };
-      testResponse((res) => {
+      testResponse(res => {
         assert.deepEqual(processResponse(res).content.text, JSON.stringify(body));
         return done();
       }, body);

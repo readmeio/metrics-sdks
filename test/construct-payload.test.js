@@ -40,7 +40,7 @@ describe('constructPayload()', () => {
         assert.deepEqual(body.request.log.creator, {
           name: packageJson.name,
           version: packageJson.version,
-          comment: `${process.platform}/${process.version}`
+          comment: `${process.platform}/${process.version}`,
         });
       }));
 
