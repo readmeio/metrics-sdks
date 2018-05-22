@@ -12,6 +12,10 @@ function testResponse(assertion, response) {
   app.post('/*', (req, res) => {
     res.once('finish', assertion.bind(null, res));
 
+    // This is done in the main middleware by
+    // overwriting res.write/end
+    res._body = JSON.stringify(response); // eslint-disable-line no-underscore-dangle
+
     res.json(response);
   });
 
@@ -22,7 +26,7 @@ function testResponse(assertion, response) {
 }
 
 describe('processResponse()', () => {
-  describe.skip('options', () => {
+  describe('options', () => {
     it('should strip blacklisted properties', done => {
       testResponse(
         res => {
@@ -90,7 +94,7 @@ describe('processResponse()', () => {
         return done();
       }));
 
-    it.skip('#text', done => {
+    it('#text', done => {
       const body = { a: 1, b: 2, c: 3 };
       testResponse(res => {
         assert.deepEqual(processResponse(res).content.text, JSON.stringify(body));

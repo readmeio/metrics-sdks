@@ -43,11 +43,7 @@ describe('@readme/metrics', () => {
       .reply(200);
 
     const app = express();
-    app.use((req, res, next) => {
-      req.user = { group };
-      return next();
-    });
-    app.use(middleware(apiKey, req => req.user.group));
+    app.use(middleware(apiKey, () => group));
     app.get('/test', (req, res) => res.sendStatus(200));
 
     await request(app)
@@ -55,5 +51,71 @@ describe('@readme/metrics', () => {
       .expect(200);
 
     mock.done();
+  });
+
+  describe('`res._body`', () => {
+    const responseBody = { a: 1, b: 2, c: 3 };
+    function createMock() {
+      return nock(config.host)
+        .post('/request', ([body]) => {
+          assert.equal(
+            body.request.log.entries[0].response.content.text,
+            JSON.stringify(responseBody),
+          );
+          return true;
+        })
+        .basicAuth({ user: apiKey })
+        .reply(200);
+    }
+
+    it('should buffer up res.write() calls', async function test() {
+      this.timeout(5000);
+
+      const mock = createMock();
+      const app = express();
+      app.use(middleware(apiKey, () => '123'));
+      app.get('/test', (req, res) => {
+        res.write('{"a":1,');
+        res.write('"b":2,');
+        res.write('"c":3}');
+        res.status(200).end();
+      });
+
+      await request(app)
+        .get('/test')
+        .expect(200);
+
+      mock.done();
+    });
+
+    it('should buffer up res.end() calls', async function test() {
+      this.timeout(5000);
+
+      const mock = createMock();
+      const app = express();
+      app.use(middleware(apiKey, () => '123'));
+      app.get('/test', (req, res) => res.end(JSON.stringify(responseBody)));
+
+      await request(app)
+        .get('/test')
+        .expect(200);
+
+      mock.done();
+    });
+
+    it('should work for res.send() calls', async function test() {
+      this.timeout(5000);
+
+      const mock = createMock();
+      const app = express();
+      app.use(middleware(apiKey, () => '123'));
+      app.get('/test', (req, res) => res.send(responseBody));
+
+      await request(app)
+        .get('/test')
+        .expect(200);
+
+      mock.done();
+    });
   });
 });
