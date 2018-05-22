@@ -45,12 +45,14 @@ module.exports = (apiKey, group, options = {}) => {
       // this is fine for now
       queue.push(constructPayload(req, res, group, options, { startedDateTime }));
       if (queue.length >= bufferLength) {
-        request.post(`${config.host}/request`, {
-          headers: { authorization: `Basic ${encoded}` },
-          json: queue,
-        }).response.then(() => {
-          queue = [];
-        });
+        request
+          .post(`${config.host}/request`, {
+            headers: { authorization: `Basic ${encoded}` },
+            json: queue,
+          })
+          .response.then(() => {
+            queue = [];
+          });
       }
 
       cleanup(); // eslint-disable-line no-use-before-define

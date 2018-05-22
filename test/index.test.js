@@ -54,13 +54,13 @@ describe('@readme/metrics', () => {
   });
 
   describe('#bufferLength', () => {
-    it('should send requests when number hits `bufferLength` size',  async function test() {
+    it('should send requests when number hits `bufferLength` size', async function test() {
       this.timeout(5000);
 
       const group = '5afa21b97011c63320226ef3';
 
       const mock = nock(config.host)
-        .post('/request', (body) => {
+        .post('/request', body => {
           assert.equal(body.length, 3);
           return true;
         })
