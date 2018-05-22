@@ -101,7 +101,6 @@ describe('@readme/metrics', () => {
           );
           return true;
         })
-        .basicAuth({ user: apiKey })
         .reply(200);
     }
 
