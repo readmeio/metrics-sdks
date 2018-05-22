@@ -51,6 +51,13 @@ describe('constructPayload()', () => {
         assert.equal(body.clientIPAddress, '::ffff:127.0.0.1');
       }));
 
+  it('#pageref should be `req.route.path`', () =>
+    request(createApp({}))
+      .post('/')
+      .expect(({ body }) => {
+        assert.equal(body.request.log.entries[0].pageref, '/*');
+      }));
+
   it('#startedDateTime', () => {
     const startedDateTime = new Date();
 
