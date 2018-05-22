@@ -53,6 +53,43 @@ describe('@readme/metrics', () => {
     mock.done();
   });
 
+  describe('#bufferLength', () => {
+    it('should send requests when number hits `bufferLength` size',  async function test() {
+      this.timeout(5000);
+
+      const group = '5afa21b97011c63320226ef3';
+
+      const mock = nock(config.host)
+        .post('/request', (body) => {
+          assert.equal(body.length, 3);
+          return true;
+        })
+        .reply(200);
+
+      const app = express();
+      app.use(middleware(apiKey, () => group, { bufferLength: 3 }));
+      app.get('/test', (req, res) => res.sendStatus(200));
+
+      await request(app)
+        .get('/test')
+        .expect(200);
+
+      assert.equal(mock.isDone(), false);
+
+      await request(app)
+        .get('/test')
+        .expect(200);
+
+      assert.equal(mock.isDone(), false);
+
+      await request(app)
+        .get('/test')
+        .expect(200);
+
+      mock.done();
+    });
+  });
+
   describe('`res._body`', () => {
     const responseBody = { a: 1, b: 2, c: 3 };
     function createMock() {

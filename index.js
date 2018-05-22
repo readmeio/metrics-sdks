@@ -27,21 +27,32 @@ function patchResponse(res) {
   };
 }
 
-module.exports = (apiKey, group, options) => {
+module.exports = (apiKey, group, options = {}) => {
   if (!apiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a grouping function');
 
+  const bufferLength = options.bufferLength || config.bufferLength;
   const encoded = Buffer.from(`${apiKey}:`).toString('base64');
+  let queue = [];
 
   return (req, res, next) => {
     const startedDateTime = new Date();
     patchResponse(res);
 
     function send() {
-      request.post(`${config.host}/request`, {
-        headers: { authorization: `Basic ${encoded}` },
-        json: [constructPayload(req, res, group, options, { startedDateTime })],
-      });
+      // This should in future become more sophisticated,
+      // with flush timeouts and more error checking but
+      // this is fine for now
+      queue.push(constructPayload(req, res, group, options, { startedDateTime }));
+      if (queue.length >= bufferLength) {
+        request.post(`${config.host}/request`, {
+          headers: { authorization: `Basic ${encoded}` },
+          json: queue,
+        }).response.then(() => {
+          queue = [];
+        });
+      }
+
       cleanup(); // eslint-disable-line no-use-before-define
     }
 

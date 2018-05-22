@@ -1,3 +1,4 @@
 {
-  "host": "https://metrics.readme.io"
+  "host": "http://localhost:3003",
+  "bufferLength": 10
 }
