@@ -19,13 +19,13 @@ describe('@readme/metrics', () => {
   it('should error if missing apiKey', () => {
     assert.throws(() => {
       middleware();
-    }, 'You must provide your ReadMe API key');
+    }, /You must provide your ReadMe API key/);
   });
 
   it('should error if missing grouping function', () => {
     assert.throws(() => {
       middleware('api-key');
-    }, 'You must provide a grouping function');
+    }, /You must provide a grouping function/);
   });
 
   it('should send a request to the metrics server', async function test() {
