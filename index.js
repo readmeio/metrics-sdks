@@ -1,5 +1,5 @@
 const request = require('r2');
-const config = require('config');
+const config = require('./config');
 
 const constructPayload = require('./lib/construct-payload');
 
