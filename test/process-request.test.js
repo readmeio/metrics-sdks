@@ -36,10 +36,10 @@ describe('processRequest()', () => {
         .post('/')
         .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
         .expect(({ body }) => {
-          assert.deepEqual(
-            body.postData.params,
-            [{ name: 'password', value: '123456' }, { name: 'apiKey', value: 'abcdef' }]
-          );
+          assert.deepEqual(body.postData.params, [
+            { name: 'password', value: '123456' },
+            { name: 'apiKey', value: 'abcdef' },
+          ]);
         });
     });
   });
@@ -95,7 +95,12 @@ describe('processRequest()', () => {
       return request(createApp())
         .post('/')
         .send(body)
-        .expect(res => assert.deepEqual(res.body.postData.params, [{ name: 'a', value: 1 }, { name: 'b', value: 2 }]));
+        .expect(res =>
+          assert.deepEqual(res.body.postData.params, [
+            { name: 'a', value: 1 },
+            { name: 'b', value: 2 },
+          ]),
+        );
     });
   });
 });

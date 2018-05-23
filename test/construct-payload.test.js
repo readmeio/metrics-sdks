@@ -27,7 +27,9 @@ describe('constructPayload()', () => {
         assert.equal(typeof body.request.log.entries[0].request, 'object');
         assert.equal(typeof body.request.log.entries[0].response, 'object');
         assert(
-          !body.request.log.entries[0].request.postData.params.find(param => param.name === 'password'),
+          !body.request.log.entries[0].request.postData.params.find(
+            param => param.name === 'password',
+          ),
           'Should pass through options',
         );
       });
