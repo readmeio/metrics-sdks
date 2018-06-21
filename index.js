@@ -1,7 +1,10 @@
 const request = require('r2');
+const uuid = require('node-uuid');
+const jwt = require('jsonwebtoken');
 const config = require('./config');
 
 const constructPayload = require('./lib/construct-payload');
+const getReadmeData = require('./lib/get-readme-data');
 
 // We're doing this to buffer up the response body
 // so we can send it off to the metrics server
@@ -27,7 +30,7 @@ function patchResponse(res) {
   };
 }
 
-module.exports = (apiKey, group, options = {}) => {
+module.exports.metrics = (apiKey, group, options = {}) => {
   if (!apiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a grouping function');
 
@@ -71,4 +74,44 @@ module.exports = (apiKey, group, options = {}) => {
 
     return next();
   };
+};
+
+module.exports.login = (apiKey, userFnc, options = {}) => {
+  if (!apiKey) throw new Error('You must provide your ReadMe API key');
+  if (!userFnc) throw new Error('You must provide a function to get the user');
+  return async (req, res) => {
+    let u;
+    try {
+      u = userFnc(req);
+    } catch (e) {
+      // User isn't logged in
+    }
+
+    if (!u) {
+      const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+      return res.redirect(`${options.loginUrl}?redirect=${encodeURIComponent(fullUrl)}`);
+    }
+
+    const jwtUrl = await module.exports.magicLink(apiKey, u, req.query.redirect);
+    return res.redirect(jwtUrl);
+  };
+};
+
+module.exports.magicLink = async (apiKey, user, redirectPath = '') => {
+  if (!apiKey) throw new Error('You must provide your ReadMe API key');
+  if (!user) throw new Error('You must provide a user object');
+
+  const readmeData = await getReadmeData(apiKey);
+  let baseUrl = redirectPath;
+
+  if (!redirectPath.startsWith('http')) {
+    baseUrl = `${readmeData.baseUrl}${redirectPath}`;
+  }
+
+  const jwtOptions = {
+    jwtid: uuid.v4(),
+  };
+
+  const token = jwt.sign(user, readmeData.jwtSecret, jwtOptions);
+  return `${baseUrl}?auth_token=${token}`;
 };

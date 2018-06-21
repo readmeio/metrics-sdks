@@ -57,7 +57,7 @@ describe('constructPayload()', () => {
     request(createApp({}))
       .post('/')
       .expect(({ body }) => {
-        assert.equal(body.request.log.entries[0].pageref, '/*');
+        assert(body.request.log.entries[0].pageref.endsWith('/*'));
       }));
 
   it('#startedDateTime', () => {
