@@ -194,12 +194,12 @@ describe('#metrics', () => {
     it('should redirect to readme if user', () => {
       const app = express();
       nock(config.readmeUrl)
-        .get('/api/v1/jwt-secret')
+        .get('/api/v1/')
         .basicAuth({
           user: apiKey,
           pass: '',
         })
-        .reply(200, { jwtSecret: 'jwt', redirect: 'http://readme.readme.io' });
+        .reply(200, { jwtSecret: 'jwt', baseUrl: 'http://readme.readme.io' });
 
       app.get(
         '/readme',
@@ -244,7 +244,7 @@ describe('#metrics', () => {
 
     it('should prepend base url if redirect is path', async () => {
       nock(config.readmeUrl)
-        .get('/api/v1/jwt-secret')
+        .get('/api/v1/')
         .basicAuth({
           user: apiKey,
           pass: '',
@@ -254,22 +254,22 @@ describe('#metrics', () => {
       const jwtLink = await middleware.magicLink(apiKey, { user: 'marc' }, '/docs');
       assert(jwtLink.startsWith('http://readme.readme.io/docs'));
     });
-  });
 
-  it('should not prepend base url if redirect is full url', async () => {
-    nock(config.readmeUrl)
-      .get('/api/v1/jwt-secret')
-      .basicAuth({
-        user: apiKey,
-        pass: '',
-      })
-      .reply(200, { jwtSecret: 'jwt', baseUrl: 'http://readme.readme.io' });
+    it('should not prepend base url if redirect is full url', async () => {
+      nock(config.readmeUrl)
+        .get('/api/v1/')
+        .basicAuth({
+          user: apiKey,
+          pass: '',
+        })
+        .reply(200, { jwtSecret: 'jwt', baseUrl: 'http://readme.readme.io' });
 
-    const jwtLink = await middleware.magicLink(
-      apiKey,
-      { user: 'marc' },
-      'http://docs.readme.io/docs',
-    );
-    assert(jwtLink.startsWith('http://docs.readme.io/docs'));
+      const jwtLink = await middleware.magicLink(
+        apiKey,
+        { user: 'marc' },
+        'http://docs.readme.io/docs',
+      );
+      assert(jwtLink.startsWith('http://docs.readme.io/docs'));
+    });
   });
 });

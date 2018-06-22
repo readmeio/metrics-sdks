@@ -76,13 +76,13 @@ module.exports.metrics = (apiKey, group, options = {}) => {
   };
 };
 
-module.exports.login = (apiKey, userFnc, options = {}) => {
+module.exports.login = (apiKey, getUser, options = {}) => {
   if (!apiKey) throw new Error('You must provide your ReadMe API key');
-  if (!userFnc) throw new Error('You must provide a function to get the user');
+  if (!getUser) throw new Error('You must provide a function to get the user');
   return async (req, res) => {
     let u;
     try {
-      u = userFnc(req);
+      u = getUser(req);
     } catch (e) {
       // User isn't logged in
     }

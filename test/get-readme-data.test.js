@@ -11,11 +11,9 @@ describe('#get-readme-data', () => {
   });
   after(() => nock.cleanAll());
 
-  beforeEach(() => getReadmeData.cache.reset());
-
   beforeEach(() => {
     nock(config.readmeUrl)
-      .get('/api/v1/jwt-secret')
+      .get('/api/v1/')
       .basicAuth({
         user: 'readme_api',
         pass: '',
@@ -34,9 +32,17 @@ describe('#get-readme-data', () => {
     await getReadmeData('readme_api');
     const data = await getReadmeData('readme_api');
     assert.deepEqual(data, { jwtSecret: 'jwt', baseUrl: 'redirect' });
-    assert.deepEqual(getReadmeData.cache.get('readme_api'), {
+    assert.deepEqual(getReadmeData.cachedReadmeData.readme_api, {
       jwtSecret: 'jwt',
       baseUrl: 'redirect',
     });
+  });
+
+  it('should error if invalid api key', async () => {
+    try {
+      await getReadmeData('invalid');
+    } catch (e) {
+      assert.equal(e.message, 'Invalid API Key');
+    }
   });
 });
