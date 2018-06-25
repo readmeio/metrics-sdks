@@ -1,5 +1,5 @@
 {
-  "name": "@readme/metrics",
+  "name": "readmeio",
   "description": "Track your API metrics within ReadMe",
   "version": "0.0.0",
   "dependencies": {
