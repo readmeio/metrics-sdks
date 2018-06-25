@@ -9,7 +9,7 @@ const middleware = require('../');
 
 const apiKey = 'OUW3RlI4gUCwWGpO10srIo2ufdWmMhMH';
 
-describe('@readme/metrics', () => {
+describe('#metrics', () => {
   before(() => {
     nock.disableNetConnect();
     nock.enableNetConnect('127.0.0.1');
@@ -18,13 +18,13 @@ describe('@readme/metrics', () => {
 
   it('should error if missing apiKey', () => {
     assert.throws(() => {
-      middleware();
+      middleware.metrics();
     }, /You must provide your ReadMe API key/);
   });
 
   it('should error if missing grouping function', () => {
     assert.throws(() => {
-      middleware('api-key');
+      middleware.metrics('api-key');
     }, /You must provide a grouping function/);
   });
 
@@ -43,7 +43,7 @@ describe('@readme/metrics', () => {
       .reply(200);
 
     const app = express();
-    app.use(middleware(apiKey, () => group));
+    app.use(middleware.metrics(apiKey, () => group));
     app.get('/test', (req, res) => res.sendStatus(200));
 
     await request(app)
@@ -67,7 +67,7 @@ describe('@readme/metrics', () => {
         .reply(200);
 
       const app = express();
-      app.use(middleware(apiKey, () => group, { bufferLength: 3 }));
+      app.use(middleware.metrics(apiKey, () => group, { bufferLength: 3 }));
       app.get('/test', (req, res) => res.sendStatus(200));
 
       await request(app)
@@ -109,7 +109,7 @@ describe('@readme/metrics', () => {
 
       const mock = createMock();
       const app = express();
-      app.use(middleware(apiKey, () => '123'));
+      app.use(middleware.metrics(apiKey, () => '123'));
       app.get('/test', (req, res) => {
         res.write('{"a":1,');
         res.write('"b":2,');
@@ -129,7 +129,7 @@ describe('@readme/metrics', () => {
 
       const mock = createMock();
       const app = express();
-      app.use(middleware(apiKey, () => '123'));
+      app.use(middleware.metrics(apiKey, () => '123'));
       app.get('/test', (req, res) => res.end(JSON.stringify(responseBody)));
 
       await request(app)
@@ -144,7 +144,7 @@ describe('@readme/metrics', () => {
 
       const mock = createMock();
       const app = express();
-      app.use(middleware(apiKey, () => '123'));
+      app.use(middleware.metrics(apiKey, () => '123'));
       app.get('/test', (req, res) => res.send(responseBody));
 
       await request(app)
@@ -152,6 +152,68 @@ describe('@readme/metrics', () => {
         .expect(200);
 
       mock.done();
+    });
+  });
+
+  describe('#login', () => {
+    before(() => {
+      nock.disableNetConnect();
+      nock.enableNetConnect('127.0.0.1');
+    });
+    after(() => nock.cleanAll());
+
+    it('should error if missing apiKey', () => {
+      assert.throws(() => {
+        middleware.login();
+      }, /You must provide your ReadMe API key/);
+    });
+
+    it('should error if missing user function', () => {
+      assert.throws(() => {
+        middleware.login(apiKey);
+      }, /You must provide a function to get the user/);
+    });
+
+    it('should redirect if no user', () => {
+      const app = express();
+      app.get(
+        '/readme',
+        middleware.login(apiKey, () => false, {
+          loginUrl: '/login',
+        }),
+      );
+
+      return request(app)
+        .get('/readme')
+        .expect(302)
+        .expect(res => {
+          assert(res.header.location.startsWith('/login?redirect='));
+        });
+    });
+
+    it('should redirect to readme if user', () => {
+      const app = express();
+      nock(config.readmeUrl)
+        .get('/api/v1/')
+        .basicAuth({
+          user: apiKey,
+          pass: '',
+        })
+        .reply(200, { jwtSecret: 'jwt', baseUrl: 'http://readme.readme.io' });
+
+      app.get(
+        '/readme',
+        middleware.login(apiKey, () => ({ name: 'marc' }), {
+          loginUrl: '/login',
+        }),
+      );
+
+      return request(app)
+        .get('/readme')
+        .expect(302)
+        .expect(res => {
+          assert(res.header.location.startsWith('http://readme.readme.io?auth_token='));
+        });
     });
   });
 });

@@ -2,6 +2,8 @@ const request = require('r2');
 const config = require('./config');
 
 const constructPayload = require('./lib/construct-payload');
+const createJWTLink = require('./lib/create-jwt-link');
+const getReadmeData = require('./lib/get-readme-data');
 
 // We're doing this to buffer up the response body
 // so we can send it off to the metrics server
@@ -27,7 +29,7 @@ function patchResponse(res) {
   };
 }
 
-module.exports = (apiKey, group, options = {}) => {
+module.exports.metrics = (apiKey, group, options = {}) => {
   if (!apiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a grouping function');
 
@@ -70,5 +72,34 @@ module.exports = (apiKey, group, options = {}) => {
     res.once('close', cleanup);
 
     return next();
+  };
+};
+
+module.exports.login = (apiKey, getUser, options = {}) => {
+  if (!apiKey) throw new Error('You must provide your ReadMe API key');
+  if (!getUser) throw new Error('You must provide a function to get the user');
+
+  // Make sure api key is valid
+  getReadmeData(apiKey);
+
+  return async (req, res, next) => {
+    let u;
+    try {
+      u = getUser(req);
+    } catch (e) {
+      // User isn't logged in
+    }
+
+    if (!u) {
+      const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+      return res.redirect(`${options.loginUrl}?redirect=${encodeURIComponent(fullUrl)}`);
+    }
+
+    try {
+      const jwtUrl = await createJWTLink(apiKey, u, req.query.redirect);
+      return res.redirect(jwtUrl);
+    } catch (e) {
+      return next(e);
+    }
   };
 };

@@ -1,4 +1,5 @@
 {
   "host": "https://metrics.readme.io",
+  "readmeUrl": "https://dash.readme.io",
   "bufferLength": 10
 }

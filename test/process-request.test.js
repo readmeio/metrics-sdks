@@ -56,6 +56,13 @@ describe('processRequest()', () => {
       // This regex is for supertest's random port numbers
       .expect(({ body }) => assert(body.url.match(/http:\/\/127.0.0.1:\d+\/path\?a=b/))));
 
+  it('#url with x-forwarded-host', () =>
+    request(createApp())
+      .post('/path')
+      .set({ 'x-forwarded-host': 'dash.readme.io' })
+      // This regex is for supertest's random port numbers
+      .expect(({ body }) => assert(body.url.match('http://dash.readme.io/path'))));
+
   it('#httpVersion', () =>
     request(createApp())
       .post('/')
