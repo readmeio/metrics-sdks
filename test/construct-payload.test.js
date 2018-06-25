@@ -57,7 +57,7 @@ describe('constructPayload()', () => {
     request(createApp({}))
       .post('/')
       .expect(({ body }) => {
-        assert(body.request.log.entries[0].pageref.endsWith('/*'));
+        assert(body.request.log.entries[0].pageref.match(/http:\/\/127.0.0.1:\d+\/\*/));
       }));
 
   it('#startedDateTime', () => {
