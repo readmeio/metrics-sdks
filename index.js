@@ -82,7 +82,7 @@ module.exports.login = (apiKey, getUser, options = {}) => {
   // Make sure api key is valid
   getReadmeData(apiKey);
 
-  return async (req, res) => {
+  return async (req, res, next) => {
     let u;
     try {
       u = getUser(req);
@@ -95,7 +95,11 @@ module.exports.login = (apiKey, getUser, options = {}) => {
       return res.redirect(`${options.loginUrl}?redirect=${encodeURIComponent(fullUrl)}`);
     }
 
-    const jwtUrl = await createJWTLink(apiKey, u, req.query.redirect);
-    return res.redirect(jwtUrl);
+    try {
+      const jwtUrl = await createJWTLink(apiKey, u, req.query.redirect);
+      return res.redirect(jwtUrl);
+    } catch (e) {
+      return next(e);
+    }
   };
 };
