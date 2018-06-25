@@ -3,6 +3,7 @@ const config = require('./config');
 
 const constructPayload = require('./lib/construct-payload');
 const createJWTLink = require('./lib/create-jwt-link');
+const getReadmeData = require('./lib/get-readme-data');
 
 // We're doing this to buffer up the response body
 // so we can send it off to the metrics server
@@ -77,6 +78,10 @@ module.exports.metrics = (apiKey, group, options = {}) => {
 module.exports.login = (apiKey, getUser, options = {}) => {
   if (!apiKey) throw new Error('You must provide your ReadMe API key');
   if (!getUser) throw new Error('You must provide a function to get the user');
+
+  // Make sure api key is valid
+  getReadmeData(apiKey);
+
   return async (req, res) => {
     let u;
     try {

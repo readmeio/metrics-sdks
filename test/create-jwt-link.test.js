@@ -14,24 +14,6 @@ describe('#createJwtLink', () => {
   });
   after(() => nock.cleanAll());
 
-  it('should error if missing apiKey', async () => {
-    try {
-      await createJWTLink();
-    } catch (e) {
-      return assert.equal(e.message, 'You must provide your ReadMe API key');
-    }
-    return assert(false);
-  });
-
-  it('should error if missing user function', async () => {
-    try {
-      await createJWTLink(apiKey);
-    } catch (e) {
-      return assert.equal(e.message, 'You must provide a user object');
-    }
-    return assert(false);
-  });
-
   it('should prepend base url if redirect is path', async () => {
     nock(config.readmeUrl)
       .get('/api/v1/')
