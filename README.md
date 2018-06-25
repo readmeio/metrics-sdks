@@ -1,4 +1,4 @@
-# @readme/metrics
+# readmeio
 
 Track your API metrics within ReadMe
 
@@ -9,7 +9,7 @@ Track your API metrics within ReadMe
 ## Installation
 
 ```
-npm install @readme/metrics
+npm install readmeio
 ```
 
 ## Usage
@@ -23,6 +23,7 @@ the same way that `body-parser` does it. The properties will be converted to JSO
 
 ## Credits
 [Dom Harrington](https://github.com/domharrington/)
+[Marc Cuva](https://github.com/mjcuva/)
 
 ## License
 
