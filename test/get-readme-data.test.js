@@ -42,7 +42,7 @@ describe('#get-readme-data', () => {
     try {
       await getReadmeData('invalid');
     } catch (e) {
-      assert.equal(e.message, 'Invalid API Key');
+      assert.equal(e.message, 'Invalid ReadMe API Key');
     }
   });
 });
