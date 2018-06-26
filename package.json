@@ -1,6 +1,6 @@
 {
   "name": "readmeio",
-  "description": "Track your API metrics within ReadMe",
+  "description": "ReadMe.io integrations for Node",
   "version": "0.0.0",
   "dependencies": {
     "configly": "^4.1.0",

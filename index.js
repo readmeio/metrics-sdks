@@ -91,7 +91,8 @@ module.exports.login = (apiKey, getUser, options = {}) => {
     }
 
     if (!u) {
-      const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+      const domain = req.headers['x-forwarded-host'] || req.get('host');
+      const fullUrl = `${req.protocol}://${domain}${req.originalUrl}`;
       return res.redirect(`${options.loginUrl}?redirect=${encodeURIComponent(fullUrl)}`);
     }
 
