@@ -9,6 +9,13 @@ const processRequest = require('../lib/process-request');
 function createApp(options) {
   const app = express();
   app.use(bodyParser.json());
+
+  const router = express.Router();
+
+  router.post('/a', (req, res) => res.json(processRequest(req, options)));
+
+  app.use('/test-base-path', router);
+
   app.post('/*', (req, res) => {
     res.json(processRequest(req, options));
   });
@@ -55,6 +62,15 @@ describe('processRequest()', () => {
       .query({ a: 'b' })
       // This regex is for supertest's random port numbers
       .expect(({ body }) => assert(body.url.match(/http:\/\/127.0.0.1:\d+\/path\?a=b/))));
+
+  it('#url-basepath', () =>
+    request(createApp())
+      .post('/test-base-path/a')
+      .query({ a: 'b' })
+      // This regex is for supertest's random port numbers
+      .expect(({ body }) =>
+        assert(body.url.match(/http:\/\/127.0.0.1:\d+\/test-base-path\/a\?a=b/)),
+      ));
 
   it('#url with x-forwarded-host', () =>
     request(createApp())
