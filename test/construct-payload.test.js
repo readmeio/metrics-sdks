@@ -10,6 +10,15 @@ const constructPayload = require('../lib/construct-payload');
 function createApp(options, existingPayload = { startedDateTime: new Date() }) {
   const app = express();
   app.use(bodyParser.json());
+
+  const router = express.Router();
+
+  router.post('/a', (req, res) =>
+    res.json(constructPayload(req, res, () => {}, options, existingPayload)),
+  );
+
+  app.use('/test-base-path', router);
+
   app.post('/*', (req, res) => {
     res.json(constructPayload(req, res, () => {}, options, existingPayload));
   });
@@ -58,6 +67,15 @@ describe('constructPayload()', () => {
       .post('/')
       .expect(({ body }) => {
         assert(body.request.log.entries[0].pageref.match(/http:\/\/127.0.0.1:\d+\/\*/));
+      }));
+
+  it('#pageref baseurl should be included as well', () =>
+    request(createApp({}))
+      .post('/test-base-path/a')
+      .expect(({ body }) => {
+        assert(
+          body.request.log.entries[0].pageref.match(/http:\/\/127.0.0.1:\d+\/test-base-path\/a/),
+        );
       }));
 
   it('#startedDateTime', () => {

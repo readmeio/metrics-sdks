@@ -12,7 +12,7 @@ function createApp(options) {
 
   const router = express.Router();
 
-  router.get('/a', (req, res) => res.json(processRequest(req, options)));
+  router.post('/a', (req, res) => res.json(processRequest(req, options)));
 
   app.use('/test-base-path', router);
 
