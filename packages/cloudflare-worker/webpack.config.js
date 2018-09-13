@@ -1,8 +1,10 @@
 const webpack = require('webpack');
+const { join } = require('path');
+const config = require('../config');
 const { version } = require('./package.json');
 
 module.exports = {
-  entry: __dirname + '/template.js',
+  entry: join(__dirname, '/template.js'),
   target: 'webworker',
   // Always either production|development
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
@@ -10,10 +12,13 @@ module.exports = {
     new webpack.DefinePlugin({
       VERSION: JSON.stringify(version),
     }),
+    new webpack.DefinePlugin({
+      HOST: JSON.stringify(config.host),
+    }),
   ],
   output: {
     filename: 'main.js',
-    path: __dirname + '/dist',
+    path: join(__dirname, '/dist'),
   },
   // optimization: {
   //   // We no not want to minimize our code.

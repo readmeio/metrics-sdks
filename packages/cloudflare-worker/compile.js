@@ -16,7 +16,7 @@ module.exports = async function compile(template) {
   memoryFs.writeFileSync(input, template);
 
   const compiler = webpack(config);
-  compiler.inputFileSystem = memoryFs;
+  // compiler.inputFileSystem = memoryFs;
   compiler.outputFileSystem = memoryFs;
 
   return new Promise((resolve, reject) => {
