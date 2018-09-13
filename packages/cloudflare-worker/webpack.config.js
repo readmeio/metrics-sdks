@@ -2,7 +2,7 @@ const webpack = require('webpack');
 const { version } = require('./package.json');
 
 module.exports = {
-  entry: './template.js',
+  entry: __dirname + '/template.js',
   target: 'webworker',
   // Always either production|development
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
