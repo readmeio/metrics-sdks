@@ -12,9 +12,8 @@ global.btoa = str => Buffer.from(str).toString('base64');
 
 const assert = require('assert');
 const nock = require('nock');
-const config = require('../../config');
 
-const worker = require('../../worker');
+const worker = require('../');
 
 describe('worker', () => {
   before(() => {
