@@ -1,5 +1,9 @@
 {
   "env": {
     "worker": true
+  },
+  "extends": ["airbnb-base", "prettier"],
+  "rules": {
+
   }
 }
