@@ -2,7 +2,6 @@ const MemoryFS = require('memory-fs');
 const webpack = require('webpack');
 
 const path = require('path');
-const { promisify } = require('util');
 const fs = require('fs');
 
 const index = fs.readFileSync(path.join(__dirname, './index.js'), 'utf8');

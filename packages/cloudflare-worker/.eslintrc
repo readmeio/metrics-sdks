@@ -1,9 +1,12 @@
 {
   "env": {
-    "worker": true
+    "worker": true,
+    "browser": true
   },
   "extends": ["airbnb-base", "prettier"],
   "rules": {
-
+    "no-restricted-globals": 0,
+    "no-use-before-define": ["error", "nofunc"],
+    "import/no-unresolved": ["error", { "ignore": ["@readme/cloudflare-worker"] }]
   }
 }
