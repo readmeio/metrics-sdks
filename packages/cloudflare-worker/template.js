@@ -1,7 +1,3 @@
-// TODO
-// - try using streaming for better efficiency
-// - figure out the best way to get request mime type
-
 const readme = require('@readme/cloudflare-worker');
 
 addEventListener('fetch', event => {
