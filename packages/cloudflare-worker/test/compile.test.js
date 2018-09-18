@@ -21,7 +21,7 @@ describe('compile-worker', () => {
     } catch (e) {
       assert.equal(e.message, 'Must provide a host');
     }
-  })
+  });
 
   it('should replace HOST with the provided host', async () => {
     const host = 'https://hostexample.com';
@@ -32,7 +32,10 @@ describe('compile-worker', () => {
 
   it('should use passed in template', async () => {
     const apiKey = '123456789';
-    const output = await compileWorker('https://hostexample.com', template.replace('API_KEY', apiKey));
+    const output = await compileWorker(
+      'https://hostexample.com',
+      template.replace('API_KEY', apiKey),
+    );
     assert.equal(output.indexOf(apiKey) > -1, true);
   });
 });

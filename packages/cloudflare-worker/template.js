@@ -1,8 +1,8 @@
 const readme = require('@readme/cloudflare-worker');
 
 addEventListener('fetch', event => {
-  event.passThroughOnException()
-  event.respondWith(respond(event))
+  event.passThroughOnException();
+  event.respondWith(respond(event));
 });
 
 async function respond(event) {

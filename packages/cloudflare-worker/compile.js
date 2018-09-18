@@ -32,12 +32,12 @@ module.exports = async function compile(host, template) {
       const info = stats.toJson();
 
       if (stats.hasErrors()) {
-        return reject(new Error(info.errors[0]))
+        return reject(new Error(info.errors[0]));
       }
 
       const compiled = memoryFs.readFileSync(output, 'utf8');
 
-      return resolve(compiled)
+      return resolve(compiled);
     });
-  })
-}
+  });
+};

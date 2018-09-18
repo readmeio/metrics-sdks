@@ -31,4 +31,4 @@ module.exports = (env, { host }) => {
       path: join(__dirname, '/dist'),
     },
   };
-}
+};
