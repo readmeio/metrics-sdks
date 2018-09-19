@@ -37,6 +37,7 @@ async function getResponseBody(response) {
 // size and reduce the number of dependencies
 let version = 'node';
 let host = 'http://localhost';
+/* istanbul ignore next */
 try {
   version = VERSION;
   host = HOST;

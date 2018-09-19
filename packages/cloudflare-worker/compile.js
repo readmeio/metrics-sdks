@@ -25,14 +25,15 @@ module.exports = async function compile(host, template) {
 
   return new Promise((resolve, reject) => {
     compiler.run((err, stats) => {
-      if (err) {
-        return reject(err);
-      }
-
-      const info = stats.toJson();
+      /* istanbul ignore if */
+      if (err) return reject(err);
 
       if (stats.hasErrors()) {
-        return reject(new Error(info.errors[0]));
+        return reject(
+          new Error(
+            'There was a problem compiling your worker. Please only provide valid JavaScript.',
+          ),
+        );
       }
 
       const compiled = memoryFs.readFileSync(output, 'utf8');

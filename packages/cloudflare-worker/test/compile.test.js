@@ -23,6 +23,17 @@ describe('compile-worker', () => {
     }
   });
 
+  it('should error with invalid javascript being passed in', async () => {
+    try {
+      await compileWorker('https://hostexample.com', 'const a =');
+    } catch (e) {
+      assert.equal(
+        e.message,
+        'There was a problem compiling your worker. Please only provide valid JavaScript.',
+      );
+    }
+  });
+
   it('should replace HOST with the provided host', async () => {
     const host = 'https://hostexample.com';
     const output = await compileWorker(host, template);
