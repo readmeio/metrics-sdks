@@ -46,7 +46,13 @@ try {
   // environment, which is only during unit testing
 }
 
+function log(...args) {
+  /* eslint-disable no-console */
+  if (process.env.NODE_ENV !== 'testing') console.log(...args);
+}
+
 module.exports.fetchAndCollect = async function fetchAndCollect(request) {
+  log(`Readme CloudFlare Worker v${version}`, 'https://github.com/readmeio/cloudflare-worker');
   const startedDateTime = new Date();
 
   const { req, body: requestBody } = await getRequestBody(request);
@@ -57,7 +63,7 @@ module.exports.fetchAndCollect = async function fetchAndCollect(request) {
 
   const har = {
     log: {
-      creator: { name: 'cloudflare-worker', version },
+      creator: { name: '@readme/cloudflare-worker', version },
       entries: [
         {
           startedDateTime: startedDateTime.toISOString(),
@@ -96,7 +102,6 @@ module.exports.fetchAndCollect = async function fetchAndCollect(request) {
 };
 
 module.exports.metrics = function readme(apiKey, group, req, har) {
-  /* eslint-disable no-console */
   return fetch(`${host}/request`, {
     method: 'POST',
     headers: {
@@ -113,10 +118,8 @@ module.exports.metrics = function readme(apiKey, group, req, har) {
   })
     .then(async response => {
       /* istanbul ignore if */
-      if (process.env.NODE_ENV !== 'testing') {
-        console.log('Response from readme', response);
-        console.log(await response.text());
-      }
+      log('Response from readme', response);
+      log(await response.text());
     })
     .catch(
       /* istanbul ignore next */ err => {

@@ -72,7 +72,7 @@ describe('worker', () => {
 
       const { har } = await worker.fetchAndCollect(request);
 
-      assert.deepEqual(har.log.creator, { name: 'cloudflare-worker', version: 'node' });
+      assert.deepEqual(har.log.creator, { name: '@readme/cloudflare-worker', version: 'node' });
       assert.equal(typeof har.log.entries[0].startedDateTime, 'string');
       assert.equal(typeof har.log.entries[0].time, 'number');
       assert.deepEqual(har.log.entries[0].request, {
