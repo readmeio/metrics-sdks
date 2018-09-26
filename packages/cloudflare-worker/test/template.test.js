@@ -75,6 +75,7 @@ describe('template', () => {
       })
       .listen(0);
 
+    global.API_KEY = '123456';
     global.HOST = `http://127.0.0.1:${server.address().port}`;
     requireTemplate();
 

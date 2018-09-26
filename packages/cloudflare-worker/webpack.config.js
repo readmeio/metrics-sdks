@@ -4,6 +4,7 @@ const { version } = require('./package.json');
 
 module.exports = (env, { host, apiKey = 'API_KEY' }) => {
   if (!host) throw new Error('Must provide a host');
+  if (!apiKey) throw new Error('Must provide an apiKey');
 
   return {
     entry: join(__dirname, '/template.js'),
