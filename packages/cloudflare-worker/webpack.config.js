@@ -2,7 +2,7 @@ const webpack = require('webpack');
 const { join, resolve } = require('path');
 const { version } = require('./package.json');
 
-module.exports = (env, { host }) => {
+module.exports = (env, { host, apiKey = 'API_KEY' }) => {
   if (!host) throw new Error('Must provide a host');
 
   return {
@@ -12,6 +12,9 @@ module.exports = (env, { host }) => {
     // or just default it to production
     mode: env || 'production',
     plugins: [
+      new webpack.DefinePlugin({
+        API_KEY: JSON.stringify(apiKey),
+      }),
       new webpack.DefinePlugin({
         VERSION: JSON.stringify(version),
       }),

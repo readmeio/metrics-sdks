@@ -35,16 +35,20 @@ async function getResponseBody(response) {
 // compiled via webpack using a DefinePlugin
 // it has been done this way to reduce the worker bundle
 // size and reduce the number of dependencies
+//
+// The catch blocks will only be triggered from within a node
+// environment, which is only during unit testing
+
 let version = 'node';
-let host = 'http://localhost';
 /* istanbul ignore next */
 try {
   version = VERSION;
+} catch (e) {} // eslint-disable-line no-empty
+let host = 'http://localhost';
+/* istanbul ignore next */
+try {
   host = HOST;
-} catch (e) {
-  // This should only be triggered from within a node
-  // environment, which is only during unit testing
-}
+} catch (e) {} // eslint-disable-line no-empty
 
 function log(...args) {
   /* eslint-disable no-console */
@@ -117,7 +121,6 @@ module.exports.metrics = function readme(apiKey, group, req, har) {
     ]),
   })
     .then(async response => {
-      /* istanbul ignore if */
       log('Response from readme', response);
       log(await response.text());
     })

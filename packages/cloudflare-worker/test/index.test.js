@@ -1,19 +1,13 @@
 /* eslint-env mocha */
-const fetch = require('node-fetch');
-
-const { Request, Response } = fetch;
-const { URL } = require('url');
-
-global.fetch = fetch;
-global.Request = Request;
-global.Response = Response;
-global.URL = URL;
-global.btoa = str => Buffer.from(str).toString('base64');
-
 const assert = require('assert');
 const nock = require('nock');
 
-const worker = require('../');
+const globals = require('./service-worker-globals');
+
+function requireWorker() {
+  delete require.cache[require.resolve('../')];
+  return require('../'); // eslint-disable-line global-require
+}
 
 describe('worker', () => {
   before(() => {
@@ -21,6 +15,10 @@ describe('worker', () => {
     nock.enableNetConnect('127.0.0.1');
   });
   after(() => nock.cleanAll());
+
+  beforeEach(() => {
+    Object.assign(global, globals());
+  });
 
   describe('#fetchAndCollect()', () => {
     it('should work for GET/HEAD requests (no body)', async () => {
@@ -34,7 +32,7 @@ describe('worker', () => {
         .get('/a?b=2')
         .reply(200);
 
-      await worker.fetchAndCollect(request);
+      await requireWorker().fetchAndCollect(request);
       mock.done();
     });
 
@@ -50,7 +48,7 @@ describe('worker', () => {
         .post('/a?b=2', JSON.stringify({ c: 3, d: 4 }))
         .reply(200);
 
-      await worker.fetchAndCollect(request);
+      await requireWorker().fetchAndCollect(request);
       mock.done();
     });
 
@@ -70,9 +68,9 @@ describe('worker', () => {
           'x-response-header': 'hello',
         });
 
-      const { har } = await worker.fetchAndCollect(request);
+      const { har } = await requireWorker().fetchAndCollect(request);
 
-      assert.deepEqual(har.log.creator, { name: '@readme/cloudflare-worker', version: 'node' });
+      assert.deepEqual(har.log.creator.name, '@readme/cloudflare-worker');
       assert.equal(typeof har.log.entries[0].startedDateTime, 'string');
       assert.equal(typeof har.log.entries[0].time, 'number');
       assert.deepEqual(har.log.entries[0].request, {
@@ -130,7 +128,7 @@ describe('worker', () => {
         .post('/a?b=2')
         .reply(200);
 
-      const { har } = await worker.fetchAndCollect(request);
+      const { har } = await requireWorker().fetchAndCollect(request);
 
       assert.equal(har.log.entries[0].request.postData.mimeType, 'application/json');
       assert.equal(har.log.entries[0].response.content.mimeType, 'application/json');
@@ -155,7 +153,7 @@ describe('worker', () => {
           },
         );
 
-      const { response } = await worker.fetchAndCollect(request);
+      const { response } = await requireWorker().fetchAndCollect(request);
 
       // If we can read the response body, then it means
       // it can be returned from the service worker
@@ -193,7 +191,7 @@ describe('worker', () => {
         },
       });
 
-      await worker.metrics(apiKey, group, request, har);
+      await requireWorker().metrics(apiKey, group, request, har);
 
       mock.done();
     });

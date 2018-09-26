@@ -30,6 +30,7 @@
     "eslint-plugin-import": "^2.14.0",
     "jsinspect": "^0.12.7",
     "mocha": "^5.2.0",
+    "module-alias": "^2.1.0",
     "nock": "^10.0.0",
     "node-fetch": "^2.2.0",
     "nyc": "^13.0.1",
