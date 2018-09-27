@@ -8,8 +8,5 @@
     "no-restricted-globals": 0,
     "no-use-before-define": ["error", "nofunc"],
     "import/no-unresolved": ["error", { "ignore": ["@readme/cloudflare-worker"] }]
-  },
-  "globals": {
-    "API_KEY": false
   }
 }
