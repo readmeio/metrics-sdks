@@ -106,7 +106,7 @@ module.exports.fetchAndCollect = async function fetchAndCollect(request) {
 };
 
 module.exports.metrics = function readme(apiKey, group, req, har) {
-  return fetch(`${host}/request`, {
+  return fetch(`${host}/v1/request`, {
     method: 'POST',
     headers: {
       authorization: `Basic ${btoa(`${apiKey}:`)}`,

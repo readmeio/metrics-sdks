@@ -177,7 +177,7 @@ describe('worker', () => {
       };
 
       const mock = nock('http://localhost')
-        .post('/request', ([body]) => {
+        .post('/v1/request', ([body]) => {
           assert.equal(body.group, group);
           assert.deepEqual(body.request, har);
           return true;
