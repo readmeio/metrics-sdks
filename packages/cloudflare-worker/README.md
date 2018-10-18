@@ -2,8 +2,8 @@
 
 Cloudflare worker to get your API log data into ReadMe
 
-[![build status](https://secure.travis-ci.org/readme/readme-cloudflare-worker.svg)](http://travis-ci.org/readme/readme-cloudflare-worker)
-[![dependency status](https://david-dm.org/readme/readme-cloudflare-worker.svg)](https://david-dm.org/readme/readme-cloudflare-worker)
+[![CircleCI](https://circleci.com/gh/readmeio/cloudflare-worker.svg?style=svg)](https://circleci.com/gh/readmeio/cloudflare-worker)
+[![](https://d3vv6lp55qjaqc.cloudfront.net/items/1M3C3j0I0s0j3T362344/Untitled-2.png)](https://readme.io)
 
 ## Installation
 
