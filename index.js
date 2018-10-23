@@ -48,7 +48,7 @@ module.exports.metrics = (apiKey, group, options = {}) => {
       queue.push(constructPayload(req, res, group, options, { startedDateTime }));
       if (queue.length >= bufferLength) {
         request
-          .post(`${config.host}/request`, {
+          .post(`${config.host}/v1/request`, {
             headers: { authorization: `Basic ${encoded}` },
             json: queue,
           })

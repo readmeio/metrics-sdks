@@ -4,7 +4,7 @@ jobs:
     docker:
       - image: circleci/node:10
         environment:
-          CC_TEST_REPORTER_ID: 78920f9261ea42577b43485502978df56a1b906f8302787fa4874c6741b7faf9
+          CC_TEST_REPORTER_ID: 4842c41def582299b8bc9314db312b14c0910915a3f29435a70851fe1267ce3a
 
     working_directory: ~/repo
 

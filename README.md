@@ -2,7 +2,7 @@
 
 Track your API metrics within ReadMe
 
-[![CircleCI](https://circleci.com/gh/readmeio/metrics.svg?style=svg)](https://circleci.com/gh/readmeio/metrics)
+[![CircleCI](https://circleci.com/gh/readmeio/readme-node.svg?style=svg)](https://circleci.com/gh/readmeio/readme-node)
 
 [![](https://d3vv6lp55qjaqc.cloudfront.net/items/1M3C3j0I0s0j3T362344/Untitled-2.png)](https://readme.io)
 
