@@ -13,6 +13,8 @@ npm install --save @readme/cloudflare-worker
 
 ## Usage
 
+See the docs: https://readme.readme.io/v2.0/docs/sending-logs-to-readme-with-cloudflare
+
 ## Credits
 [Dom Harrington](https://github.com/domharrington/)
 
