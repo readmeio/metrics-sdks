@@ -14,6 +14,21 @@ npm install readmeio
 
 ## Usage
 
+Just add the middleware to express, and that's it!
+
+```javascript
+const readme = require('readmeio');
+
+app.use(readme.metrics('<<apiKey>>', req => ({
+  id: req.project._id,
+  label: req.project.name,
+  email: req.project.owner
+})));
+```
+
+View full documentation here: [https://readme.readme.io/v2.0/docs/sending-logs-to-readme-with-nodejs](https://readme.readme.io/v2.0/docs/sending-logs-to-readme-with-nodejs)
+
+
 ### Limitations
 - Currently only supports JSON. Adding a whitelist/blacklist for non-json bodies will not work (unless they're added to `req.body`)
 the same way that `body-parser` does it. The properties will be converted to JSON in the har format.
