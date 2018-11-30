@@ -62,6 +62,17 @@ module.exports.fetchAndCollect = async function fetchAndCollect(request) {
   const { req, body: requestBody } = await getRequestBody(request);
 
   const response = await fetch(req);
+  const requiredHeaders = ['x-readme-id', 'x-readme-label'];
+
+  const missingHeaders = requiredHeaders
+    .map(header => {
+      if (!response.headers.has(header)) return header;
+      return false;
+    })
+    .filter(Boolean);
+
+  if (missingHeaders.length)
+    throw new Error(`Missing headers on the request: ${missingHeaders.join(', ')}`);
 
   const { res, body: responseBody } = await getResponseBody(response);
 
@@ -90,7 +101,10 @@ module.exports.fetchAndCollect = async function fetchAndCollect(request) {
           response: {
             status: res.status,
             statusText: res.statusText,
-            headers: [...res.headers].map(([name, value]) => ({ name, value })),
+            headers: [...res.headers]
+              .map(([name, value]) => ({ name, value }))
+              // Strip out x-readme-* headers
+              .filter(header => requiredHeaders.indexOf(header.name) === -1),
             content: {
               text: responseBody,
               size: responseBody.length,

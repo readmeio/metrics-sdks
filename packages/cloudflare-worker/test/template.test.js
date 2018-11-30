@@ -41,20 +41,6 @@ describe('template', () => {
     delete global.HOST;
   });
 
-  it('should error if required headers are not set on the request', async () => {
-    let called = false;
-    try {
-      requireTemplate();
-      await global.listeners.fetch[0](
-        new FetchEvent({ request: new Request('http://localhost/test') }),
-      );
-    } catch (e) {
-      called = true;
-      assert.equal(e.message, 'Missing headers on the request: x-readme-id, x-readme-label');
-    }
-    assert(called);
-  });
-
   it('should send x-readme-* headers through to metrics backend', done => {
     const id = 123456;
     const label = 'api-key-label';
@@ -81,12 +67,14 @@ describe('template', () => {
 
     nock('http://example.com')
       .post('/test')
-      .reply(200);
+      .reply(200, '', {
+        'x-readme-id': id,
+        'x-readme-label': label,
+      });
     global.listeners.fetch[0](
       new FetchEvent({
         request: new Request('http://example.com/test', {
           method: 'POST',
-          headers: new Headers({ 'x-readme-id': id, 'x-readme-label': label }),
           body: 'body',
         }),
       }),

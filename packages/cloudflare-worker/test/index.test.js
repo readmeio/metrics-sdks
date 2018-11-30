@@ -21,7 +21,7 @@ describe('worker', () => {
   });
 
   describe('#fetchAndCollect()', () => {
-    it('should work for GET/HEAD requests (no body)', async () => {
+    it('should error if response from API is missing required headers', async () => {
       const request = new global.Request('https://example.com/a?b=2', {
         method: 'GET',
         headers: {
@@ -31,6 +31,32 @@ describe('worker', () => {
       const mock = nock('https://example.com')
         .get('/a?b=2')
         .reply(200);
+
+      let called = false;
+      try {
+        await requireWorker().fetchAndCollect(request);
+      } catch (e) {
+        called = true;
+        assert.equal(e.message, 'Missing headers on the request: x-readme-id, x-readme-label');
+      }
+      assert(called);
+
+      mock.done();
+    });
+
+    it('should work for GET/HEAD requests (no body)', async () => {
+      const request = new global.Request('https://example.com/a?b=2', {
+        method: 'GET',
+        headers: {
+          'content-type': 'application/json',
+        },
+      });
+      const mock = nock('https://example.com')
+        .get('/a?b=2')
+        .reply(200, '', {
+          'x-readme-id': 'id',
+          'x-readme-label': 'label',
+        });
 
       await requireWorker().fetchAndCollect(request);
       mock.done();
@@ -46,7 +72,10 @@ describe('worker', () => {
       });
       const mock = nock('https://example.com')
         .post('/a?b=2', JSON.stringify({ c: 3, d: 4 }))
-        .reply(200);
+        .reply(200, '', {
+          'x-readme-id': 'id',
+          'x-readme-label': 'label',
+        });
 
       await requireWorker().fetchAndCollect(request);
       mock.done();
@@ -66,6 +95,8 @@ describe('worker', () => {
         .reply(200, 'response', {
           'content-type': 'text/plain',
           'x-response-header': 'hello',
+          'x-readme-id': 'id',
+          'x-readme-label': 'label',
         });
 
       const { har } = await requireWorker().fetchAndCollect(request);
@@ -126,7 +157,10 @@ describe('worker', () => {
 
       nock('https://example.com')
         .post('/a?b=2')
-        .reply(200);
+        .reply(200, '', {
+          'x-readme-id': 'id',
+          'x-readme-label': 'label',
+        });
 
       const { har } = await requireWorker().fetchAndCollect(request);
 
@@ -150,6 +184,8 @@ describe('worker', () => {
           { response: true },
           {
             'x-response-header': 'hello',
+            'x-readme-id': 'id',
+            'x-readme-label': 'label',
           },
         );
 
@@ -183,7 +219,10 @@ describe('worker', () => {
           return true;
         })
         .basicAuth({ user: apiKey })
-        .reply(200, 'OK');
+        .reply(200, 'OK', {
+          'x-readme-id': 'id',
+          'x-readme-label': 'label',
+        });
 
       const request = new Request('https://example.com', {
         headers: {
