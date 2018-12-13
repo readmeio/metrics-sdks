@@ -72,7 +72,7 @@ module.exports.fetchAndCollect = async function fetchAndCollect(request) {
     .filter(Boolean);
 
   if (missingHeaders.length)
-    throw new Error(`Missing headers on the request: ${missingHeaders.join(', ')}`);
+    throw new Error(`Missing headers on the response: ${missingHeaders.join(', ')}`);
 
   const { res, body: responseBody } = await getResponseBody(response);
 

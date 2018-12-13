@@ -37,7 +37,7 @@ describe('worker', () => {
         await requireWorker().fetchAndCollect(request);
       } catch (e) {
         called = true;
-        assert.equal(e.message, 'Missing headers on the request: x-readme-id, x-readme-label');
+        assert.equal(e.message, 'Missing headers on the response: x-readme-id, x-readme-label');
       }
       assert(called);
 
