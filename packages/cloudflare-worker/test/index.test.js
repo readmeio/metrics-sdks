@@ -211,10 +211,12 @@ describe('worker', () => {
           ],
         },
       };
+      const clientIPAddress = '127.0.0.1';
 
       const mock = nock('http://localhost')
         .post('/v1/request', ([body]) => {
           assert.equal(body.group, group);
+          assert.equal(body.clientIPAddress, clientIPAddress);
           assert.deepEqual(body.request, har);
           return true;
         })
@@ -226,11 +228,39 @@ describe('worker', () => {
 
       const request = new Request('https://example.com', {
         headers: {
-          'cf-connecting-ip': '127.0.0.1',
+          'cf-connecting-ip': clientIPAddress,
         },
       });
 
       await requireWorker().metrics(apiKey, group, request, har);
+
+      mock.done();
+    });
+
+    it('should default clientIPAddress to 0.0.0.0', async () => {
+      const apiKey = 'OUW3RlI4gUCwWGpO10srIo2ufdWmMhMH';
+      const har = {
+        log: {
+          entries: [
+            {
+              request: {},
+              response: {},
+            },
+          ],
+        },
+      };
+
+      const mock = nock('http://localhost')
+        .post('/v1/request', ([body]) => {
+          assert.equal(body.clientIPAddress, '0.0.0.0');
+          return true;
+        })
+        .basicAuth({ user: apiKey })
+        .reply(200);
+
+      const request = new Request('https://example.com');
+
+      await requireWorker().metrics(apiKey, '1234', request, har);
 
       mock.done();
     });

@@ -129,7 +129,7 @@ module.exports.metrics = function readme(apiKey, group, req, har) {
     body: JSON.stringify([
       {
         group,
-        clientIPAddress: req.headers.get('cf-connecting-ip'),
+        clientIPAddress: req.headers.get('cf-connecting-ip') || '0.0.0.0',
         request: har,
       },
     ]),
