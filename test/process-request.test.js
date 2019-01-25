@@ -63,6 +63,13 @@ describe('processRequest()', () => {
       // This regex is for supertest's random port numbers
       .expect(({ body }) => assert(body.url.match(/http:\/\/127.0.0.1:\d+\/path\?a=b/))));
 
+  it('#url protocol x-forwarded-proto', () =>
+    request(createApp())
+      .post('/')
+      .set('x-forwarded-proto', 'https')
+      // This regex is for supertest's random port numbers
+      .expect(({ body }) => assert(body.url.match(/^https/))));
+
   it('#url-basepath', () =>
     request(createApp())
       .post('/test-base-path/a')
