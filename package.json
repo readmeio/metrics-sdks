@@ -1,7 +1,7 @@
 {
   "name": "readmeio",
   "description": "ReadMe.io integrations for Node",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "dependencies": {
     "configly": "^4.1.0",
     "jsonwebtoken": "^8.3.0",
