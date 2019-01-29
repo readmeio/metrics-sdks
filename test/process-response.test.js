@@ -14,7 +14,7 @@ function testResponse(assertion, response) {
 
     // This is done in the main middleware by
     // overwriting res.write/end
-    res._body = JSON.stringify(response); // eslint-disable-line no-underscore-dangle
+    res._body = response; // eslint-disable-line no-underscore-dangle
 
     res.json(response);
   });
@@ -36,7 +36,7 @@ describe('processResponse()', () => {
           );
           return done();
         },
-        { password: '123456', apiKey: 'abcdef', another: 'Hello world' },
+        JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }),
       );
     });
 
@@ -49,7 +49,21 @@ describe('processResponse()', () => {
           );
           return done();
         },
-        { password: '123456', apiKey: 'abcdef', another: 'Hello world' },
+        JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }),
+      );
+    });
+
+    it('should not be applied for plain text bodies', done => {
+      const body = 'hello world: dasdsas';
+      testResponse(
+        res => {
+          assert.deepEqual(
+            processResponse(res, { blacklist: ['password', 'apiKey'] }).content.text,
+            JSON.stringify(body),
+          );
+          return done();
+        },
+        body,
       );
     });
   });
@@ -96,6 +110,14 @@ describe('processResponse()', () => {
 
     it('#text', done => {
       const body = { a: 1, b: 2, c: 3 };
+      testResponse(res => {
+        assert.deepEqual(processResponse(res).content.text, JSON.stringify(body));
+        return done();
+      }, JSON.stringify(body));
+    });
+
+    it('#text should work with plain text body', done => {
+      const body = 'hello world: dasdsas';
       testResponse(res => {
         assert.deepEqual(processResponse(res).content.text, JSON.stringify(body));
         return done();
