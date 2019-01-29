@@ -28,43 +28,34 @@ function testResponse(assertion, response) {
 describe('processResponse()', () => {
   describe('options', () => {
     it('should strip blacklisted properties', done => {
-      testResponse(
-        res => {
-          assert.deepEqual(
-            processResponse(res, { blacklist: ['password', 'apiKey'] }).content.text,
-            JSON.stringify({ another: 'Hello world' }),
-          );
-          return done();
-        },
-        JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }),
-      );
+      testResponse(res => {
+        assert.deepEqual(
+          processResponse(res, { blacklist: ['password', 'apiKey'] }).content.text,
+          JSON.stringify({ another: 'Hello world' }),
+        );
+        return done();
+      }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
     });
 
     it('should only send whitelisted properties', done => {
-      testResponse(
-        res => {
-          assert.deepEqual(
-            processResponse(res, { whitelist: ['password', 'apiKey'] }).content.text,
-            JSON.stringify({ password: '123456', apiKey: 'abcdef' }),
-          );
-          return done();
-        },
-        JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }),
-      );
+      testResponse(res => {
+        assert.deepEqual(
+          processResponse(res, { whitelist: ['password', 'apiKey'] }).content.text,
+          JSON.stringify({ password: '123456', apiKey: 'abcdef' }),
+        );
+        return done();
+      }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
     });
 
     it('should not be applied for plain text bodies', done => {
       const body = 'hello world: dasdsas';
-      testResponse(
-        res => {
-          assert.deepEqual(
-            processResponse(res, { blacklist: ['password', 'apiKey'] }).content.text,
-            JSON.stringify(body),
-          );
-          return done();
-        },
-        body,
-      );
+      testResponse(res => {
+        assert.deepEqual(
+          processResponse(res, { blacklist: ['password', 'apiKey'] }).content.text,
+          JSON.stringify(body),
+        );
+        return done();
+      }, body);
     });
   });
 
