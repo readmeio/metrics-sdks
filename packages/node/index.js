@@ -26,7 +26,7 @@ function patchResponse(res) {
   };
 }
 
-module.exports.metrics = (apiKey, group, options = {}) => {
+module.exports.metrics = (apiKey, group, options = {}, cb = () => {}) => {
   if (!apiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a grouping function');
 
@@ -44,14 +44,15 @@ module.exports.metrics = (apiKey, group, options = {}) => {
       // this is fine for now
       queue.push(constructPayload(req, res, group, options, { startedDateTime }));
       if (queue.length >= bufferLength) {
+        const json = queue.slice();
+        queue = [];
         request
           .post(`${config.host}/v1/request`, {
             headers: { authorization: `Basic ${encoded}` },
-            json: queue,
+            json,
           })
-          .response.then(() => {
-            queue = [];
-          });
+          // We only expose this callback for testing purposes
+          .response.catch((e) => cb && cb(e));
       }
 
       cleanup(); // eslint-disable-line no-use-before-define
