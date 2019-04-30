@@ -52,7 +52,7 @@ module.exports.metrics = (apiKey, group, options = {}, cb = () => {}) => {
             json,
           })
           // We only expose this callback for testing purposes
-          .response.catch((e) => cb && cb(e));
+          .response.catch(e => cb && cb(e));
       }
 
       cleanup(); // eslint-disable-line no-use-before-define

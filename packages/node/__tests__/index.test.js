@@ -76,7 +76,7 @@ describe('#metrics', () => {
       mock.done();
     }, 5000);
 
-    it('should clear out the queue when sent', (done) => {
+    it('should clear out the queue when sent', done => {
       const group = '5afa21b97011c63320226ef3';
 
       const numberOfLogs = 20;
@@ -93,21 +93,25 @@ describe('#metrics', () => {
           // the delay mimics the latency of a real
           // HTTP request
           .delay(1)
-          .reply(200)
+          .reply(200),
       );
 
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group, { bufferLength }, (e) => done(e)));
+      app.use(middleware.metrics(apiKey, () => group, { bufferLength }, e => done(e)));
       app.get('/test', (req, res) => res.sendStatus(200));
 
-      Promise.all([...Array(numberOfLogs).keys()].map(() =>
-        request(app)
-          .get('/test')
-          .expect(200)
-      )).then(() => {
-        mocks.map(mock => mock.done());
-        return done();
-      }).catch(done);
+      Promise.all(
+        [...Array(numberOfLogs).keys()].map(() =>
+          request(app)
+            .get('/test')
+            .expect(200),
+        ),
+      )
+        .then(() => {
+          mocks.map(mock => mock.done());
+          return done();
+        })
+        .catch(done);
     });
   });
 
