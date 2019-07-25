@@ -4,7 +4,7 @@ const config = require('./config');
 const constructPayload = require('./lib/construct-payload');
 const createJWTLink = require('./lib/create-jwt-link');
 const getReadmeData = require('./lib/get-readme-data');
-const ObjectID = require("bson-objectid");
+const ObjectID = require('bson-objectid');
 
 // We're doing this to buffer up the response body
 // so we can send it off to the metrics server
