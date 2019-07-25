@@ -3,7 +3,8 @@ const processRequest = require('./process-request');
 const processResponse = require('./process-response');
 const { name, version } = require('../package.json');
 
-module.exports = (req, res, group, options = {}, { startedDateTime }) => ({
+module.exports = (req, res, group, options = {}, { startedDateTime, logId }) => ({
+  _id: logId,
   group: group(req),
   clientIPAddress: req.ip,
   development: options.development,

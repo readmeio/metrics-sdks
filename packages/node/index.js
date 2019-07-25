@@ -4,6 +4,7 @@ const config = require('./config');
 const constructPayload = require('./lib/construct-payload');
 const createJWTLink = require('./lib/create-jwt-link');
 const getReadmeData = require('./lib/get-readme-data');
+const ObjectID = require("bson-objectid");
 
 // We're doing this to buffer up the response body
 // so we can send it off to the metrics server
@@ -38,13 +39,17 @@ module.exports.metrics = (apiKey, group, options = {}) => {
 
   return (req, res, next) => {
     const startedDateTime = new Date();
+    const logId = ObjectID();
+    res.setHeader('x-documentation-url', `https://dash.readme.io/logs/${logId}`);
+
     patchResponse(res);
 
     function send() {
       // This should in future become more sophisticated,
       // with flush timeouts and more error checking but
       // this is fine for now
-      queue.push(constructPayload(req, res, group, options, { startedDateTime }));
+      const payload = constructPayload(req, res, group, options, { startedDateTime, logId });
+      queue.push(payload);
       if (queue.length >= bufferLength) {
         request
           .post(`${config.host}/v1/request`, {
