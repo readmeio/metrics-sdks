@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json.schemastore.org/install",
+  "workers": [
+    {
+      "src": "./dist/main.js"
+    }
+  ],
+  "options": {
+    "properties": {
+      "API_KEY": {
+        "title": "API Key",
+        "type": "string",
+        "required": true,
+        "description": "Key associated with your README project.",
+        "placeholder": "API Key"
+      },
+      "ROUTES": {
+        "title": "Routes",
+        "type": "array",
+        "description": "List of routes to pattern match incoming requests against. Prefix URIs with HTTP or HTTPS.",
+        "items": {
+          "title": "Route",
+          "type": "string",
+          "format": "url",
+          "placeholder": "https://www.example.com/api/*"
+        }
+      }
+    }
+  }
+}
