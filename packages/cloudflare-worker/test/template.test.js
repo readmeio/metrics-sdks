@@ -46,6 +46,7 @@ describe('template', () => {
     const label = 'api-key-label';
     const server = http
       .createServer((req, res) => {
+        console.log(req);
         let body = '';
         req.on('data', chunk => {
           body += chunk;
@@ -61,21 +62,65 @@ describe('template', () => {
       })
       .listen(0);
 
-    global.API_KEY = '123456';
     global.HOST = `http://127.0.0.1:${server.address().port}`;
-    requireTemplate();
+    global.INSTALL_OPTIONS = {
+      API_KEY: '123456',
+      ROUTES: ['http://example.com/*', 'http://*.example.com/test'],
+    };
 
-    nock('http://example.com')
+    requireTemplate();
+    nock('http://www.example.com')
       .post('/test')
       .reply(200, '', {
         'x-readme-id': id,
         'x-readme-label': label,
       });
+
     global.listeners.fetch[0](
       new FetchEvent({
-        request: new Request('http://example.com/test', {
+        request: new Request('http://www.example.com/test', {
           method: 'POST',
           body: 'body',
+        }),
+      }),
+    );
+  });
+
+  it('should passthrough if domain routing does not match existing routes', done => {
+    const server = http
+      .createServer((req, res) => {
+        let body = '';
+
+        req.on('data', chunk => {
+          body += chunk;
+        });
+
+        req.on('error', () => done());
+
+        req.on('end', () => {
+          assert.equal(body, null);
+          res.end();
+          server.close();
+          return done();
+        });
+      })
+      .listen(0);
+
+    global.HOST = `http://127.0.0.1:${server.address().port}`;
+    global.INSTALL_OPTIONS = {
+      API_KEY: '123456',
+      ROUTES: ['http://www.example.com/docs'],
+    };
+
+    requireTemplate();
+    nock('http://www.example.com')
+      .get('/test')
+      .reply(200);
+
+    global.listeners.fetch[0](
+      new FetchEvent({
+        request: new Request('http://www.example.com/test', {
+          method: 'GET',
         }),
       }),
     );
