@@ -46,7 +46,6 @@ describe('template', () => {
     const label = 'api-key-label';
     const server = http
       .createServer((req, res) => {
-        console.log(req);
         let body = '';
         req.on('data', chunk => {
           body += chunk;
@@ -86,43 +85,31 @@ describe('template', () => {
     );
   });
 
-  it('should passthrough if domain routing does not match existing routes', done => {
-    const server = http
-      .createServer((req, res) => {
-        let body = '';
-
-        req.on('data', chunk => {
-          body += chunk;
-        });
-
-        req.on('error', () => done());
-
-        req.on('end', () => {
-          assert.equal(body, null);
-          res.end();
-          server.close();
-          return done();
-        });
-      })
-      .listen(0);
-
-    global.HOST = `http://127.0.0.1:${server.address().port}`;
+  it('should passthrough if domain routing does not match existing routes', () => {
+    const API_KEY = '123456';
     global.INSTALL_OPTIONS = {
-      API_KEY: '123456',
+      API_KEY,
       ROUTES: ['http://www.example.com/docs'],
     };
 
     requireTemplate();
-    nock('http://www.example.com')
-      .get('/test')
-      .reply(200);
+    const mock = nock('http://www.example.com')
+      .post('/test')
+      .reply(200, '', {
+        'x-readme-id': API_KEY,
+        'x-readme-label': 'api-key-label',
+      });
 
-    global.listeners.fetch[0](
-      new FetchEvent({
-        request: new Request('http://www.example.com/test', {
-          method: 'GET',
-        }),
+    const event = new FetchEvent({
+      request: new Request('http://www.example.com/test', {
+        method: 'POST',
+        body: 'body',
       }),
-    );
+    });
+
+    global.listeners.fetch[0](event);
+
+    assert.equal(Object.keys(event.request.headers).length, 0);
+    mock.done();
   });
 });
