@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const readme = require('@readme/cloudflare-worker');
 const { determineRouting } = require('./lib/cloudflare-routing.js');
 
@@ -14,7 +15,7 @@ addEventListener('fetch', event => {
 async function respond(event) {
   const { response, har } = await readme.fetchAndCollect(event.request);
 
-  event.waitUntil(readme.metrics('API_KEY', {
+  event.waitUntil(readme.metrics(INSTALL_OPTIONS.API_KEY, {
     id: response.headers.get('x-readme-id'),
     label: response.headers.get('x-readme-label'),
   }, event.request, har));
