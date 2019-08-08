@@ -1,11 +1,10 @@
-/* eslint-disable no-undef */
 const readme = require('@readme/cloudflare-worker');
-const { determineRouting } = require('./lib/cloudflare-routing.js');
+const matchRouteWhitelist = require('./lib/cloudflare-routing.js');
 
 addEventListener('fetch', event => {
   event.passThroughOnException();
 
-  if (determineRouting(event.request.url)) {
+  if (matchRouteWhitelist(event.request.url)) {
     event.respondWith(respond(event));
   }  else {
     event.respondWith(fetch(event.request));

@@ -1,5 +1,5 @@
-/* eslint-disable no-undef, prefer-template, no-useless-escape */
-exports.determineRouting = url => {
+/* eslint-disable prefer-template, no-useless-escape */
+module.exports = url => {
   const { protocol: reqProtocol, host: reqDomain, pathname: reqPath } = new URL(url);
 
   return INSTALL_OPTIONS.ROUTES.map(r => {
