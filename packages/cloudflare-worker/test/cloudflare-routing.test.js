@@ -61,7 +61,6 @@ describe('cloudflare-routing()', () => {
       ROUTES: ['https://www.example.com/docs*'],
     };
 
-    assert.equal(matchRouteWhitelist('https://www.example.com/docs/myDoc'), true);
     assert.equal(matchRouteWhitelist('https://www.example.com/docs2'), true);
     assert.equal(matchRouteWhitelist('https://www.example.com/docs'), true);
   });
