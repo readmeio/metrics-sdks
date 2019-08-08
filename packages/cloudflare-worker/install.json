@@ -11,7 +11,7 @@
         "title": "API Key",
         "type": "string",
         "required": true,
-        "description": "Key associated with your README project.",
+        "description": "API Key associated with your ReadMe project.",
         "placeholder": "API Key"
       },
       "ROUTES": {
