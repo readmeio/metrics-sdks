@@ -11,6 +11,9 @@ module.exports = (env, { host }) => {
     // Allow overriding env via `--env development`
     // or just default it to production
     mode: env || 'production',
+    optimization: {
+      minimize: false,
+    },
     plugins: [
       new webpack.DefinePlugin({
         VERSION: JSON.stringify(version),

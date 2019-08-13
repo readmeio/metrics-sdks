@@ -7,7 +7,7 @@
   },
   "scripts": {
     "lint": "eslint -f unix .",
-    "inspect": "jsinspect",
+    "inspect": "jsinspect --ignore 'dist'",
     "prettier": "prettier --list-different \"./**/**.js\"",
     "pretest": "npm run lint && npm run inspect && npm run prettier",
     "test": "nyc --reporter=lcov mocha",
