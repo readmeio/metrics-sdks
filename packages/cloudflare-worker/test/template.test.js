@@ -63,8 +63,7 @@ describe('template', () => {
 
     global.HOST = `http://127.0.0.1:${server.address().port}`;
     global.INSTALL_OPTIONS = {
-      API_KEY: '123456',
-      ROUTES: ['http://example.com/*', 'http://*.example.com/test'],
+      routes: ['http://example.com/*', 'http://*.example.com/test'],
     };
 
     requireTemplate();
@@ -75,28 +74,27 @@ describe('template', () => {
         'x-readme-label': label,
       });
 
-    global.listeners.fetch[0](
-      new FetchEvent({
-        request: new Request('http://www.example.com/test', {
-          method: 'POST',
-          body: 'body',
-        }),
+    const fetchEvent = new FetchEvent({
+      request: new Request('http://www.example.com/test', {
+        method: 'POST',
+        body: 'body',
       }),
-    );
+    });
+
+    fetchEvent.request.authentications = { account: { token: { token: '123456' } } };
+    global.listeners.fetch[0](fetchEvent);
   });
 
   it('should passthrough if domain routing does not match existing routes', () => {
-    const API_KEY = '123456';
     global.INSTALL_OPTIONS = {
-      API_KEY,
-      ROUTES: ['http://www.example.com/docs'],
+      routes: ['http://www.example.com/docs'],
     };
 
     requireTemplate();
     const mock = nock('http://www.example.com')
       .post('/test')
       .reply(200, '', {
-        'x-readme-id': API_KEY,
+        'x-readme-id': '123456',
         'x-readme-label': 'api-key-label',
       });
 

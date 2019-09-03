@@ -7,14 +7,16 @@
   ],
   "options": {
     "properties": {
-      "API_KEY": {
-        "title": "API Key",
-        "type": "string",
-        "required": true,
-        "description": "API Key associated with your ReadMe project.",
-        "placeholder": "API Key"
+      "account": {
+        "title": "Readme Account",
+        "type": "object",
+        "format": "account",
+        "services": ["Readme"],
+        "order": 0,
+        "description": "Login with your Readme account to get your project API key.",
+        "required": true
       },
-      "ROUTES": {
+      "routes": {
         "title": "Routes",
         "type": "array",
         "description": "List of routes to pattern match incoming requests against. Prefix URIs with HTTP or HTTPS.",
@@ -26,5 +28,21 @@
         }
       }
     }
-  }
+  },
+  "hooks": [
+    {
+      "endpoint": "https://oauthreq.readme.io/redirect",
+      "events": ["oauth-login", "account-logout"],
+      "block": true,
+      "authenticate": ["account"],
+      "failure": {
+        "action": "notify",
+        "message": "There was an error communicating with Readme."
+      }
+    },
+    {
+      "events": ["account-logout"],
+      "action": "reset-schema"
+    }
+  ]
 }

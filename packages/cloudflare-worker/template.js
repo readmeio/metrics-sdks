@@ -14,7 +14,7 @@ addEventListener('fetch', event => {
 async function respond(event) {
   const { response, har } = await readme.fetchAndCollect(event.request);
 
-  event.waitUntil(readme.metrics(INSTALL_OPTIONS.API_KEY, {
+  event.waitUntil(readme.metrics(event.request.authentications.account.token.token, {
     id: response.headers.get('x-readme-id'),
     label: response.headers.get('x-readme-label'),
   }, event.request, har));

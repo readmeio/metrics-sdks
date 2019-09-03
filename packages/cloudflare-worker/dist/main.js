@@ -104,7 +104,7 @@ addEventListener('fetch', event => {
 async function respond(event) {
   const { response, har } = await readme.fetchAndCollect(event.request);
 
-  event.waitUntil(readme.metrics(INSTALL_OPTIONS.API_KEY, {
+  event.waitUntil(readme.metrics(event.request.authentications.account.token.token, {
     id: response.headers.get('x-readme-id'),
     label: response.headers.get('x-readme-label'),
   }, event.request, har));
@@ -272,7 +272,11 @@ module.exports.metrics = function readme(apiKey, group, req, har) {
 
 const minimatch = __webpack_require__(3);
 
-module.exports = url => INSTALL_OPTIONS.ROUTES.map(r => minimatch(url, r)).some(e => e);
+module.exports = url =>
+  INSTALL_OPTIONS.routes
+    .filter(r => r)
+    .map(r => minimatch(url, r))
+    .some(e => e);
 
 
 /***/ }),

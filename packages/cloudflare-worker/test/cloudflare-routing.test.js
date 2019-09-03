@@ -10,7 +10,7 @@ describe('cloudflare-routing()', () => {
 
   it('should return false if no match for incoming url', () => {
     global.INSTALL_OPTIONS = {
-      ROUTES: ['https://www.example.com/getTestDocs'],
+      routes: ['https://www.example.com/getTestDocs'],
     };
 
     assert.equal(matchRouteWhitelist('https://example.com/'), false);
@@ -18,7 +18,7 @@ describe('cloudflare-routing()', () => {
 
   it('should return false if url incorrectly matches wildcard path route', () => {
     global.INSTALL_OPTIONS = {
-      ROUTES: ['https://test.example.com/docs/*'],
+      routes: ['https://test.example.com/docs/*'],
     };
 
     assert.equal(matchRouteWhitelist('https://test.example.com/api/myDoc'), false);
@@ -26,7 +26,7 @@ describe('cloudflare-routing()', () => {
 
   it('should return true if url is a complete match of reference route', () => {
     global.INSTALL_OPTIONS = {
-      ROUTES: ['https://test.example.com/'],
+      routes: ['https://test.example.com/'],
     };
 
     assert.equal(matchRouteWhitelist('https://test.example.com/'), true);
@@ -34,7 +34,7 @@ describe('cloudflare-routing()', () => {
 
   it('should return true if url matches a domain reference wildcard', () => {
     global.INSTALL_OPTIONS = {
-      ROUTES: ['https://*.example.com/'],
+      routes: ['https://*.example.com/'],
     };
 
     assert.equal(matchRouteWhitelist('https://test.example.com/'), true);
@@ -42,7 +42,7 @@ describe('cloudflare-routing()', () => {
 
   it('should return true if url matches a path reference wildcard', () => {
     global.INSTALL_OPTIONS = {
-      ROUTES: ['https://test.example.com/*'],
+      routes: ['https://test.example.com/*'],
     };
 
     assert.equal(matchRouteWhitelist('https://test.example.com/getTestDocs'), true);
@@ -50,7 +50,7 @@ describe('cloudflare-routing()', () => {
 
   it('should return true if url matches a path and domain reference wildcard', () => {
     global.INSTALL_OPTIONS = {
-      ROUTES: ['https://*.example.com/docs/*'],
+      routes: ['https://*.example.com/docs/*'],
     };
 
     assert.equal(matchRouteWhitelist('https://test.example.com/docs/myDoc'), true);
@@ -58,7 +58,7 @@ describe('cloudflare-routing()', () => {
 
   it('should return true if wildcard appends required string for multiple cases', () => {
     global.INSTALL_OPTIONS = {
-      ROUTES: ['https://www.example.com/docs*'],
+      routes: ['https://www.example.com/docs*'],
     };
 
     assert.equal(matchRouteWhitelist('https://www.example.com/docs2'), true);
