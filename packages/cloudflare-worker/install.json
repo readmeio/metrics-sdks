@@ -28,21 +28,5 @@
         }
       }
     }
-  },
-  "hooks": [
-    {
-      "endpoint": "https://oauthreq.readme.io/redirect",
-      "events": ["oauth-login", "account-logout"],
-      "block": true,
-      "authenticate": ["account"],
-      "failure": {
-        "action": "notify",
-        "message": "There was an error communicating with Readme."
-      }
-    },
-    {
-      "events": ["account-logout"],
-      "action": "reset-schema"
-    }
-  ]
+  }
 }
