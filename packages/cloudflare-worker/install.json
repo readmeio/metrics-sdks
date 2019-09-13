@@ -8,12 +8,12 @@
   "options": {
     "properties": {
       "account": {
-        "title": "Readme Account",
+        "title": "ReadMe Account",
         "type": "object",
         "format": "account",
-        "services": ["Readme"],
+        "services": ["ReadMe"],
         "order": 0,
-        "description": "Login with your Readme account to get your project API key.",
+        "description": "Login with your ReadMe account to get your project API key.",
         "required": true
       },
       "routes": {
