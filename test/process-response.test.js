@@ -1,12 +1,10 @@
-/* eslint-env mocha */
 const express = require('express');
 const request = require('supertest');
-const assert = require('assert');
 const bodyParser = require('body-parser');
 
 const processResponse = require('../lib/process-response');
 
-function testResponse(assertion, response) {
+async function testResponse(assertion, response) {
   const app = express();
   app.use(bodyParser.json());
   app.post('/*', (req, res) => {
@@ -14,104 +12,98 @@ function testResponse(assertion, response) {
 
     // This is done in the main middleware by
     // overwriting res.write/end
-    res._body = response; // eslint-disable-line no-underscore-dangle
+    res._body = response;
 
     res.json(response);
   });
 
-  request(app)
+  return request(app)
     .post('/')
-    .expect(200)
-    .end();
+    .expect(200);
 }
 
 describe('processResponse()', () => {
   describe('options', () => {
-    it('should strip blacklisted properties', done => {
-      testResponse(res => {
-        assert.deepEqual(
+    it('should strip blacklisted properties', () => {
+      expect.hasAssertions();
+      return testResponse(res => {
+        expect(
           processResponse(res, { blacklist: ['password', 'apiKey'] }).content.text,
-          JSON.stringify({ another: 'Hello world' }),
-        );
-        return done();
+        ).toStrictEqual(JSON.stringify({ another: 'Hello world' }));
       }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
     });
 
-    it('should only send whitelisted properties', done => {
-      testResponse(res => {
-        assert.deepEqual(
+    it('should only send whitelisted properties', () => {
+      expect.hasAssertions();
+      return testResponse(res => {
+        expect(
           processResponse(res, { whitelist: ['password', 'apiKey'] }).content.text,
-          JSON.stringify({ password: '123456', apiKey: 'abcdef' }),
-        );
-        return done();
+        ).toStrictEqual(JSON.stringify({ password: '123456', apiKey: 'abcdef' }));
       }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
     });
 
-    it('should not be applied for plain text bodies', done => {
+    it('should not be applied for plain text bodies', () => {
+      expect.hasAssertions();
       const body = 'hello world: dasdsas';
-      testResponse(res => {
-        assert.deepEqual(
+      return testResponse(res => {
+        expect(
           processResponse(res, { blacklist: ['password', 'apiKey'] }).content.text,
-          JSON.stringify(body),
-        );
-        return done();
+        ).toStrictEqual(JSON.stringify(body));
       }, body);
     });
   });
 
-  it('#status', done =>
+  it('#status', () =>
     testResponse(res => {
-      assert.equal(processResponse(res).status, 200);
-      return done();
+      expect(processResponse(res).status).toBe(200);
     }));
 
-  it('#statusText', done =>
+  it('#statusText', () =>
     testResponse(res => {
-      assert.equal(processResponse(res).statusText, 'OK');
-      return done();
+      expect(processResponse(res).statusText).toBe('OK');
     }));
 
-  it('#headers', done => {
-    testResponse(res => {
-      assert.deepEqual(processResponse(res).headers.filter(header => header.name !== 'date'), [
+  it('#headers', () => {
+    return testResponse(res => {
+      expect(processResponse(res).headers.filter(header => header.name !== 'date')).toStrictEqual([
         { name: 'x-powered-by', value: 'Express' },
         {
           name: 'content-type',
           value: 'application/json; charset=utf-8',
         },
       ]);
-      return done();
     });
   });
 
   describe('#content', () => {
-    it('#size', done => {
+    it('#size', () => {
+      expect.hasAssertions();
       const body = { a: 1, b: 2, c: 3 };
-      testResponse(res => {
-        assert.deepEqual(processResponse(res).content.size, JSON.stringify(body).length);
-        return done();
+      return testResponse(res => {
+        // `.content.size` returns a string, while `.length` is integer, and Jest doesn't have any
+        // assertions that do just a `==` so we need to coax the response a bit.
+        expect(parseInt(processResponse(res).content.size, 10)).toBe(JSON.stringify(body).length);
       }, body);
     });
 
-    it('#mimeType', done =>
+    it('#mimeType', () =>
       testResponse(res => {
-        assert.deepEqual(processResponse(res).content.mimeType, 'application/json; charset=utf-8');
-        return done();
+        expect(processResponse(res).content.mimeType).toStrictEqual(
+          'application/json; charset=utf-8',
+        );
       }));
 
-    it('#text', done => {
+    it('#text', () => {
       const body = { a: 1, b: 2, c: 3 };
-      testResponse(res => {
-        assert.deepEqual(processResponse(res).content.text, JSON.stringify(body));
-        return done();
+      return testResponse(res => {
+        expect(processResponse(res).content.text).toStrictEqual(JSON.stringify(body));
       }, JSON.stringify(body));
     });
 
-    it('#text should work with plain text body', done => {
+    it('#text should work with plain text body', () => {
       const body = 'hello world: dasdsas';
-      testResponse(res => {
-        assert.deepEqual(processResponse(res).content.text, JSON.stringify(body));
-        return done();
+      return testResponse(res => {
+        expect(processResponse(res).content.text).toStrictEqual(JSON.stringify(body));
       }, body);
     });
   });

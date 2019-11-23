@@ -1,6 +1,6 @@
 # readmeio
 
-Track your API metrics within ReadMe
+Track your API metrics within ReadMe.
 
 [![CircleCI](https://circleci.com/gh/readmeio/readme-node.svg?style=svg)](https://circleci.com/gh/readmeio/readme-node)
 

@@ -1,7 +1,5 @@
-/* eslint-env mocha */
 const express = require('express');
 const request = require('supertest');
-const assert = require('assert');
 const nock = require('nock');
 const config = require('../config');
 
@@ -10,33 +8,31 @@ const middleware = require('../');
 const apiKey = 'OUW3RlI4gUCwWGpO10srIo2ufdWmMhMH';
 
 describe('#metrics', () => {
-  before(() => {
+  beforeEach(() => {
     nock.disableNetConnect();
     nock.enableNetConnect('127.0.0.1');
   });
-  after(() => nock.cleanAll());
+  afterEach(() => nock.cleanAll());
 
   it('should error if missing apiKey', () => {
-    assert.throws(() => {
+    expect(() => {
       middleware.metrics();
-    }, /You must provide your ReadMe API key/);
+    }).toThrow('You must provide your ReadMe API key');
   });
 
   it('should error if missing grouping function', () => {
-    assert.throws(() => {
+    expect(() => {
       middleware.metrics('api-key');
-    }, /You must provide a grouping function/);
+    }).toThrow('You must provide a grouping function');
   });
 
   it('should send a request to the metrics server', async function test() {
-    this.timeout(5000);
-
     const group = '5afa21b97011c63320226ef3';
 
     const mock = nock(config.host)
       .post('/v1/request', ([body]) => {
-        assert.equal(body.group, group);
-        assert.equal(typeof body.request.log.entries[0].startedDateTime, 'string');
+        expect(body.group).toBe(group);
+        expect(typeof body.request.log.entries[0].startedDateTime).toBe('string');
         return true;
       })
       .basicAuth({ user: apiKey })
@@ -51,17 +47,15 @@ describe('#metrics', () => {
       .expect(200);
 
     mock.done();
-  });
+  }, 5000);
 
   describe('#bufferLength', () => {
     it('should send requests when number hits `bufferLength` size', async function test() {
-      this.timeout(5000);
-
       const group = '5afa21b97011c63320226ef3';
 
       const mock = nock(config.host)
         .post('/v1/request', body => {
-          assert.equal(body.length, 3);
+          expect(body).toHaveLength(3);
           return true;
         })
         .reply(200);
@@ -74,20 +68,20 @@ describe('#metrics', () => {
         .get('/test')
         .expect(200);
 
-      assert.equal(mock.isDone(), false);
+      expect(mock.isDone()).toBeFalsy();
 
       await request(app)
         .get('/test')
         .expect(200);
 
-      assert.equal(mock.isDone(), false);
+      expect(mock.isDone()).toBeFalsy();
 
       await request(app)
         .get('/test')
         .expect(200);
 
       mock.done();
-    });
+    }, 5000);
   });
 
   describe('`res._body`', () => {
@@ -95,8 +89,7 @@ describe('#metrics', () => {
     function createMock() {
       return nock(config.host)
         .post('/v1/request', ([body]) => {
-          assert.equal(
-            body.request.log.entries[0].response.content.text,
+          expect(body.request.log.entries[0].response.content.text).toBe(
             JSON.stringify(responseBody),
           );
           return true;
@@ -105,8 +98,6 @@ describe('#metrics', () => {
     }
 
     it('should buffer up res.write() calls', async function test() {
-      this.timeout(5000);
-
       const mock = createMock();
       const app = express();
       app.use(middleware.metrics(apiKey, () => '123'));
@@ -122,11 +113,9 @@ describe('#metrics', () => {
         .expect(200);
 
       mock.done();
-    });
+    }, 5000);
 
     it('should buffer up res.end() calls', async function test() {
-      this.timeout(5000);
-
       const mock = createMock();
       const app = express();
       app.use(middleware.metrics(apiKey, () => '123'));
@@ -137,11 +126,9 @@ describe('#metrics', () => {
         .expect(200);
 
       mock.done();
-    });
+    }, 5000);
 
     it('should work for res.send() calls', async function test() {
-      this.timeout(5000);
-
       const mock = createMock();
       const app = express();
       app.use(middleware.metrics(apiKey, () => '123'));
@@ -152,68 +139,76 @@ describe('#metrics', () => {
         .expect(200);
 
       mock.done();
-    });
+    }, 5000);
   });
 
   describe('#login', () => {
-    before(() => {
+    beforeEach(() => {
       nock.disableNetConnect();
       nock.enableNetConnect('127.0.0.1');
     });
-    after(() => nock.cleanAll());
+    afterEach(() => nock.cleanAll());
 
     it('should error if missing apiKey', () => {
-      assert.throws(() => {
+      expect(() => {
         middleware.login();
-      }, /You must provide your ReadMe API key/);
+      }).toThrow('You must provide your ReadMe API key');
     });
 
     it('should error if missing user function', () => {
-      assert.throws(() => {
+      expect(() => {
         middleware.login(apiKey);
-      }, /You must provide a function to get the user/);
+      }).toThrow('You must provide a function to get the user');
     });
 
-    it('should redirect if no user', () => {
-      const app = express();
-      app.get(
-        '/readme',
-        middleware.login(apiKey, () => false, {
-          loginUrl: '/login',
-        }),
-      );
+    describe('redirect flows', () => {
+      beforeEach(() => {
+        nock(config.readmeUrl)
+          .get('/api/v1/')
+          .basicAuth({
+            user: apiKey,
+            pass: '',
+          })
+          .reply(200, { jwtSecret: 'jwt', baseUrl: 'http://readme.readme.io' });
+      });
 
-      return request(app)
-        .get('/readme')
-        .expect(302)
-        .expect(res => {
-          assert(res.header.location.startsWith('/login?redirect='));
-        });
-    });
+      it('should redirect if no user', () => {
+        const app = express();
 
-    it('should redirect to readme if user', () => {
-      const app = express();
-      nock(config.readmeUrl)
-        .get('/api/v1/')
-        .basicAuth({
-          user: apiKey,
-          pass: '',
-        })
-        .reply(200, { jwtSecret: 'jwt', baseUrl: 'http://readme.readme.io' });
+        app.get(
+          '/readme',
+          middleware.login(apiKey, () => false, {
+            loginUrl: '/login',
+          }),
+        );
 
-      app.get(
-        '/readme',
-        middleware.login(apiKey, () => ({ name: 'marc' }), {
-          loginUrl: '/login',
-        }),
-      );
+        return request(app)
+          .get('/readme')
+          .expect(302)
+          .expect(res => {
+            expect(res.header.location.startsWith('/login?redirect=')).toBeTruthy();
+          });
+      });
 
-      return request(app)
-        .get('/readme')
-        .expect(302)
-        .expect(res => {
-          assert(res.header.location.startsWith('http://readme.readme.io?auth_token='));
-        });
+      it('should redirect to readme if user', () => {
+        const app = express();
+
+        app.get(
+          '/readme',
+          middleware.login(apiKey, () => ({ name: 'marc' }), {
+            loginUrl: '/login',
+          }),
+        );
+
+        return request(app)
+          .get('/readme')
+          .expect(302)
+          .expect(res => {
+            expect(
+              res.header.location.startsWith('http://readme.readme.io?auth_token='),
+            ).toBeTruthy();
+          });
+      });
     });
   });
 });

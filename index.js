@@ -11,7 +11,6 @@ const getReadmeData = require('./lib/get-readme-data');
 // natively. This may take up lots of memory on
 // big responses, we can make it configurable in future
 function patchResponse(res) {
-  /* eslint-disable no-underscore-dangle */
   const { write, end } = res;
 
   res._body = '';

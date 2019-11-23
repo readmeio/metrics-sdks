@@ -1,7 +1,5 @@
-/* eslint-env mocha */
 const express = require('express');
 const request = require('supertest');
-const assert = require('assert');
 const bodyParser = require('body-parser');
 
 const processRequest = require('../lib/process-request');
@@ -32,7 +30,7 @@ describe('processRequest()', () => {
         .post('/')
         .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
         .expect(({ body }) => {
-          assert.deepEqual(body.postData.params, [{ name: 'another', value: 'Hello world' }]);
+          expect(body.postData.params).toStrictEqual([{ name: 'another', value: 'Hello world' }]);
         });
     });
 
@@ -43,7 +41,7 @@ describe('processRequest()', () => {
         .post('/')
         .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
         .expect(({ body }) => {
-          assert.deepEqual(body.postData.params, [
+          expect(body.postData.params).toStrictEqual([
             { name: 'password', value: '123456' },
             { name: 'apiKey', value: 'abcdef' },
           ]);
@@ -54,21 +52,21 @@ describe('processRequest()', () => {
   it('#method', () =>
     request(createApp())
       .post('/')
-      .expect(({ body }) => assert.equal(body.method, 'POST')));
+      .expect(({ body }) => expect(body.method).toBe('POST')));
 
   it('#url', () =>
     request(createApp())
       .post('/path')
       .query({ a: 'b' })
       // This regex is for supertest's random port numbers
-      .expect(({ body }) => assert(body.url.match(/http:\/\/127.0.0.1:\d+\/path\?a=b/))));
+      .expect(({ body }) => expect(body.url).toMatch(/http:\/\/127.0.0.1:\d+\/path\?a=b/)));
 
   it('#url protocol x-forwarded-proto', () =>
     request(createApp())
       .post('/')
       .set('x-forwarded-proto', 'https')
       // This regex is for supertest's random port numbers
-      .expect(({ body }) => assert(body.url.match(/^https/))));
+      .expect(({ body }) => expect(body.url).toMatch(/^https/)));
 
   it('#url-basepath', () =>
     request(createApp())
@@ -76,7 +74,7 @@ describe('processRequest()', () => {
       .query({ a: 'b' })
       // This regex is for supertest's random port numbers
       .expect(({ body }) =>
-        assert(body.url.match(/http:\/\/127.0.0.1:\d+\/test-base-path\/a\?a=b/)),
+        expect(body.url).toMatch(/http:\/\/127.0.0.1:\d+\/test-base-path\/a\?a=b/),
       ));
 
   it('#url with x-forwarded-host', () =>
@@ -84,22 +82,22 @@ describe('processRequest()', () => {
       .post('/path')
       .set({ 'x-forwarded-host': 'dash.readme.io' })
       // This regex is for supertest's random port numbers
-      .expect(({ body }) => assert(body.url.match('http://dash.readme.io/path'))));
+      .expect(({ body }) => expect(body.url).toMatch('http://dash.readme.io/path')));
 
   it('#httpVersion', () =>
     request(createApp())
       .post('/')
-      .expect(({ body }) => assert.equal(body.httpVersion, '1.1')));
+      .expect(({ body }) => expect(body.httpVersion).toBe('1.1')));
 
   it('#headers', () =>
     request(createApp())
       .post('/')
       .set('a', '1')
       .expect(({ body }) => {
-        assert(body.headers.find(header => header.name === 'host').value.match(/127.0.0.1:\d+/));
-        assert.deepEqual(body.headers.filter(header => header.name !== 'host'), [
+        expect(body.headers.find(header => header.name === 'host').value).toMatch(/127.0.0.1:\d+/);
+        expect(body.headers.filter(header => header.name !== 'host')).toStrictEqual([
           { name: 'accept-encoding', value: 'gzip, deflate' },
-          { name: 'user-agent', value: 'node-superagent/3.8.2' },
+          { name: 'user-agent', value: 'node-superagent/3.8.3' },
           { name: 'a', value: '1' },
           { name: 'connection', value: 'close' },
           { name: 'content-length', value: '0' },
@@ -111,14 +109,17 @@ describe('processRequest()', () => {
       .post('/')
       .query({ a: 'b', c: 'd' })
       .expect(({ body }) =>
-        assert.deepEqual(body.queryString, [{ name: 'a', value: 'b' }, { name: 'c', value: 'd' }]),
+        expect(body.queryString).toStrictEqual([
+          { name: 'a', value: 'b' },
+          { name: 'c', value: 'd' },
+        ]),
       ));
 
   describe('#postData', () => {
     it('#mimeType should be application/json', () =>
       request(createApp())
         .post('/')
-        .expect(({ body }) => assert.equal(body.postData.mimeType, 'application/json')));
+        .expect(({ body }) => expect(body.postData.mimeType).toBe('application/json')));
 
     it('#text should be stringified body', () => {
       const body = { a: 1, b: 2 };
@@ -126,7 +127,7 @@ describe('processRequest()', () => {
         .post('/')
         .send(body)
         .expect(res =>
-          assert.deepEqual(res.body.postData.params, [
+          expect(res.body.postData.params).toStrictEqual([
             { name: 'a', value: 1 },
             { name: 'b', value: 2 },
           ]),

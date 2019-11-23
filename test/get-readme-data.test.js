@@ -1,17 +1,12 @@
-/* eslint-env mocha */
-const assert = require('assert');
 const nock = require('nock');
 const config = require('../config');
 const getReadmeData = require('../lib/get-readme-data');
 
 describe('#get-readme-data', () => {
-  before(() => {
+  beforeEach(() => {
     nock.disableNetConnect();
     nock.enableNetConnect('127.0.0.1');
-  });
-  after(() => nock.cleanAll());
 
-  beforeEach(() => {
     nock(config.readmeUrl)
       .get('/api/v1/')
       .basicAuth({
@@ -21,18 +16,18 @@ describe('#get-readme-data', () => {
       .reply(200, { jwtSecret: 'jwt', baseUrl: 'redirect' });
   });
 
-  it('should send get jwt secret and redirect from readme', async function test() {
-    this.timeout(5000);
+  afterEach(() => nock.cleanAll());
 
+  it('should send get jwt secret and redirect from readme', async () => {
     const data = await getReadmeData('readme_api');
-    assert.deepEqual(data, { jwtSecret: 'jwt', baseUrl: 'redirect' });
-  });
+    expect(data).toStrictEqual({ jwtSecret: 'jwt', baseUrl: 'redirect' });
+  }, 5000);
 
   it('should cache if called twice', async () => {
     await getReadmeData('readme_api');
     const data = await getReadmeData('readme_api');
-    assert.deepEqual(data, { jwtSecret: 'jwt', baseUrl: 'redirect' });
-    assert.deepEqual(getReadmeData.cachedReadmeData.readme_api, {
+    expect(data).toStrictEqual({ jwtSecret: 'jwt', baseUrl: 'redirect' });
+    expect(getReadmeData.cachedReadmeData.readme_api).toStrictEqual({
       jwtSecret: 'jwt',
       baseUrl: 'redirect',
     });
@@ -42,7 +37,8 @@ describe('#get-readme-data', () => {
     try {
       await getReadmeData('invalid');
     } catch (e) {
-      assert.equal(e.message, 'Invalid ReadMe API Key');
+      // eslint-disable-next-line jest/no-try-expect
+      expect(e.message).toBe('Invalid ReadMe API Key');
     }
   });
 });

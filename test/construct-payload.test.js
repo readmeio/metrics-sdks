@@ -1,7 +1,5 @@
-/* eslint-env mocha */
 const express = require('express');
 const request = require('supertest');
-const assert = require('assert');
 const bodyParser = require('body-parser');
 const packageJson = require('../package.json');
 
@@ -27,28 +25,26 @@ function createApp(options, existingPayload = { startedDateTime: new Date() }) {
 }
 
 describe('constructPayload()', () => {
-  it('should construct a har file from the request/response', function test() {
-    this.timeout(8000);
+  it('should construct a har file from the request/response', () => {
     return request(createApp({ blacklist: ['password'] }))
       .post('/')
       .send({ password: '123456' })
       .expect(({ body }) => {
-        assert.equal(typeof body.request.log.entries[0].request, 'object');
-        assert.equal(typeof body.request.log.entries[0].response, 'object');
-        assert(
-          !body.request.log.entries[0].request.postData.params.find(
+        expect(typeof body.request.log.entries[0].request).toBe('object');
+        expect(typeof body.request.log.entries[0].response).toBe('object');
+        expect(
+          body.request.log.entries[0].request.postData.params.find(
             param => param.name === 'password',
           ),
-          'Should pass through options',
-        );
+        ).toBeFalsy();
       });
-  });
+  }, 8000);
 
   it('#creator', () =>
     request(createApp())
       .post('/')
       .expect(({ body }) => {
-        assert.deepEqual(body.request.log.creator, {
+        expect(body.request.log.creator).toStrictEqual({
           name: packageJson.name,
           version: packageJson.version,
           comment: `${process.platform}/${process.version}`,
@@ -59,22 +55,22 @@ describe('constructPayload()', () => {
     request(createApp())
       .post('/')
       .expect(({ body }) => {
-        assert.equal(body.clientIPAddress, '::ffff:127.0.0.1');
+        expect(body.clientIPAddress).toBe('::ffff:127.0.0.1');
       }));
 
   it('#pageref should be `req.route.path`', () =>
     request(createApp({}))
       .post('/')
       .expect(({ body }) => {
-        assert(body.request.log.entries[0].pageref.match(/http:\/\/127.0.0.1:\d+\/\*/));
+        expect(body.request.log.entries[0].pageref).toMatch(/http:\/\/127.0.0.1:\d+\/\*/);
       }));
 
   it('#pageref baseurl should be included as well', () =>
     request(createApp({}))
       .post('/test-base-path/a')
       .expect(({ body }) => {
-        assert(
-          body.request.log.entries[0].pageref.match(/http:\/\/127.0.0.1:\d+\/test-base-path\/a/),
+        expect(body.request.log.entries[0].pageref).toMatch(
+          /http:\/\/127.0.0.1:\d+\/test-base-path\/a/,
         );
       }));
 
@@ -84,8 +80,7 @@ describe('constructPayload()', () => {
     return request(createApp({}, { startedDateTime }))
       .post('/')
       .expect(({ body }) => {
-        assert.equal(
-          new Date(body.request.log.entries[0].startedDateTime).toISOString(),
+        expect(new Date(body.request.log.entries[0].startedDateTime).toISOString()).toBe(
           startedDateTime.toISOString(),
         );
       });
@@ -97,8 +92,8 @@ describe('constructPayload()', () => {
     return request(createApp({}, { startedDateTime }))
       .post('/')
       .expect(({ body }) => {
-        assert.equal(typeof body.request.log.entries[0].time, 'number');
-        assert(body.request.log.entries[0].time > 0);
+        expect(typeof body.request.log.entries[0].time).toBe('number');
+        expect(body.request.log.entries[0].time > 0).toBeTruthy();
       });
   });
 });

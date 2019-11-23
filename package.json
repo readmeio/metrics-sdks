@@ -1,6 +1,6 @@
 {
   "name": "readmeio",
-  "description": "ReadMe.io integrations for Node",
+  "description": "Track your API metrics within ReadMe.",
   "version": "1.2.0",
   "dependencies": {
     "configly": "^4.1.0",
@@ -11,12 +11,11 @@
     "r2": "^2.0.1"
   },
   "scripts": {
-    "lint": "eslint -f unix .",
+    "lint": "eslint .",
     "inspect": "jsinspect",
-    "prettier": "prettier --list-different \"./**/**.js\"",
     "pretest": "npm run lint && npm run inspect && npm run prettier",
-    "test": "nyc mocha",
-    "posttest": "nyc report --reporter=lcov && nyc check-coverage --statements 95 --branches 95 --functions 95 --lines 95"
+    "prettier": "prettier --list-different --write \"./**/**.js\"",
+    "test": "jest --coverage"
   },
   "publishConfig": {
     "registry": "http://registry.npmjs.org"
@@ -28,17 +27,18 @@
     "url": "git@github.com:readmeio/readme-node.git"
   },
   "devDependencies": {
+    "@readme/eslint-config": "^1.4.2",
     "body-parser": "^1.18.3",
-    "eslint": "^4.19.1",
-    "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-config-prettier": "^2.9.0",
-    "eslint-plugin-import": "^2.11.0",
+    "eslint": "^6.7.0",
+    "eslint-plugin-jest": "^23.0.4",
     "express": "^4.16.3",
+    "jest": "^24.9.0",
     "jsinspect": "^0.12.7",
-    "mocha": "^5.0.0",
-    "nock": "^9.2.6",
-    "nyc": "^13.1.0",
-    "prettier": "^1.12.1",
-    "supertest": "^3.1.0"
+    "nock": "^11.7.0",
+    "prettier": "^1.19.1",
+    "supertest": "^4.0.2"
+  },
+  "jest": {
+    "globalSetup": "<rootDir>/test/jest.setup.js"
   }
 }
