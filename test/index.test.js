@@ -12,6 +12,7 @@ describe('#metrics', () => {
     nock.disableNetConnect();
     nock.enableNetConnect('127.0.0.1');
   });
+
   afterEach(() => nock.cleanAll());
 
   it('should error if missing apiKey', () => {
@@ -147,6 +148,7 @@ describe('#metrics', () => {
       nock.disableNetConnect();
       nock.enableNetConnect('127.0.0.1');
     });
+
     afterEach(() => nock.cleanAll());
 
     it('should error if missing apiKey', () => {
