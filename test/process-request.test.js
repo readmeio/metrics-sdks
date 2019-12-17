@@ -87,7 +87,7 @@ describe('processRequest()', () => {
   it('#httpVersion', () =>
     request(createApp())
       .post('/')
-      .expect(({ body }) => expect(body.httpVersion).toBe('1.1')));
+      .expect(({ body }) => expect(body.httpVersion).toBe('HTTP/1.1')));
 
   it('#headers', () =>
     request(createApp())
