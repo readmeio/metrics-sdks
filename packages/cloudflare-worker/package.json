@@ -22,7 +22,7 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git@github.com:readme/cloudflare-worker.git"
+    "url": "git@github.com:readmeio/cloudflare-worker.git"
   },
   "devDependencies": {
     "eslint": "^5.2.0",
