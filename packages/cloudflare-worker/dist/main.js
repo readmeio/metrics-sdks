@@ -161,7 +161,7 @@ async function getResponseBody(response) {
 let version = 'node';
 /* istanbul ignore next */
 try {
-  version = "1.1.0";
+  version = "1.1.1";
 } catch (e) {} // eslint-disable-line no-empty
 let host = 'http://localhost';
 /* istanbul ignore next */
