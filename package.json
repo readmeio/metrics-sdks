@@ -31,7 +31,7 @@
     "body-parser": "^1.19.0",
     "eslint": "^6.7.0",
     "express": "^4.17.1",
-    "jest": "^24.9.0",
+    "jest": "^25.1.0",
     "jsinspect": "^0.12.7",
     "nock": "^11.7.0",
     "prettier": "^1.19.1",
