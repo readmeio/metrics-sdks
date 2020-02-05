@@ -27,18 +27,18 @@ describe('processResponse()', () => {
     it('should strip blacklisted properties', () => {
       expect.hasAssertions();
       return testResponse(res => {
-        expect(
-          processResponse(res, { blacklist: ['password', 'apiKey'] }).content.text,
-        ).toStrictEqual(JSON.stringify({ another: 'Hello world' }));
+        expect(processResponse(res, { blacklist: ['password', 'apiKey'] }).content.text).toStrictEqual(
+          JSON.stringify({ another: 'Hello world' })
+        );
       }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
     });
 
     it('should only send whitelisted properties', () => {
       expect.hasAssertions();
       return testResponse(res => {
-        expect(
-          processResponse(res, { whitelist: ['password', 'apiKey'] }).content.text,
-        ).toStrictEqual(JSON.stringify({ password: '123456', apiKey: 'abcdef' }));
+        expect(processResponse(res, { whitelist: ['password', 'apiKey'] }).content.text).toStrictEqual(
+          JSON.stringify({ password: '123456', apiKey: 'abcdef' })
+        );
       }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
     });
 
@@ -46,9 +46,9 @@ describe('processResponse()', () => {
       expect.hasAssertions();
       const body = 'hello world: dasdsas';
       return testResponse(res => {
-        expect(
-          processResponse(res, { blacklist: ['password', 'apiKey'] }).content.text,
-        ).toStrictEqual(JSON.stringify(body));
+        expect(processResponse(res, { blacklist: ['password', 'apiKey'] }).content.text).toStrictEqual(
+          JSON.stringify(body)
+        );
       }, body);
     });
   });
@@ -88,9 +88,7 @@ describe('processResponse()', () => {
 
     it('#mimeType', () =>
       testResponse(res => {
-        expect(processResponse(res).content.mimeType).toStrictEqual(
-          'application/json; charset=utf-8',
-        );
+        expect(processResponse(res).content.mimeType).toStrictEqual('application/json; charset=utf-8');
       }));
 
     it('#text', () => {

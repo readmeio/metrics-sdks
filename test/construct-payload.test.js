@@ -11,9 +11,7 @@ function createApp(options, existingPayload = { startedDateTime: new Date() }) {
 
   const router = express.Router();
 
-  router.post('/a', (req, res) =>
-    res.json(constructPayload(req, res, () => {}, options, existingPayload)),
-  );
+  router.post('/a', (req, res) => res.json(constructPayload(req, res, () => {}, options, existingPayload)));
 
   app.use('/test-base-path', router);
 
@@ -33,9 +31,7 @@ describe('constructPayload()', () => {
         expect(typeof body.request.log.entries[0].request).toBe('object');
         expect(typeof body.request.log.entries[0].response).toBe('object');
         expect(
-          body.request.log.entries[0].request.postData.params.find(
-            param => param.name === 'password',
-          ),
+          body.request.log.entries[0].request.postData.params.find(param => param.name === 'password')
         ).toBeFalsy();
       });
   }, 8000);
@@ -69,9 +65,7 @@ describe('constructPayload()', () => {
     request(createApp({}))
       .post('/test-base-path/a')
       .expect(({ body }) => {
-        expect(body.request.log.entries[0].pageref).toMatch(
-          /http:\/\/127.0.0.1:\d+\/test-base-path\/a/,
-        );
+        expect(body.request.log.entries[0].pageref).toMatch(/http:\/\/127.0.0.1:\d+\/test-base-path\/a/);
       }));
 
   it('#startedDateTime', () => {
@@ -80,9 +74,7 @@ describe('constructPayload()', () => {
     return request(createApp({}, { startedDateTime }))
       .post('/')
       .expect(({ body }) => {
-        expect(new Date(body.request.log.entries[0].startedDateTime).toISOString()).toBe(
-          startedDateTime.toISOString(),
-        );
+        expect(new Date(body.request.log.entries[0].startedDateTime).toISOString()).toBe(startedDateTime.toISOString());
       });
   });
 

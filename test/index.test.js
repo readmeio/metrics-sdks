@@ -90,9 +90,7 @@ describe('#metrics', () => {
     function createMock() {
       return nock(config.host)
         .post('/v1/request', ([body]) => {
-          expect(body.request.log.entries[0].response.content.text).toBe(
-            JSON.stringify(responseBody),
-          );
+          expect(body.request.log.entries[0].response.content.text).toBe(JSON.stringify(responseBody));
           return true;
         })
         .reply(200);
@@ -181,7 +179,7 @@ describe('#metrics', () => {
           '/readme',
           middleware.login(apiKey, () => false, {
             loginUrl: '/login',
-          }),
+          })
         );
 
         return request(app)
@@ -199,16 +197,14 @@ describe('#metrics', () => {
           '/readme',
           middleware.login(apiKey, () => ({ name: 'marc' }), {
             loginUrl: '/login',
-          }),
+          })
         );
 
         return request(app)
           .get('/readme')
           .expect(302)
           .expect(res => {
-            expect(
-              res.header.location.startsWith('http://readme.readme.io?auth_token='),
-            ).toBeTruthy();
+            expect(res.header.location.startsWith('http://readme.readme.io?auth_token=')).toBeTruthy();
           });
       });
     });

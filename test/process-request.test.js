@@ -73,9 +73,7 @@ describe('processRequest()', () => {
       .post('/test-base-path/a')
       .query({ a: 'b' })
       // This regex is for supertest's random port numbers
-      .expect(({ body }) =>
-        expect(body.url).toMatch(/http:\/\/127.0.0.1:\d+\/test-base-path\/a\?a=b/),
-      ));
+      .expect(({ body }) => expect(body.url).toMatch(/http:\/\/127.0.0.1:\d+\/test-base-path\/a\?a=b/)));
 
   it('#url with x-forwarded-host', () =>
     request(createApp())
@@ -112,7 +110,7 @@ describe('processRequest()', () => {
         expect(body.queryString).toStrictEqual([
           { name: 'a', value: 'b' },
           { name: 'c', value: 'd' },
-        ]),
+        ])
       ));
 
   describe('#postData', () => {
@@ -130,7 +128,7 @@ describe('processRequest()', () => {
           expect(res.body.postData.params).toStrictEqual([
             { name: 'a', value: 1 },
             { name: 'b', value: 2 },
-          ]),
+          ])
         );
     });
   });
