@@ -2,6 +2,9 @@
   "name": "readmeio",
   "description": "Track your API metrics within ReadMe.",
   "version": "1.2.1",
+  "engines": {
+    "node": ">=10"
+  },
   "dependencies": {
     "configly": "^4.1.0",
     "jsonwebtoken": "^8.3.0",
