@@ -44,6 +44,7 @@ describe('template', () => {
   it('should send x-readme-* headers through to metrics backend', done => {
     const id = 123456;
     const label = 'api-key-label';
+    const email = 'test@readme.io';
     const server = http
       .createServer((req, res) => {
         let body = '';
@@ -54,6 +55,7 @@ describe('template', () => {
           body = JSON.parse(body);
           assert.equal(body[0].group.id, id);
           assert.equal(body[0].group.label, label);
+          assert.equal(body[0].group.email, email);
           res.end();
           server.close();
           return done();
@@ -72,6 +74,7 @@ describe('template', () => {
       .reply(200, '', {
         'x-readme-id': id,
         'x-readme-label': label,
+        'x-readme-email': email,
       });
 
     const fetchEvent = new FetchEvent({
@@ -96,6 +99,7 @@ describe('template', () => {
       .reply(200, '', {
         'x-readme-id': '123456',
         'x-readme-label': 'api-key-label',
+        'x-readme-email': 'test@readme.io',
       });
 
     const event = new FetchEvent({

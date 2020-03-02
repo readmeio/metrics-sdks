@@ -81,15 +81,29 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports) {
+
+module.exports.CONSTANTS = {
+  HEADERS: {
+    EMAIL: 'x-readme-email',
+    ID: 'x-readme-id',
+    LABEL: 'x-readme-label',
+  },
+};
+
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const readme = __webpack_require__(1);
-const matchRouteWhitelist = __webpack_require__(2);
+const readme = __webpack_require__(2);
+const matchRouteWhitelist = __webpack_require__(3);
+const { CONSTANTS } = __webpack_require__(0);
 
 addEventListener('fetch', event => {
   event.passThroughOnException();
@@ -105,8 +119,9 @@ async function respond(event) {
   const { response, har } = await readme.fetchAndCollect(event.request);
 
   event.waitUntil(readme.metrics(event.request.authentications.account.token.token, {
-    id: response.headers.get('x-readme-id'),
-    label: response.headers.get('x-readme-label'),
+    id: response.headers.get(CONSTANTS.HEADERS.ID),
+    email: response.headers.get(CONSTANTS.HEADERS.EMAIL),
+    label: response.headers.get(CONSTANTS.HEADERS.LABEL),
   }, event.request, har));
 
   return response;
@@ -114,11 +129,12 @@ async function respond(event) {
 
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* eslint-env worker */
 /* global HOST, VERSION */
+const { CONSTANTS } = __webpack_require__(0);
 
 async function getRequestBody(request) {
   if (request.method.match(/GET|HEAD/)) {
@@ -181,7 +197,8 @@ module.exports.fetchAndCollect = async function fetchAndCollect(request) {
   const { req, body: requestBody } = await getRequestBody(request);
 
   const response = await fetch(req);
-  const requiredHeaders = ['x-readme-id', 'x-readme-label'];
+  const requiredHeaders = [CONSTANTS.HEADERS.ID, CONSTANTS.HEADERS.LABEL];
+  const readmeHeaders = [CONSTANTS.HEADERS.ID, CONSTANTS.HEADERS.LABEL, CONSTANTS.HEADERS.EMAIL];
 
   const missingHeaders = requiredHeaders
     .map(header => {
@@ -223,7 +240,7 @@ module.exports.fetchAndCollect = async function fetchAndCollect(request) {
             headers: [...res.headers]
               .map(([name, value]) => ({ name, value }))
               // Strip out x-readme-* headers
-              .filter(header => requiredHeaders.indexOf(header.name) === -1),
+              .filter(header => readmeHeaders.indexOf(header.name) === -1),
             content: {
               text: responseBody,
               size: responseBody.length,
@@ -267,10 +284,10 @@ module.exports.metrics = function readme(apiKey, group, req, har) {
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const minimatch = __webpack_require__(3);
+const minimatch = __webpack_require__(4);
 
 module.exports = url =>
   INSTALL_OPTIONS.routes
@@ -280,7 +297,7 @@ module.exports = url =>
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = minimatch
@@ -288,11 +305,11 @@ minimatch.Minimatch = Minimatch
 
 var path = { sep: '/' }
 try {
-  path = __webpack_require__(4)
+  path = __webpack_require__(5)
 } catch (er) {}
 
 var GLOBSTAR = minimatch.GLOBSTAR = Minimatch.GLOBSTAR = {}
-var expand = __webpack_require__(6)
+var expand = __webpack_require__(7)
 
 var plTypes = {
   '!': { open: '(?:(?!(?:', close: '))[^/]*?)'},
@@ -1209,7 +1226,7 @@ function regExpEscape (s) {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -1437,10 +1454,10 @@ var substr = 'ab'.substr(-1) === 'b'
     }
 ;
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(6)))
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -1630,11 +1647,11 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var concatMap = __webpack_require__(7);
-var balanced = __webpack_require__(8);
+var concatMap = __webpack_require__(8);
+var balanced = __webpack_require__(9);
 
 module.exports = expandTop;
 
@@ -1837,7 +1854,7 @@ function expand(str, isTop) {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports) {
 
 module.exports = function (xs, fn) {
@@ -1856,7 +1873,7 @@ var isArray = Array.isArray || function (xs) {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

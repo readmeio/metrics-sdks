@@ -1,5 +1,6 @@
 /* eslint-env worker */
 /* global HOST, VERSION */
+const { CONSTANTS } = require('./constants.js');
 
 async function getRequestBody(request) {
   if (request.method.match(/GET|HEAD/)) {
@@ -62,7 +63,8 @@ module.exports.fetchAndCollect = async function fetchAndCollect(request) {
   const { req, body: requestBody } = await getRequestBody(request);
 
   const response = await fetch(req);
-  const requiredHeaders = ['x-readme-id', 'x-readme-label'];
+  const requiredHeaders = [CONSTANTS.HEADERS.ID, CONSTANTS.HEADERS.LABEL];
+  const readmeHeaders = [CONSTANTS.HEADERS.ID, CONSTANTS.HEADERS.LABEL, CONSTANTS.HEADERS.EMAIL];
 
   const missingHeaders = requiredHeaders
     .map(header => {
@@ -104,7 +106,7 @@ module.exports.fetchAndCollect = async function fetchAndCollect(request) {
             headers: [...res.headers]
               .map(([name, value]) => ({ name, value }))
               // Strip out x-readme-* headers
-              .filter(header => requiredHeaders.indexOf(header.name) === -1),
+              .filter(header => readmeHeaders.indexOf(header.name) === -1),
             content: {
               text: responseBody,
               size: responseBody.length,

@@ -195,6 +195,30 @@ describe('worker', () => {
       // it can be returned from the service worker
       await response.json();
     });
+
+    it('should strip out any x-readme-headers', async () => {
+      const request = new global.Request('https://example.com/a?b=2', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({ c: 3, d: 4 }),
+      });
+      nock('https://example.com')
+        .post('/a?b=2', JSON.stringify({ c: 3, d: 4 }))
+        .reply(200, '', {
+          'x-readme-id': 'id',
+          'x-readme-label': 'label',
+          'x-readme-email': 'myEmail',
+          coronavirus: 'activated',
+        });
+
+      const { har } = await requireWorker().fetchAndCollect(request);
+      const headers = har.log.entries[0].response.headers.map(h => h.name);
+      assert.equal(headers.indexOf('x-readme-id'), -1);
+      assert.equal(headers.indexOf('x-readme-label'), -1);
+      assert.equal(headers.indexOf('x-readme-email'), -1);
+    });
   });
 
   describe('#metrics()', () => {
