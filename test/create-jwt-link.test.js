@@ -23,7 +23,7 @@ describe('#createJwtLink', () => {
       .reply(200, { jwtSecret: 'jwt', baseUrl: 'http://readme.readme.io' });
 
     const jwtLink = await createJWTLink(apiKey, { user: 'marc' }, '/docs');
-    expect(jwtLink.startsWith('http://readme.readme.io/docs')).toBeTruthy();
+    expect(jwtLink.startsWith('http://readme.readme.io/docs')).toBe(true);
   });
 
   it('should not prepend base url if redirect is full url', async () => {
@@ -36,6 +36,6 @@ describe('#createJwtLink', () => {
       .reply(200, { jwtSecret: 'jwt', baseUrl: 'http://readme.readme.io' });
 
     const jwtLink = await createJWTLink(apiKey, { user: 'marc' }, 'http://docs.readme.io/docs');
-    expect(jwtLink.startsWith('http://docs.readme.io/docs')).toBeTruthy();
+    expect(jwtLink.startsWith('http://docs.readme.io/docs')).toBe(true);
   });
 });

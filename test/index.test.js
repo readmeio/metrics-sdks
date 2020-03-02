@@ -69,13 +69,13 @@ describe('#metrics', () => {
         .get('/test')
         .expect(200);
 
-      expect(mock.isDone()).toBeFalsy();
+      expect(mock.isDone()).toBe(false);
 
       await request(app)
         .get('/test')
         .expect(200);
 
-      expect(mock.isDone()).toBeFalsy();
+      expect(mock.isDone()).toBe(false);
 
       await request(app)
         .get('/test')
@@ -186,7 +186,7 @@ describe('#metrics', () => {
           .get('/readme')
           .expect(302)
           .expect(res => {
-            expect(res.header.location.startsWith('/login?redirect=')).toBeTruthy();
+            expect(res.header.location.startsWith('/login?redirect=')).toBe(true);
           });
       });
 
@@ -204,7 +204,7 @@ describe('#metrics', () => {
           .get('/readme')
           .expect(302)
           .expect(res => {
-            expect(res.header.location.startsWith('http://readme.readme.io?auth_token=')).toBeTruthy();
+            expect(res.header.location.startsWith('http://readme.readme.io?auth_token=')).toBe(true);
           });
       });
     });

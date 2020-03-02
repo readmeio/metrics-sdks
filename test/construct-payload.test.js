@@ -32,7 +32,7 @@ describe('constructPayload()', () => {
         expect(typeof body.request.log.entries[0].response).toBe('object');
         expect(
           body.request.log.entries[0].request.postData.params.find(param => param.name === 'password')
-        ).toBeFalsy();
+        ).toBeUndefined();
       });
   }, 8000);
 
@@ -85,7 +85,7 @@ describe('constructPayload()', () => {
       .post('/')
       .expect(({ body }) => {
         expect(typeof body.request.log.entries[0].time).toBe('number');
-        expect(body.request.log.entries[0].time > 0).toBeTruthy();
+        expect(body.request.log.entries[0].time).toBeGreaterThan(0);
       });
   });
 });

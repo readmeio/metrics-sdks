@@ -6,7 +6,7 @@
       {
         "assertFunctionNames": [
           "expect",
-          "request.*.expect"
+          "request.**.expect"
         ]
       }
     ]
