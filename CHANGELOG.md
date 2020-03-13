@@ -1,3 +1,16 @@
+## <small>1.3.1 (2020-03-13)</small>
+
+* chore: adding a .npmignore for smaller package sizes ([03bde01](https://github.com/readmeio/readme-node/commit/03bde01))
+* chore(deps-dev): Bump @readme/eslint-config from 1.12.0 to 1.13.0 (#43) ([7c5a710](https://github.com/readmeio/readme-node/commit/7c5a710)), closes [#43](https://github.com/readmeio/readme-node/issues/43)
+* chore(deps-dev): Bump @readme/eslint-config from 1.13.0 to 1.14.0 (#45) ([a8a51e7](https://github.com/readmeio/readme-node/commit/a8a51e7)), closes [#45](https://github.com/readmeio/readme-node/issues/45)
+* chore(deps-dev): Bump nock from 11.8.2 to 12.0.0 (#41) ([e837015](https://github.com/readmeio/readme-node/commit/e837015)), closes [#41](https://github.com/readmeio/readme-node/issues/41)
+* chore(deps-dev): Bump nock from 12.0.0 to 12.0.1 (#42) ([76ca2e5](https://github.com/readmeio/readme-node/commit/76ca2e5)), closes [#42](https://github.com/readmeio/readme-node/issues/42)
+* chore(deps-dev): Bump nock from 12.0.1 to 12.0.2 (#44) ([263a7f9](https://github.com/readmeio/readme-node/commit/263a7f9)), closes [#44](https://github.com/readmeio/readme-node/issues/44)
+* docs: adding a changelog ([c86f8c4](https://github.com/readmeio/readme-node/commit/c86f8c4))
+* fix: fix omit for nested objects (#46) ([8cec864](https://github.com/readmeio/readme-node/commit/8cec864)), closes [#46](https://github.com/readmeio/readme-node/issues/46)
+
+
+
 ## 1.3.0 (2020-02-12)
 
 * build: 1.3.0 release ([f69ca41](https://github.com/readmeio/readme-node/commit/f69ca41))
