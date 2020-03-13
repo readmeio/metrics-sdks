@@ -34,6 +34,17 @@ describe('processRequest()', () => {
         });
     });
 
+    it('should strip blacklisted nested properties', () => {
+      const app = createApp({ blacklist: ['a.b.c'] });
+
+      return request(app)
+        .post('/')
+        .send({ a: { b: { c: 1 } } })
+        .expect(({ body }) => {
+          expect(body.postData.params).toStrictEqual([{ name: 'a', value: { b: {} } }]);
+        });
+    });
+
     it('should only send whitelisted properties', () => {
       const app = createApp({ whitelist: ['password', 'apiKey'] });
 
@@ -45,6 +56,17 @@ describe('processRequest()', () => {
             { name: 'password', value: '123456' },
             { name: 'apiKey', value: 'abcdef' },
           ]);
+        });
+    });
+
+    it('should only send whitelisted nested properties', () => {
+      const app = createApp({ whitelist: ['a.b.c'] });
+
+      return request(app)
+        .post('/')
+        .send({ a: { b: { c: 1 } }, d: 2 })
+        .expect(({ body }) => {
+          expect(body.postData.params).toStrictEqual([{ name: 'a', value: { b: { c: 1 } } }]);
         });
     });
   });

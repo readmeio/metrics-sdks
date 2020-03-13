@@ -8,8 +8,7 @@
   "dependencies": {
     "configly": "^4.1.0",
     "jsonwebtoken": "^8.3.0",
-    "lodash.omit": "^4.5.0",
-    "lodash.pick": "^4.4.0",
+    "lodash": "^4.17.15",
     "node-uuid": "^1.4.8",
     "r2": "^2.0.1"
   },
