@@ -17,6 +17,7 @@
     "inspect": "jsinspect",
     "pretest": "npm run lint && npm run inspect && npm run prettier",
     "prettier": "prettier --list-different --write \"./**/**.js\"",
+    "release": "conventional-changelog -i CHANGELOG.md -s",
     "test": "jest --coverage"
   },
   "publishConfig": {
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@readme/eslint-config": "^1.4.2",
     "body-parser": "^1.19.0",
+    "conventional-changelog-cli": "^2.0.31",
     "eslint": "^6.7.0",
     "express": "^4.17.1",
     "jest": "^25.1.0",
