@@ -3,7 +3,7 @@ const request = require('supertest');
 const nock = require('nock');
 const config = require('../config');
 
-const middleware = require('../');
+const middleware = require('..');
 
 const apiKey = 'OUW3RlI4gUCwWGpO10srIo2ufdWmMhMH';
 
