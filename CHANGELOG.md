@@ -1,3 +1,10 @@
+## <small>1.3.2 (2020-03-16)</small>
+
+* chore(deps-dev): Bump @readme/eslint-config from 1.14.0 to 1.15.0 (#48) ([6ec1518](https://github.com/readmeio/readme-node/commit/6ec1518)), closes [#48](https://github.com/readmeio/readme-node/issues/48)
+* chore(deps): [Security] Bump acorn from 6.4.0 to 6.4.1 (#47) ([8344447](https://github.com/readmeio/readme-node/commit/8344447)), closes [#47](https://github.com/readmeio/readme-node/issues/47)
+
+
+
 ## <small>1.3.1 (2020-03-13)</small>
 
 * chore: adding a .npmignore for smaller package sizes ([03bde01](https://github.com/readmeio/readme-node/commit/03bde01))
