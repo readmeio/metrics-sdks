@@ -1,3 +1,11 @@
+## 2.0.0 (2020-03-23)
+
+* chore(deps-dev): Bump nock from 12.0.2 to 12.0.3 (#50) ([bd50c95](https://github.com/readmeio/readme-node/commit/bd50c95)), closes [#50](https://github.com/readmeio/readme-node/issues/50)
+* chore(deps-dev): upgrading prettier and our eslint config to 2.0 (#52) ([3a45034](https://github.com/readmeio/readme-node/commit/3a45034)), closes [#52](https://github.com/readmeio/readme-node/issues/52)
+* feat: support for blacklist/whitelisting headers (#49) ([5370bb2](https://github.com/readmeio/readme-node/commit/5370bb2)), closes [#49](https://github.com/readmeio/readme-node/issues/49) [/github.com/readmeio/readme-node/pull/49#pullrequestreview-378815773](https://github.com//github.com/readmeio/readme-node/pull/49/issues/pullrequestreview-378815773) [/github.com/readmeio/readme-node/pull/49#discussion_r395217319](https://github.com//github.com/readmeio/readme-node/pull/49/issues/discussion_r395217319)
+
+
+
 ## <small>1.3.2 (2020-03-16)</small>
 
 * chore(deps-dev): Bump @readme/eslint-config from 1.14.0 to 1.15.0 (#48) ([6ec1518](https://github.com/readmeio/readme-node/commit/6ec1518)), closes [#48](https://github.com/readmeio/readme-node/issues/48)
