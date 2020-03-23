@@ -17,9 +17,7 @@ async function testResponse(assertion, response) {
     res.json(response);
   });
 
-  return request(app)
-    .post('/')
-    .expect(200);
+  return request(app).post('/').expect(200);
 }
 
 describe('processResponse()', () => {

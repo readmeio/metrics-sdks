@@ -43,9 +43,7 @@ describe('#metrics', () => {
     app.use(middleware.metrics(apiKey, () => group));
     app.get('/test', (req, res) => res.sendStatus(200));
 
-    await request(app)
-      .get('/test')
-      .expect(200);
+    await request(app).get('/test').expect(200);
 
     mock.done();
   }, 5000);
@@ -65,21 +63,15 @@ describe('#metrics', () => {
       app.use(middleware.metrics(apiKey, () => group, { bufferLength: 3 }));
       app.get('/test', (req, res) => res.sendStatus(200));
 
-      await request(app)
-        .get('/test')
-        .expect(200);
+      await request(app).get('/test').expect(200);
 
       expect(mock.isDone()).toBe(false);
 
-      await request(app)
-        .get('/test')
-        .expect(200);
+      await request(app).get('/test').expect(200);
 
       expect(mock.isDone()).toBe(false);
 
-      await request(app)
-        .get('/test')
-        .expect(200);
+      await request(app).get('/test').expect(200);
 
       mock.done();
     }, 5000);
@@ -107,9 +99,7 @@ describe('#metrics', () => {
         res.status(200).end();
       });
 
-      await request(app)
-        .get('/test')
-        .expect(200);
+      await request(app).get('/test').expect(200);
 
       mock.done();
     }, 5000);
@@ -120,9 +110,7 @@ describe('#metrics', () => {
       app.use(middleware.metrics(apiKey, () => '123'));
       app.get('/test', (req, res) => res.end(JSON.stringify(responseBody)));
 
-      await request(app)
-        .get('/test')
-        .expect(200);
+      await request(app).get('/test').expect(200);
 
       mock.done();
     }, 5000);
@@ -133,9 +121,7 @@ describe('#metrics', () => {
       app.use(middleware.metrics(apiKey, () => '123'));
       app.get('/test', (req, res) => res.send(responseBody));
 
-      await request(app)
-        .get('/test')
-        .expect(200);
+      await request(app).get('/test').expect(200);
 
       mock.done();
     }, 5000);
