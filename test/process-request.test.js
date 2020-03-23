@@ -23,51 +23,148 @@ function createApp(options) {
 
 describe('processRequest()', () => {
   describe('options', () => {
-    it('should strip blacklisted properties', () => {
-      const app = createApp({ blacklist: ['password', 'apiKey'] });
+    describe('blacklist/whitelist in body', () => {
+      it('should strip blacklisted properties', () => {
+        const app = createApp({ blacklist: ['password', 'apiKey'] });
 
-      return request(app)
-        .post('/')
-        .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
-        .expect(({ body }) => {
-          expect(body.postData.params).toStrictEqual([{ name: 'another', value: 'Hello world' }]);
-        });
+        return request(app)
+          .post('/')
+          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .expect(({ body }) => {
+            expect(body.postData.params).toStrictEqual([{ name: 'another', value: 'Hello world' }]);
+          });
+      });
+
+      it('should strip blacklisted nested properties', () => {
+        const app = createApp({ blacklist: ['a.b.c'] });
+
+        return request(app)
+          .post('/')
+          .send({ a: { b: { c: 1 } } })
+          .expect(({ body }) => {
+            expect(body.postData.params).toStrictEqual([{ name: 'a', value: { b: {} } }]);
+          });
+      });
+
+      it('should only send whitelisted properties', () => {
+        const app = createApp({ whitelist: ['password', 'apiKey'] });
+
+        return request(app)
+          .post('/')
+          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .expect(({ body }) => {
+            expect(body.postData.params).toStrictEqual([
+              { name: 'password', value: '123456' },
+              { name: 'apiKey', value: 'abcdef' },
+            ]);
+          });
+      });
+
+      it('should only send whitelisted nested properties', () => {
+        const app = createApp({ whitelist: ['a.b.c'] });
+
+        return request(app)
+          .post('/')
+          .send({ a: { b: { c: 1 } }, d: 2 })
+          .expect(({ body }) => {
+            expect(body.postData.params).toStrictEqual([{ name: 'a', value: { b: { c: 1 } } }]);
+          });
+      });
+
+      it('should ignore whitelist if blacklist is present', () => {
+        const app = createApp({ blacklist: ['password', 'apiKey'], whitelist: ['password', 'apiKey'] });
+
+        return request(app)
+          .post('/')
+          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .expect(({ body }) => {
+            expect(body.postData.params).toStrictEqual([{ name: 'another', value: 'Hello world' }]);
+          });
+      });
     });
 
-    it('should strip blacklisted nested properties', () => {
-      const app = createApp({ blacklist: ['a.b.c'] });
+    describe('blacklist/whitelist in headers', () => {
+      it('should strip blacklisted properties', () => {
+        const app = createApp({ blacklist: ['host', 'accept-encoding', 'user-agent', 'connection'] });
 
-      return request(app)
-        .post('/')
-        .send({ a: { b: { c: 1 } } })
-        .expect(({ body }) => {
-          expect(body.postData.params).toStrictEqual([{ name: 'a', value: { b: {} } }]);
-        });
+        return request(app)
+          .post('/')
+          .set('a', '1')
+          .expect(({ body }) => {
+            expect(body.headers).toStrictEqual([
+              { name: 'a', value: '1' },
+              { name: 'content-length', value: '0' },
+            ]);
+          });
+      });
+
+      it('should only send whitelisted properties', () => {
+        const app = createApp({ whitelist: ['a'] });
+
+        return request(app)
+          .post('/')
+          .set('a', '1')
+          .expect(({ body }) => {
+            expect(body.headers).toStrictEqual([{ name: 'a', value: '1' }]);
+          });
+      });
     });
 
-    it('should only send whitelisted properties', () => {
-      const app = createApp({ whitelist: ['password', 'apiKey'] });
-
-      return request(app)
-        .post('/')
-        .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
-        .expect(({ body }) => {
-          expect(body.postData.params).toStrictEqual([
-            { name: 'password', value: '123456' },
-            { name: 'apiKey', value: 'abcdef' },
-          ]);
+    describe('blacklist/whitelist in body and headers', () => {
+      it('should strip blacklisted properties in body and headers', () => {
+        const app = createApp({
+          blacklist: ['host', 'accept-encoding', 'user-agent', 'connection', 'content-length', 'password', 'apiKey'],
         });
-    });
 
-    it('should only send whitelisted nested properties', () => {
-      const app = createApp({ whitelist: ['a.b.c'] });
+        return request(app)
+          .post('/')
+          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .set('a', '1')
+          .expect(({ body }) => {
+            expect(body.headers).toStrictEqual([
+              { name: 'content-type', value: 'application/json' },
+              { name: 'a', value: '1' },
+            ]);
+            expect(body.postData.params).toStrictEqual([{ name: 'another', value: 'Hello world' }]);
+          });
+      });
 
-      return request(app)
-        .post('/')
-        .send({ a: { b: { c: 1 } }, d: 2 })
-        .expect(({ body }) => {
-          expect(body.postData.params).toStrictEqual([{ name: 'a', value: { b: { c: 1 } } }]);
+      it('should only send whitelisted nested properties in body and headers', () => {
+        const app = createApp({
+          whitelist: ['a', 'another', 'content-type'],
         });
+
+        return request(app)
+          .post('/')
+          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .set('a', '1')
+          .expect(({ body }) => {
+            expect(body.headers).toStrictEqual([
+              { name: 'a', value: '1' },
+              { name: 'content-type', value: 'application/json' },
+            ]);
+            expect(body.postData.params).toStrictEqual([{ name: 'another', value: 'Hello world' }]);
+          });
+      });
+
+      it('should ignore whitelist if there are blacklisted properties in headers and body', () => {
+        const app = createApp({
+          blacklist: ['host', 'accept-encoding', 'user-agent', 'connection', 'content-length', 'password', 'apiKey'],
+          whitelist: ['host', 'accept-encoding', 'user-agent', 'connection', 'content-length', 'password', 'apiKey'],
+        });
+
+        return request(app)
+          .post('/')
+          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .set('a', '1')
+          .expect(({ body }) => {
+            expect(body.headers).toStrictEqual([
+              { name: 'content-type', value: 'application/json' },
+              { name: 'a', value: '1' },
+            ]);
+            expect(body.postData.params).toStrictEqual([{ name: 'another', value: 'Hello world' }]);
+          });
+      });
     });
   });
 
