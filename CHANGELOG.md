@@ -1,3 +1,17 @@
+## <small>2.0.1 (2020-04-15)</small>
+
+* deps: remove configly (#63) ([08cd121](https://github.com/readmeio/readme-node/commit/08cd121)), closes [#63](https://github.com/readmeio/readme-node/issues/63)
+* chore(deps-dev): Bump @readme/eslint-config from 2.0.0 to 2.0.2 (#55) ([1e6f7c3](https://github.com/readmeio/readme-node/commit/1e6f7c3)), closes [#55](https://github.com/readmeio/readme-node/issues/55)
+* chore(deps-dev): Bump @readme/eslint-config from 2.0.2 to 2.0.3 (#57) ([08ab26f](https://github.com/readmeio/readme-node/commit/08ab26f)), closes [#57](https://github.com/readmeio/readme-node/issues/57)
+* chore(deps-dev): Bump jest from 25.1.0 to 25.2.4 (#54) ([c275a28](https://github.com/readmeio/readme-node/commit/c275a28)), closes [#54](https://github.com/readmeio/readme-node/issues/54)
+* chore(deps-dev): Bump jest from 25.2.4 to 25.2.7 (#59) ([c42a6e0](https://github.com/readmeio/readme-node/commit/c42a6e0)), closes [#59](https://github.com/readmeio/readme-node/issues/59)
+* chore(deps-dev): Bump jest from 25.2.7 to 25.3.0 (#61) ([2696d0c](https://github.com/readmeio/readme-node/commit/2696d0c)), closes [#61](https://github.com/readmeio/readme-node/issues/61)
+* chore(deps-dev): Bump prettier from 2.0.1 to 2.0.2 (#56) ([4e32081](https://github.com/readmeio/readme-node/commit/4e32081)), closes [#56](https://github.com/readmeio/readme-node/issues/56)
+* chore(deps-dev): Bump prettier from 2.0.2 to 2.0.3 (#58) ([766c4e2](https://github.com/readmeio/readme-node/commit/766c4e2)), closes [#58](https://github.com/readmeio/readme-node/issues/58)
+* chore(deps-dev): Bump prettier from 2.0.3 to 2.0.4 (#60) ([352cb06](https://github.com/readmeio/readme-node/commit/352cb06)), closes [#60](https://github.com/readmeio/readme-node/issues/60)
+
+
+
 ## 2.0.0 (2020-03-23)
 
 * chore(deps-dev): Bump nock from 12.0.2 to 12.0.3 (#50) ([bd50c95](https://github.com/readmeio/readme-node/commit/bd50c95)), closes [#50](https://github.com/readmeio/readme-node/issues/50)
