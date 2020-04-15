@@ -1,4 +1,12 @@
-// Have to disable this rule because we're using a fake
-// `config` module as documented here:
-// https://github.com/alexindigo/configly#migration-from-config
-module.exports = require('configly')(__dirname);
+const defaultJson = require('./default.json');
+
+function getConfig() {
+  if (['localhost', 'testing'].includes(process.env.NODE_ENV)) {
+    // eslint-disable-next-line global-require, import/no-dynamic-require
+    const file = require(`./${process.env.NODE_ENV}.json`);
+    return Object.assign(defaultJson, file);
+  }
+  return defaultJson;
+}
+
+module.exports = getConfig();

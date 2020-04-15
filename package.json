@@ -6,7 +6,6 @@
     "node": ">=10"
   },
   "dependencies": {
-    "configly": "^4.1.0",
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.15",
     "node-uuid": "^1.4.8",
@@ -42,7 +41,9 @@
     "supertest": "^4.0.2"
   },
   "jest": {
-    "globalSetup": "<rootDir>/test/jest.setup.js"
+    "setupFiles": [
+      "./test/set-node-env"
+    ]
   },
   "prettier": "@readme/eslint-config/prettier"
 }
