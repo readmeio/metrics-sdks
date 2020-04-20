@@ -1,3 +1,11 @@
+## <small>2.0.2 (2020-04-20)</small>
+
+* fix: use correct mimeType instead of always specifying JSON (#64) ([9406479](https://github.com/readmeio/readme-node/commit/9406479)), closes [#64](https://github.com/readmeio/readme-node/issues/64)
+* chore(deps-dev): Bump @readme/eslint-config from 2.0.3 to 2.0.4 (#65) ([e9a5558](https://github.com/readmeio/readme-node/commit/e9a5558)), closes [#65](https://github.com/readmeio/readme-node/issues/65)
+* chore(deps-dev): Bump jest from 25.3.0 to 25.4.0 (#66) ([c4d5998](https://github.com/readmeio/readme-node/commit/c4d5998)), closes [#66](https://github.com/readmeio/readme-node/issues/66)
+
+
+
 ## <small>2.0.1 (2020-04-15)</small>
 
 * deps: remove configly (#63) ([08cd121](https://github.com/readmeio/readme-node/commit/08cd121)), closes [#63](https://github.com/readmeio/readme-node/issues/63)
