@@ -6,6 +6,7 @@ const processRequest = require('../lib/process-request');
 
 function createApp(options) {
   const app = express();
+  app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
 
   const router = express.Router();
@@ -233,12 +234,35 @@ describe('processRequest()', () => {
       ));
 
   describe('#postData', () => {
-    it('#mimeType should be application/json', () =>
+    describe('application/x-www-form-urlencoded', () => {
+      it('#params should contain parsed body', () => {
+        return request(createApp())
+          .post('/')
+          .set({ name: 'content-type', value: 'application/x-www-form-urlencoded' })
+          .send('a=1&b=2')
+          .expect(res =>
+            expect(res.body.postData.params).toStrictEqual([
+              { name: 'a', value: '1' },
+              { name: 'b', value: '2' },
+            ])
+          );
+      });
+
+      it('#mimeType should properly parse content-type header', () => {
+        return request(createApp())
+          .post('/')
+          .set({ name: 'content-type', value: 'application/x-www-form-urlencoded; charset=UTF-8' })
+          .send('a=1&b=2')
+          .expect(res => expect(res.body.postData.mimeType).toBe('application/x-www-form-urlencoded'));
+      });
+    });
+
+    it('#mimeType should default to application/json', () =>
       request(createApp())
         .post('/')
         .expect(({ body }) => expect(body.postData.mimeType).toBe('application/json')));
 
-    it('#text should be stringified body', () => {
+    it('#params should contain parsed body', () => {
       const body = { a: 1, b: 2 };
       return request(createApp())
         .post('/')

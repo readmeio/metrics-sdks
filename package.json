@@ -6,6 +6,7 @@
     "node": ">=10"
   },
   "dependencies": {
+    "content-type": "^1.0.4",
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.15",
     "node-uuid": "^1.4.8",
