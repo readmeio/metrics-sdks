@@ -259,7 +259,7 @@ describe('processRequest()', () => {
         .post('/')
         .expect(({ body }) => expect(body.postData.mimeType).toBe('application/json')));
 
-    it('#params should contain parsed body', () => {
+    it('#text should contain stringified body', () => {
       const body = { a: 1, b: 2 };
       return request(createApp())
         .post('/')
