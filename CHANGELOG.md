@@ -1,3 +1,11 @@
+## 2.1.0 (2020-04-29)
+
+* chore: fix name of a test ([ec725bf](https://github.com/readmeio/readme-node/commit/ec725bf))
+* chore(deps-dev): Bump prettier from 2.0.4 to 2.0.5 (#67) ([aa6739b](https://github.com/readmeio/readme-node/commit/aa6739b)), closes [#67](https://github.com/readmeio/readme-node/issues/67)
+* fix: use postData.text for JSON to handle nested body content (#68) ([8c34afc](https://github.com/readmeio/readme-node/commit/8c34afc)), closes [#68](https://github.com/readmeio/readme-node/issues/68)
+
+
+
 ## <small>2.0.2 (2020-04-20)</small>
 
 * fix: use correct mimeType instead of always specifying JSON (#64) ([9406479](https://github.com/readmeio/readme-node/commit/9406479)), closes [#64](https://github.com/readmeio/readme-node/issues/64)
