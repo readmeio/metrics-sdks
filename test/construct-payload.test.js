@@ -30,9 +30,7 @@ describe('constructPayload()', () => {
       .expect(({ body }) => {
         expect(typeof body.request.log.entries[0].request).toBe('object');
         expect(typeof body.request.log.entries[0].response).toBe('object');
-        expect(
-          body.request.log.entries[0].request.postData.params.find(param => param.name === 'password')
-        ).toBeUndefined();
+        expect(body.request.log.entries[0].request.postData.text).toBe('{}');
       });
   }, 8000);
 

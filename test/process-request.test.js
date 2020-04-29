@@ -32,7 +32,7 @@ describe('processRequest()', () => {
           .post('/')
           .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
           .expect(({ body }) => {
-            expect(body.postData.params).toStrictEqual([{ name: 'another', value: 'Hello world' }]);
+            expect(body.postData.text).toBe('{"another":"Hello world"}');
           });
       });
 
@@ -43,7 +43,7 @@ describe('processRequest()', () => {
           .post('/')
           .send({ a: { b: { c: 1 } } })
           .expect(({ body }) => {
-            expect(body.postData.params).toStrictEqual([{ name: 'a', value: { b: {} } }]);
+            expect(body.postData.text).toBe('{"a":{"b":{}}}');
           });
       });
 
@@ -54,10 +54,7 @@ describe('processRequest()', () => {
           .post('/')
           .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
           .expect(({ body }) => {
-            expect(body.postData.params).toStrictEqual([
-              { name: 'password', value: '123456' },
-              { name: 'apiKey', value: 'abcdef' },
-            ]);
+            expect(body.postData.text).toBe('{"password":"123456","apiKey":"abcdef"}');
           });
       });
 
@@ -68,7 +65,7 @@ describe('processRequest()', () => {
           .post('/')
           .send({ a: { b: { c: 1 } }, d: 2 })
           .expect(({ body }) => {
-            expect(body.postData.params).toStrictEqual([{ name: 'a', value: { b: { c: 1 } } }]);
+            expect(body.postData.text).toBe('{"a":{"b":{"c":1}}}');
           });
       });
 
@@ -79,7 +76,7 @@ describe('processRequest()', () => {
           .post('/')
           .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
           .expect(({ body }) => {
-            expect(body.postData.params).toStrictEqual([{ name: 'another', value: 'Hello world' }]);
+            expect(body.postData.text).toBe('{"another":"Hello world"}');
           });
       });
     });
@@ -126,7 +123,7 @@ describe('processRequest()', () => {
               { name: 'content-type', value: 'application/json' },
               { name: 'a', value: '1' },
             ]);
-            expect(body.postData.params).toStrictEqual([{ name: 'another', value: 'Hello world' }]);
+            expect(body.postData.text).toBe('{"another":"Hello world"}');
           });
       });
 
@@ -144,7 +141,7 @@ describe('processRequest()', () => {
               { name: 'a', value: '1' },
               { name: 'content-type', value: 'application/json' },
             ]);
-            expect(body.postData.params).toStrictEqual([{ name: 'another', value: 'Hello world' }]);
+            expect(body.postData.text).toBe('{"another":"Hello world"}');
           });
       });
 
@@ -163,7 +160,7 @@ describe('processRequest()', () => {
               { name: 'content-type', value: 'application/json' },
               { name: 'a', value: '1' },
             ]);
-            expect(body.postData.params).toStrictEqual([{ name: 'another', value: 'Hello world' }]);
+            expect(body.postData.text).toBe('{"another":"Hello world"}');
           });
       });
     });
@@ -267,12 +264,7 @@ describe('processRequest()', () => {
       return request(createApp())
         .post('/')
         .send(body)
-        .expect(res =>
-          expect(res.body.postData.params).toStrictEqual([
-            { name: 'a', value: 1 },
-            { name: 'b', value: 2 },
-          ])
-        );
+        .expect(res => expect(res.body.postData.text).toBe('{"a":1,"b":2}'));
     });
   });
 });
