@@ -1,3 +1,14 @@
+## <small>2.1.1 (2020-05-18)</small>
+
+* chore(deps-dev): Bump @readme/eslint-config from 2.0.4 to 2.0.6 (#70) ([94d93df](https://github.com/readmeio/readme-node/commit/94d93df)), closes [#70](https://github.com/readmeio/readme-node/issues/70)
+* chore(deps-dev): Bump conventional-changelog-cli from 2.0.31 to 2.0.34 (#71) ([2db5ce4](https://github.com/readmeio/readme-node/commit/2db5ce4)), closes [#71](https://github.com/readmeio/readme-node/issues/71)
+* chore(deps-dev): Bump jest from 25.4.0 to 25.5.4 (#69) ([53a7675](https://github.com/readmeio/readme-node/commit/53a7675)), closes [#69](https://github.com/readmeio/readme-node/issues/69)
+* chore(deps-dev): Bump jest from 25.5.4 to 26.0.1 (#73) ([dcbed98](https://github.com/readmeio/readme-node/commit/dcbed98)), closes [#73](https://github.com/readmeio/readme-node/issues/73)
+* chore(deps-dev): upgrading @readme/eslint-config to v3 and eslint to v7 (#74) ([baeb49d](https://github.com/readmeio/readme-node/commit/baeb49d)), closes [#74](https://github.com/readmeio/readme-node/issues/74)
+* chore(deps): [Security] Bump minimist from 0.0.8 to 1.2.5 (#75) ([92e46fb](https://github.com/readmeio/readme-node/commit/92e46fb)), closes [#75](https://github.com/readmeio/readme-node/issues/75)
+
+
+
 ## 2.1.0 (2020-04-29)
 
 * chore: fix name of a test ([ec725bf](https://github.com/readmeio/readme-node/commit/ec725bf))
