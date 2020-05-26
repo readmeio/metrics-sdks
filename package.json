@@ -9,8 +9,8 @@
     "content-type": "^1.0.4",
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.15",
-    "node-uuid": "^1.4.8",
-    "r2": "^2.0.1"
+    "r2": "^2.0.1",
+    "uuid": "^8.1.0"
   },
   "scripts": {
     "lint": "eslint .",
