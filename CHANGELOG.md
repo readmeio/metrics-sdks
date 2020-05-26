@@ -1,3 +1,11 @@
+## <small>2.1.2 (2020-05-26)</small>
+
+* chore(deps-dev): Bump @readme/eslint-config from 3.0.0 to 3.1.0 (#76) ([cb63770](https://github.com/readmeio/readme-node/commit/cb63770)), closes [#76](https://github.com/readmeio/readme-node/issues/76)
+* chore(deps-dev): Bump eslint from 7.0.0 to 7.1.0 (#77) ([a4d6be5](https://github.com/readmeio/readme-node/commit/a4d6be5)), closes [#77](https://github.com/readmeio/readme-node/issues/77)
+* chore(deps): replacing node-uuid with uuid (#78) ([5493338](https://github.com/readmeio/readme-node/commit/5493338)), closes [#78](https://github.com/readmeio/readme-node/issues/78)
+
+
+
 ## <small>2.1.1 (2020-05-18)</small>
 
 * chore(deps-dev): Bump @readme/eslint-config from 2.0.4 to 2.0.6 (#70) ([94d93df](https://github.com/readmeio/readme-node/commit/94d93df)), closes [#70](https://github.com/readmeio/readme-node/issues/70)
