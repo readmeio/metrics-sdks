@@ -1,3 +1,9 @@
+## <small>2.1.3 (2020-05-29)</small>
+
+* fix: don't stringify empty post bodies (#79) ([16aae67](https://github.com/readmeio/readme-node/commit/16aae67)), closes [#79](https://github.com/readmeio/readme-node/issues/79)
+
+
+
 ## <small>2.1.2 (2020-05-26)</small>
 
 * chore(deps-dev): Bump @readme/eslint-config from 3.0.0 to 3.1.0 (#76) ([cb63770](https://github.com/readmeio/readme-node/commit/cb63770)), closes [#76](https://github.com/readmeio/readme-node/issues/76)
