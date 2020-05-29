@@ -15,6 +15,8 @@ function createApp(options) {
 
   app.use('/test-base-path', router);
 
+  app.get('/*', (req, res) => res.json(processRequest(req, options)));
+
   app.post('/*', (req, res) => {
     res.json(processRequest(req, options));
   });
@@ -257,7 +259,18 @@ describe('processRequest()', () => {
     it('#mimeType should default to application/json', () =>
       request(createApp())
         .post('/')
+        .send({ a: 1 })
         .expect(({ body }) => expect(body.postData.mimeType).toBe('application/json')));
+
+    it('should be an empty object if request is a GET', () =>
+      request(createApp())
+        .get('/')
+        .expect(({ body }) => expect(body.postData).toStrictEqual({})));
+
+    it('should be an empty object if req.body is empty', () =>
+      request(createApp())
+        .post('/')
+        .expect(({ body }) => expect(body.postData).toStrictEqual({})));
 
     it('#text should contain stringified body', () => {
       const body = { a: 1, b: 2 };

@@ -30,7 +30,7 @@ describe('constructPayload()', () => {
       .expect(({ body }) => {
         expect(typeof body.request.log.entries[0].request).toBe('object');
         expect(typeof body.request.log.entries[0].response).toBe('object');
-        expect(body.request.log.entries[0].request.postData.text).toBe('{}');
+        expect(body.request.log.entries[0].request.postData).toStrictEqual({});
       });
   }, 8000);
 
