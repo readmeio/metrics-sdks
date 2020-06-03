@@ -1,3 +1,12 @@
+## <small>2.1.4 (2020-06-03)</small>
+
+* build(deps-dev): bump @readme/eslint-config from 3.1.0 to 3.1.3 (#82) ([4be69bb](https://github.com/readmeio/readme-node/commit/4be69bb)), closes [#82](https://github.com/readmeio/readme-node/issues/82)
+* build(deps): bump jsonwebtoken from 8.3.0 to 8.5.1 (#81) ([85c6dc2](https://github.com/readmeio/readme-node/commit/85c6dc2)), closes [#81](https://github.com/readmeio/readme-node/issues/81)
+* ci: create Dependabot config file (#80) ([b9b5124](https://github.com/readmeio/readme-node/commit/b9b5124)), closes [#80](https://github.com/readmeio/readme-node/issues/80)
+* ci: running tests against node 14 ([cc73f8e](https://github.com/readmeio/readme-node/commit/cc73f8e))
+
+
+
 ## <small>2.1.3 (2020-05-29)</small>
 
 * fix: don't stringify empty post bodies (#79) ([16aae67](https://github.com/readmeio/readme-node/commit/16aae67)), closes [#79](https://github.com/readmeio/readme-node/issues/79)
