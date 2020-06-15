@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 
 const processResponse = require('../lib/process-response');
 
-async function testResponse(assertion, response) {
+function testResponse(assertion, response) {
   const app = express();
   app.use(bodyParser.json());
   app.post('/*', (req, res) => {
