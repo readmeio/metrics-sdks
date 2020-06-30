@@ -1,3 +1,17 @@
+## <small>2.1.5 (2020-06-30)</small>
+
+* build(deps-dev): bump @readme/eslint-config from 3.1.3 to 3.2.0 (#84) ([fcc2db5](https://github.com/readmeio/readme-node/commit/fcc2db5)), closes [#84](https://github.com/readmeio/readme-node/issues/84)
+* build(deps-dev): bump @readme/eslint-config from 3.2.0 to 3.2.1 (#85) ([a7a96f9](https://github.com/readmeio/readme-node/commit/a7a96f9)), closes [#85](https://github.com/readmeio/readme-node/issues/85)
+* build(deps-dev): bump @readme/eslint-config from 3.2.1 to 3.3.0 (#87) ([8087c61](https://github.com/readmeio/readme-node/commit/8087c61)), closes [#87](https://github.com/readmeio/readme-node/issues/87)
+* build(deps-dev): bump eslint from 7.1.0 to 7.2.0 (#83) ([2fa6b80](https://github.com/readmeio/readme-node/commit/2fa6b80)), closes [#83](https://github.com/readmeio/readme-node/issues/83)
+* build(deps-dev): bump eslint from 7.2.0 to 7.3.1 (#90) ([0079a2e](https://github.com/readmeio/readme-node/commit/0079a2e)), closes [#90](https://github.com/readmeio/readme-node/issues/90)
+* build(deps-dev): bump jest from 26.0.1 to 26.1.0 (#88) ([d8c5f4c](https://github.com/readmeio/readme-node/commit/d8c5f4c)), closes [#88](https://github.com/readmeio/readme-node/issues/88)
+* build(deps-dev): bump nock from 12.0.3 to 13.0.0 (#91) ([3510919](https://github.com/readmeio/readme-node/commit/3510919)), closes [#91](https://github.com/readmeio/readme-node/issues/91)
+* build(deps): bump uuid from 8.1.0 to 8.2.0 (#89) ([b30b4d7](https://github.com/readmeio/readme-node/commit/b30b4d7)), closes [#89](https://github.com/readmeio/readme-node/issues/89)
+* ci: updating the label dependabot uses ([0348e38](https://github.com/readmeio/readme-node/commit/0348e38))
+
+
+
 ## <small>2.1.4 (2020-06-03)</small>
 
 * build(deps-dev): bump @readme/eslint-config from 3.1.0 to 3.1.3 (#82) ([4be69bb](https://github.com/readmeio/readme-node/commit/4be69bb)), closes [#82](https://github.com/readmeio/readme-node/issues/82)
