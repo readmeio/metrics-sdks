@@ -34,11 +34,6 @@ describe('#get-readme-data', () => {
   });
 
   it('should error if invalid api key', async () => {
-    try {
-      await getReadmeData('invalid');
-    } catch (e) {
-      // eslint-disable-next-line jest/no-try-expect
-      expect(e.message).toBe('Invalid ReadMe API Key');
-    }
+    await expect(getReadmeData('invalid')).rejects.toThrow('Invalid ReadMe API Key');
   });
 });
