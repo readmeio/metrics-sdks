@@ -40,7 +40,7 @@ module.exports.metrics = (apiKey, group, options = {}) => {
   return (req, res, next) => {
     const startedDateTime = new Date();
     const logId = ObjectID();
-    res.setHeader('x-documentation-url', `https://dash.readme.io/logs/${logId}`);
+    res.setHeader('x-log-id', logId);
 
     patchResponse(res);
 
