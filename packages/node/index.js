@@ -40,7 +40,7 @@ module.exports.metrics = (apiKey, group, options = {}) => {
   return (req, res, next) => {
     const startedDateTime = new Date();
     const logId = ObjectID();
-    res.setHeader('x-log-id', logId);
+    res.setHeader('x-readme-log', logId);
 
     patchResponse(res);
 
