@@ -1,0 +1,9 @@
+{
+  "extends": "@readme/eslint-config",
+  "root": true,
+  "rules": {
+    "no-underscore-dangle": ["error", {
+      "allow": ["_body"]
+    }]
+  }
+}
