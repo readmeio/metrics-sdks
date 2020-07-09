@@ -2,7 +2,7 @@
 
 Track your API metrics within ReadMe.
 
-[![Build](https://github.com/readmeio/readme-node/workflows/Node%20CI/badge.svg)](https://github.com/readmeio/readme-node)
+[![Build](https://github.com/readmeio/metrics-sdks/workflows/nodejs/badge.svg)](https://github.com/readmeio/metrics-sdks)
 
 [![](https://d3vv6lp55qjaqc.cloudfront.net/items/1M3C3j0I0s0j3T362344/Untitled-2.png)](https://readme.io)
 
