@@ -3,7 +3,7 @@
   "root": true,
   "rules": {
     "no-underscore-dangle": ["error", {
-      "allow": ["_body"]
+      "allow": ["_id", "_body"]
     }]
   }
 }

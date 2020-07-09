@@ -1,4 +1,5 @@
 const request = require('r2');
+const { v4: uuidv4 } = require('uuid');
 const config = require('./config');
 
 const constructPayload = require('./lib/construct-payload');
@@ -36,13 +37,17 @@ module.exports.metrics = (apiKey, group, options = {}) => {
 
   return (req, res, next) => {
     const startedDateTime = new Date();
+    const logId = uuidv4();
+
+    res.setHeader('x-readme-log', logId);
     patchResponse(res);
 
     function send() {
       // This should in future become more sophisticated,
       // with flush timeouts and more error checking but
       // this is fine for now
-      queue.push(constructPayload(req, res, group, options, { startedDateTime }));
+      const payload = constructPayload(req, res, group, options, { logId, startedDateTime });
+      queue.push(payload);
       if (queue.length >= bufferLength) {
         request
           .post(`${config.host}/v1/request`, {
