@@ -107,8 +107,8 @@ describe('#metrics', () => {
       app.get('/test', (req, res) => res.sendStatus(200));
 
       return Promise.all(
-        [...new Array(numberOfLogs).keys()].map(() => {
-          return request(app).get('/test').expect(200);
+        [...new Array(numberOfLogs).keys()].map(i => {
+          return request(app).get(`/test?log=${i}`).expect(200);
         })
       ).then(() => {
         mocks.map(mock => mock.done());
