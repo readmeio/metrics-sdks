@@ -9,7 +9,8 @@
     "bson-objectid": "^1.3.1",
     "content-type": "^1.0.4",
     "lodash": "^4.17.15",
-    "r2": "^2.0.1"
+    "r2": "^2.0.1",
+    "uuid": "^8.2.0"
   },
   "scripts": {
     "lint": "eslint .",
@@ -35,7 +36,9 @@
     "conventional-changelog-cli": "^2.0.31",
     "eslint": "^7.0.0",
     "express": "^4.17.1",
+    "is-valid-uuid-v4": "^1.2.0",
     "jest": "^26.0.1",
+    "jest-expect-har": "^1.0.1",
     "jsinspect": "^0.12.7",
     "nock": "^13.0.0",
     "prettier": "^2.0.1",
