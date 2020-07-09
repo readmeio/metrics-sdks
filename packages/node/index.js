@@ -2,9 +2,6 @@ const request = require('r2');
 const config = require('./config');
 
 const constructPayload = require('./lib/construct-payload');
-const createJWTLink = require('./lib/create-jwt-link');
-const getReadmeData = require('./lib/get-readme-data');
-const ObjectID = require('bson-objectid');
 
 // We're doing this to buffer up the response body
 // so we can send it off to the metrics server
@@ -76,35 +73,5 @@ module.exports.metrics = (apiKey, group, options = {}) => {
     res.once('close', cleanup);
 
     return next();
-  };
-};
-
-module.exports.login = (apiKey, getUser, options = {}) => {
-  if (!apiKey) throw new Error('You must provide your ReadMe API key');
-  if (!getUser) throw new Error('You must provide a function to get the user');
-
-  // Make sure api key is valid
-  getReadmeData(apiKey);
-
-  return async (req, res, next) => {
-    let u;
-    try {
-      u = getUser(req);
-    } catch (e) {
-      // User isn't logged in
-    }
-
-    if (!u) {
-      const domain = req.headers['x-forwarded-host'] || req.get('host');
-      const fullUrl = `${req.protocol}://${domain}${req.originalUrl}`;
-      return res.redirect(`${options.loginUrl}?redirect=${encodeURIComponent(fullUrl)}`);
-    }
-
-    try {
-      const jwtUrl = await createJWTLink(apiKey, u, req.query.redirect);
-      return res.redirect(jwtUrl);
-    } catch (e) {
-      return next(e);
-    }
   };
 };
