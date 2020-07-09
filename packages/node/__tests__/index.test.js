@@ -2,12 +2,34 @@ const express = require('express');
 const request = require('supertest');
 const nock = require('nock');
 const crypto = require('crypto');
+const { isValidUUIDV4 } = require('is-valid-uuid-v4');
 const config = require('../config');
 
 const middleware = require('..');
 
 const apiKey = 'fakeApiKey';
 const group = '5afa21b97011c63320226ef3';
+
+expect.extend({
+  toHaveLogHeader(res) {
+    const { matcherHint, printExpected, printReceived } = this.utils;
+    const message = (pass, actual) => () => {
+      return (
+        `${matcherHint(pass ? '.not.toHaveLogHeader' : '.toHaveLogHeader')}\n\n` +
+        `Expected response headers to have a ${printExpected('x-readme-log')} header with a valid UUIDv4.\n` +
+        'Received:\n' +
+        `\t${printReceived(actual)}`
+      );
+    };
+
+    const pass = 'x-readme-log' in res.headers && isValidUUIDV4(res.headers['x-readme-log']);
+
+    return {
+      pass,
+      message: message(pass, 'x-readme-log' in res.headers ? res.headers['x-readme-log'] : undefined),
+    };
+  },
+});
 
 describe('#metrics', () => {
   beforeEach(() => {
@@ -43,10 +65,13 @@ describe('#metrics', () => {
     app.use(middleware.metrics(apiKey, () => group));
     app.get('/test', (req, res) => res.sendStatus(200));
 
-    await request(app).get('/test').expect(200);
+    await request(app)
+      .get('/test')
+      .expect(200)
+      .expect(res => expect(res).toHaveLogHeader());
 
     mock.done();
-  }, 5000);
+  });
 
   describe('#bufferLength', () => {
     it('should send requests when number hits `bufferLength` size', async function test() {
@@ -61,18 +86,41 @@ describe('#metrics', () => {
       app.use(middleware.metrics(apiKey, () => group, { bufferLength: 3 }));
       app.get('/test', (req, res) => res.sendStatus(200));
 
-      await request(app).get('/test').expect(200);
+      // We need to make sure that the logId isn't being preserved between buffered requests.
+      let logId;
+
+      await request(app)
+        .get('/test')
+        .expect(200)
+        .expect(res => {
+          expect(res).toHaveLogHeader();
+          logId = res.headers['x-readme-log'];
+        });
 
       expect(mock.isDone()).toBe(false);
 
-      await request(app).get('/test').expect(200);
+      await request(app)
+        .get('/test')
+        .expect(200)
+        .expect(res => {
+          expect(res).toHaveLogHeader();
+          expect(res.headers['x-readme-log']).not.toBe(logId);
+          logId = res.headers['x-readme-log'];
+        });
 
       expect(mock.isDone()).toBe(false);
 
-      await request(app).get('/test').expect(200);
+      await request(app)
+        .get('/test')
+        .expect(200)
+        .expect(res => {
+          expect(res).toHaveLogHeader();
+          expect(res.headers['x-readme-log']).not.toBe(logId);
+        });
 
+      expect(mock.isDone()).toBe(true);
       mock.done();
-    }, 5000);
+    });
 
     it('should clear out the queue when sent', () => {
       const numberOfLogs = 20;
@@ -141,7 +189,7 @@ describe('#metrics', () => {
       await request(app).get('/test').expect(200);
 
       mock.done();
-    }, 5000);
+    });
 
     it('should buffer up res.end() calls', async function test() {
       const mock = createMock();
@@ -149,10 +197,13 @@ describe('#metrics', () => {
       app.use(middleware.metrics(apiKey, () => group));
       app.get('/test', (req, res) => res.end(JSON.stringify(responseBody)));
 
-      await request(app).get('/test').expect(200);
+      await request(app)
+        .get('/test')
+        .expect(200)
+        .expect(res => expect(res).toHaveLogHeader());
 
       mock.done();
-    }, 5000);
+    });
 
     it('should work for res.send() calls', async function test() {
       const mock = createMock();
@@ -160,9 +211,12 @@ describe('#metrics', () => {
       app.use(middleware.metrics(apiKey, () => group));
       app.get('/test', (req, res) => res.send(responseBody));
 
-      await request(app).get('/test').expect(200);
+      await request(app)
+        .get('/test')
+        .expect(200)
+        .expect(res => expect(res).toHaveLogHeader());
 
       mock.done();
-    }, 5000);
+    });
   });
 });
