@@ -1,11 +1,13 @@
 const express = require('express');
 const request = require('supertest');
 const bodyParser = require('body-parser');
-const packageJson = require('../package.json');
+const { v4: uuidv4 } = require('uuid');
+const { isValidUUIDV4 } = require('is-valid-uuid-v4');
+const packageJson = require('../../package.json');
 
-const constructPayload = require('../lib/construct-payload');
+const constructPayload = require('../../lib/construct-payload');
 
-function createApp(options, existingPayload = { startedDateTime: new Date() }) {
+function createApp(options, existingPayload = { logId: uuidv4(), startedDateTime: new Date() }) {
   const app = express();
   app.use(bodyParser.json());
 
@@ -28,11 +30,12 @@ describe('constructPayload()', () => {
       .post('/')
       .send({ password: '123456' })
       .expect(({ body }) => {
+        expect(isValidUUIDV4(body._id)).toBe(true);
         expect(typeof body.request.log.entries[0].request).toBe('object');
         expect(typeof body.request.log.entries[0].response).toBe('object');
         expect(body.request.log.entries[0].request.postData).toStrictEqual({});
       });
-  }, 8000);
+  });
 
   it('#creator', () =>
     request(createApp())
