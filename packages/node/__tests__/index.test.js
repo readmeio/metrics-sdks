@@ -98,8 +98,7 @@ describe('#metrics', () => {
           // This is the important part of this test,
           // the delay mimics the latency of a real
           // HTTP request
-          .delayConnection(1000)
-          .delayBody(2000)
+          .delay(1000)
           .reply(200)
       );
 
