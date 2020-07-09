@@ -26,7 +26,7 @@ function patchResponse(res) {
   };
 }
 
-module.exports.metrics = (apiKey, group, options = {}, cb = () => {}) => {
+module.exports.metrics = (apiKey, group, options = {}) => {
   if (!apiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a grouping function');
 
@@ -46,13 +46,10 @@ module.exports.metrics = (apiKey, group, options = {}, cb = () => {}) => {
       if (queue.length >= bufferLength) {
         const json = queue.slice();
         queue = [];
-        request
-          .post(`${config.host}/v1/request`, {
-            headers: { authorization: `Basic ${encoded}` },
-            json,
-          })
-          // We only expose this callback for testing purposes
-          .response.catch(/* istanbul ignore next */ e => cb && cb(e));
+        request.post(`${config.host}/v1/request`, {
+          headers: { authorization: `Basic ${encoded}` },
+          json,
+        });
       }
 
       cleanup(); // eslint-disable-line no-use-before-define
