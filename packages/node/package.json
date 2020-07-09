@@ -38,7 +38,6 @@
     "express": "^4.17.1",
     "is-valid-uuid-v4": "^1.2.0",
     "jest": "^26.0.1",
-    "jest-expect-har": "^1.0.1",
     "jsinspect": "^0.12.7",
     "nock": "^13.0.0",
     "prettier": "^2.0.1",
