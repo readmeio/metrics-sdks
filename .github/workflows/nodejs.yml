@@ -4,22 +4,25 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/node
 
     strategy:
       matrix:
         node-version: [10.x, 12.x, 14.x]
 
     steps:
-    - uses: actions/checkout@v2.3.1
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2.1.0
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: npm install and test
-      run: |
-        npm install
-        npm test
-      env:
-        CI: true
+      - uses: actions/checkout@v2.3.1
+
+      - uses: actions/setup-node@v2.1.0
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Run tests
+        run: |
+          npm install
+          npm test
+        env:
+          CI: true
