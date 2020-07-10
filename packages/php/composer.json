@@ -43,7 +43,8 @@
       "lint": "phpcs --standard=phpcs.xml src/ tests/",
       "lint:fix": "phpcbf --standard=phpcs.xml src/ tests/",
       "phpunit": "phpunit tests/",
-      "psalm": "psalm --taint-analysis",
+      "psalm": "psalm",
+      "psalm:taintAnalysis": "psalm --taint-analysis",
       "test": [
           "composer run lint",
           "composer run psalm",
