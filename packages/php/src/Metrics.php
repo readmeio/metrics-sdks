@@ -181,6 +181,9 @@ class Metrics
         ];
     }
 
+    /**
+     * @psalm-suppress TaintedInput
+     */
     private function processRequest(Request $request): array
     {
         /**
