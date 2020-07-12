@@ -1,3 +1,21 @@
+## 3.0.0 (2020-07-12)
+
+* chore: regenerating the root package-lock file ([902efdf](https://github.com/readmeio/metrics-sdks/commit/902efdf))
+* chore(deps): bump actions/checkout from v1 to v2.3.1 (#3) ([a708d74](https://github.com/readmeio/metrics-sdks/commit/a708d74)), closes [#3](https://github.com/readmeio/metrics-sdks/issues/3)
+* chore(deps): bump actions/setup-node from v1 to v2.1.0 (#4) ([8a61a99](https://github.com/readmeio/metrics-sdks/commit/8a61a99)), closes [#4](https://github.com/readmeio/metrics-sdks/issues/4)
+* chore(deps): bump lodash from 4.17.15 to 4.17.19 (#1) ([d5169e7](https://github.com/readmeio/metrics-sdks/commit/d5169e7)), closes [#1](https://github.com/readmeio/metrics-sdks/issues/1)
+* docs: updating links in the changelog to point to the new repo ([993547c](https://github.com/readmeio/metrics-sdks/commit/993547c))
+* feat: allowing the sdk to create its own log ID (#6) ([734afe7](https://github.com/readmeio/metrics-sdks/commit/734afe7)), closes [#6](https://github.com/readmeio/metrics-sdks/issues/6)
+* feat: migrating the repository over to a monorepo structure (#5) ([2e1bc33](https://github.com/readmeio/metrics-sdks/commit/2e1bc33)), closes [#5](https://github.com/readmeio/metrics-sdks/issues/5)
+* feat: stripping out all jwt work as it was an unused experiment (#7) ([2775e25](https://github.com/readmeio/metrics-sdks/commit/2775e25)), closes [#7](https://github.com/readmeio/metrics-sdks/issues/7)
+* build(deps-dev): bump @readme/eslint-config from 3.3.0 to 3.3.2 (#94) ([15e64b4](https://github.com/readmeio/metrics-sdks/commit/15e64b4)), closes [#94](https://github.com/readmeio/metrics-sdks/issues/94)
+* build(deps-dev): bump @readme/eslint-config from 3.3.2 to 3.3.3 (#2) ([d93c27c](https://github.com/readmeio/metrics-sdks/commit/d93c27c)), closes [#2](https://github.com/readmeio/metrics-sdks/issues/2)
+* build(deps-dev): bump eslint from 7.3.1 to 7.4.0 (#92) ([1dbff2e](https://github.com/readmeio/metrics-sdks/commit/1dbff2e)), closes [#92](https://github.com/readmeio/metrics-sdks/issues/92)
+* build(deps-dev): bump nock from 13.0.0 to 13.0.2 (#93) ([a3a158f](https://github.com/readmeio/metrics-sdks/commit/a3a158f)), closes [#93](https://github.com/readmeio/metrics-sdks/issues/93)
+* ci: dependabot commit formatting updates ([b84c6cc](https://github.com/readmeio/metrics-sdks/commit/b84c6cc))
+
+
+
 ## <small>2.1.5 (2020-06-30)</small>
 
 * build(deps-dev): bump @readme/eslint-config from 3.1.3 to 3.2.0 (#84) ([fcc2db5](https://github.com/readmeio/metrics-sdks/commit/fcc2db5)), closes [#84](https://github.com/readmeio/metrics-sdks/issues/84)
