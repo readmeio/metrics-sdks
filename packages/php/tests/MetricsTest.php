@@ -326,7 +326,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             ['name' => 'apiKey', 'value' => 'abcdef'],
         ], json_decode($payload_response['content']['text'], true));
 
-        $this->assertSame($response->headers->get('Content-Length', 0), $payload_response['content']['size']);
+        $this->assertEquals($response->headers->get('Content-Length', 0), $payload_response['content']['size']);
         $this->assertSame($response->headers->get('Content-Type'), $payload_response['content']['mimeType']);
     }
 
