@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<ruleset>
+    <description>ReadMe coding standards</description>
+    <rule ref="PSR2"/>
+
+    <!-- Require that strings be single quoted. -->
+    <rule ref="Squiz.Strings.DoubleQuoteUsage" />
+</ruleset>
