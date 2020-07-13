@@ -3,3 +3,4 @@
 This is the monorepo for the following [ReadMe Metrics](https://readme.com/metrics/) SDKs:
 
 * [readmeio](https://github.com/readmeio/metrics-sdks/tree/master/node) (NodeJS)
+* [readme/metrics](https://github.com/readmeio/metrics-sdks/tree/master/php) (PHP)
