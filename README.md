@@ -4,3 +4,6 @@ This is the monorepo for the following [ReadMe Metrics](https://readme.com/metri
 
 * [readmeio](https://github.com/readmeio/metrics-sdks/tree/master/packages/node) (NodeJS)
 * [readme/metrics](https://github.com/readmeio/metrics-sdks/tree/master/packages/php) (PHP)
+
+
+Guide for building SDKs for ReadMe Developer Metrics: https://docs.readme.com/metrics/docs/building-api-metrics-middleware
