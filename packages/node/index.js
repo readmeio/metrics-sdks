@@ -1,4 +1,4 @@
-const request = require('r2');
+const fetch = require('node-fetch');
 const { v4: uuidv4 } = require('uuid');
 const config = require('./config');
 
@@ -49,12 +49,17 @@ module.exports.metrics = (apiKey, group, options = {}) => {
       const payload = constructPayload(req, res, group, options, { logId, startedDateTime });
       queue.push(payload);
       if (queue.length >= bufferLength) {
-        request
-          .post(`${config.host}/v1/request`, {
-            headers: { authorization: `Basic ${encoded}` },
-            json: queue,
+        fetch(`${config.host}/v1/request`, {
+          method: 'post',
+          body: JSON.stringify(queue),
+          headers: {
+            Authorization: `Basic ${encoded}`,
+          },
+        })
+          .then(() => {
+            queue = [];
           })
-          .response.then(() => {
+          .catch(() => {
             queue = [];
           });
       }
