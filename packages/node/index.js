@@ -49,14 +49,12 @@ module.exports.metrics = (apiKey, group, options = {}) => {
       const payload = constructPayload(req, res, group, options, { logId, startedDateTime });
       queue.push(payload);
       if (queue.length >= bufferLength) {
-        request
-          .post(`${config.host}/v1/request`, {
-            headers: { authorization: `Basic ${encoded}` },
-            json: queue,
-          })
-          .response.then(() => {
-            queue = [];
-          });
+        const json = queue.slice();
+        queue = [];
+        request.post(`${config.host}/v1/request`, {
+          headers: { authorization: `Basic ${encoded}` },
+          json,
+        });
       }
 
       cleanup(); // eslint-disable-line no-use-before-define
