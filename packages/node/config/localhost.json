@@ -1,3 +1,4 @@
 {
-  "host": "http://localhost:3003"
+  "host": "http://localhost:3003",
+  "readmeApiUrl": "https://dash.readme.local:3000/api/"
 }

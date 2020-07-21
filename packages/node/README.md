@@ -15,7 +15,7 @@ npm install readmeio
 
 ## Usage
 
-Just add the middleware to express, and that's it!
+Just add the middleware to [Express](https://expressjs.com/), and that's it!
 
 ```javascript
 const readme = require('readmeio');
