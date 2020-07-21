@@ -2,4 +2,9 @@
 
 This is the monorepo for the following [ReadMe Metrics](https://readme.com/metrics/) SDKs:
 
-* [readmeio](https://github.com/readmeio/metrics-sdks/tree/master/node) (NodeJS)
+| Language / Framework | Package | Version |
+| :--- | :--- | :--- |
+| NodeJS (General) | [readmeio](https://github.com/readmeio/metrics-sdks/tree/master/packages/node) | ![](https://img.shields.io/npm/v/readmeio) |
+| PHP (Laravel) | [readme/metrics](https://github.com/readmeio/metrics-sdks/tree/master/packages/php) | ![](https://img.shields.io/packagist/v/readme/metrics) |
+
+Want to build your own SDK for Developer Metrics? [Check out our guide.](https://docs.readme.com/metrics/docs/building-api-metrics-middleware)
