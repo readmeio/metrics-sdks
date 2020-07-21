@@ -151,6 +151,47 @@ describe('#metrics', () => {
       apiMock.done();
       mock.done();
     });
+
+    it('should clear out the queue when sent', () => {
+      const numberOfLogs = 20;
+      const numberOfMocks = 4;
+      const bufferLength = numberOfLogs / numberOfMocks;
+
+      const seenLogs = [];
+
+      const mocks = [...new Array(numberOfMocks).keys()].map(() =>
+        nock(config.host)
+          .post('/v1/request', body => {
+            expect(body).toHaveLength(bufferLength);
+
+            // Ensure that our executed requests and the buffered queue they're in remain unique.
+            body.forEach(req => {
+              const requestHash = crypto.createHash('md5').update(JSON.stringify(req)).digest('hex');
+              expect(seenLogs).not.toContain(requestHash);
+              seenLogs.push(requestHash);
+            });
+
+            return true;
+          })
+          // This is the important part of this test,
+          // the delay mimics the latency of a real
+          // HTTP request
+          .delay(1000)
+          .reply(200)
+      );
+
+      const app = express();
+      app.use(middleware.metrics(apiKey, () => group, { bufferLength }));
+      app.get('/test', (req, res) => res.sendStatus(200));
+
+      return Promise.all(
+        [...new Array(numberOfLogs).keys()].map(i => {
+          return request(app).get(`/test?log=${i}`).expect(200);
+        })
+      ).then(() => {
+        mocks.map(mock => mock.done());
+      });
+    });
   });
 
   describe('#baseLogUrl', () => {
@@ -266,7 +307,7 @@ describe('#metrics', () => {
     it('should buffer up res.write() calls', async () => {
       const mock = createMock();
       const app = express();
-      app.use(middleware.metrics(apiKey, () => '123'));
+      app.use(middleware.metrics(apiKey, () => group));
       app.get('/test', (req, res) => {
         res.write('{"a":1,');
         res.write('"b":2,');
@@ -282,7 +323,7 @@ describe('#metrics', () => {
     it('should buffer up res.end() calls', async () => {
       const mock = createMock();
       const app = express();
-      app.use(middleware.metrics(apiKey, () => '123'));
+      app.use(middleware.metrics(apiKey, () => group));
       app.get('/test', (req, res) => res.end(JSON.stringify(responseBody)));
 
       await request(app)
@@ -296,7 +337,7 @@ describe('#metrics', () => {
     it('should work for res.send() calls', async () => {
       const mock = createMock();
       const app = express();
-      app.use(middleware.metrics(apiKey, () => '123'));
+      app.use(middleware.metrics(apiKey, () => group));
       app.get('/test', (req, res) => res.send(responseBody));
 
       await request(app)

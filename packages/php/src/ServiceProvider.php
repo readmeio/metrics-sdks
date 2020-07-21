@@ -14,7 +14,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         ], 'config');
 
         $this->publishes([
-            __DIR__ . '/handler.dist.php' => $path = app_path('Handler/ReadMe.php'),
+            __DIR__ . '/handler.dist.php' => app_path('Handler/ReadMe.php'),
         ]);
     }
 }

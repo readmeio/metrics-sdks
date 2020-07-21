@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use PackageVersions\Versions;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\MimeTypes;
@@ -86,9 +87,13 @@ class Metrics
      * @param Response $response
      * @throws MetricsException
      */
-    public function track(Request $request, $response): void
+    public function track(Request $request, &$response): void
     {
-        $payload = $this->constructPayload($request, $response);
+        $log_id = Uuid::uuid4()->toString();
+        $response->headers->set('x-readme-log', $log_id);
+
+        $payload = $this->constructPayload($log_id, $request, $response);
+
         $headers = [
             'Authorization' => 'Basic ' . base64_encode($this->api_key . ':'),
             'User-Agent' => 'readme-metrics-php/' . $this->package_version
@@ -114,7 +119,7 @@ class Metrics
         }
 
         try {
-            $response = $this->client->post('/request', [
+            $metrics_response = $this->client->post('/request', [
                 'headers' => $headers,
                 'json' => [$payload]
             ]);
@@ -122,7 +127,7 @@ class Metrics
             throw $e;
         }
 
-        $json = (string) $response->getBody();
+        $json = (string) $metrics_response->getBody();
         if ($json === 'OK') {
             return;
         }
@@ -141,11 +146,12 @@ class Metrics
     }
 
     /**
+     * @param string $log_id
      * @param Request $request
      * @param Response $response
      * @return array
      */
-    public function constructPayload(Request $request, $response): array
+    public function constructPayload(string $log_id, Request $request, $response): array
     {
         $request_start = (!defined('LARAVEL_START')) ? LARAVEL_START : $_SERVER['REQUEST_TIME_FLOAT'];
         $group = $this->group_handler::constructGroup($request);
@@ -157,6 +163,7 @@ class Metrics
         }
 
         return [
+            '_id' => $log_id,
             'group' => $group,
             'clientIPAddress' => $request->ip(),
             'development' => $this->development_mode,
@@ -221,7 +228,7 @@ class Metrics
     private function processResponse($response): array
     {
         if ($response instanceof JsonResponse) {
-            $body = $response->getData();
+            $body = $response->getData(true);
 
             if (!empty($this->blacklist)) {
                 $body = $this->excludeDataFromBlacklist($body);

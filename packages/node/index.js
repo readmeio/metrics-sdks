@@ -93,19 +93,17 @@ module.exports.metrics = (apiKey, group, options = {}) => {
       const payload = constructPayload(req, res, group, options, { logId, startedDateTime });
       queue.push(payload);
       if (queue.length >= bufferLength) {
+        const json = queue.slice();
+        queue = [];
         fetch(`${config.host}/v1/request`, {
           method: 'post',
-          body: JSON.stringify(queue),
+          body: JSON.stringify(json),
           headers: {
             Authorization: `Basic ${encodedApiKey}`,
           },
         })
-          .then(() => {
-            queue = [];
-          })
-          .catch(() => {
-            queue = [];
-          });
+          .then(() => {})
+          .catch(() => {});
       }
 
       cleanup(); // eslint-disable-line no-use-before-define
