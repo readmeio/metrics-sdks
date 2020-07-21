@@ -2,6 +2,7 @@
 namespace ReadMe\Tests;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Middleware;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Handler\MockHandler;
@@ -18,14 +19,21 @@ use Symfony\Component\HttpFoundation\Response;
 
 class MetricsTest extends \PHPUnit\Framework\TestCase
 {
+    private const UUID_PATTERN = '/([a-z0-9\-]+)/';
+
     private const MOCK_RESPONSE_HEADERS = [
-        'cache-control' => ['no-cache, private'],
-        'content-type' => ['application/json'],
-        'x-ratelimit-limit' => [60],
-        'x-ratelimit-remaining' => [58]
+        'cache-control' => 'no-cache, private',
+        'x-ratelimit-limit' => 60,
+        'x-ratelimit-remaining' => 58,
+
+        // HeaderBag sets its own date header, but since we don't care what it actually is we're overriding it here for
+        // our mocks
+        'date' => 'date.now()'
     ];
 
-    // ?val=1&arr[]=&arr[]=3
+    /**
+     * @example ?val=1&arr[]=&arr[]=3
+     */
     private const MOCK_QUERY_PARAMS = [
         'val' => '1',
         'arr' => [null, '3'],
@@ -53,6 +61,9 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /** @var class-string */
     private $group_handler = TestHandler::class;
 
+    /** @var string */
+    private $log_uuid;
+
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
@@ -65,7 +76,16 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
+        $this->requests = [];
+
         $this->metrics = new Metrics('fakeApiKey', $this->group_handler);
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->requests = [];
     }
 
     /**
@@ -74,11 +94,14 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
      */
     public function testTrack(bool $development_mode): void
     {
+        // Mock out a 200 request from the Metrics server.
         $mock = new MockHandler([
             new \GuzzleHttp\Psr7\Response(200, [], 'OK'),
         ]);
 
         $handlerStack = HandlerStack::create($mock);
+        $handlerStack->push(Middleware::history($this->requests));
+
         $metrics = new Metrics('fakeApiKey', $this->group_handler, [
             'development_mode' => $development_mode,
             'client' => new Client(['handler' => $handlerStack])
@@ -87,12 +110,59 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
         $response = $this->getMockJsonResponse();
 
-        try {
-            $metrics->track($request, $response);
-            $this->assertTrue(true);
-        } catch (\Exception $e) {
-            $this->fail('No exceptions should have been thrown for a valid request.');
-        }
+        $metrics->track($request, $response);
+
+        // Assert that the x-readme-log header was properly added into the current response.
+        $this->assertContains('x-readme-log', array_keys($response->headers->all()));
+        $log_header_id = array_shift($response->headers->all()['x-readme-log']);
+        $this->assertRegExp(self::UUID_PATTERN, $log_header_id);
+
+        // Assert that we only tracked a single request and also the payload looks as expected.
+        $this->assertCount(1, $this->requests);
+
+        $actual_request = array_shift($this->requests);
+        $actual_request = $actual_request['request'];
+
+        $this->assertSame('/request', $actual_request->getRequestTarget());
+
+        $actual_payload = json_decode($actual_request->getBody(), true);
+        $this->assertCount(1, $actual_payload);
+
+        $actual_payload = array_shift($actual_payload);
+        $this->assertSame(['_id', 'group', 'clientIPAddress', 'development', 'request'], array_keys($actual_payload));
+        $this->assertSame($log_header_id, $actual_payload['_id']);
+
+        $this->assertSame([
+            'method' => 'GET',
+            'url' => '?val=1&arr%5B1%5D=3',
+            'httpVersion' => 'HTTP/1.1',
+            'headers' => [
+                [
+                    'name' => 'cache-control',
+                    'value' => 'max-age=0'
+                ],
+                [
+                    'name' => 'user-agent',
+                    'value' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) ...'
+                ]
+            ],
+            'queryString' => [
+                ['name' => 'val', 'value' => '1'],
+                ['name' => 'arr', 'value' => '[null,"3"]']
+            ],
+            'postData' => [
+                'mimeType' => 'application/json',
+                'params' => []
+            ]
+        ], $actual_payload['request']['log']['entries'][0]['request']);
+
+        // Make sure that our x-readme-log header ended up being logged as a response header in the metrics request.
+        $response_headers = $actual_payload['request']['log']['entries'][0]['response']['headers'];
+        $readme_log_header = array_filter($response_headers, function ($header) {
+            return $header['name'] === 'x-readme-log';
+        });
+
+        $this->assertSame($log_header_id, array_shift($readme_log_header)['value']);
     }
 
     /**
@@ -152,6 +222,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
      */
     public function testTrackHandlesApiServerUnavailability(bool $development_mode): void
     {
+        // Exceptions **should** be thrown under development mode!
         if ($development_mode) {
             $this->expectException(ServerException::class);
             $this->expectExceptionMessageMatches('/500 Internal Server Error/');
@@ -175,7 +246,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         if (!$development_mode) {
             $this->assertTrue(
                 true,
-                'When not in development mode, exceptions should not have been thrown so this assertion should pass.'
+                'When not in development mode, exceptions should not be thrown which means this assertion should pass.'
             );
         }
     }
@@ -184,7 +255,9 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     {
         $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
         $response = $this->getMockJsonResponse();
-        $payload = $this->metrics->constructPayload($request, $response);
+        $payload = $this->metrics->constructPayload('fakeId', $request, $response);
+
+        $this->assertSame('fakeId', $payload['_id']);
 
         $this->assertSame([
             'id' => '123457890',
@@ -240,11 +313,12 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(200, $payload_response['status']);
         $this->assertSame('OK', $payload_response['statusText']);
 
-        $this->assertSame([
+        $this->assertEqualsCanonicalizing([
             ['name' => 'cache-control', 'value' => 'no-cache, private'],
             ['name' => 'content-type', 'value' => 'application/json'],
             ['name' => 'x-ratelimit-limit', 'value' => 60],
-            ['name' => 'x-ratelimit-remaining', 'value' => 58]
+            ['name' => 'x-ratelimit-remaining', 'value' => 58],
+            ['name' => 'date', 'value' => 'date.now()']
         ], $payload_response['headers']);
 
         $this->assertSame([
@@ -252,7 +326,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             ['name' => 'apiKey', 'value' => 'abcdef'],
         ], json_decode($payload_response['content']['text'], true));
 
-        $this->assertSame($response->headers->get('Content-Length', 0), $payload_response['content']['size']);
+        $this->assertEquals($response->headers->get('Content-Length', 0), $payload_response['content']['size']);
         $this->assertSame($response->headers->get('Content-Type'), $payload_response['content']['mimeType']);
     }
 
@@ -260,13 +334,13 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     {
         $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
         $response = $this->getMockTextResponse();
-        $payload = $this->metrics->constructPayload($request, $response);
+        $payload = $this->metrics->constructPayload('fakeId', $request, $response);
 
         $payload_response = $payload['request']['log']['entries'][0]['response'];
         $this->assertSame(200, $payload_response['status']);
         $this->assertSame('OK', $payload_response['statusText']);
         $this->assertSame('OK COMPUTER', $payload_response['content']['text']);
-        $this->assertSame(11, $payload_response['content']['size']);
+        $this->assertSame('11', $payload_response['content']['size']);
         $this->assertSame('text/plain', $payload_response['content']['mimeType']);
     }
 
@@ -274,7 +348,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     {
         $request = $this->getMockRequest([], self::MOCK_POST_PARAMS, self::MOCK_FILES_PARAMS);
         $response = $this->getMockJsonResponse();
-        $payload = $this->metrics->constructPayload($request, $response);
+        $payload = $this->metrics->constructPayload('fakeId', $request, $response);
 
         $params = $payload['request']['log']['entries'][0]['request']['postData']['params'];
         $this->assertSame([
@@ -298,7 +372,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $request = \Mockery::mock(Request::class);
         $response = \Mockery::mock(JsonResponse::class);
 
-        (new Metrics('fakeApiKey', TestHandlerReturnsNoData::class))->constructPayload($request, $response);
+        (new Metrics('fakeApiKey', TestHandlerReturnsNoData::class))->constructPayload('fakeId', $request, $response);
     }
 
     public function testConstructPayloadShouldThrowErrorIfGroupFunctionReturnsAnEmptyId(): void
@@ -309,7 +383,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $request = \Mockery::mock(Request::class);
         $response = \Mockery::mock(JsonResponse::class);
 
-        (new Metrics('fakeApiKey', TestHandlerReturnsEmptyId::class))->constructPayload($request, $response);
+        (new Metrics('fakeApiKey', TestHandlerReturnsEmptyId::class))->constructPayload('fakeId', $request, $response);
     }
 
     public function testProcessRequestShouldFilterOutItemsInBlacklist(): void
@@ -320,7 +394,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
         $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS, self::MOCK_POST_PARAMS);
         $response = $this->getMockJsonResponse();
-        $payload = $metrics->constructPayload($request, $response);
+        $payload = $metrics->constructPayload('fakeId', $request, $response);
 
         $request_data = $payload['request']['log']['entries'][0]['request'];
 
@@ -345,7 +419,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
         $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS, self::MOCK_POST_PARAMS);
         $response = $this->getMockJsonResponse();
-        $payload = $metrics->constructPayload($request, $response);
+        $payload = $metrics->constructPayload('fakeId', $request, $response);
 
         $request_data = $payload['request']['log']['entries'][0]['request'];
 
@@ -369,7 +443,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
         $request = $this->getMockRequest();
         $response = $this->getMockJsonResponse();
-        $payload = $metrics->constructPayload($request, $response);
+        $payload = $metrics->constructPayload('fakeId', $request, $response);
 
         $content = $payload['request']['log']['entries'][0]['response']['content'];
 
@@ -387,7 +461,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
         $request = $this->getMockRequest();
         $response = $this->getMockJsonResponse();
-        $payload = $metrics->constructPayload($request, $response);
+        $payload = $metrics->constructPayload('fakeId', $request, $response);
 
         $content = $payload['request']['log']['entries'][0]['response']['content'];
 
@@ -425,39 +499,28 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
     private function getMockJsonResponse(): JsonResponse
     {
-        $response = \Mockery::mock(JsonResponse::class, [
-            'getData' => [
+        return new JsonResponse(
+            [
                 ['name' => 'password', 'value' => '123456'],
                 ['name' => 'apiKey', 'value' => 'abcdef'],
             ],
-            'getStatusCode' => 200,
-        ]);
-
-        $response->headers = \Mockery::mock(HeaderBag::class, [
-            'all' => self::MOCK_RESPONSE_HEADERS
-        ]);
-
-        $response->headers->shouldReceive('get')->withArgs(['Content-Length', 0])->andReturn(33);
-        $response->headers->shouldReceive('get')->withArgs(['Content-Type'])->andReturn('application/json');
-
-        return $response;
+            200,
+            array_merge(self::MOCK_RESPONSE_HEADERS, [
+                'Content-Type' => 'application/json'
+            ])
+        );
     }
 
     private function getMockTextResponse(): Response
     {
-        $response = \Mockery::mock(Response::class, [
-            'getContent' => 'OK COMPUTER',
-            'getStatusCode' => 200,
-        ]);
-
-        $response->headers = \Mockery::mock(HeaderBag::class, [
-            'all' => self::MOCK_RESPONSE_HEADERS
-        ]);
-
-        $response->headers->shouldReceive('get')->withArgs(['Content-Length', 0])->andReturn(11);
-        $response->headers->shouldReceive('get')->withArgs(['Content-Type'])->andReturn('text/plain');
-
-        return $response;
+        return new Response(
+            'OK COMPUTER',
+            200,
+            array_merge(self::MOCK_RESPONSE_HEADERS, [
+                'Content-Type' => 'text/plain',
+                'Content-Length' => 11
+            ])
+        );
     }
 
     public function providerDevelopmentModeToggle(): array
