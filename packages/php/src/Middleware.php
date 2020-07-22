@@ -18,7 +18,8 @@ class Middleware
             [
                 'development_mode' => config('readme.development_mode', false),
                 'blacklist' => config('readme.blacklist', []),
-                'whitelist' => config('readme.whitelist', [])
+                'whitelist' => config('readme.whitelist', []),
+                'base_log_url' => config('readme.base_log_url'),
             ]
         );
     }

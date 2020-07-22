@@ -46,4 +46,17 @@ return [
      * be whitelisted.
      */
     'whitelist' => [],
+
+    /**
+     * Optionally, this is the base URL for your ReadMe project.
+     *
+     * This URL will be the basis for the `x-documentation-url` that's applied to
+     * responses that contains the URL to the log in ReadMe Metrics.
+     *
+     * Normally this would be https://projectName.readme.io or
+     * https://docs.yourdomain.com, however if this value is not supplied, a
+     * request to the ReadMe API will be made once a day to retrieve it. This data
+     * will is cached into `$COMPOSER_HOME/cache`.
+     */
+    'base_log_url' => null,
 ];
