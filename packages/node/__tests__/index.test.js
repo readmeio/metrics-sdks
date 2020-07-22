@@ -24,6 +24,18 @@ function getReadMeApiMock(numberOfTimes) {
     .reply(200, { baseUrl: baseLogUrl });
 }
 
+function hydrateCache(lastUpdated) {
+  const encodedApiKey = Buffer.from(`${apiKey}:`).toString('base64');
+  const fsSafeApikey = crypto.createHash('md5').update(encodedApiKey).digest('hex');
+  const cacheKey = [pkg.name, pkg.version, fsSafeApikey].join('-');
+  const cache = flatCache.load(cacheKey, cacheDir);
+
+  // Postdate the cache to two days ago so it'll bee seen as stale.
+  cache.setKey('lastUpdated', lastUpdated);
+  cache.setKey('baseUrl', baseLogUrl);
+  cache.save();
+}
+
 expect.extend({
   toHaveLogHeader(res) {
     const { matcherHint, printExpected, printReceived } = this.utils;
@@ -153,6 +165,9 @@ describe('#metrics', () => {
     });
 
     it('should clear out the queue when sent', () => {
+      // Hydrate the cache so we don't need to mess with mocking out the API.
+      hydrateCache(Math.round(Date.now() / 1000));
+
       const numberOfLogs = 20;
       const numberOfMocks = 4;
       const bufferLength = numberOfLogs / numberOfMocks;
@@ -257,15 +272,8 @@ describe('#metrics', () => {
     });
 
     it('should refresh the cache if out of date', async () => {
-      const encodedApiKey = Buffer.from(`${apiKey}:`).toString('base64');
-      const fsSafeApikey = crypto.createHash('md5').update(encodedApiKey).digest('hex');
-      const cacheKey = [pkg.name, pkg.version, fsSafeApikey].join('-');
-      const cache = flatCache.load(cacheKey, cacheDir);
-
-      // Postdate the cache to two days ago so it'll bee seen as stale.
-      cache.setKey('lastUpdated', Math.round(Date.now() / 1000 - 86400 * 2));
-      cache.setKey('baseUrl', baseLogUrl);
-      cache.save();
+      // Hydate and postdate the cache to two days ago so it'll bee seen as stale.
+      hydrateCache(Math.round(Date.now() / 1000 - 86400 * 2));
 
       const apiMock = getReadMeApiMock(1);
       const metricsMock = nock(config.host).post('/v1/request').basicAuth({ user: apiKey }).reply(200);
