@@ -1,4 +1,5 @@
 <?php
+
 namespace ReadMe\Tests;
 
 class ConfigTest extends \PHPUnit\Framework\TestCase

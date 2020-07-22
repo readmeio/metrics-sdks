@@ -1,4 +1,5 @@
 <?php
+
 namespace ReadMe\Tests;
 
 class HandlerTest extends \PHPUnit\Framework\TestCase
@@ -7,7 +8,7 @@ class HandlerTest extends \PHPUnit\Framework\TestCase
     {
         require_once(__DIR__ . '/../src/handler.dist.php');
 
-        $handler = new \App\Handler\ReadMe;
+        $handler = new \App\Handler\ReadMe();
 
         $this->assertInstanceOf(\ReadMe\Handler::class, $handler);
     }

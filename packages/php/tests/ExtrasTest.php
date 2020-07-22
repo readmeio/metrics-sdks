@@ -1,4 +1,5 @@
 <?php
+
 namespace ReadMe\Tests;
 
 class ExtrasTest extends \PHPUnit\Framework\TestCase

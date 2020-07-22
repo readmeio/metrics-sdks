@@ -1,4 +1,5 @@
 <?php
+
 namespace ReadMe;
 
 class MetricsException extends \Exception
