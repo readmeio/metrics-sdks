@@ -37,11 +37,11 @@ function hydrateCache(lastUpdated) {
 }
 
 expect.extend({
-  toHaveLogHeader(res) {
+  toHaveDocumentationHeader(res) {
     const { matcherHint, printExpected, printReceived } = this.utils;
     const message = (pass, actual) => () => {
       return (
-        `${matcherHint(pass ? '.not.toHaveLogHeader' : '.toHaveLogHeader')}\n\n` +
+        `${matcherHint(pass ? '.not.toHaveDocumentationHeader' : '.toHaveDocumentationHeader')}\n\n` +
         `Expected response headers to have a ${printExpected('x-documentation-url')} header with a valid UUIDv4 ID.\n` +
         'Received:\n' +
         `\t${printReceived(actual)}`
@@ -105,7 +105,7 @@ describe('#metrics', () => {
     return request(app)
       .get('/test')
       .expect(200)
-      .expect(res => expect(res).toHaveLogHeader())
+      .expect(res => expect(res).toHaveDocumentationHeader())
       .then(() => {
         apiMock.done();
         mock.done();
@@ -133,7 +133,7 @@ describe('#metrics', () => {
         .get('/test')
         .expect(200)
         .expect(res => {
-          expect(res).toHaveLogHeader();
+          expect(res).toHaveDocumentationHeader();
           logUrl = res.headers['x-documentation-url'];
         });
 
@@ -144,7 +144,7 @@ describe('#metrics', () => {
         .get('/test')
         .expect(200)
         .expect(res => {
-          expect(res).toHaveLogHeader();
+          expect(res).toHaveDocumentationHeader();
           expect(res.headers['x-documentation-url']).not.toBe(logUrl);
           logUrl = res.headers['x-documentation-url'];
         });
@@ -155,7 +155,7 @@ describe('#metrics', () => {
         .get('/test')
         .expect(200)
         .expect(res => {
-          expect(res).toHaveLogHeader();
+          expect(res).toHaveDocumentationHeader();
           expect(res.headers['x-documentation-url']).not.toBe(logUrl);
         });
 
@@ -219,7 +219,7 @@ describe('#metrics', () => {
       await request(app)
         .get('/test')
         .expect(200)
-        .expect(res => expect(res).toHaveLogHeader());
+        .expect(res => expect(res).toHaveDocumentationHeader());
 
       mock.done();
     });
@@ -236,7 +236,7 @@ describe('#metrics', () => {
       await request(app)
         .get('/test')
         .expect(200)
-        .expect(res => expect(res).toHaveLogHeader());
+        .expect(res => expect(res).toHaveDocumentationHeader());
 
       // Spin up a new app so we're forced to look for the baseUrl in the cache instead of what's saved in-memory
       // within the middleware.
@@ -248,7 +248,7 @@ describe('#metrics', () => {
       await request(app2)
         .get('/test')
         .expect(200)
-        .expect(res => expect(res).toHaveLogHeader());
+        .expect(res => expect(res).toHaveDocumentationHeader());
 
       apiMock.done();
       metricsMock.done();
@@ -265,7 +265,7 @@ describe('#metrics', () => {
       await request(app)
         .get('/test')
         .expect(200)
-        .expect(res => expect(res).toHaveLogHeader());
+        .expect(res => expect(res).toHaveDocumentationHeader());
 
       apiMock.done();
       metricsMock.done();
@@ -285,7 +285,7 @@ describe('#metrics', () => {
       await request(app)
         .get('/test')
         .expect(200)
-        .expect(res => expect(res).toHaveLogHeader());
+        .expect(res => expect(res).toHaveDocumentationHeader());
 
       apiMock.done();
       metricsMock.done();
@@ -337,7 +337,7 @@ describe('#metrics', () => {
       await request(app)
         .get('/test')
         .expect(200)
-        .expect(res => expect(res).toHaveLogHeader());
+        .expect(res => expect(res).toHaveDocumentationHeader());
 
       mock.done();
     });
@@ -351,7 +351,7 @@ describe('#metrics', () => {
       await request(app)
         .get('/test')
         .expect(200)
-        .expect(res => expect(res).toHaveLogHeader());
+        .expect(res => expect(res).toHaveDocumentationHeader());
 
       mock.done();
     });
