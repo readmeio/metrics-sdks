@@ -1,4 +1,5 @@
 <?php
+
 namespace ReadMe;
 
 use Closure;
@@ -16,8 +17,8 @@ use Symfony\Component\Mime\MimeTypes;
 
 class Metrics
 {
-    const PACKAGE_NAME = 'readme/metrics';
-    const METRICS_API = 'https://metrics.readme.io';
+    protected const PACKAGE_NAME = 'readme/metrics';
+    protected const METRICS_API = 'https://metrics.readme.io';
 
     /** @var string */
     private $api_key;

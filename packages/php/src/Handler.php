@@ -1,4 +1,5 @@
 <?php
+
 namespace ReadMe;
 
 use Illuminate\Http\Request;

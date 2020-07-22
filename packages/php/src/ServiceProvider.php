@@ -1,4 +1,5 @@
 <?php
+
 namespace ReadMe;
 
 class ServiceProvider extends \Illuminate\Support\ServiceProvider
