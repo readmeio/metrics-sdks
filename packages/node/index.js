@@ -49,18 +49,30 @@ async function getProjectBaseUrl(encodedApiKey) {
     lastUpdated === undefined ||
     (lastUpdated !== undefined && Math.abs(lastUpdated - Math.round(Date.now() / 1000)) >= 86400)
   ) {
-    const project = await fetch(`${config.readmeApiUrl}/v1/`, {
+    let baseUrl;
+    await fetch(`${config.readmeApiUrl}/v1/`, {
       method: 'get',
       headers: {
         Authorization: `Basic ${encodedApiKey}`,
       },
-    }).then(res => res.json());
+    })
+      .then(res => res.json())
+      .then(project => {
+        baseUrl = project.baseUrl;
 
-    cache.setKey('baseUrl', project.baseUrl);
-    cache.setKey('lastUpdated', Math.round(Date.now() / 1000));
+        cache.setKey('baseUrl', project.baseUrl);
+        cache.setKey('lastUpdated', Math.round(Date.now() / 1000));
+      })
+      .catch(() => {
+        // If unable to access the ReadMe API for whatever reason, let's set the last updated time to two minutes from
+        // now yesterday so that in 2 minutes we'll automatically make another attempt.
+        cache.setKey('baseUrl', null);
+        cache.setKey('lastUpdated', Math.round(Date.now() / 1000) - 86400 + 120);
+      });
+
     cache.save();
 
-    return project.baseUrl;
+    return baseUrl;
   }
 
   return cache.getKey('baseUrl');
@@ -83,7 +95,10 @@ module.exports.metrics = (apiKey, group, options = {}) => {
     const startedDateTime = new Date();
     const logId = uuidv4();
 
-    res.setHeader('x-documentation-url', `${baseLogUrl}/logs/${logId}`);
+    if (baseLogUrl !== undefined) {
+      res.setHeader('x-documentation-url', `${baseLogUrl}/logs/${logId}`);
+    }
+
     patchResponse(res);
 
     function send() {

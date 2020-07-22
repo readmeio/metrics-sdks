@@ -24,11 +24,16 @@ function getReadMeApiMock(numberOfTimes) {
     .reply(200, { baseUrl: baseLogUrl });
 }
 
-function hydrateCache(lastUpdated) {
+function getCache() {
   const encodedApiKey = Buffer.from(`${apiKey}:`).toString('base64');
   const fsSafeApikey = crypto.createHash('md5').update(encodedApiKey).digest('hex');
   const cacheKey = [pkg.name, pkg.version, fsSafeApikey].join('-');
-  const cache = flatCache.load(cacheKey, cacheDir);
+
+  return flatCache.load(cacheKey, cacheDir);
+}
+
+function hydrateCache(lastUpdated) {
+  const cache = getCache();
 
   // Postdate the cache to two days ago so it'll bee seen as stale.
   cache.setKey('lastUpdated', lastUpdated);
@@ -286,6 +291,36 @@ describe('#metrics', () => {
         .get('/test')
         .expect(200)
         .expect(res => expect(res).toHaveDocumentationHeader());
+
+      apiMock.done();
+      metricsMock.done();
+    });
+
+    it('should temporarily set baseUrl to null if the call to the ReadMe API fails for whatever reason', async () => {
+      const apiMock = nock(config.readmeApiUrl).get('/v1/').basicAuth({ user: apiKey }).reply(200, {
+        error: 'APIKEY_NOTFOUNDD',
+        message: "We couldn't find your API key",
+        suggestion:
+          "The API key you passed in (moc··········Key) doesn't match any keys we have in our system. API keys must be passed in as the username part of basic auth. You can get your API key in Configuration > API Key, or in the docs.",
+        docs: 'https://docs.readme.com/developers/logs/fake-uuid',
+        help: "If you need help, email support@readme.io and mention log 'fake-uuid'.",
+      });
+
+      const metricsMock = nock(config.host).post('/v1/request').basicAuth({ user: apiKey }).reply(200);
+
+      const app = express();
+      app.use(middleware.metrics(apiKey, () => group));
+      app.get('/test', (req, res) => res.sendStatus(200));
+
+      await request(app)
+        .get('/test')
+        .expect(200)
+        .expect(res => {
+          expect(getCache().getKey('baseUrl')).toBeUndefined();
+
+          // `x-documentation-url` header should not be present since we couldn't get the base URL!
+          expect(Object.keys(res.headers)).not.toContain('x-documentation-url');
+        });
 
       apiMock.done();
       metricsMock.done();

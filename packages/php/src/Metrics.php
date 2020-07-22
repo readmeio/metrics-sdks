@@ -325,8 +325,8 @@ class Metrics
                 $json = (string) $response->getBody();
                 $json = json_decode($json);
 
-                $cache->last_updated = time();
                 $cache->base_url = $json->baseUrl;
+                $cache->last_updated = time();
             } catch (\Exception $e) {
                 // If we're running in development mode, toss any errors that happen when we try to call the ReadMe API.
                 //
@@ -353,8 +353,8 @@ class Metrics
 
                 // If unable to access the ReadMe API for whatever reason, let's set the last updated time to two
                 // minutes from now yesterday so that in 2 minutes we'll automatically make another attempt.
-                $cache->last_updated = (time() - 86400) + 120;
                 $cache->base_url = null;
+                $cache->last_updated = (time() - 86400) + 120;
             }
 
             file_put_contents($cache_file, json_encode($cache));

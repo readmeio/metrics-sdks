@@ -577,8 +577,8 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
         // Hydrate the cache so it can be seen as fresh
         file_put_contents($this->metrics->getCacheFile(), json_encode([
-            'last_updated' => time(),
-            'base_url' => $this->base_log_url
+            'base_url' => $this->base_log_url,
+            'last_updated' => time()
         ]));
 
         $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
@@ -612,8 +612,8 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
         // Hydrate the cache so it can be seen as fresh
         file_put_contents($this->metrics->getCacheFile(), json_encode([
-            'last_updated' => time() - (86400 * 2),
-            'base_url' => $this->base_log_url
+            'base_url' => $this->base_log_url,
+            'last_updated' => time() - (86400 * 2)
         ]));
 
         $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
@@ -631,7 +631,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group getProjectBaseUrl
      */
-    public function testProjectBaseUrlIsTemporarilyIfReadMeCallFailsWhileNotInDevelopmentMode(): void
+    public function testProjectBaseUrlIsTemporarilyNullIfReadMeCallFailsWhileNotInDevelopmentMode(): void
     {
         $handlers = $this->getMockHandlers(
             new \GuzzleHttp\Psr7\Response(200),
