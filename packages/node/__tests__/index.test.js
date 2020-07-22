@@ -271,7 +271,7 @@ describe('#metrics', () => {
       metricsMock.done();
     });
 
-    it('should refresh the cache if out of date', async () => {
+    it('should refresh the cache if stale', async () => {
       // Hydate and postdate the cache to two days ago so it'll bee seen as stale.
       hydrateCache(Math.round(Date.now() / 1000 - 86400 * 2));
 
