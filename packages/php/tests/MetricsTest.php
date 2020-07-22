@@ -1,4 +1,5 @@
 <?php
+
 namespace ReadMe\Tests;
 
 use GuzzleHttp\Client;

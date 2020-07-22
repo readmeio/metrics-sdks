@@ -1,4 +1,5 @@
 <?php
+
 namespace ReadMe\Tests\Fixtures;
 
 use Illuminate\Http\Request;
