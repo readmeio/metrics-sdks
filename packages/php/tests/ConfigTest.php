@@ -13,7 +13,8 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
             'group_handler',
             'development_mode',
             'blacklist',
-            'whitelist'
+            'whitelist',
+            'base_log_url'
         ], array_keys($config));
     }
 }
