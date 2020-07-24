@@ -1,6 +1,10 @@
-const request = require('r2');
+const fetch = require('node-fetch');
 const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 const config = require('./config');
+const flatCache = require('flat-cache');
+const findCacheDir = require('find-cache-dir');
+const pkg = require('./package.json');
 
 const constructPayload = require('./lib/construct-payload');
 
@@ -27,19 +31,74 @@ function patchResponse(res) {
   };
 }
 
+async function getProjectBaseUrl(encodedApiKey) {
+  const cacheDir = findCacheDir({ name: pkg.name, create: true });
+  const fsSafeApikey = crypto.createHash('md5').update(encodedApiKey).digest('hex');
+
+  // Since we might have differences of cache management, set the package version into the cache key so all caches will
+  // automatically get refreshed when the package is updated/installed.
+  const cacheKey = `${pkg.name}-${pkg.version}-${fsSafeApikey}`;
+
+  const cache = flatCache.load(cacheKey, cacheDir);
+
+  // Does the cache exist? If it doesn't, let's fill it. If it does, let's see if it's stale. Caches should have a TTL
+  // of 1 day.
+  const lastUpdated = cache.getKey('lastUpdated');
+
+  if (
+    lastUpdated === undefined ||
+    (lastUpdated !== undefined && Math.abs(lastUpdated - Math.round(Date.now() / 1000)) >= 86400)
+  ) {
+    let baseUrl;
+    await fetch(`${config.readmeApiUrl}/v1/`, {
+      method: 'get',
+      headers: {
+        Authorization: `Basic ${encodedApiKey}`,
+      },
+    })
+      .then(res => res.json())
+      .then(project => {
+        baseUrl = project.baseUrl;
+
+        cache.setKey('baseUrl', project.baseUrl);
+        cache.setKey('lastUpdated', Math.round(Date.now() / 1000));
+      })
+      .catch(() => {
+        // If unable to access the ReadMe API for whatever reason, let's set the last updated time to two minutes from
+        // now yesterday so that in 2 minutes we'll automatically make another attempt.
+        cache.setKey('baseUrl', null);
+        cache.setKey('lastUpdated', Math.round(Date.now() / 1000) - 86400 + 120);
+      });
+
+    cache.save();
+
+    return baseUrl;
+  }
+
+  return cache.getKey('baseUrl');
+}
+
 module.exports.metrics = (apiKey, group, options = {}) => {
   if (!apiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a grouping function');
 
   const bufferLength = options.bufferLength || config.bufferLength;
-  const encoded = Buffer.from(`${apiKey}:`).toString('base64');
+  const encodedApiKey = Buffer.from(`${apiKey}:`).toString('base64');
+  let baseLogUrl = options.baseLogUrl || undefined;
   let queue = [];
 
-  return (req, res, next) => {
+  return async (req, res, next) => {
+    if (baseLogUrl === undefined) {
+      baseLogUrl = await getProjectBaseUrl(encodedApiKey);
+    }
+
     const startedDateTime = new Date();
     const logId = uuidv4();
 
-    res.setHeader('x-readme-log', logId);
+    if (baseLogUrl !== undefined) {
+      res.setHeader('x-documentation-url', `${baseLogUrl}/logs/${logId}`);
+    }
+
     patchResponse(res);
 
     function send() {
@@ -51,10 +110,15 @@ module.exports.metrics = (apiKey, group, options = {}) => {
       if (queue.length >= bufferLength) {
         const json = queue.slice();
         queue = [];
-        request.post(`${config.host}/v1/request`, {
-          headers: { authorization: `Basic ${encoded}` },
-          json,
-        });
+        fetch(`${config.host}/v1/request`, {
+          method: 'post',
+          body: JSON.stringify(json),
+          headers: {
+            Authorization: `Basic ${encodedApiKey}`,
+          },
+        })
+          .then(() => {})
+          .catch(() => {});
       }
 
       cleanup(); // eslint-disable-line no-use-before-define
