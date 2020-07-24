@@ -3,9 +3,11 @@
 namespace ReadMe;
 
 use Closure;
+use Composer\Factory;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlMultiHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -19,6 +21,7 @@ class Metrics
 {
     protected const PACKAGE_NAME = 'readme/metrics';
     protected const METRICS_API = 'https://metrics.readme.io';
+    protected const README_API = 'https://dash.readme.io';
 
     /** @var string */
     private $api_key;
@@ -32,6 +35,9 @@ class Metrics
     /** @var array */
     private $whitelist = [];
 
+    /** @var string|null */
+    private $base_log_url = null;
+
     /** @var class-string */
     private $group_handler;
 
@@ -41,8 +47,17 @@ class Metrics
     /** @var Client */
     private $client;
 
+    /** @var Client */
+    private $readme_api_client;
+
     /** @var string */
     private $package_version;
+
+    /** @var string */
+    private $cache_dir;
+
+    /** @var string */
+    private $user_agent;
 
     /**
      * @param string $api_key
@@ -51,7 +66,7 @@ class Metrics
      */
     public function __construct(string $api_key, string $group_handler, array $options = [])
     {
-        $this->api_key = $api_key;
+        $this->api_key = base64_encode($api_key . ':');
         $this->group_handler = $group_handler;
         $this->development_mode = array_key_exists('development_mode', $options)
             ? (bool)$options['development_mode']
@@ -65,20 +80,32 @@ class Metrics
             $this->whitelist = $options['whitelist'];
         }
 
+        if (!empty($options['base_log_url'])) {
+            $this->base_log_url = $options['base_log_url'];
+        }
+
+        // In development mode, requests are sent asynchronously (as well as PHP can without directly invoking
+        // shell cURL commands), so a very small timeout here ensures that the Metrics code will finish as fast as
+        // possible, send the POST request to the background and continue on with whatever else the application
+        // needs to execute.
+        $curl_timeout = (!$this->development_mode) ? 0.2 : 0;
+
         $this->curl_handler = new CurlMultiHandler();
         $this->client = (isset($options['client'])) ? $options['client'] : new Client([
             'handler' => HandlerStack::create($this->curl_handler),
-
             'base_uri' => self::METRICS_API,
+            'timeout' => $curl_timeout,
+        ]);
 
-            // In development mode, requests are sent asynchronously (as well as PHP can without directly invoking
-            // shell cURL commands), so a very small timeout here ensures that the Metrics code will finish as fast as
-            // possible, send the POST request to the background and continue on with whatever else the application
-            // needs to execute.
-            'timeout' => (!$this->development_mode) ? 0.2 : 0,
+        $this->readme_api_client = (isset($options['client_readme'])) ? $options['client_readme'] : new Client([
+            'base_uri' => self::README_API,
+            'timeout' => $curl_timeout,
         ]);
 
         $this->package_version = Versions::getVersion(self::PACKAGE_NAME);
+        $this->cache_dir = Factory::createConfig()->get('cache-dir');
+
+        $this->user_agent = 'readme-metrics-php/' . $this->package_version;
     }
 
     /**
@@ -90,14 +117,21 @@ class Metrics
      */
     public function track(Request $request, &$response): void
     {
+        if (empty($this->base_log_url)) {
+            $this->base_log_url = $this->getProjectBaseUrl();
+        }
+
         $log_id = Uuid::uuid4()->toString();
-        $response->headers->set('x-readme-log', $log_id);
+        if (!is_null($this->base_log_url)) {
+            // Only set the header if we have a fully-formed log URL to give to users.
+            $response->headers->set('x-documentation-url', $this->base_log_url . '/logs/' . $log_id);
+        }
 
         $payload = $this->constructPayload($log_id, $request, $response);
 
         $headers = [
-            'Authorization' => 'Basic ' . base64_encode($this->api_key . ':'),
-            'User-Agent' => 'readme-metrics-php/' . $this->package_version
+            'Authorization' => 'Basic ' . $this->api_key,
+            'User-Agent' => $this->user_agent
         ];
 
         // If not in development mode, all requests should be async.
@@ -254,6 +288,100 @@ class Metrics
                 'mimeType' => $response->headers->get('Content-Type')
             ]
         ];
+    }
+
+    /**
+     * Make an API request to ReadMe to retrieve the base log URL that'll be used to populate the `x-documentation-url`
+     * header.
+     *
+     * @return string|null
+     */
+    private function getProjectBaseUrl(): ?string
+    {
+        $cache_file = $this->getCacheFile();
+        $cache = new \stdClass();
+        if (file_exists($cache_file)) {
+            try {
+                $cache = file_get_contents($cache_file);
+                $cache = json_decode($cache);
+            } catch (\Exception $e) {
+                // If we can't decode the cache then we should act as if it doesn't exist and let it rehydrate itself.
+            }
+        }
+
+        // Does the cache exist? If it doesn't, let's fill it. If it does, let's see if it's stale. Caches should have
+        // a TTL of 1 day.
+        $last_updated = property_exists($cache, 'last_updated') ? $cache->last_updated : null;
+
+        if (is_null($last_updated) || (!is_null($last_updated) && abs($last_updated - time()) > 86400)) {
+            try {
+                $response = $this->readme_api_client->get('/api/v1/', [
+                    'headers' => [
+                        'Authorization' => 'Basic ' . $this->api_key,
+                        'User-Agent' => $this->user_agent
+                    ],
+                ]);
+
+                $json = (string) $response->getBody();
+                $json = json_decode($json);
+
+                $cache->base_url = $json->baseUrl;
+                $cache->last_updated = time();
+            } catch (\Exception $e) {
+                // If we're running in development mode, toss any errors that happen when we try to call the ReadMe API.
+                //
+                // These errors will likely be from invalid API keys, so it'll be good to surface those to users before
+                // it hits production.
+                if ($this->development_mode) {
+                    try {
+                        // If we don't have a ClientException here, throw again so we end up below and handle this
+                        // exception as a non-HTTP response problem.
+                        if (!($e instanceof ClientException)) {
+                            throw $e;
+                        }
+
+                        /** @psalm-suppress PossiblyNullReference */
+                        $json = (string) $e->getResponse()->getBody();
+                        $json = json_decode($json);
+                    } catch (\Exception $e) {
+                        $ex = new MetricsException($e->getMessage());
+                        throw $ex;
+                    }
+
+                    throw new MetricsException($json->message);
+                }
+
+                // If unable to access the ReadMe API for whatever reason, let's set the last updated time to two
+                // minutes from now yesterday so that in 2 minutes we'll automatically make another attempt.
+                $cache->base_url = null;
+                $cache->last_updated = (time() - 86400) + 120;
+            }
+
+            file_put_contents($cache_file, json_encode($cache));
+        }
+
+        return $cache->base_url;
+    }
+
+    /**
+     * Retrieve the cache file that'll be used to store the base URL for the `x-documentation-url` header.
+     *
+     * @return string
+     */
+    public function getCacheFile(): string
+    {
+        // Since we might have differences of cache management, set the package version into the cache key so all
+        // caches will automatically get refreshed when the package is updated/installed.
+        $cache_key = join('-', [
+            str_replace('/', '_', self::PACKAGE_NAME),
+            $this->package_version,
+            md5($this->api_key)
+        ]);
+
+        // Replace potentially unsafe characters in the cache key so it can be safely used as a filename on the server.
+        $cache_key = str_replace([DIRECTORY_SEPARATOR, '@'], '-', $cache_key);
+
+        return $this->cache_dir . DIRECTORY_SEPARATOR . $cache_key;
     }
 
     /**

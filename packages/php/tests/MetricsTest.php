@@ -62,6 +62,18 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /** @var class-string */
     private $group_handler = TestHandler::class;
 
+    /** @var array */
+    private $api_calls = [];
+
+    /** @var array */
+    private $api_calls_to_readme = [];
+
+    /** @var string */
+    private $api_key = 'mockReadMeApiKey';
+
+    /** @var string */
+    private $base_log_url = 'https://docs.example.com';
+
     /** @var string */
     private $log_uuid;
 
@@ -77,51 +89,57 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->requests = [];
-
-        $this->metrics = new Metrics('fakeApiKey', $this->group_handler);
+        $this->metrics = new Metrics($this->api_key, $this->group_handler);
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
 
-        $this->requests = [];
+        $this->api_calls = [];
+        $this->api_calls_to_readme = [];
+
+        // Clean up the cache dir between tests. Caching to the filesystem should probably be mocked out. 🤷‍♂️
+        $cache_file = $this->metrics->getCacheFile();
+        if (file_exists($cache_file)) {
+            unlink($cache_file);
+        }
     }
 
     /**
+     * @group track
      * @dataProvider providerDevelopmentModeToggle
      * @param bool $development_mode
      */
     public function testTrack(bool $development_mode): void
     {
-        // Mock out a 200 request from the Metrics server.
-        $mock = new MockHandler([
+        // Mock out a 200 request from the Metrics and ReadMe APIs.
+        $handlers = $this->getMockHandlers(
             new \GuzzleHttp\Psr7\Response(200, [], 'OK'),
-        ]);
+            new \GuzzleHttp\Psr7\Response(200, [], json_encode(['baseUrl' => $this->base_log_url]))
+        );
 
-        $handlerStack = HandlerStack::create($mock);
-        $handlerStack->push(Middleware::history($this->requests));
-
-        $metrics = new Metrics('fakeApiKey', $this->group_handler, [
+        $this->metrics = new Metrics($this->api_key, $this->group_handler, [
             'development_mode' => $development_mode,
-            'client' => new Client(['handler' => $handlerStack])
+            'client' => new Client(['handler' => $handlers->metrics]),
+            'client_readme' => new Client(['handler' => $handlers->readme])
         ]);
 
         $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
         $response = $this->getMockJsonResponse();
 
-        $metrics->track($request, $response);
+        $this->metrics->track($request, $response);
 
-        // Assert that the x-readme-log header was properly added into the current response.
-        $this->assertContains('x-readme-log', array_keys($response->headers->all()));
-        $log_header_id = array_shift($response->headers->all()['x-readme-log']);
-        $this->assertRegExp(self::UUID_PATTERN, $log_header_id);
+        // Assert that the `x-documentation-url` header was properly added into the current response.
+        $this->assertContains('x-documentation-url', array_keys($response->headers->all()));
+        $documentation_header = array_shift($response->headers->all()['x-documentation-url']);
+        $log_id = $this->getLogIdFromDocumentationHeader($documentation_header);
+        $this->assertRegExp(self::UUID_PATTERN, $log_id);
 
         // Assert that we only tracked a single request and also the payload looks as expected.
-        $this->assertCount(1, $this->requests);
+        $this->assertCount(1, $this->api_calls);
 
-        $actual_request = array_shift($this->requests);
+        $actual_request = array_shift($this->api_calls);
         $actual_request = $actual_request['request'];
 
         $this->assertSame('/request', $actual_request->getRequestTarget());
@@ -131,7 +149,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
         $actual_payload = array_shift($actual_payload);
         $this->assertSame(['_id', 'group', 'clientIPAddress', 'development', 'request'], array_keys($actual_payload));
-        $this->assertSame($log_header_id, $actual_payload['_id']);
+        $this->assertSame($log_id, $actual_payload['_id']);
 
         $this->assertSame([
             'method' => 'GET',
@@ -160,13 +178,14 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         // Make sure that our x-readme-log header ended up being logged as a response header in the metrics request.
         $response_headers = $actual_payload['request']['log']['entries'][0]['response']['headers'];
         $readme_log_header = array_filter($response_headers, function ($header) {
-            return $header['name'] === 'x-readme-log';
+            return $header['name'] === 'x-documentation-url';
         });
 
-        $this->assertSame($log_header_id, array_shift($readme_log_header)['value']);
+        $this->assertSame($log_id, $this->getLogIdFromDocumentationHeader(array_shift($readme_log_header)['value']));
     }
 
     /**
+     * @group track
      * @dataProvider providerDevelopmentModeToggle
      * @param bool $development_mode
      */
@@ -178,7 +197,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             $this->expectExceptionMessage('ValidationError: queryString.0.value: Path `value` is required.');
         }
 
-        $mock = new MockHandler([
+        $handlers = $this->getMockHandlers(
             new \GuzzleHttp\Psr7\Response(200, [], json_encode([
                 'errors' => [
                     'queryString.0.value' => [
@@ -194,20 +213,19 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
                 'message' => 'RequestModel validation failed: queryString.0.value: Path `value` is required.',
                 'name' => 'ValidationError',
             ])),
-        ]);
+            new \GuzzleHttp\Psr7\Response(200, [], json_encode(['baseUrl' => $this->base_log_url]))
+        );
 
-        $handlerStack = HandlerStack::create($mock);
-        $metrics = new Metrics('fakeApiKey', $this->group_handler, [
+        $this->metrics = new Metrics($this->api_key, $this->group_handler, [
             'development_mode' => $development_mode,
-            'client' => new Client([
-                'handler' => $handlerStack
-            ])
+            'client' => new Client(['handler' => $handlers->metrics]),
+            'client_readme' => new Client(['handler' => $handlers->readme])
         ]);
 
         $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
         $response = $this->getMockJsonResponse();
 
-        $metrics->track($request, $response);
+        $this->metrics->track($request, $response);
 
         if (!$development_mode) {
             $this->assertTrue(
@@ -218,6 +236,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @group track
      * @dataProvider providerDevelopmentModeToggle
      * @param bool $development_mode
      */
@@ -229,20 +248,21 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             $this->expectExceptionMessageMatches('/500 Internal Server Error/');
         }
 
-        $mock = new MockHandler([
+        $handlers = $this->getMockHandlers(
             new \GuzzleHttp\Psr7\Response(500),
-        ]);
+            new \GuzzleHttp\Psr7\Response(200, [], json_encode(['baseUrl' => $this->base_log_url]))
+        );
 
-        $handlerStack = HandlerStack::create($mock);
-        $metrics = new Metrics('fakeApiKey', $this->group_handler, [
+        $this->metrics = new Metrics($this->api_key, $this->group_handler, [
             'development_mode' => $development_mode,
-            'client' => new Client(['handler' => $handlerStack])
+            'client' => new Client(['handler' => $handlers->metrics]),
+            'client_readme' => new Client(['handler' => $handlers->readme])
         ]);
 
         $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
         $response = $this->getMockJsonResponse();
 
-        $metrics->track($request, $response);
+        $this->metrics->track($request, $response);
 
         if (!$development_mode) {
             $this->assertTrue(
@@ -252,13 +272,16 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         }
     }
 
+    /**
+     * @group constructPayload
+     */
     public function testConstructPayload(): void
     {
         $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
         $response = $this->getMockJsonResponse();
-        $payload = $this->metrics->constructPayload('fakeId', $request, $response);
+        $payload = $this->metrics->constructPayload('fake-uuid', $request, $response);
 
-        $this->assertSame('fakeId', $payload['_id']);
+        $this->assertSame('fake-uuid', $payload['_id']);
 
         $this->assertSame([
             'id' => '123457890',
@@ -331,11 +354,14 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($response->headers->get('Content-Type'), $payload_response['content']['mimeType']);
     }
 
+    /**
+     * @group constructPayload
+     */
     public function testConstructPayloadWithNonJsonResponse(): void
     {
         $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
         $response = $this->getMockTextResponse();
-        $payload = $this->metrics->constructPayload('fakeId', $request, $response);
+        $payload = $this->metrics->constructPayload('fake-uuid', $request, $response);
 
         $payload_response = $payload['request']['log']['entries'][0]['response'];
         $this->assertSame(200, $payload_response['status']);
@@ -345,11 +371,14 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('text/plain', $payload_response['content']['mimeType']);
     }
 
+    /**
+     * @group constructPayload
+     */
     public function testConstructPayloadWithUploadFileInRequest(): void
     {
         $request = $this->getMockRequest([], self::MOCK_POST_PARAMS, self::MOCK_FILES_PARAMS);
         $response = $this->getMockJsonResponse();
-        $payload = $this->metrics->constructPayload('fakeId', $request, $response);
+        $payload = $this->metrics->constructPayload('fake-uuid', $request, $response);
 
         $params = $payload['request']['log']['entries'][0]['request']['postData']['params'];
         $this->assertSame([
@@ -365,6 +394,9 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         ], $params);
     }
 
+    /**
+     * @group constructPayload
+     */
     public function testConstructPayloadShouldThrowErrorIfGroupFunctionDoesNotReturnExpectedPayload(): void
     {
         $this->expectException(\TypeError::class);
@@ -373,9 +405,16 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $request = \Mockery::mock(Request::class);
         $response = \Mockery::mock(JsonResponse::class);
 
-        (new Metrics('fakeApiKey', TestHandlerReturnsNoData::class))->constructPayload('fakeId', $request, $response);
+        (new Metrics($this->api_key, TestHandlerReturnsNoData::class))->constructPayload(
+            'fake-uuid',
+            $request,
+            $response
+        );
     }
 
+    /**
+     * @group constructPayload
+     */
     public function testConstructPayloadShouldThrowErrorIfGroupFunctionReturnsAnEmptyId(): void
     {
         $this->expectException(\TypeError::class);
@@ -384,18 +423,25 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $request = \Mockery::mock(Request::class);
         $response = \Mockery::mock(JsonResponse::class);
 
-        (new Metrics('fakeApiKey', TestHandlerReturnsEmptyId::class))->constructPayload('fakeId', $request, $response);
+        (new Metrics($this->api_key, TestHandlerReturnsEmptyId::class))->constructPayload(
+            'fake-uuid',
+            $request,
+            $response
+        );
     }
 
+    /**
+     * @group processRequest
+     */
     public function testProcessRequestShouldFilterOutItemsInBlacklist(): void
     {
-        $metrics = new Metrics('fakeApiKey', $this->group_handler, [
+        $metrics = new Metrics($this->api_key, $this->group_handler, [
             'blacklist' => ['val', 'password']
         ]);
 
         $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS, self::MOCK_POST_PARAMS);
         $response = $this->getMockJsonResponse();
-        $payload = $metrics->constructPayload('fakeId', $request, $response);
+        $payload = $metrics->constructPayload('fake-uuid', $request, $response);
 
         $request_data = $payload['request']['log']['entries'][0]['request'];
 
@@ -412,15 +458,18 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         ], $params);
     }
 
+    /**
+     * @group processRequest
+     */
     public function testProcessRequestShouldFilterOnlyItemsInWhitelist(): void
     {
-        $metrics = new Metrics('fakeApiKey', $this->group_handler, [
+        $metrics = new Metrics($this->api_key, $this->group_handler, [
             'whitelist' => ['val', 'password']
         ]);
 
         $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS, self::MOCK_POST_PARAMS);
         $response = $this->getMockJsonResponse();
-        $payload = $metrics->constructPayload('fakeId', $request, $response);
+        $payload = $metrics->constructPayload('fake-uuid', $request, $response);
 
         $request_data = $payload['request']['log']['entries'][0]['request'];
 
@@ -436,15 +485,18 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         ], $params);
     }
 
+    /**
+     * @group processResponse
+     */
     public function testProcessResponseShouldFilterOutItemsInBlacklist(): void
     {
-        $metrics = new Metrics('fakeApiKey', $this->group_handler, [
+        $metrics = new Metrics($this->api_key, $this->group_handler, [
             'blacklist' => ['value']
         ]);
 
         $request = $this->getMockRequest();
         $response = $this->getMockJsonResponse();
-        $payload = $metrics->constructPayload('fakeId', $request, $response);
+        $payload = $metrics->constructPayload('fake-uuid', $request, $response);
 
         $content = $payload['request']['log']['entries'][0]['response']['content'];
 
@@ -454,15 +506,18 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         ], json_decode($content['text'], true));
     }
 
+    /**
+     * @group processResponse
+     */
     public function testProcessResponseShouldFilterOnlyItemsInWhitelist(): void
     {
-        $metrics = new Metrics('fakeApiKey', $this->group_handler, [
+        $metrics = new Metrics($this->api_key, $this->group_handler, [
             'whitelist' => ['value']
         ]);
 
         $request = $this->getMockRequest();
         $response = $this->getMockJsonResponse();
-        $payload = $metrics->constructPayload('fakeId', $request, $response);
+        $payload = $metrics->constructPayload('fake-uuid', $request, $response);
 
         $content = $payload['request']['log']['entries'][0]['response']['content'];
 
@@ -470,6 +525,223 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             ['value' => '123456'],
             ['value' => 'abcdef']
         ], json_decode($content['text'], true));
+    }
+
+    /**
+     * @group getProjectBaseUrl
+     * @dataProvider providerDevelopmentModeToggle
+     * @param bool $development_mode
+     */
+    public function testProjectBaseUrlIsNotFetchedIfSuppliedAsOption(bool $development_mode): void
+    {
+        $handlers = $this->getMockHandlers(
+            new \GuzzleHttp\Psr7\Response(200),
+            new \GuzzleHttp\Psr7\Response(200, [], json_encode(['baseUrl' => $this->base_log_url]))
+        );
+
+        $this->metrics = new Metrics($this->api_key, $this->group_handler, [
+            'development_mode' => $development_mode,
+            'base_log_url' => $this->base_log_url,
+            'client' => new Client(['handler' => $handlers->metrics]),
+            'client_readme' => new Client(['handler' => $handlers->readme])
+        ]);
+
+        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
+        $response = $this->getMockJsonResponse();
+
+        $this->metrics->track($request, $response);
+
+        $this->assertEmpty(
+            $this->api_calls_to_readme,
+            'A call was made to ReadMe to get the baseUrl even though it was supplied.'
+        );
+    }
+
+    /**
+     * @group getProjectBaseUrl
+     * @dataProvider providerDevelopmentModeToggle
+     * @param bool $development_mode
+     */
+    public function testProjectBaseUrlNotFetchedIfCacheIsFresh(bool $development_mode): void
+    {
+        $handlers = $this->getMockHandlers(
+            new \GuzzleHttp\Psr7\Response(200),
+            new \GuzzleHttp\Psr7\Response(200, [], json_encode(['baseUrl' => $this->base_log_url]))
+        );
+
+        $this->metrics = new Metrics($this->api_key, $this->group_handler, [
+            'development_mode' => $development_mode,
+            'client' => new Client(['handler' => $handlers->metrics]),
+            'client_readme' => new Client(['handler' => $handlers->readme])
+        ]);
+
+        // Hydrate the cache so it can be seen as fresh
+        file_put_contents($this->metrics->getCacheFile(), json_encode([
+            'base_url' => $this->base_log_url,
+            'last_updated' => time()
+        ]));
+
+        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
+        $response = $this->getMockJsonResponse();
+
+        $this->metrics->track($request, $response);
+
+        $this->assertEmpty(
+            $this->api_calls_to_readme,
+            'A call was made to ReadMe to get the baseUrl even though it was fresh in the cache.'
+        );
+    }
+
+    /**
+     * @group getProjectBaseUrl
+     * @dataProvider providerDevelopmentModeToggle
+     * @param bool $development_mode
+     */
+    public function testProjectBaseUrlDataCacheIsRefreshedIfStale(bool $development_mode): void
+    {
+        $handlers = $this->getMockHandlers(
+            new \GuzzleHttp\Psr7\Response(200),
+            new \GuzzleHttp\Psr7\Response(200, [], json_encode(['baseUrl' => $this->base_log_url]))
+        );
+
+        $this->metrics = new Metrics($this->api_key, $this->group_handler, [
+            'development_mode' => $development_mode,
+            'client' => new Client(['handler' => $handlers->metrics]),
+            'client_readme' => new Client(['handler' => $handlers->readme])
+        ]);
+
+        // Hydrate the cache so it can be seen as fresh
+        file_put_contents($this->metrics->getCacheFile(), json_encode([
+            'base_url' => $this->base_log_url,
+            'last_updated' => time() - (86400 * 2)
+        ]));
+
+        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
+        $response = $this->getMockJsonResponse();
+
+        $this->metrics->track($request, $response);
+
+        $this->assertCount(
+            1,
+            $this->api_calls_to_readme,
+            'A call was not made to ReadMe to get the baseUrl when the cache is stale.'
+        );
+    }
+
+    /**
+     * @group getProjectBaseUrl
+     */
+    public function testProjectBaseUrlIsTemporarilyNullIfReadMeCallFailsWhileNotInDevelopmentMode(): void
+    {
+        $handlers = $this->getMockHandlers(
+            new \GuzzleHttp\Psr7\Response(200),
+            new \GuzzleHttp\Psr7\Response(401, [], json_encode([
+                'error' => 'APIKEY_NOTFOUNDD',
+                'message' => "We couldn't find your API key",
+                'suggestion' => "The API key you passed in (moc··········Key) doesn't match any keys we have in our " .
+                    'system. API keys must be passed in as the username part of basic auth. You can get your API ' .
+                    'key in Configuration > API Key, or in the docs.',
+                'docs' => 'https://docs.readme.com/developers/logs/fake-uuid',
+                'help' => "If you need help, email support@readme.io and mention log 'fake-uuid'.",
+            ]))
+        );
+
+        $this->metrics = new Metrics($this->api_key, $this->group_handler, [
+            'development_mode' => false,
+            'client' => new Client(['handler' => $handlers->metrics]),
+            'client_readme' => new Client(['handler' => $handlers->readme])
+        ]);
+
+        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
+        $response = $this->getMockJsonResponse();
+
+        $this->metrics->track($request, $response);
+
+        // Since the call to ReadMe failed, the `x-documentation-url` header shouldn't be present as we didn't get a
+        // base log URL to create suffix against.
+        $this->assertNotContains('x-documentation-url', array_keys($response->headers->all()));
+
+        $cache = json_decode(file_get_contents($this->metrics->getCacheFile()));
+        $this->assertNull($cache->base_url);
+    }
+
+    /**
+     * @group getProjectBaseUrl
+     */
+    public function testProjectBaseUrlFailsInDevelopmentModeIfReadMeCallHasErrorResponse(): void
+    {
+        $this->expectException(MetricsException::class);
+        $this->expectExceptionMessageMatches("/We couldn't find your API key/");
+
+        $handlers = $this->getMockHandlers(
+            new \GuzzleHttp\Psr7\Response(200),
+            new \GuzzleHttp\Psr7\Response(401, [], json_encode([
+                'error' => 'APIKEY_NOTFOUNDD',
+                'message' => "We couldn't find your API key",
+                'suggestion' => "The API key you passed in (moc··········Key) doesn't match any keys we have in our " .
+                    'system. API keys must be passed in as the username part of basic auth. You can get your API ' .
+                    'key in Configuration > API Key, or in the docs.',
+                'docs' => 'https://docs.readme.com/developers/logs/fake-uuid',
+                'help' => "If you need help, email support@readme.io and mention log 'fake-uuid'.",
+            ]))
+        );
+
+        $this->metrics = new Metrics($this->api_key, $this->group_handler, [
+            'development_mode' => true,
+            'client' => new Client(['handler' => $handlers->metrics]),
+            'client_readme' => new Client(['handler' => $handlers->readme])
+        ]);
+
+        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
+        $response = $this->getMockJsonResponse();
+
+        $this->metrics->track($request, $response);
+    }
+
+    /**
+     * @group getProjectBaseUrl
+     */
+    public function testProjectBaseUrlFailsInDevelopmentModeIfItCantTalkToReadMe(): void
+    {
+        $this->expectException(MetricsException::class);
+        $this->expectExceptionMessageMatches('/500 Internal Server Error/');
+
+        $handlers = $this->getMockHandlers(
+            new \GuzzleHttp\Psr7\Response(200),
+            new \GuzzleHttp\Psr7\Response(500)
+        );
+
+        $this->metrics = new Metrics($this->api_key, $this->group_handler, [
+            'development_mode' => true,
+            'client' => new Client(['handler' => $handlers->metrics]),
+            'client_readme' => new Client(['handler' => $handlers->readme])
+        ]);
+
+        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
+        $response = $this->getMockJsonResponse();
+
+        $this->metrics->track($request, $response);
+    }
+
+    private function getMockHandlers(
+        \GuzzleHttp\Psr7\Response $mock_metrics_response,
+        \GuzzleHttp\Psr7\Response $mock_readme_response = null
+    ): \stdClass {
+        $handlers = new \stdClass();
+
+        $mock = new MockHandler([$mock_metrics_response]);
+        $handlers->metrics = HandlerStack::create($mock);
+        $handlers->metrics->push(Middleware::history($this->api_calls));
+
+        if (empty($mock_readme_response)) {
+            $handlers->readme = null;
+        } else {
+            $mock = new MockHandler([$mock_readme_response]);
+            $handlers->readme = HandlerStack::create($mock);
+            $handlers->readme->push(Middleware::history($this->api_calls_to_readme));
+        }
+
+        return $handlers;
     }
 
     private function getMockRequest($query_params = [], $post_params = [], $file_params = []): Request
@@ -522,6 +794,11 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
                 'Content-Length' => 11
             ])
         );
+    }
+
+    private function getLogIdFromDocumentationHeader(string $header): string
+    {
+        return str_replace($this->base_log_url . '/logs/', '', $header);
     }
 
     public function providerDevelopmentModeToggle(): array
