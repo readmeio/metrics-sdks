@@ -1,3 +1,22 @@
+## 3.1.0 (2020-07-24)
+
+* chore: pointing lerna towards just the node sdk for now ([d07aa1e](https://github.com/readmeio/metrics-sdks/commit/d07aa1e))
+* chore(deps-dev): bump @commitlint/cli from 9.0.1 to 9.1.1 (#12) ([1c5e25c](https://github.com/readmeio/metrics-sdks/commit/1c5e25c)), closes [#12](https://github.com/readmeio/metrics-sdks/issues/12)
+* chore(deps-dev): bump @commitlint/config-conventional (#13) ([4aa9c27](https://github.com/readmeio/metrics-sdks/commit/4aa9c27)), closes [#13](https://github.com/readmeio/metrics-sdks/issues/13)
+* chore(deps): bump actions/cache from v1 to v2 (#11) ([c4b405f](https://github.com/readmeio/metrics-sdks/commit/c4b405f)), closes [#11](https://github.com/readmeio/metrics-sdks/issues/11)
+* feat: allowing the php sdk to create its own log ID (#10) ([3c0aafc](https://github.com/readmeio/metrics-sdks/commit/3c0aafc)), closes [#10](https://github.com/readmeio/metrics-sdks/issues/10)
+* feat: PHP SDK (#9) ([5eb96d7](https://github.com/readmeio/metrics-sdks/commit/5eb96d7)), closes [#9](https://github.com/readmeio/metrics-sdks/issues/9)
+* feat: reworking `x-readme-log` into `x-documentation-url` (#15) ([9cd0f08](https://github.com/readmeio/metrics-sdks/commit/9cd0f08)), closes [#15](https://github.com/readmeio/metrics-sdks/issues/15)
+* style: moving the php sdk over to PSR-12 as PSR-2 is deprecated (#16) ([7228f80](https://github.com/readmeio/metrics-sdks/commit/7228f80)), closes [#16](https://github.com/readmeio/metrics-sdks/issues/16)
+* fix: issue where the same logs would get sent multiple times (#8) ([3e8ff54](https://github.com/readmeio/metrics-sdks/commit/3e8ff54)), closes [#8](https://github.com/readmeio/metrics-sdks/issues/8)
+* docs: adding the php sdk to the root-level readme ([36646b9](https://github.com/readmeio/metrics-sdks/commit/36646b9))
+* docs: cleaning up the readme a bit ([e60f154](https://github.com/readmeio/metrics-sdks/commit/e60f154))
+* docs: fix broken repo links in README.md (#14) ([429fcf2](https://github.com/readmeio/metrics-sdks/commit/429fcf2)), closes [#14](https://github.com/readmeio/metrics-sdks/issues/14)
+* Update README.md ([9ecc342](https://github.com/readmeio/metrics-sdks/commit/9ecc342))
+* Update README.md ([5b4f61a](https://github.com/readmeio/metrics-sdks/commit/5b4f61a))
+
+
+
 ## 3.0.0 (2020-07-12)
 
 * chore: regenerating the root package-lock file ([902efdf](https://github.com/readmeio/metrics-sdks/commit/902efdf))
