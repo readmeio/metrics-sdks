@@ -54,6 +54,7 @@ async function getProjectBaseUrl(encodedApiKey) {
       method: 'get',
       headers: {
         Authorization: `Basic ${encodedApiKey}`,
+        'User-Agent': `${pkg.name}/${pkg.version}`,
       },
     })
       .then(res => res.json())
@@ -115,6 +116,8 @@ module.exports.metrics = (apiKey, group, options = {}) => {
           body: JSON.stringify(json),
           headers: {
             Authorization: `Basic ${encodedApiKey}`,
+            'Content-Type': 'application/json',
+            'User-Agent': `${pkg.name}/${pkg.version}`,
           },
         })
           .then(() => {})
