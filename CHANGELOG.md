@@ -1,3 +1,11 @@
+## <small>3.1.1 (2020-07-27)</small>
+
+* fix: add content-type and user-agent headers (#19) ([019cedb](https://github.com/readmeio/metrics-sdks/commit/019cedb)), closes [#19](https://github.com/readmeio/metrics-sdks/issues/19)
+* chore(deps-dev): bump eslint from 7.4.0 to 7.5.0 (#17) ([e66eca2](https://github.com/readmeio/metrics-sdks/commit/e66eca2)), closes [#17](https://github.com/readmeio/metrics-sdks/issues/17)
+* chore(deps-dev): bump is-valid-uuid-v4 from 1.2.0 to 1.2.1 (#18) ([197a672](https://github.com/readmeio/metrics-sdks/commit/197a672)), closes [#18](https://github.com/readmeio/metrics-sdks/issues/18)
+
+
+
 ## 3.1.0 (2020-07-24)
 
 * chore: pointing lerna towards just the node sdk for now ([d07aa1e](https://github.com/readmeio/metrics-sdks/commit/d07aa1e))
