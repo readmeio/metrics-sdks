@@ -17,7 +17,11 @@ const baseLogUrl = 'https://docs.example.com';
 const cacheDir = findCacheDir({ name: pkg.name });
 
 function getReadMeApiMock(numberOfTimes) {
-  return nock(config.readmeApiUrl)
+  return nock(config.readmeApiUrl, {
+    reqheaders: {
+      'User-Agent': `${pkg.name}/${pkg.version}`,
+    },
+  })
     .get('/v1/')
     .basicAuth({ user: apiKey })
     .times(numberOfTimes)
@@ -97,6 +101,7 @@ describe('#metrics', () => {
     const mock = nock(config.host, {
       reqheaders: {
         'Content-Type': 'application/json',
+        'User-Agent': `${pkg.name}/${pkg.version}`,
       },
     })
       .post('/v1/request', ([body]) => {
@@ -127,6 +132,7 @@ describe('#metrics', () => {
       const mock = nock(config.host, {
         reqheaders: {
           'Content-Type': 'application/json',
+          'User-Agent': `${pkg.name}/${pkg.version}`,
         },
       })
         .post('/v1/request', body => {
@@ -191,6 +197,7 @@ describe('#metrics', () => {
         nock(config.host, {
           reqheaders: {
             'Content-Type': 'application/json',
+            'User-Agent': `${pkg.name}/${pkg.version}`,
           },
         })
           .post('/v1/request', body => {
@@ -231,6 +238,7 @@ describe('#metrics', () => {
       const mock = nock(config.host, {
         reqheaders: {
           'Content-Type': 'application/json',
+          'User-Agent': `${pkg.name}/${pkg.version}`,
         },
       })
         .post('/v1/request')
@@ -253,6 +261,7 @@ describe('#metrics', () => {
       const metricsMock = nock(config.host, {
         reqheaders: {
           'Content-Type': 'application/json',
+          'User-Agent': `${pkg.name}/${pkg.version}`,
         },
       })
         .post('/v1/request')
@@ -290,6 +299,7 @@ describe('#metrics', () => {
       const metricsMock = nock(config.host, {
         reqheaders: {
           'Content-Type': 'application/json',
+          'User-Agent': `${pkg.name}/${pkg.version}`,
         },
       })
         .post('/v1/request')
@@ -317,6 +327,7 @@ describe('#metrics', () => {
       const metricsMock = nock(config.host, {
         reqheaders: {
           'Content-Type': 'application/json',
+          'User-Agent': `${pkg.name}/${pkg.version}`,
         },
       })
         .post('/v1/request')
@@ -337,18 +348,26 @@ describe('#metrics', () => {
     });
 
     it('should temporarily set baseUrl to null if the call to the ReadMe API fails for whatever reason', async () => {
-      const apiMock = nock(config.readmeApiUrl).get('/v1/').basicAuth({ user: apiKey }).reply(200, {
-        error: 'APIKEY_NOTFOUNDD',
-        message: "We couldn't find your API key",
-        suggestion:
-          "The API key you passed in (moc··········Key) doesn't match any keys we have in our system. API keys must be passed in as the username part of basic auth. You can get your API key in Configuration > API Key, or in the docs.",
-        docs: 'https://docs.readme.com/developers/logs/fake-uuid',
-        help: "If you need help, email support@readme.io and mention log 'fake-uuid'.",
-      });
+      const apiMock = nock(config.readmeApiUrl, {
+        reqheaders: {
+          'User-Agent': `${pkg.name}/${pkg.version}`,
+        },
+      })
+        .get('/v1/')
+        .basicAuth({ user: apiKey })
+        .reply(200, {
+          error: 'APIKEY_NOTFOUNDD',
+          message: "We couldn't find your API key",
+          suggestion:
+            "The API key you passed in (moc··········Key) doesn't match any keys we have in our system. API keys must be passed in as the username part of basic auth. You can get your API key in Configuration > API Key, or in the docs.",
+          docs: 'https://docs.readme.com/developers/logs/fake-uuid',
+          help: "If you need help, email support@readme.io and mention log 'fake-uuid'.",
+        });
 
       const metricsMock = nock(config.host, {
         reqheaders: {
           'Content-Type': 'application/json',
+          'User-Agent': `${pkg.name}/${pkg.version}`,
         },
       })
         .post('/v1/request')
@@ -381,6 +400,7 @@ describe('#metrics', () => {
       return nock(config.host, {
         reqheaders: {
           'Content-Type': 'application/json',
+          'User-Agent': `${pkg.name}/${pkg.version}`,
         },
       })
         .post('/v1/request', ([body]) => {
