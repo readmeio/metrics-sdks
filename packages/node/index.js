@@ -115,6 +115,7 @@ module.exports.metrics = (apiKey, group, options = {}) => {
           body: JSON.stringify(json),
           headers: {
             Authorization: `Basic ${encodedApiKey}`,
+            'Content-Type': 'application/json',
           },
         })
           .then(() => {})
