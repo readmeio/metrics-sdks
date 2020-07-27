@@ -94,7 +94,11 @@ describe('#metrics', () => {
 
   it('should send a request to the metrics server', () => {
     const apiMock = getReadMeApiMock(1);
-    const mock = nock(config.host)
+    const mock = nock(config.host, {
+      reqheaders: {
+        'Content-Type': 'application/json',
+      },
+    })
       .post('/v1/request', ([body]) => {
         expect(body.group).toBe(group);
         expect(typeof body.request.log.entries[0].startedDateTime).toBe('string');
@@ -120,7 +124,11 @@ describe('#metrics', () => {
   describe('#bufferLength', () => {
     it('should send requests when number hits `bufferLength` size', async function test() {
       const apiMock = getReadMeApiMock(1);
-      const mock = nock(config.host)
+      const mock = nock(config.host, {
+        reqheaders: {
+          'Content-Type': 'application/json',
+        },
+      })
         .post('/v1/request', body => {
           expect(body).toHaveLength(3);
           return true;
@@ -180,7 +188,11 @@ describe('#metrics', () => {
       const seenLogs = [];
 
       const mocks = [...new Array(numberOfMocks).keys()].map(() =>
-        nock(config.host)
+        nock(config.host, {
+          reqheaders: {
+            'Content-Type': 'application/json',
+          },
+        })
           .post('/v1/request', body => {
             expect(body).toHaveLength(bufferLength);
 
@@ -216,7 +228,14 @@ describe('#metrics', () => {
 
   describe('#baseLogUrl', () => {
     it('should not call the API if the baseLogUrl supplied as a middleware option', async () => {
-      const mock = nock(config.host).post('/v1/request').basicAuth({ user: apiKey }).reply(200);
+      const mock = nock(config.host, {
+        reqheaders: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .post('/v1/request')
+        .basicAuth({ user: apiKey })
+        .reply(200);
       const app = express();
       app.use(middleware.metrics(apiKey, () => group, { baseLogUrl }));
       app.get('/test', (req, res) => res.sendStatus(200));
@@ -231,7 +250,14 @@ describe('#metrics', () => {
 
     it('should not call the API for project data if the cache is fresh', async () => {
       const apiMock = getReadMeApiMock(1);
-      const metricsMock = nock(config.host).post('/v1/request').basicAuth({ user: apiKey }).reply(200);
+      const metricsMock = nock(config.host, {
+        reqheaders: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .post('/v1/request')
+        .basicAuth({ user: apiKey })
+        .reply(200);
 
       const app = express();
       app.use(middleware.metrics(apiKey, () => group));
@@ -261,7 +287,14 @@ describe('#metrics', () => {
 
     it('should populate the cache if not present', async () => {
       const apiMock = getReadMeApiMock(1);
-      const metricsMock = nock(config.host).post('/v1/request').basicAuth({ user: apiKey }).reply(200);
+      const metricsMock = nock(config.host, {
+        reqheaders: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .post('/v1/request')
+        .basicAuth({ user: apiKey })
+        .reply(200);
 
       const app = express();
       app.use(middleware.metrics(apiKey, () => group));
@@ -281,7 +314,14 @@ describe('#metrics', () => {
       hydrateCache(Math.round(Date.now() / 1000 - 86400 * 2));
 
       const apiMock = getReadMeApiMock(1);
-      const metricsMock = nock(config.host).post('/v1/request').basicAuth({ user: apiKey }).reply(200);
+      const metricsMock = nock(config.host, {
+        reqheaders: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .post('/v1/request')
+        .basicAuth({ user: apiKey })
+        .reply(200);
 
       const app = express();
       app.use(middleware.metrics(apiKey, () => group));
@@ -306,7 +346,14 @@ describe('#metrics', () => {
         help: "If you need help, email support@readme.io and mention log 'fake-uuid'.",
       });
 
-      const metricsMock = nock(config.host).post('/v1/request').basicAuth({ user: apiKey }).reply(200);
+      const metricsMock = nock(config.host, {
+        reqheaders: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .post('/v1/request')
+        .basicAuth({ user: apiKey })
+        .reply(200);
 
       const app = express();
       app.use(middleware.metrics(apiKey, () => group));
@@ -331,7 +378,11 @@ describe('#metrics', () => {
     let apiMock;
     const responseBody = { a: 1, b: 2, c: 3 };
     function createMock() {
-      return nock(config.host)
+      return nock(config.host, {
+        reqheaders: {
+          'Content-Type': 'application/json',
+        },
+      })
         .post('/v1/request', ([body]) => {
           expect(body.request.log.entries[0].response.content.text).toBe(JSON.stringify(responseBody));
           return true;
