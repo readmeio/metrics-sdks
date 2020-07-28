@@ -1,3 +1,9 @@
+## <small>3.1.2 (2020-07-28)</small>
+
+* fix: prevent potentially null base log urls from being used (#20) ([d48e0d2](https://github.com/readmeio/metrics-sdks/commit/d48e0d2)), closes [#20](https://github.com/readmeio/metrics-sdks/issues/20)
+
+
+
 ## <small>3.1.1 (2020-07-27)</small>
 
 * fix: add content-type and user-agent headers (#19) ([019cedb](https://github.com/readmeio/metrics-sdks/commit/019cedb)), closes [#19](https://github.com/readmeio/metrics-sdks/issues/19)
