@@ -57,7 +57,13 @@ async function getProjectBaseUrl(encodedApiKey) {
         'User-Agent': `${pkg.name}/${pkg.version}`,
       },
     })
-      .then(res => res.json())
+      .then(res => {
+        if (res.status >= 400 && res.status <= 599) {
+          throw res;
+        }
+
+        return res.json();
+      })
       .then(project => {
         baseUrl = project.baseUrl;
 
@@ -96,7 +102,7 @@ module.exports.metrics = (apiKey, group, options = {}) => {
     const startedDateTime = new Date();
     const logId = uuidv4();
 
-    if (baseLogUrl !== undefined) {
+    if (baseLogUrl !== undefined && typeof baseLogUrl === 'string') {
       res.setHeader('x-documentation-url', `${baseLogUrl}/logs/${logId}`);
     }
 
