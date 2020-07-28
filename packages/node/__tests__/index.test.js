@@ -355,7 +355,7 @@ describe('#metrics', () => {
       })
         .get('/v1/')
         .basicAuth({ user: apiKey })
-        .reply(200, {
+        .reply(401, {
           error: 'APIKEY_NOTFOUNDD',
           message: "We couldn't find your API key",
           suggestion:
@@ -382,7 +382,7 @@ describe('#metrics', () => {
         .get('/test')
         .expect(200)
         .expect(res => {
-          expect(getCache().getKey('baseUrl')).toBeUndefined();
+          expect(getCache().getKey('baseUrl')).toBeNull();
 
           // `x-documentation-url` header should not be present since we couldn't get the base URL!
           expect(Object.keys(res.headers)).not.toContain('x-documentation-url');
