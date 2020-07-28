@@ -96,7 +96,7 @@ module.exports.metrics = (apiKey, group, options = {}) => {
     const startedDateTime = new Date();
     const logId = uuidv4();
 
-    if (baseLogUrl !== undefined) {
+    if (baseLogUrl !== undefined && typeof baseLogUrl === 'string') {
       res.setHeader('x-documentation-url', `${baseLogUrl}/logs/${logId}`);
     }
 
