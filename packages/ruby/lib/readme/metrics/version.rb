@@ -1,5 +1,5 @@
 module Readme
-  module Metrics
+  class Metrics
     VERSION = "0.1.0"
   end
 end

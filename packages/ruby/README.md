@@ -7,3 +7,24 @@ Track your API metrics within ReadMe.
 ## Installation
 
 ## Usage
+
+`Readme::Metrics` is a Rack middleware and is compatible with all Rack-based
+apps, including Rails.
+
+### Rails
+
+```ruby
+# application.rb
+require "readme/metrics"
+
+config.middleware.use Readme::Metrics, "http://example.com/your/logging/api"
+```
+
+### Rack::Builder
+
+```ruby
+Rack::Builder.new do |builder|
+  builder.use Readme::Metrics, "http://example.com/your/logging/api"
+  builder.run your_app
+end
+```
