@@ -16,7 +16,11 @@ jobs:
         with:
           ruby-version: '2.7.1'
 
+      - name: Install dependencies
+        run: bundle
+
+      - name: Run linter
+        run: bundle exec standardrb
+
       - name: Run tests
-        run: |
-          bundle
-          rake spec
+        run: rake spec
