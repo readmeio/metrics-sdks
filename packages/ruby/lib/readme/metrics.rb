@@ -3,14 +3,21 @@ require "httparty"
 
 module Readme
   class Metrics
-    def initialize(app, endpoint)
+    ENDPOINT = "https://metrics.readme.io/v1/request"
+
+    def initialize(app, api_key)
       @app = app
-      @endpoint = endpoint
+      @api_key = api_key
     end
 
     def call(env)
-      path = "#{env["REQUEST_METHOD"]} #{env["PATH_INFO"]}"
-      HTTParty.post(@endpoint, body: {path: path}.to_json)
+      json = File.read(File.expand_path("../../data.json", __FILE__))
+      HTTParty.post(
+        ENDPOINT,
+        basic_auth: {username: @api_key, password: ""},
+        headers: {"Content-Type" => "application/json"},
+        body: json
+      )
       @app.call(env)
     end
   end

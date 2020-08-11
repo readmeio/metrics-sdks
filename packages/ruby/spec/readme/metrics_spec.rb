@@ -1,11 +1,12 @@
 require "rack/test"
 require "webmock/rspec"
+require "json-schema"
 
 RSpec.describe Readme::Metrics do
   include Rack::Test::Methods
 
   before do
-    stub_request(:post, readme_endpoint)
+    stub_request(:post, Readme::Metrics::ENDPOINT)
   end
 
   it "has a version number" do
@@ -25,19 +26,13 @@ RSpec.describe Readme::Metrics do
     get "/api/foo"
     post "/api/bar"
 
-    expect(WebMock).to have_requested(:post, readme_endpoint)
-      .with(body: {path: "GET /api/foo"}.to_json)
-
-    expect(WebMock).to have_requested(:post, readme_endpoint)
-      .with(body: {path: "POST /api/bar"}.to_json)
-  end
-
-  def readme_endpoint
-    "http://example.com/"
+    expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+      .with { |request| JSON::Validator.validate!("spec/schema/readmeMetrics.json", request.body) }
+      .twice
   end
 
   def app
-    Readme::Metrics.new(noop_app, readme_endpoint)
+    Readme::Metrics.new(noop_app, "API_KEY")
   end
 
   def noop_app
