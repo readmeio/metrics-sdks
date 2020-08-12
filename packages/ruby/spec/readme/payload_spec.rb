@@ -3,7 +3,8 @@ require "readme/har"
 
 RSpec.describe Readme::Payload do
   it "returns JSON matching the readmeMetrics schema" do
-    har = Readme::Har.new(double)
+    har_json = File.read(File.expand_path("../../fixtures/har.json", __FILE__))
+    har = double("har", to_json: har_json)
     result = Readme::Payload.new(har)
 
     expect(result.to_json).to match_json_schema("readmeMetrics")

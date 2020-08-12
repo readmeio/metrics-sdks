@@ -13,7 +13,7 @@ RSpec.describe Readme::Metrics do
   end
 
   it "doesn't modify the response" do
-    get "/"
+    post "/"
 
     response_without_middleware = noop_app.call(double)
     response_with_middleware = mock_response_to_raw(last_response)
@@ -22,7 +22,7 @@ RSpec.describe Readme::Metrics do
   end
 
   it "posts request urls to Readme API" do
-    get "/api/foo"
+    post "/api/foo"
     post "/api/bar"
 
     expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
@@ -31,16 +31,30 @@ RSpec.describe Readme::Metrics do
   end
 
   def app
-    Readme::Metrics.new(noop_app, "API_KEY")
+    SetHttpVersion.new(Readme::Metrics.new(noop_app, "API_KEY"))
   end
 
   def noop_app
     lambda do |env|
-      [200, {"Content-Type" => "text/plain"}, ["OK"]]
+      [200, {"Content-Type" => "text/plain", "Content-Length" => "2"}, ["OK"]]
     end
   end
 
   def mock_response_to_raw(mock_response)
     [mock_response.status, mock_response.headers, [mock_response.body]]
+  end
+
+  # Rack::Test doesn't set the HTTP_VERSION header on requests, even though
+  # real-world implementations of Rack servers do so. This middleware adds the
+  # proper header to the env.
+  class SetHttpVersion
+    def initialize(app)
+      @app = app
+    end
+
+    def call(env)
+      new_env = env.merge({"HTTP_VERSION" => "HTTP/1.1"})
+      @app.call(new_env)
+    end
   end
 end

@@ -5,6 +5,7 @@ require "httparty"
 
 module Readme
   class Metrics
+    SDK_NAME = "Readme.io Ruby SDK"
     ENDPOINT = "https://metrics.readme.io/v1/request"
 
     def initialize(app, api_key)
@@ -13,7 +14,11 @@ module Readme
     end
 
     def call(env)
-      har = Har.new(env)
+      start_time = Time.now
+      status, headers, body = @app.call(env)
+      end_time = Time.now
+
+      har = Har.new(env, status, headers, body, start_time, end_time)
       payload = Payload.new(har)
 
       HTTParty.post(
@@ -22,7 +27,8 @@ module Readme
         headers: {"Content-Type" => "application/json"},
         body: payload.to_json
       )
-      @app.call(env)
+
+      [status, headers, body]
     end
   end
 end
