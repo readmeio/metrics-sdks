@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='readme-metrics',
-    version='0.9.3',
+    version='1.0.0',
     author='ReadMe',
     author_email = 'support@readme.io',
     description='ReadMe API Metrics WSGI SDK',
