@@ -1,5 +1,6 @@
 require "bundler/setup"
 require "readme/metrics"
+Dir["#{Dir.pwd}/spec/support/**/*.rb"].sort.each { |f| require f }
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

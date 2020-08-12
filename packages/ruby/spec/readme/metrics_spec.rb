@@ -1,6 +1,5 @@
 require "rack/test"
 require "webmock/rspec"
-require "json-schema"
 
 RSpec.describe Readme::Metrics do
   include Rack::Test::Methods
@@ -27,7 +26,7 @@ RSpec.describe Readme::Metrics do
     post "/api/bar"
 
     expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-      .with { |request| JSON::Validator.validate!("spec/schema/readmeMetrics.json", request.body) }
+      .with { |request| validate_json("readmeMetrics", request.body) }
       .twice
   end
 

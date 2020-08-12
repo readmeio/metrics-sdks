@@ -1,4 +1,6 @@
 require "readme/metrics/version"
+require "readme/har"
+require "readme/payload"
 require "httparty"
 
 module Readme
@@ -11,12 +13,14 @@ module Readme
     end
 
     def call(env)
-      json = File.read(File.expand_path("../../data.json", __FILE__))
+      har = Har.new(env)
+      payload = Payload.new(har)
+
       HTTParty.post(
         ENDPOINT,
         basic_auth: {username: @api_key, password: ""},
         headers: {"Content-Type" => "application/json"},
-        body: json
+        body: payload.to_json
       )
       @app.call(env)
     end
