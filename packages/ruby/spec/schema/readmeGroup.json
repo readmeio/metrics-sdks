@@ -1,0 +1,21 @@
+{
+  "$id": "readmeGroup.json#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "email",
+    "label"
+  ]
+}

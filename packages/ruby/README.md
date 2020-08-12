@@ -17,14 +17,14 @@ apps, including Rails.
 # application.rb
 require "readme/metrics"
 
-config.middleware.use Readme::Metrics, "http://example.com/your/logging/api"
+config.middleware.use Readme::Metrics, "YOUR_API_KEY"
 ```
 
 ### Rack::Builder
 
 ```ruby
 Rack::Builder.new do |builder|
-  builder.use Readme::Metrics, "http://example.com/your/logging/api"
+  builder.use Readme::Metrics, "YOUR_API_KEY"
   builder.run your_app
 end
 ```

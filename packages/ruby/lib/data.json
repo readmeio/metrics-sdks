@@ -1,0 +1,78 @@
+[
+  {
+    "group": {
+      "id": "abc123",
+      "email": "user@example.com",
+      "label": "Joel"
+    },
+    "clientIPAddress": "1.1.1.1",
+    "development": true,
+    "request": {
+      "log": {
+        "version": "1.2",
+        "creator": {
+          "name": "Ruby",
+          "version": "1.0",
+          "comment": "hello"
+        },
+        "entries": [
+          {
+            "cache": {},
+            "timings": {
+              "send": 0,
+              "wait": 2000,
+              "receive": 0
+            },
+            "pageref": "http://example.com/api/foo",
+            "startedDateTime": "2020-08-11T15:56:56.573Z",
+            "time": 2000,
+            "request": {
+              "cookies": [],
+              "headersSize": 50,
+              "bodySize": 200,
+              "method": "GET",
+              "url": "http://example.com/api/foo",
+              "httpVersion": "HTTP 1.1",
+              "headers": [
+                {
+                  "name": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "queryString": [
+                {
+                  "name": "id",
+                  "value": "1"
+                }
+              ],
+              "postData": {
+                "text": "[REQUEST BODY]",
+                "mimeType": "application/json"
+              }
+            },
+            "response": {
+              "status": 200,
+              "statusText": "Ok",
+              "httpVersion": "HTTP 1.1",
+              "redirectURL": "",
+              "headersSize": 50,
+              "bodySize": 200,
+              "cookies": [],
+              "headers": [
+                {
+                  "name": "Content-Length",
+                  "value": "10"
+                }
+              ],
+              "content": {
+                "text": "[RESPONSE CONTENT]",
+                "size": 10,
+                "mimeType": "application/json"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+]
