@@ -2,8 +2,8 @@ import unittest
 import requests
 import json
 
-from metrics import MetricsApiConfig
-from metrics.PayloadBuilder import PayloadBuilder
+from readme_metrics import MetricsApiConfig
+from readme_metrics.PayloadBuilder import PayloadBuilder
 
 #fetch json requests
 class DataFetcher:

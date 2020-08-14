@@ -5,17 +5,17 @@ from typing import List
 from urllib import parse
 
 import requests
-from metrics import ResponseInfoWrapper
+from readme_metrics import ResponseInfoWrapper
 from pip._vendor.requests import __version__
 from werkzeug import Request
 
-from metrics.util import util_exclude_keys, util_filter_keys
+from readme_metrics.util import util_exclude_keys, util_filter_keys
 
 
 class PayloadBuilder:
     """
-    Internal builder class that handles the construction of the request and response portions of the payload sent to
-    the ReadMe API.
+    Internal builder class that handles the construction of the request and
+    response portions of the payload sent to the ReadMe API.
 
     ...
     Attributes
@@ -47,7 +47,8 @@ class PayloadBuilder:
 
     def __call__(self, request: Request, response: ResponseInfoWrapper) -> dict:
         """
-        Builds a HAR payload encompassing the request & response data, to be sent to the ReadMe API
+        Builds a HAR payload encompassing the request & response data, to be
+        sent to the ReadMe API
 
         :param request: Request information to use
         :param response: Response information to use
