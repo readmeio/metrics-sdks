@@ -1,6 +1,6 @@
-from Metrics import Metrics
-from MetricsApiConfig import MetricsApiConfig
-from ResponseInfoWrapper import ResponseInfoWrapper
+from readme_metrics.Metrics import Metrics
+from readme_metrics.MetricsApiConfig import MetricsApiConfig
+from readme_metrics.ResponseInfoWrapper import ResponseInfoWrapper
 from werkzeug import Request, Response
 import io
 import time
