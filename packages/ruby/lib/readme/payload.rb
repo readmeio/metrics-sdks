@@ -1,13 +1,14 @@
 module Readme
   class Payload
-    def initialize(har)
+    def initialize(har, user_info)
       @har = har
+      @user_info = user_info
     end
 
     def to_json
       [
         {
-          group: {id: "abc123", email: "user@example.com", label: "Joel"},
+          group: @user_info,
           clientIPAddress: "1.1.1.1",
           development: true,
           request: JSON.parse(@har.to_json)

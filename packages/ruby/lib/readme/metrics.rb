@@ -8,9 +8,10 @@ module Readme
     SDK_NAME = "Readme.io Ruby SDK"
     ENDPOINT = "https://metrics.readme.io/v1/request"
 
-    def initialize(app, api_key)
+    def initialize(app, api_key, &get_user_info)
       @app = app
       @api_key = api_key
+      @get_user_info = get_user_info
     end
 
     def call(env)
@@ -19,7 +20,8 @@ module Readme
       end_time = Time.now
 
       har = Har.new(env, status, headers, body, start_time, end_time)
-      payload = Payload.new(har)
+      user_info = @get_user_info.call(env)
+      payload = Payload.new(har, user_info)
 
       HTTParty.post(
         ENDPOINT,

@@ -31,7 +31,16 @@ RSpec.describe Readme::Metrics do
   end
 
   def app
-    SetHttpVersion.new(Readme::Metrics.new(noop_app, "API_KEY"))
+    app = Readme::Metrics.new(noop_app, "API_KEY") { |env|
+      {
+        id: env["CURRENT_USER"].id,
+        label: env["CURRENT_USER"].name,
+        email: env["CURRENT_USER"].email
+      }
+    }
+    app_with_http_version = SetHttpVersion.new(app)
+    app_with_current_user = SetCurrentUser.new(app_with_http_version)
+    app_with_current_user
   end
 
   def noop_app
@@ -57,4 +66,17 @@ RSpec.describe Readme::Metrics do
       @app.call(new_env)
     end
   end
+
+  class SetCurrentUser
+    def initialize(app)
+      @app = app
+    end
+
+    def call(env)
+      new_env = env.merge({"CURRENT_USER" => CurrentUser.new("1", "Test Testerson", "test@example.com")})
+      @app.call(new_env)
+    end
+  end
+
+  CurrentUser = Struct.new(:id, :name, :email)
 end
