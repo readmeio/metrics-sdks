@@ -33,7 +33,7 @@ class MockServer:
         return requestQueue
 
 class MetricsMiddlewareTestCase(unittest.TestCase):
-    def setup:
+    def setUp(self):
         self.mockserver = MockServer()
 
     def testNoRequest(self):
