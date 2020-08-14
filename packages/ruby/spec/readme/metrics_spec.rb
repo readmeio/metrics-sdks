@@ -31,7 +31,8 @@ RSpec.describe Readme::Metrics do
   end
 
   def app
-    app = Readme::Metrics.new(noop_app, "API_KEY") { |env|
+    options = {api_key: "API KEY", development: true}
+    app = Readme::Metrics.new(noop_app, options) { |env|
       {
         id: env["CURRENT_USER"].id,
         label: env["CURRENT_USER"].name,

@@ -24,7 +24,8 @@ current_user for a given request from the environment.
 # application.rb
 require "readme/metrics"
 
-config.middleware.use Readme::Metrics, "YOUR_API_KEY"do |env|
+options = {api_key: "YOUR_API_KEY", development: false}
+config.middleware.use Readme::Metrics, options do |env|
   current_user = env['warden'].authenticate(scope: :current_user)
 
   {
@@ -33,14 +34,14 @@ config.middleware.use Readme::Metrics, "YOUR_API_KEY"do |env|
     email: current_user.email
   }
 end
-
 ```
 
 ### Rack::Builder
 
 ```ruby
 Rack::Builder.new do |builder|
-  builder.use Readme::Metrics, "YOUR_API_KEY" do |env|
+  options = {api_key: "YOUR_API_KEY", development: false}
+  builder.use Readme::Metrics, options do |env|
     {
       id: "my_application_id"
       label: "My Application",
