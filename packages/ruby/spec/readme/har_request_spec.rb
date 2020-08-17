@@ -47,5 +47,34 @@ RSpec.describe Readme::HarRequest do
         ]
       )
     end
+
+    it "returns filtered headers and JSON body" do
+      http_request = double(
+        :http_request,
+        url: "https://example.com/api/foo/bar?id=1&name=joel",
+        query_params: {"id" => "1", "name" => "joel"},
+        request_method: "POST",
+        http_version: "HTTP/1.1",
+        content_length: 6,
+        content_type: "application/json",
+        cookies: {"cookie1" => "value1", "cookie2" => "value2"},
+        headers: {
+          "X-Custom" => "custom",
+          "Authorization" => "Basic abc123",
+          "Filtered-Header" => "filtered"
+        },
+        body: {key1: "key1", key2: "key2"}.to_json
+      )
+      filter_params = ["Filtered-Header", "key1"]
+      request = Readme::HarRequest.new(http_request, filter_params)
+      json = request.as_json
+
+      request_body = json.dig(:postData, :text)
+      expect(request_body.keys).to_not include "key1"
+      expect(request_body.keys).to include "key2"
+
+      request_headers = json[:headers].map { |pair| pair[:name] }
+      expect(request_headers).to_not include "Filtered-Header"
+    end
   end
 end

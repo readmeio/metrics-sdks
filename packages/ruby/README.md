@@ -18,13 +18,25 @@ from the environment, or you may hardcode them.
 If you're using Warden-based authentication like Devise, you may fetch the
 current_user for a given request from the environment.
 
+### Sensitive Data
+
+If you have sensitive data you'd like to prevent from being sent to the Metrics
+API via headers, query params or payload bodies, you can specify a list of keys
+to filter via the `filter_params` option. Key-value pairs matching these keys
+will not be included in the request to the Metrics API.
+
 ### Rails
 
 ```ruby
 # application.rb
 require "readme/metrics"
 
-options = {api_key: "YOUR_API_KEY", development: false}
+options = {
+  api_key: "YOUR_API_KEY",
+  development: false,
+  filter_params: ["not_included", "dont_send"]
+}
+
 config.middleware.use Readme::Metrics, options do |env|
   current_user = env['warden'].authenticate(scope: :current_user)
 
@@ -40,7 +52,12 @@ end
 
 ```ruby
 Rack::Builder.new do |builder|
-  options = {api_key: "YOUR_API_KEY", development: false}
+  options = {
+    api_key: "YOUR_API_KEY",
+    development: false,
+    filter_params: ["not_included", "dont_send"]
+  }
+
   builder.use Readme::Metrics, options do |env|
     {
       id: "my_application_id"

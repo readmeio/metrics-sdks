@@ -14,6 +14,7 @@ module Readme
       @app = app
       @api_key = options[:api_key]
       @development = options[:development] || false
+      @filter_params = options[:filter_params] || []
       @get_user_info = get_user_info
     end
 
@@ -22,7 +23,9 @@ module Readme
       status, headers, body = @app.call(env)
       end_time = Time.now
 
-      har = Har.new(env, status, headers, body, start_time, end_time)
+      response = Rack::Response.new(body, status, headers)
+
+      har = Har.new(env, response, start_time, end_time, @filter_params)
       user_info = @get_user_info.call(env)
       payload = Payload.new(har, user_info, development: @development)
 

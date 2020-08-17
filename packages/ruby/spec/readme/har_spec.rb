@@ -27,11 +27,10 @@ RSpec.describe Readme::Har do
       end_time = start_time + 1
       har = Readme::Har.new(
         env,
-        status_code,
-        headers,
-        response_body,
+        Rack::Response.new(response_body, status_code, headers),
         start_time,
-        end_time
+        end_time,
+        []
       )
       json = JSON.parse(har.to_json)
 
@@ -71,6 +70,52 @@ RSpec.describe Readme::Har do
       expect(response["content"]["text"]).to eq "OK"
       expect(response["content"]["size"]).to eq 2
       expect(response["content"]["mimeType"]).to eq "application/json"
+    end
+
+    it "filters out headers and body keys" do
+      request_body = {key1: "key1", key2: "key2"}
+      env = {
+        "CONTENT_TYPE" => "application/json",
+        "CONTENT_LENGTH" => 0,
+        "HTTP_AUTHORIZATION" => "Basic abc123",
+        "HTTP_COOKIE" => "cookie1=value1; cookie2=value2",
+        "HTTP_VERSION" => "HTTP/1.1",
+        "HTTP_X_CUSTOM" => "custom",
+        "PATH_INFO" => "/foo/bar",
+        "REQUEST_METHOD" => "POST",
+        "SCRIPT_NAME" => "/api",
+        "QUERY_STRING" => "id=1&name=joel",
+        "SERVER_NAME" => "example.com",
+        "SERVER_PORT" => "443",
+        "rack.input" => Rack::Lint::InputWrapper.new(StringIO.new(request_body.to_json)),
+        "rack.url_scheme" => "https"
+      }
+      status_code = 200
+      response_body = {key1: "key1", key2: "key2"}.to_json
+      headers = {
+        "Content-Type" => "application/json",
+        "Content-Length" => "2",
+        "Location" => "https://example.com",
+        "Filtered-Header" => "filtered"
+      }
+
+      har = Readme::Har.new(
+        env,
+        Rack::Response.new(response_body, status_code, headers),
+        Time.now,
+        Time.now + 1,
+        ["Filtered-Header", "key1"]
+      )
+
+      json = JSON.parse(har.to_json)
+
+      response = json.dig("log", "entries", 0, "response")
+      response_body = response["content"]["text"]
+      expect(response_body.keys).to_not include "key1"
+      expect(response_body.keys).to include "key2"
+
+      response_headers = response["headers"].map { |pair| pair["name"] }
+      expect(response_headers).to_not include "Filtered-Header"
     end
   end
 end

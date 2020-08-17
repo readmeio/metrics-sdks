@@ -6,12 +6,13 @@ module Readme
   class Har
     HAR_VERSION = "1.2"
 
-    def initialize(env, status, headers, response, start_time, end_time)
+    def initialize(env, response, start_time, end_time, filter_params)
       @http_request = HttpRequest.new(env)
-      @request = HarRequest.new(@http_request)
-      @response = Rack::Response.new(response, status, headers)
+      @request = HarRequest.new(@http_request, filter_params)
+      @response = response
       @start_time = start_time
       @end_time = end_time
+      @filter_params = filter_params
     end
 
     def to_json
@@ -62,14 +63,31 @@ module Readme
       @request.as_json
     end
 
+    def response_body
+      if @response.content_type == "application/json"
+        begin
+          parsed_body = JSON.parse(@response.body.first)
+          return filter_with_params(parsed_body)
+        rescue
+          @response.body.each.reduce(:+)
+        end
+      end
+
+      @response.body.each.reduce(:+)
+    end
+
+    def response_headers
+      filter_with_params(@response.headers)
+    end
+
     def response
       {
         status: @response.status,
         statusText: Rack::Utils::HTTP_STATUS_CODES[@response.status],
         httpVersion: @http_request.http_version,
-        headers: to_hash_array(@response.headers),
+        headers: to_hash_array(response_headers),
         content: {
-          text: @response.body.each.reduce(:+),
+          text: response_body,
           size: @response.content_length,
           mimeType: @response.content_type
         },
@@ -82,6 +100,10 @@ module Readme
 
     def to_hash_array(hash)
       hash.map { |name, value| {name: name, value: value} }
+    end
+
+    def filter_with_params(hash)
+      hash.select { |key, _value| !@filter_params.include?(key) }
     end
   end
 end
