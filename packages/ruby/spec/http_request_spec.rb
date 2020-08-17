@@ -53,7 +53,7 @@ RSpec.describe HttpRequest do
       env = {"QUERY_STRING" => "id=1&name=joel"}
       request = HttpRequest.new(env)
 
-      expect(request.query_params).to eq({ "id" => "1", "name" => "joel" })
+      expect(request.query_params).to eq({"id" => "1", "name" => "joel"})
     end
 
     it "is an empty hash when the Rack QUERY_STRING key is not present" do
@@ -65,7 +65,7 @@ RSpec.describe HttpRequest do
 
   describe "#http_version" do
     it "gets the version from the proper Rack header" do
-      env = { "HTTP_VERSION" => "HTTP/1.1" }
+      env = {"HTTP_VERSION" => "HTTP/1.1"}
       request = HttpRequest.new(env)
 
       expect(request.http_version).to eq "HTTP/1.1"
@@ -120,7 +120,7 @@ RSpec.describe HttpRequest do
       }
       request = HttpRequest.new(env)
 
-      expect(request.headers).to eq ({"X-Custom" => "custom", "Accept" => "text/plain"})
+      expect(request.headers).to eq({"X-Custom" => "custom", "Accept" => "text/plain"})
     end
   end
 

@@ -4,17 +4,17 @@ require "readme/har_request"
 RSpec.describe Readme::HarRequest do
   describe "#as_json" do
     it "builds valid json" do
-     http_request = double(
-       :http_request,
-       url: "https://example.com/api/foo/bar?id=1&name=joel",
-       query_params: { "id" => "1", "name" => "joel" },
-       request_method: "POST",
-       http_version: "HTTP/1.1",
-       content_length: 6,
-       content_type: "application/json",
-       cookies: { "cookie1" => "value1", "cookie2" => "value2" },
-       headers: { "X-Custom" => "custom", "Authorization" => "Basic abc123" },
-       body: "[BODY]",
+      http_request = double(
+        :http_request,
+        url: "https://example.com/api/foo/bar?id=1&name=joel",
+        query_params: {"id" => "1", "name" => "joel"},
+        request_method: "POST",
+        http_version: "HTTP/1.1",
+        content_length: 6,
+        content_type: "application/json",
+        cookies: {"cookie1" => "value1", "cookie2" => "value2"},
+        headers: {"X-Custom" => "custom", "Authorization" => "Basic abc123"},
+        body: "[BODY]"
       )
       request = Readme::HarRequest.new(http_request)
       json = request.as_json

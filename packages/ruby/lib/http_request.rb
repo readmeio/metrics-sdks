@@ -1,12 +1,12 @@
 require "rack/request"
 
 class HttpRequest
-    HTTP_NON_HEADERS = [
-      Rack::HTTP_COOKIE,
-      Rack::HTTP_VERSION,
-      Rack::HTTP_HOST,
-      Rack::HTTP_PORT
-    ]
+  HTTP_NON_HEADERS = [
+    Rack::HTTP_COOKIE,
+    Rack::HTTP_VERSION,
+    Rack::HTTP_HOST,
+    Rack::HTTP_PORT
+  ]
 
   def initialize(env)
     @request = Rack::Request.new(env)

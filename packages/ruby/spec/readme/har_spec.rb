@@ -5,12 +5,12 @@ RSpec.describe Readme::Har do
   describe "#to_json" do
     it "builds the correct values out of the env" do
       request_json = File.read(File.expand_path("../../fixtures/har_request.json", __FILE__))
-      har_request = double( :har_request, as_json: JSON.parse(request_json))
+      har_request = double(:har_request, as_json: JSON.parse(request_json))
       allow(Readme::HarRequest).to receive(:new).and_return(har_request)
 
       http_request = double(
         :http_request,
-        cookies: { "cookie1" => "value1"},
+        cookies: {"cookie1" => "value1"},
         http_version: "HTTP/1.1"
       )
       allow(HttpRequest).to receive(:new).and_return(http_request)
