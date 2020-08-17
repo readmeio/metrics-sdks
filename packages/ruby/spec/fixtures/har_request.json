@@ -1,0 +1,24 @@
+{
+  "cookies": [],
+  "headersSize": 50,
+  "bodySize": 200,
+  "method": "GET",
+  "url": "http://example.com/api/foo",
+  "httpVersion": "HTTP 1.1",
+  "headers": [
+    {
+      "name": "Content-Type",
+      "value": "application/json"
+    }
+  ],
+  "queryString": [
+    {
+      "name": "id",
+      "value": "1"
+    }
+  ],
+  "postData": {
+    "text": "[REQUEST BODY]",
+    "mimeType": "application/json"
+  }
+}

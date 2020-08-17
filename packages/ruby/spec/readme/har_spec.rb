@@ -4,22 +4,16 @@ require "rack/lint"
 RSpec.describe Readme::Har do
   describe "#to_json" do
     it "builds the correct values out of the env" do
-      env = {
-        "CONTENT_TYPE" => "application/json",
-        "CONTENT_LENGTH" => 0,
-        "HTTP_AUTHORIZATION" => "Basic abc123",
-        "HTTP_COOKIE" => "cookie1=value1; cookie2=value2",
-        "HTTP_VERSION" => "HTTP/1.1",
-        "HTTP_X_CUSTOM" => "custom",
-        "PATH_INFO" => "/foo/bar",
-        "REQUEST_METHOD" => "POST",
-        "SCRIPT_NAME" => "/api",
-        "QUERY_STRING" => "id=1&name=joel",
-        "SERVER_NAME" => "example.com",
-        "SERVER_PORT" => "443",
-        "rack.input" => Rack::Lint::InputWrapper.new(StringIO.new("[BODY]")),
-        "rack.url_scheme" => "https"
-      }
+      request_json = File.read(File.expand_path("../../fixtures/har_request.json", __FILE__))
+      har_request = double(
+        :har_request,
+        as_json: JSON.parse(request_json),
+        cookies: [],
+        http_version: "HTTP/1.1"
+      )
+      allow(Readme::HarRequest).to receive(:new).and_return(har_request)
+      env = double(:env)
+
       status_code = 200
       response_body = ["OK"]
       headers = {
@@ -52,38 +46,11 @@ RSpec.describe Readme::Har do
       expect(json.dig("log", "entries", 0, "startedDateTime")).to eq start_time.iso8601
       expect(json.dig("log", "entries", 0, "time")).to eq 1000
 
-      request = json.dig("log", "entries", 0, "request")
-
-      expect(request["method"]).to eq "POST"
-      expect(request["url"]).to eq "https://example.com/api/foo/bar?id=1&name=joel"
-      expect(request["httpVersion"]).to eq "HTTP/1.1"
-      expect(request.dig("postData", "text")).to eq "[BODY]"
-      expect(request.dig("postData", "mimeType")).to eq "application/json"
-      expect(request["headersSize"]).to eq(-1)
-      expect(request["bodySize"]).to eq 0
-      expect(request["headers"]).to match_array(
-        [
-          {"name" => "Authorization", "value" => "Basic abc123"},
-          {"name" => "X-Custom", "value" => "custom"}
-        ]
-      )
-      expect(request["queryString"]).to match_array(
-        [
-          {"name" => "id", "value" => "1"},
-          {"name" => "name", "value" => "joel"}
-        ]
-      )
-      expect(request["cookies"]).to match_array(
-        [
-          {"name" => "cookie1", "value" => "value1"},
-          {"name" => "cookie2", "value" => "value2"}
-        ]
-      )
-
       response = json.dig("log", "entries", 0, "response")
 
       expect(response["status"]).to eq status_code
       expect(response["statusText"]).to eq "OK"
+      expect(response["httpVersion"]).to eq har_request.http_version
       expect(response["headers"]).to match_array(
         [
           {"name" => "Content-Type", "value" => "application/json"},
@@ -94,12 +61,7 @@ RSpec.describe Readme::Har do
       expect(response["headersSize"]).to eq(-1)
       expect(response["bodySize"]).to eq 2
       expect(response["redirectURL"]).to eq headers["Location"]
-      expect(response["cookies"]).to match_array(
-        [
-          {"name" => "cookie1", "value" => "value1"},
-          {"name" => "cookie2", "value" => "value2"}
-        ]
-      )
+      expect(response["cookies"]).to match_array(har_request.cookies)
       expect(response["content"]["text"]).to eq "OK"
       expect(response["content"]["size"]).to eq 2
       expect(response["content"]["mimeType"]).to eq "application/json"
