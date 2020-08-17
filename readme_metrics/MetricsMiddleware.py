@@ -1,10 +1,11 @@
-from metrics.Metrics import Metrics
-from metrics.MetricsApiConfig import MetricsApiConfig
-from metrics.ResponseInfoWrapper import ResponseInfoWrapper
+from readme_metrics.Metrics import Metrics
+from readme_metrics.MetricsApiConfig import MetricsApiConfig
+from readme_metrics.ResponseInfoWrapper import ResponseInfoWrapper
 from werkzeug import Request, Response
 import io
 import time
 import datetime
+
 
 class MetricsMiddleware:
     """
@@ -35,13 +36,14 @@ class MetricsMiddleware:
     def __call__(self, environ, start_response):
         """
         Method that is called by the running WSGI server.
-        You should NOT be calling this method yourself under normal circumstances.
+        You should NOT be calling this method yourself under
+        normal circumstances.
         """
         response_headers = {}
         response_status = 0
         iterable = None
         req = Request(environ)
-        
+
         def _start_response(_status, _response_headers, *args):
             write = start_response(_status, _response_headers, *args)
 
@@ -75,9 +77,7 @@ class MetricsMiddleware:
                 req.rm_content_length = content_length
                 req.rm_body = content_body
 
-
             iterable = self.app(environ, _start_response)
-
 
             for data in iterable:
                 res_ctype = ''

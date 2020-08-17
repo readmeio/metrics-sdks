@@ -15,8 +15,7 @@ pip install readme-metrics
 Just include the MetricsMiddleware into your API!
 
 ```python
-from metrics.MetricsApiConfig import MetricsApiConfig
-from metrics.MetricsMiddleware import MetricsMiddleware
+from readme_metrics import MetricsApiConfig, MetricsMiddleware
 
 app = Flask(__name__)
 

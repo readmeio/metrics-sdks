@@ -2,8 +2,8 @@ import unittest
 import requests
 import json
 
-from metrics import MetricsApiConfig
-from metrics import MetricsMiddleware
+from readme_metrics import MetricsApiConfig
+from readme_metrics import MetricsMiddleware
 
 #for this, I'm not exactly sure how to test the __call__ function
 #possible options I considered was making a mock server inside this test case connected to the middleware somehow
@@ -33,7 +33,7 @@ class MockServer:
         return requestQueue
 
 class MetricsMiddlewareTestCase(unittest.TestCase):
-    def setup:
+    def setUp(self):
         self.mockserver = MockServer()
 
     def testNoRequest(self):
