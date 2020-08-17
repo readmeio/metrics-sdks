@@ -1,12 +1,14 @@
 require "rack"
 require "readme/har_request"
+require "http_request"
 
 module Readme
   class Har
     HAR_VERSION = "1.2"
 
     def initialize(env, status, headers, response, start_time, end_time)
-      @request = HarRequest.new(env)
+      @http_request = HttpRequest.new(env)
+      @request = HarRequest.new(@http_request)
       @response = Rack::Response.new(response, status, headers)
       @start_time = start_time
       @end_time = end_time
@@ -64,7 +66,7 @@ module Readme
       {
         status: @response.status,
         statusText: Rack::Utils::HTTP_STATUS_CODES[@response.status],
-        httpVersion: @request.http_version,
+        httpVersion: @http_request.http_version,
         headers: to_hash_array(@response.headers),
         content: {
           text: @response.body.each.reduce(:+),
@@ -74,7 +76,7 @@ module Readme
         redirectURL: @response.location.to_s,
         headersSize: -1,
         bodySize: @response.content_length,
-        cookies: @request.cookies
+        cookies: to_hash_array(@http_request.cookies)
       }
     end
 
