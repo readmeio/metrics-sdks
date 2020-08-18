@@ -15,16 +15,24 @@ module Readme
         httpVersion: @request.http_version,
         headers: HarCollection.new(@filter, @request.headers).to_a,
         cookies: HarCollection.new(@filter, @request.cookies).to_a,
-        postData: {
-          text: request_body,
-          mimeType: @request.content_type
-        },
+        postData: postData,
         headersSize: -1,
         bodySize: @request.content_length
-      }
+      }.compact
     end
 
     private
+
+    def postData
+      if @request.content_type.nil?
+        nil
+      else
+        {
+          text: request_body,
+          mimeType: @request.content_type
+        }
+      end
+    end
 
     def request_body
       parsed_body = JSON.parse(@request.body)

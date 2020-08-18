@@ -21,13 +21,19 @@ RSpec.describe Readme::Metrics do
     expect(response_with_middleware).to eq response_without_middleware
   end
 
-  it "posts request urls to Readme API" do
-    post "/api/foo"
-    post "/api/bar"
+  it "posts request urls to Readme API with a JSON body" do
+    header "Content-Type", "application/json"
+    post "/api/foo", {key: "value"}.to_json
 
     expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
       .with { |request| validate_json("readmeMetrics", request.body) }
-      .twice
+  end
+
+  it "posts request urls to Readme API without a body" do
+    post "/api/foo"
+
+    expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+      .with { |request| validate_json("readmeMetrics", request.body) }
   end
 
   def app

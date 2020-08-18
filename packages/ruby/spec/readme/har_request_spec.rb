@@ -69,6 +69,15 @@ RSpec.describe Readme::HarRequest do
       request_headers = json[:headers].map { |pair| pair[:name] }
       expect(request_headers).to_not include "Filtered-Header"
     end
+
+    it "builds proper body when there is no response body" do
+      http_request = build_http_request(content_type: nil, body: "")
+
+      request = Readme::HarRequest.new(http_request)
+      json = request.as_json
+
+      expect(json).not_to have_key(:postData)
+    end
   end
 
   # if overriding `url` to have query parameters make sure to also override
