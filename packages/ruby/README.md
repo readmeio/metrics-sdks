@@ -22,8 +22,14 @@ current_user for a given request from the environment.
 
 If you have sensitive data you'd like to prevent from being sent to the Metrics
 API via headers, query params or payload bodies, you can specify a list of keys
-to filter via the `filter_params` option. Key-value pairs matching these keys
+to filter via the `reject_params` option. Key-value pairs matching these keys
 will not be included in the request to the Metrics API.
+
+You are also able to specify a set of `allow_only` which should only be sent through.
+Any header or body values not matching these keys will be filtered out and not
+send to the API.
+
+You may only specify either `reject_params` or `allow_only` keys, not both.
 
 ### Rails
 
@@ -34,7 +40,7 @@ require "readme/metrics"
 options = {
   api_key: "YOUR_API_KEY",
   development: false,
-  filter_params: ["not_included", "dont_send"]
+  reject_params: ["not_included", "dont_send"]
 }
 
 config.middleware.use Readme::Metrics, options do |env|
@@ -55,7 +61,7 @@ Rack::Builder.new do |builder|
   options = {
     api_key: "YOUR_API_KEY",
     development: false,
-    filter_params: ["not_included", "dont_send"]
+    reject_params: ["not_included", "dont_send"]
   }
 
   builder.use Readme::Metrics, options do |env|

@@ -1,4 +1,5 @@
 require "readme/har"
+require "readme/filter"
 require "rack/lint"
 
 RSpec.describe Readme::Har do
@@ -30,7 +31,7 @@ RSpec.describe Readme::Har do
         Rack::Response.new(response_body, status_code, headers),
         start_time,
         end_time,
-        []
+        Filter::None.new
       )
       json = JSON.parse(har.to_json)
 
@@ -104,13 +105,13 @@ RSpec.describe Readme::Har do
         Rack::Response.new(response_body, status_code, headers),
         Time.now,
         Time.now + 1,
-        ["Filtered-Header", "key1"]
+        Filter.for(reject: ["Filtered-Header", "key1"])
       )
 
       json = JSON.parse(har.to_json)
 
       response = json.dig("log", "entries", 0, "response")
-      response_body = response["content"]["text"]
+      response_body = JSON.parse(response["content"]["text"])
       expect(response_body.keys).to_not include "key1"
       expect(response_body.keys).to include "key2"
 

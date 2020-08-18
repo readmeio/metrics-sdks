@@ -65,11 +65,11 @@ RSpec.describe Readme::HarRequest do
         },
         body: {key1: "key1", key2: "key2"}.to_json
       )
-      filter_params = ["Filtered-Header", "key1"]
-      request = Readme::HarRequest.new(http_request, filter_params)
+      reject_params = ["Filtered-Header", "key1"]
+      request = Readme::HarRequest.new(http_request, Filter.for(reject: reject_params))
       json = request.as_json
 
-      request_body = json.dig(:postData, :text)
+      request_body = JSON.parse(json.dig(:postData, :text))
       expect(request_body.keys).to_not include "key1"
       expect(request_body.keys).to include "key2"
 

@@ -1,5 +1,6 @@
 require "readme/metrics/version"
 require "readme/har"
+require "readme/filter"
 require "readme/payload"
 require "httparty"
 
@@ -14,7 +15,10 @@ module Readme
       @app = app
       @api_key = options[:api_key]
       @development = options[:development] || false
-      @filter_params = options[:filter_params] || []
+      @filter = Filter.for(
+        reject: options[:reject_params],
+        allow_only: options[:allow_only]
+      )
       @get_user_info = get_user_info
     end
 
@@ -25,7 +29,7 @@ module Readme
 
       response = Rack::Response.new(body, status, headers)
 
-      har = Har.new(env, response, start_time, end_time, @filter_params)
+      har = Har.new(env, response, start_time, end_time, @filter)
       user_info = @get_user_info.call(env)
       payload = Payload.new(har, user_info, development: @development)
 

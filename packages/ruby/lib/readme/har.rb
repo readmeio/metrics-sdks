@@ -1,18 +1,19 @@
 require "rack"
 require "readme/har_request"
+require "readme/har_collection"
 require "http_request"
 
 module Readme
   class Har
     HAR_VERSION = "1.2"
 
-    def initialize(env, response, start_time, end_time, filter_params)
+    def initialize(env, response, start_time, end_time, filter)
       @http_request = HttpRequest.new(env)
-      @request = HarRequest.new(@http_request, filter_params)
+      @request = HarRequest.new(@http_request, filter)
       @response = response
       @start_time = start_time
       @end_time = end_time
-      @filter_params = filter_params
+      @filter = filter
     end
 
     def to_json
@@ -67,17 +68,13 @@ module Readme
       if @response.content_type == "application/json"
         begin
           parsed_body = JSON.parse(@response.body.first)
-          return filter_with_params(parsed_body)
+          HarCollection.new(@filter, parsed_body).to_h.to_json
         rescue
           @response.body.each.reduce(:+)
         end
+      else
+        @response.body.each.reduce(:+)
       end
-
-      @response.body.each.reduce(:+)
-    end
-
-    def response_headers
-      filter_with_params(@response.headers)
     end
 
     def response
@@ -85,7 +82,7 @@ module Readme
         status: @response.status,
         statusText: Rack::Utils::HTTP_STATUS_CODES[@response.status],
         httpVersion: @http_request.http_version,
-        headers: to_hash_array(response_headers),
+        headers: HarCollection.new(@filter, @response.headers).to_a,
         content: {
           text: response_body,
           size: @response.content_length,
@@ -94,16 +91,8 @@ module Readme
         redirectURL: @response.location.to_s,
         headersSize: -1,
         bodySize: @response.content_length,
-        cookies: to_hash_array(@http_request.cookies)
+        cookies: HarCollection.new(@filter, @http_request.cookies).to_a
       }
-    end
-
-    def to_hash_array(hash)
-      hash.map { |name, value| {name: name, value: value} }
-    end
-
-    def filter_with_params(hash)
-      hash.select { |key, _value| !@filter_params.include?(key) }
     end
   end
 end
