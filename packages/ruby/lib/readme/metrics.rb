@@ -2,11 +2,13 @@ require "readme/metrics/version"
 require "readme/har"
 require "readme/filter"
 require "readme/payload"
+require "readme/request_queue"
 require "httparty"
 
 module Readme
   class Metrics
     SDK_NAME = "Readme.io Ruby SDK"
+    DEFAULT_BUFFER_LENGTH = 10
     ENDPOINT = "https://metrics.readme.io/v1/request"
 
     def initialize(app, options, &get_user_info)
@@ -20,6 +22,9 @@ module Readme
         allow_only: options[:allow_only]
       )
       @get_user_info = get_user_info
+
+      buffer_length = options[:buffer_length] || DEFAULT_BUFFER_LENGTH
+      @@request_queue = Readme::RequestQueue.new(buffer_length)
     end
 
     def call(env)
@@ -33,12 +38,7 @@ module Readme
       user_info = @get_user_info.call(env)
       payload = Payload.new(har, user_info, development: @development)
 
-      HTTParty.post(
-        ENDPOINT,
-        basic_auth: {username: @api_key, password: ""},
-        headers: {"Content-Type" => "application/json"},
-        body: payload.to_json
-      )
+      @@request_queue.push(payload.to_json)
 
       [status, headers, body]
     end

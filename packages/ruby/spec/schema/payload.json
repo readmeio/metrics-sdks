@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "group": {
+      "$ref": "readmeGroup.json#"
+    },
+    "clientIPAddress": {
+      "type": "string"
+    },
+    "development": {
+      "type": "boolean"
+    },
+    "request": {
+      "$ref": "har.json#"
+    }
+  },
+  "required": [
+    "group",
+    "clientIPAddress",
+    "development",
+    "request"
+  ]
+}

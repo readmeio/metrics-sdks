@@ -18,6 +18,13 @@ from the environment, or you may hardcode them.
 If you're using Warden-based authentication like Devise, you may fetch the
 current_user for a given request from the environment.
 
+### Batching requests
+
+By default, the middleware will batch requests to the ReadMe API in groups of
+10. For every 10 requests made to your application, the middleware will make a
+single request to ReadMe. If you wish to override this, provide a
+`buffer_length` option when configuring the middleware.
+
 ### Sensitive Data
 
 If you have sensitive data you'd like to prevent from being sent to the Metrics
@@ -40,7 +47,8 @@ require "readme/metrics"
 options = {
   api_key: "YOUR_API_KEY",
   development: false,
-  reject_params: ["not_included", "dont_send"]
+  reject_params: ["not_included", "dont_send"],
+  buffer_length: 5,
 }
 
 config.middleware.use Readme::Metrics, options do |env|
