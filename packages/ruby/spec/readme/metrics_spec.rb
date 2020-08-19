@@ -80,6 +80,55 @@ RSpec.describe Readme::Metrics do
     end
   end
 
+  describe "option validation" do
+    it "raises when the API key is missing" do
+      options = {}
+      expect {
+        Readme::Metrics.new(noop_app, options)
+      }.to raise_error(Readme::ConfigurationError, "Missing API Key")
+    end
+
+    it "raises when the reject_params contains a non-string element" do
+      options = {api_key: "key", reject_params: [:key]}
+      expect {
+        Readme::Metrics.new(noop_app, options)
+      }.to raise_error(
+        Readme::ConfigurationError,
+        "reject_params option must be an array of strings"
+      )
+    end
+
+    it "raises when the allow_only contains a non-string element" do
+      options = {api_key: "key", allow_only: [:key]}
+      expect {
+        Readme::Metrics.new(noop_app, options)
+      }.to raise_error(
+        Readme::ConfigurationError,
+        "allow_only option must be an array of strings"
+      )
+    end
+
+    it "raises when buffer_length is not an integer" do
+      options = {api_key: "key", buffer_length: "1"}
+      expect {
+        Readme::Metrics.new(noop_app, options)
+      }.to raise_error(
+        Readme::ConfigurationError,
+        "buffer_length must be an Integer"
+      )
+    end
+
+    it "raises when development is not a boolean" do
+      options = {api_key: "key", development: "true"}
+      expect {
+        Readme::Metrics.new(noop_app, options)
+      }.to raise_error(
+        Readme::ConfigurationError,
+        "development option must be a boolean"
+      )
+    end
+  end
+
   def noop_app
     lambda do |env|
       [200, {"Content-Type" => "text/plain", "Content-Length" => "2"}, ["OK"]]

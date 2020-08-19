@@ -12,7 +12,7 @@ module Readme
     ENDPOINT = "https://metrics.readme.io/v1/request"
 
     def initialize(app, options, &get_user_info)
-      raise("Missing API key") if options[:api_key].nil?
+      validate_options(options)
 
       @app = app
       @development = options[:development] || false
@@ -41,5 +41,33 @@ module Readme
 
       [status, headers, body]
     end
+
+    private
+
+    def validate_options(options)
+      raise ConfigurationError, "Missing API Key" if options[:api_key].nil?
+
+      if options[:reject_params]&.any? { |param| !param.is_a? String }
+        raise ConfigurationError, "reject_params option must be an array of strings"
+      end
+
+      if options[:allow_only]&.any? { |param| !param.is_a? String }
+        raise ConfigurationError, "allow_only option must be an array of strings"
+      end
+
+      if options[:buffer_length] && !options[:buffer_length].is_a?(Integer)
+        raise ConfigurationError, "buffer_length must be an Integer"
+      end
+
+      if options[:development] && !is_a_boolean?(options[:development])
+        raise ConfigurationError, "development option must be a boolean"
+      end
+    end
+
+    def is_a_boolean?(arg)
+      arg == true || arg == false
+    end
   end
+
+  class ConfigurationError < StandardError; end
 end
