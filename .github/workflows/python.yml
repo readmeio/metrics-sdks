@@ -24,4 +24,4 @@ jobs:
         run: pip3 install -r requirements.txt
 
       - name: Check code standards
-        run: pycodestyle --show-pep8 readme_metrics/
+        run: pycodestyle --show-pep8 readme_metrics/ tests/
