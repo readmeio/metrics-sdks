@@ -15,7 +15,6 @@ module Readme
       raise("Missing API key") if options[:api_key].nil?
 
       @app = app
-      @api_key = options[:api_key]
       @development = options[:development] || false
       @filter = Filter.for(
         reject: options[:reject_params],
@@ -24,7 +23,7 @@ module Readme
       @get_user_info = get_user_info
 
       buffer_length = options[:buffer_length] || DEFAULT_BUFFER_LENGTH
-      @@request_queue = Readme::RequestQueue.new(buffer_length)
+      @@request_queue = Readme::RequestQueue.new(options[:api_key], buffer_length)
     end
 
     def call(env)

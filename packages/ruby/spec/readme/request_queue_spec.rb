@@ -4,7 +4,7 @@ require "webmock/rspec"
 RSpec.describe Readme::RequestQueue do
   describe "#push" do
     it "adds a value to the queue" do
-      queue = Readme::RequestQueue.new(10)
+      queue = Readme::RequestQueue.new("key", 10)
       queue.push("value")
       queue.push("other_value")
 
@@ -14,7 +14,7 @@ RSpec.describe Readme::RequestQueue do
     it "does not send a request until the queue is long enough" do
       stub_request(:post, Readme::Metrics::ENDPOINT)
 
-      queue = Readme::RequestQueue.new(2)
+      queue = Readme::RequestQueue.new("key", 2)
       queue.push("value")
 
       expect(WebMock).to_not have_requested(:post, Readme::Metrics::ENDPOINT)
@@ -26,7 +26,7 @@ RSpec.describe Readme::RequestQueue do
       end
 
       it "sends a request" do
-        queue = Readme::RequestQueue.new(2)
+        queue = Readme::RequestQueue.new("key", 2)
         queue.push("value")
         queue.push("other_value")
 
@@ -35,7 +35,7 @@ RSpec.describe Readme::RequestQueue do
       end
 
       it "pulls off the appropriate number of items from the queue" do
-        queue = Readme::RequestQueue.new(2)
+        queue = Readme::RequestQueue.new("key", 2)
         queue.push("value")
         queue.push("other_value")
         queue.push("leftover")

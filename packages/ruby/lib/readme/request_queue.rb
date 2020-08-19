@@ -2,9 +2,10 @@ module Readme
   class RequestQueue
     attr_reader :queue
 
-    def initialize(buffer_length)
+    def initialize(api_key, buffer_length)
       @queue = []
       @buffer_length = buffer_length
+      @api_key = api_key
     end
 
     def push(request)
@@ -12,7 +13,6 @@ module Readme
 
       if ready_to_send?
         payloads = @queue.slice!(0, @buffer_length)
-
         HTTParty.post(
           Readme::Metrics::ENDPOINT,
           basic_auth: {username: @api_key, password: ""},
