@@ -2,6 +2,7 @@ require "rack"
 require "http_request"
 require "readme/metrics"
 require "readme/har/request_serializer"
+require "readme/har/response_serializer"
 require "readme/har/collection"
 
 module Readme
@@ -65,35 +66,8 @@ module Readme
         Har::RequestSerializer.new(@http_request, @filter).as_json
       end
 
-      def response_body
-        if @response.content_type == "application/json"
-          begin
-            parsed_body = JSON.parse(@response.body.first)
-            Har::Collection.new(@filter, parsed_body).to_h.to_json
-          rescue
-            @response.body.each.reduce(:+)
-          end
-        else
-          @response.body.each.reduce(:+)
-        end
-      end
-
       def response
-        {
-          status: @response.status,
-          statusText: Rack::Utils::HTTP_STATUS_CODES[@response.status],
-          httpVersion: @http_request.http_version,
-          headers: Har::Collection.new(@filter, @response.headers).to_a,
-          content: {
-            text: response_body,
-            size: @response.content_length,
-            mimeType: @response.content_type
-          },
-          redirectURL: @response.location.to_s,
-          headersSize: -1,
-          bodySize: @response.content_length,
-          cookies: Har::Collection.new(@filter, @http_request.cookies).to_a
-        }
+        Har::ResponseSerializer.new(@http_request, @response, @filter).as_json
       end
     end
   end
