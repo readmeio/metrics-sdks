@@ -80,12 +80,40 @@ RSpec.describe Readme::Metrics do
     end
   end
 
+  describe "block validation" do
+    it "raises when the block is missing" do
+      options = {api_key: "key"}
+      expect {
+        Readme::Metrics.new(noop_app, options)
+      }.to raise_error(
+        Readme::Errors::ConfigurationError,
+        Readme::Errors::MISSING_BLOCK_ERROR
+      )
+    end
+
+    context "when the block returns a malformed hash" do
+      def app
+        options = {api_key: "API KEY"}
+        Readme::Metrics.new(noop_app, options) { |env| {} }
+      end
+
+      it "logs an error" do
+        expect { post "/api/foo" }
+          .to output(Readme::Errors.bad_block_message({}))
+          .to_stdout
+      end
+    end
+  end
+
   describe "option validation" do
     it "raises when the API key is missing" do
       options = {}
       expect {
         Readme::Metrics.new(noop_app, options)
-      }.to raise_error(Readme::ConfigurationError, "Missing API Key")
+      }.to raise_error(
+        Readme::Errors::ConfigurationError,
+        Readme::Errors::API_KEY_ERROR
+      )
     end
 
     it "raises when the reject_params contains a non-string element" do
@@ -93,8 +121,8 @@ RSpec.describe Readme::Metrics do
       expect {
         Readme::Metrics.new(noop_app, options)
       }.to raise_error(
-        Readme::ConfigurationError,
-        "reject_params option must be an array of strings"
+        Readme::Errors::ConfigurationError,
+        Readme::Errors::REJECT_PARAMS_ERROR
       )
     end
 
@@ -103,8 +131,8 @@ RSpec.describe Readme::Metrics do
       expect {
         Readme::Metrics.new(noop_app, options)
       }.to raise_error(
-        Readme::ConfigurationError,
-        "allow_only option must be an array of strings"
+        Readme::Errors::ConfigurationError,
+        Readme::Errors::ALLOW_ONLY_ERROR
       )
     end
 
@@ -113,8 +141,8 @@ RSpec.describe Readme::Metrics do
       expect {
         Readme::Metrics.new(noop_app, options)
       }.to raise_error(
-        Readme::ConfigurationError,
-        "buffer_length must be an Integer"
+        Readme::Errors::ConfigurationError,
+        Readme::Errors::BUFFER_LENGTH_ERROR
       )
     end
 
@@ -123,8 +151,8 @@ RSpec.describe Readme::Metrics do
       expect {
         Readme::Metrics.new(noop_app, options)
       }.to raise_error(
-        Readme::ConfigurationError,
-        "development option must be a boolean"
+        Readme::Errors::ConfigurationError,
+        Readme::Errors::DEVELOPMENT_ERROR
       )
     end
   end
