@@ -1,10 +1,9 @@
-require "spec_helper"
-require "readme/har_request"
+require "readme/har/request_serializer"
 
-RSpec.describe Readme::HarRequest do
+RSpec.describe Readme::Har::RequestSerializer do
   describe "#as_json" do
     it "builds valid json" do
-      request = Readme::HarRequest.new(build_http_request)
+      request = Readme::Har::RequestSerializer.new(build_http_request)
       json = request.as_json
 
       expect(json).to match_json_schema("request")
@@ -17,7 +16,7 @@ RSpec.describe Readme::HarRequest do
         cookies: {"cookie1" => "value1", "cookie2" => "value2"},
         headers: {"X-Custom" => "custom", "Authorization" => "Basic abc123"}
       )
-      request = Readme::HarRequest.new(http_request)
+      request = Readme::Har::RequestSerializer.new(http_request)
       json = request.as_json
 
       expect(json[:method]).to eq http_request.request_method
@@ -59,7 +58,7 @@ RSpec.describe Readme::HarRequest do
         body: {key1: "key1", key2: "key2"}.to_json
       )
       reject_params = ["Filtered-Header", "key1"]
-      request = Readme::HarRequest.new(http_request, Filter.for(reject: reject_params))
+      request = Readme::Har::RequestSerializer.new(http_request, Filter.for(reject: reject_params))
       json = request.as_json
 
       request_body = JSON.parse(json.dig(:postData, :text))
@@ -73,7 +72,7 @@ RSpec.describe Readme::HarRequest do
     it "builds proper body when there is no response body" do
       http_request = build_http_request(content_type: nil, body: "")
 
-      request = Readme::HarRequest.new(http_request)
+      request = Readme::Har::RequestSerializer.new(http_request)
       json = request.as_json
 
       expect(json).not_to have_key(:postData)

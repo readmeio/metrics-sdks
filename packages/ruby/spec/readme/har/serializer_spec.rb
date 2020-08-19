@@ -1,13 +1,12 @@
-require "readme/har"
-require "readme/filter"
+require "readme/har/serializer"
 require "rack/lint"
 
-RSpec.describe Readme::Har do
+RSpec.describe Readme::Har::Serializer do
   describe "#to_json" do
     it "builds the correct values out of the env" do
-      request_json = File.read(File.expand_path("../../fixtures/har_request.json", __FILE__))
+      request_json = File.read(File.expand_path("../../../fixtures/har_request.json", __FILE__))
       har_request = double(:har_request, as_json: JSON.parse(request_json))
-      allow(Readme::HarRequest).to receive(:new).and_return(har_request)
+      allow(Readme::Har::RequestSerializer).to receive(:new).and_return(har_request)
 
       http_request = double(
         :http_request,
@@ -26,7 +25,7 @@ RSpec.describe Readme::Har do
       }
       start_time = Time.now
       end_time = start_time + 1
-      har = Readme::Har.new(
+      har = Readme::Har::Serializer.new(
         env,
         Rack::Response.new(response_body, status_code, headers),
         start_time,
@@ -37,7 +36,7 @@ RSpec.describe Readme::Har do
 
       expect(json).to match_json_schema("har")
 
-      expect(json.dig("log", "version")).to eq Readme::Har::HAR_VERSION
+      expect(json.dig("log", "version")).to eq Readme::Har::Serializer::HAR_VERSION
       expect(json.dig("log", "creator", "name")).to eq Readme::Metrics::SDK_NAME
       expect(json.dig("log", "creator", "version")).to eq Readme::Metrics::VERSION
       expect(json.dig("log", "entries").length).to eq 1
@@ -100,7 +99,7 @@ RSpec.describe Readme::Har do
         "Filtered-Header" => "filtered"
       }
 
-      har = Readme::Har.new(
+      har = Readme::Har::Serializer.new(
         env,
         Rack::Response.new(response_body, status_code, headers),
         Time.now,

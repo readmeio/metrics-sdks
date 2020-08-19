@@ -1,3 +1,5 @@
+require "readme/metrics"
+
 module Readme
   class RequestQueue
     attr_reader :queue

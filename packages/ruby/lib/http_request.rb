@@ -1,3 +1,4 @@
+require "rack"
 require "rack/request"
 
 class HttpRequest

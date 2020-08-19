@@ -1,5 +1,4 @@
 require "readme/payload"
-require "readme/har"
 
 RSpec.describe Readme::Payload do
   it "returns JSON matching the payload schema" do

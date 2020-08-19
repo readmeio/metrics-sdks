@@ -1,3 +1,4 @@
+require "readme/metrics"
 require "rack/test"
 require "webmock/rspec"
 

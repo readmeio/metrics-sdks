@@ -1,5 +1,5 @@
 require "readme/metrics/version"
-require "readme/har"
+require "readme/har/serializer"
 require "readme/filter"
 require "readme/payload"
 require "readme/request_queue"
@@ -33,7 +33,7 @@ module Readme
 
       response = Rack::Response.new(body, status, headers)
 
-      har = Har.new(env, response, start_time, end_time, @filter)
+      har = Har::Serializer.new(env, response, start_time, end_time, @filter)
       user_info = @get_user_info.call(env)
       payload = Payload.new(har, user_info, development: @development)
 
