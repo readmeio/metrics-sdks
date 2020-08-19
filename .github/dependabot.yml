@@ -1,5 +1,19 @@
 version: 2
 updates:
+  - package-ecosystem: composer
+    directory: "/packages/php"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    reviewers:
+      - erunion
+    labels:
+      - scope:dependency
+      - area:php
+    commit-message:
+      prefix: chore(deps)
+      prefix-development: chore(deps-dev)
+
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
@@ -19,12 +33,13 @@ updates:
       - erunion
     labels:
       - scope:dependency
+      - area:node
     commit-message:
       prefix: chore(deps)
       prefix-development: chore(deps-dev)
 
-  - package-ecosystem: composer
-    directory: "/"
+  - package-ecosystem: pip
+    directory: "/packages/python"
     schedule:
       interval: weekly
     open-pull-requests-limit: 10
@@ -32,6 +47,7 @@ updates:
       - erunion
     labels:
       - scope:dependency
+      - area:python
     commit-message:
       prefix: chore(deps)
       prefix-development: chore(deps-dev)
