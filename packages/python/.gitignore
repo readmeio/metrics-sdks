@@ -1,4 +1,4 @@
-.eggs/*
-dist/
 *.egg-info
-build/*
+.eggs/*
+build/
+dist/
