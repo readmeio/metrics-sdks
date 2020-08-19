@@ -1,22 +1,27 @@
 class ResponseInfoWrapper:
     """
-    Internal data class used by the middleware to wrap a call's response information
+    Internal data class used by the middleware to wrap a call's response
+    information
 
-    ...
-    Attributes
-    ----------
-    headers: dict
-        Dictionary containing the headers that will be sent back to the client with this response
-    status: int
-        HTTP status code that will be sent back with this response
-    content_type: str
-        Content type header that will be sent back with this response
-    content_length: int
-        Content-Length header that will be sent back with this response
-    body: str
-        Body of the response that will be sent
+    Attributes:
+        headers (dict): Dictionary containing the headers that will be sent
+            back to the client with this response
+        status (int): HTTP status code that will be sent back with this
+            response
+        content_type (str): Content type header that will be sent back with
+            this response
+        content_length (int): Content-Length header that will be sent back with
+            this response
+        body (str): Body of the response that will be sent
     """
-    def __init__(self, headers: dict, status: int, content_type: str, content_length: int, body: str):
+    def __init__(
+        self,
+        headers: dict,
+        status: int,
+        content_type: str,
+        content_length: int,
+        body: str
+    ):
         headers = dict(headers)
         self.headers = headers
         self.status = status

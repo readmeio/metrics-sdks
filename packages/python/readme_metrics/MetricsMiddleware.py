@@ -11,24 +11,24 @@ class MetricsMiddleware:
     """
     Core middleware class for ReadMe Metrics
 
-    ...
-    Attributes
-    ----------
-    config : MetricsApiConfig
-        contains the configuration settings for the running middleware instance
+    Attributes:
+        config (MetricsApiConfig): Contains the configuration settings for the
+            running middleware instance
     """
     def __init__(
-            self,
-            wsgi_app_reference,
-            config: MetricsApiConfig):
+        self,
+        wsgi_app_reference,
+        config: MetricsApiConfig
+    ):
         """
-        Constructs and initializes MetricsMiddleware WSGI middleware to be passed into the
-        currently running WSGI web server.
+        Constructs and initializes MetricsMiddleware WSGI middleware to be
+        passed into the currently running WSGI web server.
 
-        :param wsgi_app_reference: Reference to the current WSGI application, which will be wrapped
-        :param config: Instance of MetricsApiConfig object
+        Args:
+            wsgi_app_reference ([type]): Reference to the current WSGI
+                application, which will be wrapped
+            config (MetricsApiConfig): Instance of MetricsApiConfig object
         """
-
         self.config = config
         self.app = wsgi_app_reference
         self.metrics_core = Metrics(config)
@@ -36,8 +36,9 @@ class MetricsMiddleware:
     def __call__(self, environ, start_response):
         """
         Method that is called by the running WSGI server.
-        You should NOT be calling this method yourself under
-        normal circumstances.
+
+        You should NOT be calling this method yourself under normal
+        circumstances.
         """
         response_headers = {}
         response_status = 0
@@ -61,11 +62,14 @@ class MetricsMiddleware:
             req.rm_start_ts = int(time.time() * 1000)
 
             if req.method == 'POST':
-
-                # The next 4 lines are a workaround for a serious shortcoming in the WSGI spec.
-                # The data can only be read once, after which the socket is exhausted and cannot be read again.
-                # As such, we read the data and then repopulate the variable so that it can be used by other
-                # code down the pipeline.
+                # The next 4 lines are a workaround for a serious shortcoming
+                # in the WSGI spec.
+                #
+                # The data can only be read once, after which the socket is
+                # exhausted and cannot be read again. As such, we read the data
+                # and then repopulate the variable so that it can be used by
+                # other code down the pipeline.
+                #
                 # For more info: https://stackoverflow.com/a/13106009/643951
 
                 content_length = int(environ['CONTENT_LENGTH'])
@@ -78,20 +82,32 @@ class MetricsMiddleware:
                 req.rm_body = content_body
 
             iterable = self.app(environ, _start_response)
-
             for data in iterable:
                 res_ctype = ''
                 res_clength = 0
 
-                htype = next((h for h in response_headers if h[0] == 'Content-Type'), None)
-                hlength = next((h for h in response_headers if h[0] == 'Content-Length'), None)
+                htype = next(
+                    (h for h in response_headers if h[0] == 'Content-Type'),
+                    None
+                )
+
+                hlength = next(
+                    (h for h in response_headers if h[0] == 'Content-Length'),
+                    None
+                )
 
                 if htype and hlength:
                     res_ctype = htype[1]
                     res_clength = int(hlength[1])
 
                 # Populate response body
-                res = ResponseInfoWrapper(response_headers, response_status, res_ctype, res_clength, data.decode('utf-8'))
+                res = ResponseInfoWrapper(
+                    response_headers,
+                    response_status,
+                    res_ctype,
+                    res_clength,
+                    data.decode('utf-8')
+                )
 
                 # Send off data to be queued (and processed) by ReadMe
                 self.metrics_core.process(req, res)
