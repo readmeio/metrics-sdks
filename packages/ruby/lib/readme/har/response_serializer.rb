@@ -16,11 +16,7 @@ module Readme
           statusText: Rack::Utils::HTTP_STATUS_CODES[@response.status],
           httpVersion: @request.http_version,
           headers: Har::Collection.new(@filter, @response.headers).to_a,
-          content: {
-            text: response_body,
-            size: @response.content_length,
-            mimeType: @response.content_type
-          },
+          content: content,
           redirectURL: @response.location.to_s,
           headersSize: -1,
           bodySize: @response.content_length,
@@ -30,14 +26,45 @@ module Readme
 
       private
 
+      def content
+        if response_body.nil?
+          empty_content
+        elsif @response.content_type == "application/json"
+          json_content
+        else
+          pass_through_content
+        end
+      end
+
+      def empty_content
+        {mimeType: "", size: 0}
+      end
+
+      def json_content
+        parsed_body = JSON.parse(response_body)
+
+        {mimeType: "application/json",
+         size: @response.content_length,
+         text: Har::Collection.new(@filter, parsed_body).to_h.to_json}
+      rescue
+        pass_through_content
+      end
+
+      def pass_through_content
+        {mimeType: @response.content_type,
+         size: @response.content_length,
+         text: response_body}
+      end
+
       def response_body
-        if @response.content_type == "application/json"
-          begin
-            parsed_body = JSON.parse(@response.body.first)
-            Har::Collection.new(@filter, parsed_body).to_h.to_json
-          rescue
-            @response.body.each.reduce(:+)
-          end
+        if @response.body.nil?
+          nil
+        elsif @response.body.respond_to?(:rewind)
+          @response.body.rewind
+          body = @response.body.each.reduce(:+)
+          @response.body.rewind
+
+          body
         else
           @response.body.each.reduce(:+)
         end

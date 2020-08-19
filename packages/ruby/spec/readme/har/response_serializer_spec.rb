@@ -68,6 +68,41 @@ RSpec.describe Readme::Har::ResponseSerializer do
       expect(json.dig(:content, :size)).to eq response.content_length
       expect(json.dig(:content, :mimeType)).to eq "application/json"
     end
+
+    it "passes-through the raw body invalid JSON payloads" do
+      request = build_request
+      response = build_response(
+        content_type: "application/json",
+        body: StringIO.new("NOT JSON")
+      )
+
+      serializer = Readme::Har::ResponseSerializer.new(
+        request,
+        response,
+        Filter.for
+      )
+      json = serializer.as_json
+
+      expect(json.dig(:content, :text)).to eq "NOT JSON"
+      expect(json.dig(:content, :size)).to eq response.content_length
+      expect(json.dig(:content, :mimeType)).to eq "application/json"
+    end
+
+    it "handles responses without a body" do
+      request = build_request
+      response = build_response(status: 204, content_type: nil, body: nil)
+
+      serializer = Readme::Har::ResponseSerializer.new(
+        request,
+        response,
+        Filter.for(reject: ["reject"])
+      )
+      json = serializer.as_json
+
+      expect(json[:content]).not_to have_key(:text)
+      expect(json.dig(:content, :size)).to eq 0
+      expect(json.dig(:content, :mimeType)).to eq ""
+    end
   end
 
   def build_request(overrides = {})
