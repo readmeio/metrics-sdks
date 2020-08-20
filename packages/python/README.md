@@ -14,7 +14,7 @@ pip install readme-metrics
 
 ## Usage
 
-Just include the MetricsMiddleware into your API!
+Just include the `MetricsMiddleware` into your API!
 
 ```python
 from readme_metrics import MetricsApiConfig, MetricsMiddleware
@@ -35,7 +35,7 @@ app.wsgi_app = MetricsMiddleware(
 ```
 
 ### Configuration Options
-There are a few options you can pass in to change how the logs are sent to ReadMe. These can be passed in MetricsApiConfig`.
+There are a few options you can pass in to change how the logs are sent to ReadMe. These can be passed in `MetricsApiConfig`.
 
 Ex)
 

@@ -31,7 +31,7 @@ class PayloadBuilder:
         blacklist: List[str],
         whitelist: List[str],
         development_mode: bool,
-        grouping_function
+        grouping_function,
     ):
         """Creates a PayloadBuilder instance with the supplied configuration
 
@@ -44,14 +44,10 @@ class PayloadBuilder:
         """
         self.blacklist = blacklist
         self.whitelist = whitelist
-        self.development_mode = 'true' if development_mode else 'false'
+        self.development_mode = "true" if development_mode else "false"
         self.grouping_function = grouping_function
 
-    def __call__(
-        self,
-        request: Request,
-        response: ResponseInfoWrapper
-    ) -> dict:
+    def __call__(self, request: Request, response: ResponseInfoWrapper) -> dict:
         """Builds a HAR payload encompassing the request & response data
 
         Args:
@@ -62,26 +58,27 @@ class PayloadBuilder:
             dict: Payload object (ready to be serialized and sent to ReadMe)
         """
         payload = {
-            'group': self.grouping_function(request),
-            'clientIPAddress': request.remote_addr,
-            'development': self.development_mode,
-            'request': {
-                'log': {
-                    'creator': {
-                        'name': __name__,
-                        'version': __version__,
-                        'comment': sys.version
+            "group": self.grouping_function(request),
+            "clientIPAddress": request.remote_addr,
+            "development": self.development_mode,
+            "request": {
+                "log": {
+                    "creator": {
+                        "name": __name__,
+                        "version": __version__,
+                        "comment": sys.version,
                     },
-                    'entries': [{
-                        'pageref': request.base_url,
-                        'startedDateTime': request.rm_start_dt,
-                        'time': int(time.time() * 1000) - request.rm_start_ts,
-                        'request': self._build_request_payload(request),
-                        'response': self._build_response_payload(response)
-                    }]
+                    "entries": [
+                        {
+                            "pageref": request.base_url,
+                            "startedDateTime": request.rm_start_dt,
+                            "time": int(time.time() * 1000) - request.rm_start_ts,
+                            "request": self._build_request_payload(request),
+                            "response": self._build_response_payload(response),
+                        }
+                    ],
                 }
-            }
-
+            },
         }
 
         return payload
@@ -107,7 +104,7 @@ class PayloadBuilder:
 
         if request.content_length is not None and request.content_length > 0:
 
-            body = request.rm_body.decode('utf-8') or ''
+            body = request.rm_body.decode("utf-8") or ""
 
             try:
                 json_object = json.loads(body)
@@ -117,33 +114,33 @@ class PayloadBuilder:
                 elif self.whitelist:
                     body = util_filter_keys(json_object, self.whitelist)
 
-                post_data['mimeType'] = 'application/json'
-                post_data['text'] = body
+                post_data["mimeType"] = "application/json"
+                post_data["text"] = body
             except ValueError as e:
-                post_data['params'] = [body]
+                post_data["params"] = [body]
 
                 if request.content_type:
-                    post_data['mimeType'] = request.content_type
+                    post_data["mimeType"] = request.content_type
                 else:
-                    post_data['mimeType'] = 'text/html'
+                    post_data["mimeType"] = "text/html"
 
         hdr_items = []
         for k, v in headers.items():
-            hdr_items.append({'name': k, 'value': v})
+            hdr_items.append({"name": k, "value": v})
 
         qs_items = []
         qs_dict = dict(parse.parse_qsl(request.query_string.decode("utf-8")))
 
         for k, v in qs_dict.items():
-            qs_items.append({'name': k, 'value': v})
+            qs_items.append({"name": k, "value": v})
 
         return {
-            'method': request.method,
-            'url': request.base_url,
-            'httpVersion': request.environ['SERVER_PROTOCOL'],
-            'headers': hdr_items,
-            'queryString': qs_items,
-            **post_data
+            "method": request.method,
+            "url": request.base_url,
+            "httpVersion": request.environ["SERVER_PROTOCOL"],
+            "headers": hdr_items,
+            "queryString": qs_items,
+            **post_data,
         }
 
     def _build_response_payload(self, response: ResponseInfoWrapper) -> dict:
@@ -176,18 +173,18 @@ class PayloadBuilder:
 
         hdr_items = []
         for k, v in headers.items():
-            hdr_items.append({'name': k, 'value': v})
+            hdr_items.append({"name": k, "value": v})
 
-        status_code = int(response.status.split(' ')[0])
-        status_text = response.status.replace(str(status_code) + ' ', '')
+        status_code = int(response.status.split(" ")[0])
+        status_text = response.status.replace(str(status_code) + " ", "")
 
         return {
-            'status': status_code,
-            'statusText': status_text or '',
-            'headers': hdr_items,  # headers.items(),
-            'content': {
-                'text': body,
-                'size': response.content_length,
-                'mimeType': response.content_type
-            }
+            "status": status_code,
+            "statusText": status_text or "",
+            "headers": hdr_items,  # headers.items(),
+            "content": {
+                "text": body,
+                "size": response.content_length,
+                "mimeType": response.content_type,
+            },
         }

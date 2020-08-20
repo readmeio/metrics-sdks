@@ -30,7 +30,7 @@ class Metrics:
             config.BLACKLIST,
             config.WHITELIST,
             config.IS_DEVELOPMENT_MODE,
-            config.GROUPING_FUNCTION
+            config.GROUPING_FUNCTION,
         )
         self.queue = queue.Queue()
 
@@ -43,8 +43,8 @@ class Metrics:
         """
         self.queue.put(self.payload_builder(request, response))
 
-        if(self.queue.qsize() >= self.config.BUFFER_LENGTH):
-            if(self.config.IS_BACKGROUND_MODE):
+        if self.queue.qsize() >= self.config.BUFFER_LENGTH:
+            if self.config.IS_BACKGROUND_MODE:
                 threading.Thread(target=self._processAll, daemon=True).start()
             else:
                 self._processAll()
@@ -63,7 +63,7 @@ class Metrics:
             auth=(self.config.README_API_KEY, ""),
             data=payload,
             headers={
-                'Content-Type': 'application/json',
-                'User-Agent': 'readme-metrics-' + __version__
-            }
+                "Content-Type": "application/json",
+                "User-Agent": "readme-metrics-" + __version__,
+            },
         )

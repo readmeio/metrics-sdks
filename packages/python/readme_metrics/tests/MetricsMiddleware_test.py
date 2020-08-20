@@ -36,23 +36,23 @@ class MockServer:
         return requestQueue
 
 
-class TestMetricsMiddleware():
+class TestMetricsMiddleware:
     def setUp(self):
         self.mockserver = MockServer()
 
-    @pytest.mark.skip(reason='@todo')
+    @pytest.mark.skip(reason="@todo")
     def testNoRequest(self):
         # Test no request (None) but the function is called
         # Test no request ([]) but the function is called
         pass
 
-    @pytest.mark.skip(reason='@todo')
+    @pytest.mark.skip(reason="@todo")
     def testSingleRequest(self):
         # Test if a single request got through and processed
         # Test if a single request is sent but with trash data(?)
         pass
 
-    @pytest.mark.skip(reason='@todo')
+    @pytest.mark.skip(reason="@todo")
     def testMultipleRequests(self):
         # Test if multiple requests got through and processed
         # check by using the length of the request queue and loop by calling the
@@ -60,19 +60,19 @@ class TestMetricsMiddleware():
         # Test multiple requests but some of it has garbage data(?)
         pass
 
-    @pytest.mark.skip(reason='@todo')
+    @pytest.mark.skip(reason="@todo")
     def testClosed(self):
         # Test if iterable got closed properly
         pass
 
     # Other tests that I think can be tested, but unsure if this should be tested in
     # this section
-    @pytest.mark.skip(reason='@todo')
+    @pytest.mark.skip(reason="@todo")
     def testHeaders(self):
         # Test to verify if the response header is passed correctly
         pass
 
-    @pytest.mark.skip(reason='@todo')
+    @pytest.mark.skip(reason="@todo")
     def testStatus(self):
         # Test to verify if the response status is passed correctly
         pass

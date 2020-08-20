@@ -14,11 +14,8 @@ class MetricsMiddleware:
         config (MetricsApiConfig): Contains the configuration settings for the running
             middleware instance
     """
-    def __init__(
-        self,
-        wsgi_app_reference,
-        config: MetricsApiConfig
-    ):
+
+    def __init__(self, wsgi_app_reference, config: MetricsApiConfig):
         """
         Constructs and initializes MetricsMiddleware WSGI middleware to be passed into
         the currently running WSGI web server.
@@ -57,7 +54,7 @@ class MetricsMiddleware:
             req.rm_start_dt = str(datetime.datetime.now())
             req.rm_start_ts = int(time.time() * 1000)
 
-            if req.method == 'POST':
+            if req.method == "POST":
                 # The next 4 lines are a workaround for a serious shortcoming in the
                 # WSGI spec.
                 #
@@ -68,28 +65,26 @@ class MetricsMiddleware:
                 #
                 # For more info: https://stackoverflow.com/a/13106009/643951
 
-                content_length = int(environ['CONTENT_LENGTH'])
-                content_body = environ['wsgi.input'].read(content_length)
+                content_length = int(environ["CONTENT_LENGTH"])
+                content_body = environ["wsgi.input"].read(content_length)
 
-                environ['wsgi.input'].close()
-                environ['wsgi.input'] = io.BytesIO(content_body)
+                environ["wsgi.input"].close()
+                environ["wsgi.input"] = io.BytesIO(content_body)
 
                 req.rm_content_length = content_length
                 req.rm_body = content_body
 
             iterable = self.app(environ, _start_response)
             for data in iterable:
-                res_ctype = ''
+                res_ctype = ""
                 res_clength = 0
 
                 htype = next(
-                    (h for h in response_headers if h[0] == 'Content-Type'),
-                    None
+                    (h for h in response_headers if h[0] == "Content-Type"), None
                 )
 
                 hlength = next(
-                    (h for h in response_headers if h[0] == 'Content-Length'),
-                    None
+                    (h for h in response_headers if h[0] == "Content-Length"), None
                 )
 
                 if htype and hlength:
@@ -102,7 +97,7 @@ class MetricsMiddleware:
                     response_status,
                     res_ctype,
                     res_clength,
-                    data.decode('utf-8')
+                    data.decode("utf-8"),
                 )
 
                 # Send off data to be queued (and processed) by ReadMe
@@ -112,5 +107,5 @@ class MetricsMiddleware:
 
         finally:
             # Undocumented in WSGI spec but the iterable has to be closed
-            if hasattr(iterable, 'close'):
+            if hasattr(iterable, "close"):
                 iterable.close()

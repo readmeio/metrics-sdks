@@ -27,6 +27,7 @@ class MetricsApiConfig:
 
             If this option is configured, ONLY the whitelisted properties will be sent.
     """
+
     README_API_KEY: str = None
     BUFFER_LENGTH: int = 10
     GROUPING_FUNCTION: (lambda req: None)
@@ -43,7 +44,7 @@ class MetricsApiConfig:
         development_mode: bool = False,
         background_worker_mode: bool = True,
         blacklist: List[str] = None,
-        whitelist: List[str] = None
+        whitelist: List[str] = None,
     ):
         """Initializes an instance of the MetricsApiConfig object
 

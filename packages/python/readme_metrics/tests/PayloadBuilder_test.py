@@ -54,7 +54,7 @@ class TestPayloadBuilder:
         # Compare the two contents and check if they are similar(?)
         return True
 
-    @pytest.mark.skip(reason='@todo')
+    @pytest.mark.skip(reason="@todo")
     def testBlackListed(self, url):
 
         # Tests when the website is blacklisted
@@ -65,7 +65,7 @@ class TestPayloadBuilder:
         # self.assertTrue(similar)
         pass
 
-    @pytest.mark.skip(reason='@todo')
+    @pytest.mark.skip(reason="@todo")
     def testWhiteListed(self):
         # Tests when the website is whitelisted
         # payload = createPayload(MetricsApiConfig(#params here))
@@ -75,7 +75,7 @@ class TestPayloadBuilder:
         # self.assertTrue(similar)
         pass
 
-    @pytest.mark.skip(reason='@todo')
+    @pytest.mark.skip(reason="@todo")
     def testProduction(self):
         # Tests when the website is called in production
         # payload = createPayload(MetricsApiConfig(#params here))
@@ -85,7 +85,7 @@ class TestPayloadBuilder:
         # self.assertTrue(similar)
         pass
 
-    @pytest.mark.skip(reason='@todo')
+    @pytest.mark.skip(reason="@todo")
     def testDevelopment(self):
         # Tests when the website is called in development mode
         # payload = createPayload(MetricsApiConfig(#params here))
@@ -98,7 +98,7 @@ class TestPayloadBuilder:
     # for test GET/POST/PUT I'm putting the status code tests for now since we cant
     # verify the body yet for status 401 and 403, they can also be moved to
     # blacklisted(?)
-    @pytest.mark.skip(reason='@todo')
+    @pytest.mark.skip(reason="@todo")
     def testGET(self):
         # payload = createPayload(MetricsApiConfig(#params here))
 
@@ -115,7 +115,7 @@ class TestPayloadBuilder:
         # Test GET with 404 (Not Found)
         pass
 
-    @pytest.mark.skip(reason='@todo')
+    @pytest.mark.skip(reason="@todo")
     def testPOST(self):
         # payload = createPayload(MetricsApiConfig(#params here))
 
@@ -132,7 +132,7 @@ class TestPayloadBuilder:
         # Test POST with 404 (Not Found)
         pass
 
-    @pytest.mark.skip(reason='@todo')
+    @pytest.mark.skip(reason="@todo")
     def testPUT(self):
         # payload = createPayload(MetricsApiConfig(#params here))
 
