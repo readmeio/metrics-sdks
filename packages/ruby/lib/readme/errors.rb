@@ -5,6 +5,10 @@ module Readme
     ALLOW_ONLY_ERROR = "The `allow_only` option must be an array of strings"
     BUFFER_LENGTH_ERROR = "The `buffer_length` must be an Integer"
     DEVELOPMENT_ERROR = "The `development` option must be a boolean"
+    LOGGER_ERROR = <<~MESSAGE
+      The `logger` option must be class that responds to the following messages:
+        :unkown, :fatal, :error, :warn, :info, :debug, :level
+    MESSAGE
 
     MISSING_BLOCK_ERROR = <<~MESSAGE
       Missing block argument. You must provide a block when configuring the

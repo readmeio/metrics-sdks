@@ -136,7 +136,7 @@ RSpec.describe Readme::Metrics do
 
       it "logs an error" do
         expect { post "/api/foo" }
-          .to output(Readme::Errors.bad_block_message({}))
+          .to output(/#{Readme::Errors.bad_block_message({})}/)
           .to_stdout
       end
     end
@@ -190,6 +190,16 @@ RSpec.describe Readme::Metrics do
       }.to raise_error(
         Readme::Errors::ConfigurationError,
         Readme::Errors::DEVELOPMENT_ERROR
+      )
+    end
+
+    it "raises when the logger does not respond to the correct messages" do
+      options = {api_key: "key", logger: Class.new}
+      expect {
+        Readme::Metrics.new(noop_app, options)
+      }.to raise_error(
+        Readme::Errors::ConfigurationError,
+        Readme::Errors::LOGGER_ERROR
       )
     end
   end

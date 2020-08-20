@@ -5,6 +5,7 @@ require "readme/payload"
 require "readme/request_queue"
 require "readme/errors"
 require "httparty"
+require "logger"
 
 module Readme
   class Metrics
@@ -12,6 +13,10 @@ module Readme
     DEFAULT_BUFFER_LENGTH = 10
     ENDPOINT = "https://metrics.readme.io/v1/request"
     USER_INFO_KEYS = [:id, :label, :email]
+
+    def self.logger
+      @@logger
+    end
 
     def initialize(app, options, &get_user_info)
       validate_options(options)
@@ -27,6 +32,7 @@ module Readme
 
       buffer_length = options[:buffer_length] || DEFAULT_BUFFER_LENGTH
       @@request_queue = Readme::RequestQueue.new(options[:api_key], buffer_length)
+      @@logger = options[:logger] || Logger.new($stdout)
     end
 
     def call(env)
@@ -41,7 +47,7 @@ module Readme
       user_info = @get_user_info.call(env)
 
       if user_info_invalid?(user_info)
-        puts Errors.bad_block_message(user_info)
+        Readme::Metrics.logger.error Errors.bad_block_message(user_info)
         return [status, headers, body]
       else
         payload = Payload.new(har, user_info, development: @development)
@@ -71,6 +77,21 @@ module Readme
       if options[:development] && !is_a_boolean?(options[:development])
         raise Errors::ConfigurationError, Errors::DEVELOPMENT_ERROR
       end
+
+      if options[:logger] && has_logger_inferface?(options[:logger])
+        raise Errors::ConfigurationError, Errors::LOGGER_ERROR
+      end
+    end
+
+    def has_logger_inferface?(logger)
+      [
+        :unknown,
+        :fatal,
+        :error,
+        :warn,
+        :info,
+        :debug
+      ].any? { |message| !logger.respond_to? message }
     end
 
     def is_a_boolean?(arg)
