@@ -23,7 +23,7 @@ RSpec.describe Readme::Metrics do
       expect(response_with_middleware).to eq response_without_middleware
     end
 
-    it "posts request urls to Readme API with a JSON body" do
+    it "submits to the Readme API for POST requests with a JSON body" do
       header "Content-Type", "application/json"
       post "/api/foo", {key: "value"}.to_json
 
@@ -31,8 +31,38 @@ RSpec.describe Readme::Metrics do
         .with { |request| validate_json("readmeMetrics", request.body) }
     end
 
-    it "posts request urls to Readme API without a body" do
+    it "submits to the Readme API for POST requests with no body" do
       post "/api/foo"
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) }
+    end
+
+    it "submits to the Readme API for GET requests" do
+      get "/api/foo"
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) }
+    end
+
+    it "submits to the Readme API for PUT requests with a JSON body" do
+      header "Content-Type", "application/json"
+      put "/api/foo", {key: "value"}.to_json
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) }
+    end
+
+    it "submits to the Readme API for PATCH requests with a JSON body" do
+      header "Content-Type", "application/json"
+      patch "/api/foo", {key: "value"}.to_json
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) }
+    end
+
+    it "submits to the Readme API for DELETE requests" do
+      delete "/api/foo"
 
       expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
         .with { |request| validate_json("readmeMetrics", request.body) }
