@@ -46,8 +46,8 @@ MetricsApiConfig(
         'label': 'label for us to show for this user (ie email, project name, user name, etc)',
         'email': 'email address for user'
     },
-    buffer_length: 1,
-    blacklist: 'credit_card' # Prevents credit_card in the request from being sent to readme
+    buffer_length=1,
+    blacklist=['credit_card'] # Prevents credit_card in the request from being sent to readme
 )
 
 ```
