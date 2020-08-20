@@ -8,12 +8,11 @@ import datetime
 
 
 class MetricsMiddleware:
-    """
-    Core middleware class for ReadMe Metrics
+    """Core middleware class for ReadMe Metrics
 
     Attributes:
-        config (MetricsApiConfig): Contains the configuration settings for the
-            running middleware instance
+        config (MetricsApiConfig): Contains the configuration settings for the running
+            middleware instance
     """
     def __init__(
         self,
@@ -21,12 +20,12 @@ class MetricsMiddleware:
         config: MetricsApiConfig
     ):
         """
-        Constructs and initializes MetricsMiddleware WSGI middleware to be
-        passed into the currently running WSGI web server.
+        Constructs and initializes MetricsMiddleware WSGI middleware to be passed into
+        the currently running WSGI web server.
 
         Args:
-            wsgi_app_reference ([type]): Reference to the current WSGI
-                application, which will be wrapped
+            wsgi_app_reference ([type]): Reference to the current WSGI application,
+                which will be wrapped
             config (MetricsApiConfig): Instance of MetricsApiConfig object
         """
         self.config = config
@@ -34,11 +33,9 @@ class MetricsMiddleware:
         self.metrics_core = Metrics(config)
 
     def __call__(self, environ, start_response):
-        """
-        Method that is called by the running WSGI server.
+        """Method that is called by the running WSGI server.
 
-        You should NOT be calling this method yourself under normal
-        circumstances.
+        You should NOT be calling this method yourself under normal circumstances.
         """
         response_headers = {}
         response_status = 0
@@ -57,18 +54,17 @@ class MetricsMiddleware:
             return write
 
         try:
-
             req.rm_start_dt = str(datetime.datetime.now())
             req.rm_start_ts = int(time.time() * 1000)
 
             if req.method == 'POST':
-                # The next 4 lines are a workaround for a serious shortcoming
-                # in the WSGI spec.
+                # The next 4 lines are a workaround for a serious shortcoming in the
+                # WSGI spec.
                 #
-                # The data can only be read once, after which the socket is
-                # exhausted and cannot be read again. As such, we read the data
-                # and then repopulate the variable so that it can be used by
-                # other code down the pipeline.
+                # The data can only be read once, after which the socket is exhausted
+                # and cannot be read again. As such, we read the data and then
+                # repopulate the variable so that it can be used by other code down the
+                # pipeline.
                 #
                 # For more info: https://stackoverflow.com/a/13106009/643951
 

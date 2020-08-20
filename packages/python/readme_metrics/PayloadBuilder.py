@@ -14,18 +14,16 @@ from readme_metrics.util import util_exclude_keys, util_filter_keys
 
 class PayloadBuilder:
     """
-    Internal builder class that handles the construction of the request and
-    response portions of the payload sent to the ReadMe API.
+    Internal builder class that handles the construction of the request and response
+    portions of the payload sent to the ReadMe API.
 
     Attributes:
-        blacklist (List[str]): Cached blacklist for current PayloadBuilder
-            instance
-        whitelist (List[str]): Cached whitelist for current PayloadBuilder
-            instance
+        blacklist (List[str]): Cached blacklist for current PayloadBuilder instance
+        whitelist (List[str]): Cached whitelist for current PayloadBuilder instance
         development_mode (bool): Cached development mode parameter for current
             PayloadBuilder instance
-        grouping_function ([type]): Cached grouping function for current
-            PayloadBuilder instance
+        grouping_function ([type]): Cached grouping function for current PayloadBuilder
+            instance
     """
 
     def __init__(
@@ -41,8 +39,8 @@ class PayloadBuilder:
             blacklist (List[str]): Header/JSON body blacklist
             whitelist (List[str]): Header/JSON body whitelist
             development_mode (bool): Development mode flag passed to ReadMe
-            grouping_function ([type]): Grouping function to generate an
-                identity payload
+            grouping_function ([type]): Grouping function to generate an identity
+                payload
         """
         self.blacklist = blacklist
         self.whitelist = whitelist
@@ -92,8 +90,7 @@ class PayloadBuilder:
         """Wraps the request portion of the payload
 
         Args:
-            request (Request): Request object containing the response
-                information
+            request (Request): Request object containing the response information
 
         Returns:
             dict: Wrapped request payload
