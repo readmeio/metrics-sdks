@@ -30,7 +30,7 @@ class MetricsApiConfig:
 
     README_API_KEY: str = None
     BUFFER_LENGTH: int = 10
-    GROUPING_FUNCTION: (lambda req: None)
+    GROUPING_FUNCTION = lambda req: None
     IS_DEVELOPMENT_MODE: bool = False
     IS_BACKGROUND_MODE: bool = True
     BLACKLIST: List[str] = []
