@@ -3,6 +3,7 @@ require "readme/har/serializer"
 require "readme/filter"
 require "readme/payload"
 require "readme/request_queue"
+require "readme/errors"
 require "httparty"
 
 module Readme
@@ -10,9 +11,11 @@ module Readme
     SDK_NAME = "Readme.io Ruby SDK"
     DEFAULT_BUFFER_LENGTH = 10
     ENDPOINT = "https://metrics.readme.io/v1/request"
+    USER_INFO_KEYS = [:id, :label, :email]
 
     def initialize(app, options, &get_user_info)
       validate_options(options)
+      raise Errors::ConfigurationError, Errors::MISSING_BLOCK_ERROR if get_user_info.nil?
 
       @app = app
       @development = options[:development] || false
@@ -34,10 +37,16 @@ module Readme
       response = Rack::Response.new(body, status, headers)
 
       har = Har::Serializer.new(env, response, start_time, end_time, @filter)
-      user_info = @get_user_info.call(env)
-      payload = Payload.new(har, user_info, development: @development)
 
-      @@request_queue.push(payload.to_json)
+      user_info = @get_user_info.call(env)
+
+      if user_info_invalid?(user_info)
+        puts Errors.bad_block_message(user_info)
+        return [status, headers, body]
+      else
+        payload = Payload.new(har, user_info, development: @development)
+        @@request_queue.push(payload.to_json)
+      end
 
       [status, headers, body]
     end
@@ -45,29 +54,33 @@ module Readme
     private
 
     def validate_options(options)
-      raise ConfigurationError, "Missing API Key" if options[:api_key].nil?
+      raise Errors::ConfigurationError, Errors::API_KEY_ERROR if options[:api_key].nil?
 
       if options[:reject_params]&.any? { |param| !param.is_a? String }
-        raise ConfigurationError, "reject_params option must be an array of strings"
+        raise Errors::ConfigurationError, Errors::REJECT_PARAMS_ERROR
       end
 
       if options[:allow_only]&.any? { |param| !param.is_a? String }
-        raise ConfigurationError, "allow_only option must be an array of strings"
+        raise Errors::ConfigurationError, Errors::ALLOW_ONLY_ERROR
       end
 
       if options[:buffer_length] && !options[:buffer_length].is_a?(Integer)
-        raise ConfigurationError, "buffer_length must be an Integer"
+        raise Errors::ConfigurationError, Errors::BUFFER_LENGTH_ERROR
       end
 
       if options[:development] && !is_a_boolean?(options[:development])
-        raise ConfigurationError, "development option must be a boolean"
+        raise Errors::ConfigurationError, Errors::DEVELOPMENT_ERROR
       end
     end
 
     def is_a_boolean?(arg)
       arg == true || arg == false
     end
-  end
 
-  class ConfigurationError < StandardError; end
+    def user_info_invalid?(user_info)
+      user_info.nil? ||
+        user_info.values.any?(&:nil?) ||
+        USER_INFO_KEYS.sort != user_info.keys.sort
+    end
+  end
 end

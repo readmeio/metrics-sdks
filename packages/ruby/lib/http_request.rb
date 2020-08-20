@@ -37,6 +37,10 @@ class HttpRequest
     @request.content_type
   end
 
+  def form_data?
+    @request.form_data?
+  end
+
   def content_length
     @request.content_length.to_i
   end
@@ -55,6 +59,10 @@ class HttpRequest
     @request.body.rewind
 
     content
+  end
+
+  def parsed_form_data
+    @request.POST
   end
 
   private

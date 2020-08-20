@@ -93,6 +93,27 @@ RSpec.describe HttpRequest do
     end
   end
 
+  describe "#form_data?" do
+    it "is true for `application/x-www-form-urlencoded`" do
+      request = HttpRequest.new(
+        "CONTENT_TYPE" => "application/x-www-form-urlencoded"
+      )
+
+      expect(request).to be_form_data
+    end
+
+    it "is true for `multipart/form-data`" do
+      request = HttpRequest.new("CONTENT_TYPE" => "multipart/form-data")
+
+      expect(request).to be_form_data
+    end
+    it "is false for other MIME types" do
+      request = HttpRequest.new("CONTENT_TYPE" => "application/json")
+
+      expect(request).not_to be_form_data
+    end
+  end
+
   describe "#content_length" do
     it "gets the the value from the Rack CONTENT_LENGTH key" do
       request = HttpRequest.new("CONTENT_LENGTH" => "256")
@@ -141,6 +162,19 @@ RSpec.describe HttpRequest do
 
       expect(request.body).to eq "[BODY]"
       expect(request.body).to eq "[BODY]"
+    end
+  end
+
+  describe "#parsed_form_data" do
+    it "returns the parsed form-encoded body as a hash" do
+      env = {
+        "CONTENT_TYPE" => "application/x-www-form-urlencoded",
+        "rack.input" => Rack::Lint::InputWrapper.new(StringIO.new("first=1&second=2"))
+      }
+
+      request = HttpRequest.new(env)
+
+      expect(request.parsed_form_data).to eq({"first" => "1", "second" => "2"})
     end
   end
 end
