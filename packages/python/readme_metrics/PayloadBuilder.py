@@ -1,12 +1,12 @@
 import json
 import sys
 import time
+import pkg_resources
 from typing import List
 from urllib import parse
 
 import requests
 from readme_metrics import ResponseInfoWrapper
-from pip._vendor.requests import __version__
 from werkzeug import Request
 
 from readme_metrics.util import util_exclude_keys, util_filter_keys
@@ -58,15 +58,15 @@ class PayloadBuilder:
             dict: Payload object (ready to be serialized and sent to ReadMe)
         """
         payload = {
-            "group": self.grouping_function(request),
-            "clientIPAddress": request.remote_addr,
-            "development": self.development_mode,
-            "request": {
-                "log": {
-                    "creator": {
-                        "name": __name__,
-                        "version": __version__,
-                        "comment": sys.version,
+            'group': self.grouping_function(request),
+            'clientIPAddress': request.remote_addr,
+            'development': self.development_mode,
+            'request': {
+                'log': {
+                    'creator': {
+                        'name': __name__,
+                        'version': pkg_resources.require("readme_metrics")[0].version,
+                        'comment': sys.version
                     },
                     "entries": [
                         {

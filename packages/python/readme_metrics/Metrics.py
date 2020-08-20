@@ -2,9 +2,9 @@ import queue
 import threading
 import requests
 import json
+import pkg_resources
 
 from werkzeug import Request
-from pip._vendor.requests import __version__
 
 from readme_metrics import MetricsApiConfig, ResponseInfoWrapper
 from readme_metrics.PayloadBuilder import PayloadBuilder
@@ -58,12 +58,13 @@ class Metrics:
 
         payload = json.dumps(result_list)
 
+        version = pkg_resources.require("readme_metrics")[0].version
+
         readme_result = requests.post(
             self.METRICS_API + "/request",
             auth=(self.config.README_API_KEY, ""),
-            data=payload,
-            headers={
-                "Content-Type": "application/json",
-                "User-Agent": "readme-metrics-" + __version__,
-            },
-        )
+                                      data=payload,
+                                      headers={
+                                        'Content-Type': 'application/json',
+                                        'User-Agent': 'readme-metrics-python@' + version
+                                      })

@@ -28,12 +28,21 @@ module Readme
       def postData
         if @request.content_type.nil?
           nil
+        elsif @request.form_data?
+          {
+            params: form_encoded_body,
+            mimeType: @request.content_type
+          }
         else
           {
             text: request_body,
             mimeType: @request.content_type
           }
         end
+      end
+
+      def form_encoded_body
+        Har::Collection.new(@filter, @request.parsed_form_data).to_a
       end
 
       def request_body

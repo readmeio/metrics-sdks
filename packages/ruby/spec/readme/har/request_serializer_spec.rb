@@ -77,6 +77,22 @@ RSpec.describe Readme::Har::RequestSerializer do
 
       expect(json).not_to have_key(:postData)
     end
+
+    it "filters url-encoded body" do
+      http_request = build_http_request(
+        form_data?: true,
+        parsed_form_data: {"item" => "1", "other" => "2", "reject" => "3"}
+      )
+      serializer = Readme::Har::RequestSerializer.new(http_request, Filter.for(reject: ["reject"]))
+      json = serializer.as_json
+
+      expect(json[:postData]).not_to have_key(:text)
+      expect(json.dig(:postData, :mimeType)).to eq http_request.content_type
+      expect(json.dig(:postData, :params)).to match_array(
+        [{name: "item", value: "1"},
+          {name: "other", value: "2"}]
+      )
+    end
   end
 
   # if overriding `url` to have query parameters make sure to also override
@@ -88,6 +104,7 @@ RSpec.describe Readme::Har::RequestSerializer do
       request_method: "POST",
       http_version: "HTTP/1.1",
       content_length: 6,
+      form_data?: false,
       content_type: "application/json",
       cookies: {"cookie1" => "value1", "cookie2" => "value2"},
       headers: {"X-Custom" => "custom", "Authorization" => "Basic abc123"},

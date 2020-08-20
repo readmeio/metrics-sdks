@@ -23,7 +23,7 @@ RSpec.describe Readme::Metrics do
       expect(response_with_middleware).to eq response_without_middleware
     end
 
-    it "posts request urls to Readme API with a JSON body" do
+    it "submits to the Readme API for POST requests with a JSON body" do
       header "Content-Type", "application/json"
       post "/api/foo", {key: "value"}.to_json
 
@@ -31,8 +31,45 @@ RSpec.describe Readme::Metrics do
         .with { |request| validate_json("readmeMetrics", request.body) }
     end
 
-    it "posts request urls to Readme API without a body" do
+    it "submits to the Readme API for POST requests with a url encoded body" do
+      post "/api/foo", {key: "value"}
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) }
+    end
+
+    it "submits to the Readme API for POST requests with no body" do
       post "/api/foo"
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) }
+    end
+
+    it "submits to the Readme API for GET requests" do
+      get "/api/foo"
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) }
+    end
+
+    it "submits to the Readme API for PUT requests with a JSON body" do
+      header "Content-Type", "application/json"
+      put "/api/foo", {key: "value"}.to_json
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) }
+    end
+
+    it "submits to the Readme API for PATCH requests with a JSON body" do
+      header "Content-Type", "application/json"
+      patch "/api/foo", {key: "value"}.to_json
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) }
+    end
+
+    it "submits to the Readme API for DELETE requests" do
+      delete "/api/foo"
 
       expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
         .with { |request| validate_json("readmeMetrics", request.body) }
@@ -80,12 +117,40 @@ RSpec.describe Readme::Metrics do
     end
   end
 
+  describe "block validation" do
+    it "raises when the block is missing" do
+      options = {api_key: "key"}
+      expect {
+        Readme::Metrics.new(noop_app, options)
+      }.to raise_error(
+        Readme::Errors::ConfigurationError,
+        Readme::Errors::MISSING_BLOCK_ERROR
+      )
+    end
+
+    context "when the block returns a malformed hash" do
+      def app
+        options = {api_key: "API KEY"}
+        Readme::Metrics.new(noop_app, options) { |env| {} }
+      end
+
+      it "logs an error" do
+        expect { post "/api/foo" }
+          .to output(Readme::Errors.bad_block_message({}))
+          .to_stdout
+      end
+    end
+  end
+
   describe "option validation" do
     it "raises when the API key is missing" do
       options = {}
       expect {
         Readme::Metrics.new(noop_app, options)
-      }.to raise_error(Readme::ConfigurationError, "Missing API Key")
+      }.to raise_error(
+        Readme::Errors::ConfigurationError,
+        Readme::Errors::API_KEY_ERROR
+      )
     end
 
     it "raises when the reject_params contains a non-string element" do
@@ -93,8 +158,8 @@ RSpec.describe Readme::Metrics do
       expect {
         Readme::Metrics.new(noop_app, options)
       }.to raise_error(
-        Readme::ConfigurationError,
-        "reject_params option must be an array of strings"
+        Readme::Errors::ConfigurationError,
+        Readme::Errors::REJECT_PARAMS_ERROR
       )
     end
 
@@ -103,8 +168,8 @@ RSpec.describe Readme::Metrics do
       expect {
         Readme::Metrics.new(noop_app, options)
       }.to raise_error(
-        Readme::ConfigurationError,
-        "allow_only option must be an array of strings"
+        Readme::Errors::ConfigurationError,
+        Readme::Errors::ALLOW_ONLY_ERROR
       )
     end
 
@@ -113,8 +178,8 @@ RSpec.describe Readme::Metrics do
       expect {
         Readme::Metrics.new(noop_app, options)
       }.to raise_error(
-        Readme::ConfigurationError,
-        "buffer_length must be an Integer"
+        Readme::Errors::ConfigurationError,
+        Readme::Errors::BUFFER_LENGTH_ERROR
       )
     end
 
@@ -123,8 +188,8 @@ RSpec.describe Readme::Metrics do
       expect {
         Readme::Metrics.new(noop_app, options)
       }.to raise_error(
-        Readme::ConfigurationError,
-        "development option must be a boolean"
+        Readme::Errors::ConfigurationError,
+        Readme::Errors::DEVELOPMENT_ERROR
       )
     end
   end
