@@ -3,8 +3,9 @@ require_relative "lib/readme/metrics/version"
 Gem::Specification.new do |spec|
   spec.name = "readme-metrics"
   spec.version = Readme::Metrics::VERSION
-  spec.authors = ["Joël Quenneville"]
-  spec.email = ["joelq@thoughtbot.com"]
+  spec.authors = ["ReadMe"]
+  spec.email = ["support@readme.io"]
+  spec.license = "ISC"
 
   spec.summary = "SDK for Readme's metrics API"
   spec.description = "Middleware for logging requests to Readme's metrics API"
@@ -24,5 +25,5 @@ Gem::Specification.new do |spec|
   # spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency "httparty"
+  spec.add_runtime_dependency "httparty", "~> 0.18"
 end

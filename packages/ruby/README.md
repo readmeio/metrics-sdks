@@ -6,6 +6,10 @@ Track your API metrics within ReadMe.
 
 ## Installation
 
+Add it to your Gemfile
+
+`gem "readme-metrics"`
+
 ## Usage
 
 `Readme::Metrics` is a Rack middleware and is compatible with all Rack-based
@@ -82,3 +86,9 @@ Rack::Builder.new do |builder|
   builder.run your_app
 end
 ```
+
+## License
+
+[View our license here](https://github.com/readmeio/metrics-sdks/tree/master/packages/ruby/LICENSE)
+
+
