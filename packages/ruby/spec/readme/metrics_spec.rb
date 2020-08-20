@@ -31,6 +31,13 @@ RSpec.describe Readme::Metrics do
         .with { |request| validate_json("readmeMetrics", request.body) }
     end
 
+    it "submits to the Readme API for POST requests with a url encoded body" do
+      post "/api/foo", {key: "value"}
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) }
+    end
+
     it "submits to the Readme API for POST requests with no body" do
       post "/api/foo"
 
