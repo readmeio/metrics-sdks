@@ -4,6 +4,8 @@ require "readme/har/collection"
 module Readme
   module Har
     class ResponseSerializer
+      JSON_MIME_TYPES = ["application/json", "application/x-json", "text/json", "text/x-json", "+json"]
+
       def initialize(request, response, filter)
         @request = request
         @response = response
@@ -29,7 +31,7 @@ module Readme
       def content
         if response_body.nil?
           empty_content
-        elsif @response.content_type == "application/json"
+        elsif content_type_is_json?
           json_content
         else
           pass_through_content
@@ -43,7 +45,7 @@ module Readme
       def json_content
         parsed_body = JSON.parse(response_body)
 
-        {mimeType: "application/json",
+        {mimeType: @response.content_type,
          size: @response.content_length,
          text: Har::Collection.new(@filter, parsed_body).to_h.to_json}
       rescue
@@ -68,6 +70,10 @@ module Readme
         else
           @response.body.each.reduce(:+)
         end
+      end
+
+      def content_type_is_json?
+        JSON_MIME_TYPES.include? @response.content_type
       end
     end
   end
