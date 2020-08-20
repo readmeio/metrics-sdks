@@ -63,8 +63,9 @@ class Metrics:
         readme_result = requests.post(
             self.METRICS_API + "/request",
             auth=(self.config.README_API_KEY, ""),
-                                      data=payload,
-                                      headers={
-                                        'Content-Type': 'application/json',
-                                        'User-Agent': 'readme-metrics-python@' + version
-                                      })
+            data=payload,
+            headers={
+                "Content-Type": "application/json",
+                "User-Agent": "readme-metrics-python@" + version,
+            },
+        )

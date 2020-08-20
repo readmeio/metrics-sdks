@@ -58,15 +58,15 @@ class PayloadBuilder:
             dict: Payload object (ready to be serialized and sent to ReadMe)
         """
         payload = {
-            'group': self.grouping_function(request),
-            'clientIPAddress': request.remote_addr,
-            'development': self.development_mode,
-            'request': {
-                'log': {
-                    'creator': {
-                        'name': __name__,
-                        'version': pkg_resources.require("readme_metrics")[0].version,
-                        'comment': sys.version
+            "group": self.grouping_function(request),
+            "clientIPAddress": request.remote_addr,
+            "development": self.development_mode,
+            "request": {
+                "log": {
+                    "creator": {
+                        "name": __name__,
+                        "version": pkg_resources.require("readme_metrics")[0].version,
+                        "comment": sys.version,
                     },
                     "entries": [
                         {
