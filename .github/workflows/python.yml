@@ -25,3 +25,6 @@ jobs:
 
       - name: Check code standards
         run: pycodestyle --show-pep8 readme_metrics/ tests/
+
+      - name: Run tests
+        run: pytest
