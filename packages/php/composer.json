@@ -3,14 +3,9 @@
   "description": "Track your API metrics within ReadMe.",
   "homepage": "https://readme.com/metrics",
   "license": "ISC",
-  "authors": [
-    {
-      "name": "Jon Ursenbach",
-      "email": "jon@readme.io"
-    }
-  ],
   "support": {
     "docs": "https://docs.readme.com/docs/sending-api-logs-to-readme",
+    "email": "support@readme.io",
     "issues": "https://github.com/readmeio/metrics-sdks/issues",
     "source": "https://github.com/readmeio/metrics-sdks"
   },

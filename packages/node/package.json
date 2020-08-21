@@ -2,6 +2,20 @@
   "name": "readmeio",
   "description": "Track your API metrics within ReadMe.",
   "version": "3.1.2",
+  "license": "ISC",
+  "homepage": "https://readme.com/metrics",
+  "bugs": {
+    "email": "support@readme.io",
+    "url": "https://github.com/readmeio/metrics-sdks/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:readmeio/metrics-sdks.git"
+  },
+  "keywords": [
+    "api-metrics",
+    "readme"
+  ],
   "engines": {
     "node": ">=10"
   },
@@ -12,24 +26,6 @@
     "lodash": "^4.17.15",
     "node-fetch": "^2.6.0",
     "uuid": "^8.2.0"
-  },
-  "scripts": {
-    "lint": "eslint .",
-    "inspect": "jsinspect",
-    "pretest": "npm run lint && npm run inspect && npm run prettier",
-    "prettier": "prettier --list-different --write \"./**/**.js\"",
-    "release": "conventional-changelog -i CHANGELOG.md -s",
-    "test": "jest --coverage"
-  },
-  "publishConfig": {
-    "registry": "http://registry.npmjs.org"
-  },
-  "author": "Dom Harrington <dom@readme.io>",
-  "license": "ISC",
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:readmeio/metrics-sdks.git",
-    "directory": "packages/node"
   },
   "devDependencies": {
     "@readme/eslint-config": "^3.0.0",
@@ -44,6 +40,14 @@
     "prettier": "^2.0.1",
     "rimraf": "^3.0.2",
     "supertest": "^4.0.2"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "inspect": "jsinspect",
+    "pretest": "npm run lint && npm run inspect && npm run prettier",
+    "prettier": "prettier --list-different --write \"./**/**.js\"",
+    "release": "conventional-changelog -i CHANGELOG.md -s",
+    "test": "jest --coverage"
   },
   "jest": {
     "globalSetup": "<rootDir>/__tests__/jest.setup.js",
