@@ -5,15 +5,46 @@ require "webmock/rspec"
 RSpec.describe Readme::Metrics do
   include Rack::Test::Methods
 
-  before do
-    stub_request(:post, Readme::Metrics::ENDPOINT)
-  end
-
   it "has a version number" do
     expect(Readme::Metrics::VERSION).not_to be nil
   end
 
+  context "in a multi-threaded environment" do
+    it "doesn't wait for the HTTP request to Readme to finish" do
+      readme_request_completion_time = 1 # seconds
+      allow(HTTParty).to receive(:post) do
+        sleep readme_request_completion_time
+      end
+
+      start_time = Time.now
+      get "/api/foo"
+      completion_time = Time.now - start_time
+
+      expect(HTTParty).to have_received(:post).once
+      expect(completion_time).to be < readme_request_completion_time
+    end
+
+    def app
+      options = {api_key: "API_KEY", buffer_length: 1}
+      app = Readme::Metrics.new(noop_app, options) { |env|
+        {
+          id: env["CURRENT_USER"].id,
+          label: env["CURRENT_USER"].name,
+          email: env["CURRENT_USER"].email
+        }
+      }
+      app_with_http_version = SetHttpVersion.new(app)
+      app_with_current_user = SetCurrentUser.new(app_with_http_version)
+      app_with_current_user
+    end
+  end
+
   context "without batching" do
+    before do
+      stub_request(:post, Readme::Metrics::ENDPOINT)
+      allow(Thread).to receive(:new).and_yield
+    end
+
     it "doesn't modify the response" do
       post "/"
 
@@ -91,6 +122,11 @@ RSpec.describe Readme::Metrics do
   end
 
   context "with batching" do
+    before do
+      stub_request(:post, Readme::Metrics::ENDPOINT)
+      allow(Thread).to receive(:new).and_yield
+    end
+
     it "batches requests to the Readme API" do
       post "/api/foo"
       post "/api/bar"

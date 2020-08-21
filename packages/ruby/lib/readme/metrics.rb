@@ -48,7 +48,6 @@ module Readme
 
       if user_info_invalid?(user_info)
         Readme::Metrics.logger.error Errors.bad_block_message(user_info)
-        return [status, headers, body]
       else
         payload = Payload.new(har, user_info, development: @development)
         @@request_queue.push(payload.to_json)

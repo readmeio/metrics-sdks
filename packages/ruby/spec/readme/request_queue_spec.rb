@@ -2,6 +2,10 @@ require "readme/request_queue"
 require "webmock/rspec"
 
 RSpec.describe Readme::RequestQueue do
+  before do
+    allow(Thread).to receive(:new).and_yield
+  end
+
   describe "#push" do
     it "adds a value to the queue" do
       queue = Readme::RequestQueue.new("key", 10)

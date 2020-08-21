@@ -15,12 +15,14 @@ module Readme
 
       if ready_to_send?
         payloads = @queue.slice!(0, @buffer_length)
-        HTTParty.post(
-          Readme::Metrics::ENDPOINT,
-          basic_auth: {username: @api_key, password: ""},
-          headers: {"Content-Type" => "application/json"},
-          body: to_json(payloads)
-        )
+        Thread.new do
+          HTTParty.post(
+            Readme::Metrics::ENDPOINT,
+            basic_auth: {username: @api_key, password: ""},
+            headers: {"Content-Type" => "application/json"},
+            body: to_json(payloads)
+          )
+        end
       end
     end
 
