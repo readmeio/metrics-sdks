@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any, Callable
 
 
 class MetricsApiConfig:
@@ -29,25 +29,30 @@ class MetricsApiConfig:
         If you configure a blacklist, it will override any whitelist configuration.
     WHITELIST: List[str]
         (optional) An array of headers and JSON body properties to send to ReadMe.
+    ALLOWED_HTTP_HOSTS: List[str]
+        (optional) A list of allowed http hosts for sending data to the ReadMe API.
 
         If this option is configured, ONLY the whitelisted properties will be sent.
     """
     README_API_KEY: str = None
     BUFFER_LENGTH: int = 10
-    GROUPING_FUNCTION = lambda req: None
+    GROUPING_FUNCTION: Callable[[Any], None] = lambda req: None
     IS_DEVELOPMENT_MODE: bool = False
     IS_BACKGROUND_MODE: bool = True
     BLACKLIST: List[str] = []
     WHITELIST: List[str] = []
+    ALLOWED_HTTP_HOSTS: List[str] = []
 
-    def __init__(self,
+    def __init__(
+            self,
             api_key: str,
             grouping_function,
-            buffer_length:int = 10,
-            development_mode:bool = False,
-            background_worker_mode:bool = True,
-            blacklist:List[str] = None,
-            whitelist:List[str] = None):
+            buffer_length: int = 10,
+            development_mode: bool = False,
+            background_worker_mode: bool = True,
+            blacklist: List[str] = None,
+            whitelist: List[str] = None,
+            allowed_http_hosts: List[str] = None):
         """
         Initializes an instance of the MetricsApiConfig object, with defaults set where possible.
         :param api_key: (required) Your ReadMe API key
@@ -66,8 +71,9 @@ class MetricsApiConfig:
             If you configure a blacklist, it will override any whitelist configuration.
         :param whitelist: (optional)
             An array of headers and JSON body properties to send to ReadMe.
-
             If this option is configured, ONLY the whitelisted properties will be sent.
+        :param allowed_http_hosts: (optional)
+            A list of allowed http hosts for sending data to the ReadMe API.
         """
 
         self.README_API_KEY = api_key
@@ -77,3 +83,4 @@ class MetricsApiConfig:
         self.IS_BACKGROUND_MODE = background_worker_mode
         self.BLACKLIST = blacklist or []
         self.WHITELIST = whitelist or []
+        self.ALLOWED_HTTP_HOSTS = allowed_http_hosts
