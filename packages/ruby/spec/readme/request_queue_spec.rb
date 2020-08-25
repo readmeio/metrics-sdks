@@ -12,7 +12,7 @@ RSpec.describe Readme::RequestQueue do
       queue.push("value")
       queue.push("other_value")
 
-      expect(queue.queue).to eq ["value", "other_value"]
+      expect(queue.length).to eq 2
     end
 
     it "does not send a request until the queue is long enough" do
@@ -44,7 +44,7 @@ RSpec.describe Readme::RequestQueue do
         queue.push("other_value")
         queue.push("leftover")
 
-        expect(queue.queue).to eq ["leftover"]
+        expect(queue.length).to eq 1
       end
     end
   end
