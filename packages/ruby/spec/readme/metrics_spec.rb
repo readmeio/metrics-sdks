@@ -25,17 +25,7 @@ RSpec.describe Readme::Metrics do
     end
 
     def app
-      options = {api_key: "API_KEY", buffer_length: 1}
-      app = Readme::Metrics.new(noop_app, options) { |env|
-        {
-          id: env["CURRENT_USER"].id,
-          label: env["CURRENT_USER"].name,
-          email: env["CURRENT_USER"].email
-        }
-      }
-      app_with_http_version = SetHttpVersion.new(app)
-      app_with_current_user = SetCurrentUser.new(app_with_http_version)
-      app_with_current_user
+      app_with_middleware(buffer_length: 1)
     end
   end
 
@@ -146,17 +136,7 @@ RSpec.describe Readme::Metrics do
     end
 
     def app
-      options = {api_key: "API KEY", development: true, buffer_length: 1}
-      app = Readme::Metrics.new(noop_app, options) { |env|
-        {
-          id: env["CURRENT_USER"].id,
-          label: env["CURRENT_USER"].name,
-          email: env["CURRENT_USER"].email
-        }
-      }
-      app_with_http_version = SetHttpVersion.new(app)
-      app_with_current_user = SetCurrentUser.new(app_with_http_version)
-      app_with_current_user
+      app_with_middleware(buffer_length: 1)
     end
   end
 
@@ -178,17 +158,7 @@ RSpec.describe Readme::Metrics do
     end
 
     def app
-      options = {api_key: "API KEY", development: true, buffer_length: 2}
-      app = Readme::Metrics.new(noop_app, options) { |env|
-        {
-          id: env["CURRENT_USER"].id,
-          label: env["CURRENT_USER"].name,
-          email: env["CURRENT_USER"].email
-        }
-      }
-      app_with_http_version = SetHttpVersion.new(app)
-      app_with_current_user = SetCurrentUser.new(app_with_http_version)
-      app_with_current_user
+      app_with_middleware(buffer_length: 2)
     end
   end
 
@@ -279,8 +249,25 @@ RSpec.describe Readme::Metrics do
     end
   end
 
+  def app_with_middleware(overrides = {})
+    defaults = {api_key: "API KEY", buffer_length: 1}
+    app = Readme::Metrics.new(noop_app, defaults.merge(overrides)) { |env|
+      {
+        id: env["CURRENT_USER"].id,
+        label: env["CURRENT_USER"].name,
+        email: env["CURRENT_USER"].email
+      }
+    }
+
+    SetCurrentUser.new(SetHttpVersion.new(app))
+  end
+
   def noop_app
-    lambda do |env|
+    NoopApp.new
+  end
+
+  class NoopApp
+    def call(env)
       [200, {"Content-Type" => "text/plain", "Content-Length" => "2"}, ["OK"]]
     end
   end
