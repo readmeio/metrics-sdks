@@ -106,6 +106,38 @@ RSpec.describe Readme::Metrics do
         .with { |request| validate_json("readmeMetrics", request.body) }
     end
 
+    it "returns a response when the middleware raises an error" do
+      allow_any_instance_of(Readme::Metrics).to receive(:process_response).and_raise
+
+      post "/api/foo"
+
+      expect(last_response.status).to eq 200
+    end
+
+    it "returns a response when the Payload raises an error" do
+      allow(Readme::Payload).to receive(:new).and_raise
+
+      post "/api/foo"
+
+      expect(last_response.status).to eq 200
+    end
+
+    it "returns a response when the Har::Serializer raises an error" do
+      allow(Readme::Har::Serializer).to receive(:new).and_raise
+
+      post "/api/foo"
+
+      expect(last_response.status).to eq 200
+    end
+
+    it "returns a response when the RequestQueue raises an error" do
+      allow_any_instance_of(Readme::RequestQueue).to receive(:push).and_raise
+
+      post "/api/foo"
+
+      expect(last_response.status).to eq 200
+    end
+
     def app
       options = {api_key: "API KEY", development: true, buffer_length: 1}
       app = Readme::Metrics.new(noop_app, options) { |env|

@@ -39,11 +39,26 @@ module Readme
       start_time = Time.now
       status, headers, body = @app.call(env)
       end_time = Time.now
-
       response = Rack::Response.new(body, status, headers)
 
-      har = Har::Serializer.new(env, response, start_time, end_time, @filter)
+      begin
+        process_response(
+          response: response,
+          env: env,
+          start_time: start_time,
+          end_time: end_time
+        )
+      rescue
+        [status, headers, body]
+      end
 
+      [status, headers, body]
+    end
+
+    private
+
+    def process_response(response:, env:, start_time:, end_time:)
+      har = Har::Serializer.new(env, response, start_time, end_time, @filter)
       user_info = @get_user_info.call(env)
 
       if user_info_invalid?(user_info)
@@ -52,11 +67,7 @@ module Readme
         payload = Payload.new(har, user_info, development: @development)
         @@request_queue.push(payload.to_json)
       end
-
-      [status, headers, body]
     end
-
-    private
 
     def validate_options(options)
       raise Errors::ConfigurationError, Errors::API_KEY_ERROR if options[:api_key].nil?
