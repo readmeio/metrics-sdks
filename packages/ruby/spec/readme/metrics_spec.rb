@@ -138,6 +138,13 @@ RSpec.describe Readme::Metrics do
       expect(last_response.status).to eq 200
     end
 
+    it "doesn't send a request to Readme with an OPTIONS request" do
+      options "api/foo"
+
+      expect(WebMock).to_not have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 200
+    end
+
     def app
       options = {api_key: "API KEY", development: true, buffer_length: 1}
       app = Readme::Metrics.new(noop_app, options) { |env|

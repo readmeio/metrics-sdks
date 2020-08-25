@@ -177,4 +177,22 @@ RSpec.describe HttpRequest do
       expect(request.parsed_form_data).to eq({"first" => "1", "second" => "2"})
     end
   end
+
+  describe "#options" do
+    it "returns true for an OPTIONS request" do
+      env = {"REQUEST_METHOD" => "OPTIONS"}
+
+      request = HttpRequest.new(env)
+
+      expect(request).to be_options
+    end
+
+    it "returns false for non-OPTIONS requests" do
+      env = {"REQUEST_METHOD" => "POST"}
+
+      request = HttpRequest.new(env)
+
+      expect(request).to_not be_options
+    end
+  end
 end

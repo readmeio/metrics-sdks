@@ -45,6 +45,10 @@ class HttpRequest
     @request.content_length.to_i
   end
 
+  def options?
+    @request.request_method == "OPTIONS"
+  end
+
   def headers
     @request
       .each_header

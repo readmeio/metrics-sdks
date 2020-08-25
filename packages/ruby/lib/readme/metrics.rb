@@ -4,6 +4,7 @@ require "readme/filter"
 require "readme/payload"
 require "readme/request_queue"
 require "readme/errors"
+require "http_request"
 require "httparty"
 require "logger"
 
@@ -58,11 +59,14 @@ module Readme
     private
 
     def process_response(response:, env:, start_time:, end_time:)
-      har = Har::Serializer.new(env, response, start_time, end_time, @filter)
+      request = HttpRequest.new(env)
+      har = Har::Serializer.new(request, response, start_time, end_time, @filter)
       user_info = @get_user_info.call(env)
 
       if user_info_invalid?(user_info)
         Readme::Metrics.logger.error Errors.bad_block_message(user_info)
+      elsif request.options?
+        Readme::Metrics.logger.info "OPTIONS request omitted from ReadMe API logging"
       else
         payload = Payload.new(har, user_info, development: @development)
         @@request_queue.push(payload.to_json)

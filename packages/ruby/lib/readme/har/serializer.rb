@@ -1,5 +1,4 @@
 require "rack"
-require "http_request"
 require "readme/metrics"
 require "readme/har/request_serializer"
 require "readme/har/response_serializer"
@@ -10,8 +9,8 @@ module Readme
     class Serializer
       HAR_VERSION = "1.2"
 
-      def initialize(env, response, start_time, end_time, filter)
-        @http_request = HttpRequest.new(env)
+      def initialize(request, response, start_time, end_time, filter)
+        @http_request = request
         @response = response
         @start_time = start_time
         @end_time = end_time
