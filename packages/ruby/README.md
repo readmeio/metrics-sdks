@@ -47,7 +47,7 @@ You may only specify either `reject_params` or `allow_only` keys, not both.
 ### Rails
 
 ```ruby
-# application.rb
+# config/environments/development.rb or config/environments/production.rb
 require "readme/metrics"
 
 options = {
@@ -100,5 +100,3 @@ end
 ## License
 
 [View our license here](https://github.com/readmeio/metrics-sdks/tree/master/packages/ruby/LICENSE)
-
-

@@ -18,8 +18,7 @@ RSpec.describe Readme::Har::ResponseSerializer do
       response = build_response(
         status: 200,
         headers: {"X-Custom" => "custom", "reject" => "reject"},
-        location: nil,
-        body: StringIO.new("OK")
+        location: nil
       )
 
       serializer = Readme::Har::ResponseSerializer.new(
@@ -55,7 +54,7 @@ RSpec.describe Readme::Har::ResponseSerializer do
       response = build_response(
         content_type: "application/json",
         json?: true,
-        body: StringIO.new({reject: "reject", keep: "keep"}.to_json)
+        body: {reject: "reject", keep: "keep"}.to_json
       )
 
       serializer = Readme::Har::ResponseSerializer.new(
@@ -75,7 +74,7 @@ RSpec.describe Readme::Har::ResponseSerializer do
       response = build_response(
         content_type: "application/json",
         json?: true,
-        body: StringIO.new("NOT JSON")
+        body: "NOT JSON"
       )
 
       serializer = Readme::Har::ResponseSerializer.new(
@@ -92,7 +91,7 @@ RSpec.describe Readme::Har::ResponseSerializer do
 
     it "handles responses without a body" do
       request = build_request
-      response = build_response(status: 204, content_type: nil, body: nil)
+      response = build_response(status: 204, content_type: nil, body: "")
 
       serializer = Readme::Har::ResponseSerializer.new(
         request,
@@ -123,7 +122,7 @@ RSpec.describe Readme::Har::ResponseSerializer do
       json?: false,
       content_length: 2,
       location: nil,
-      body: StringIO.new("OK")
+      body: "OK"
     }
 
     double(:response, defaults.merge(overrides))

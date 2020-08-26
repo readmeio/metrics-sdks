@@ -27,7 +27,7 @@ module Readme
       private
 
       def content
-        if response_body.nil?
+        if @response.body.empty?
           empty_content
         elsif @response.json?
           json_content
@@ -41,33 +41,23 @@ module Readme
       end
 
       def json_content
-        parsed_body = JSON.parse(response_body)
+        parsed_body = JSON.parse(@response.body)
 
-        {mimeType: @response.content_type,
-         size: @response.content_length,
-         text: Har::Collection.new(@filter, parsed_body).to_h.to_json}
+        {
+          mimeType: @response.content_type,
+          size: @response.content_length,
+          text: Har::Collection.new(@filter, parsed_body).to_h.to_json
+        }
       rescue
         pass_through_content
       end
 
       def pass_through_content
-        {mimeType: @response.content_type,
-         size: @response.content_length,
-         text: response_body}
-      end
-
-      def response_body
-        if @response.body.nil?
-          nil
-        elsif @response.body.respond_to?(:rewind)
-          @response.body.rewind
-          body = @response.body.each.reduce(:+)
-          @response.body.rewind
-
-          body
-        else
-          @response.body.each.reduce(:+)
-        end
+        {
+          mimeType: @response.content_type,
+          size: @response.content_length,
+          text: @response.body
+        }
       end
     end
   end

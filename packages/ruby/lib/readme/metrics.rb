@@ -41,9 +41,9 @@ module Readme
       start_time = Time.now
       status, headers, body = @app.call(env)
       end_time = Time.now
-      response = HttpResponse.from_parts(status, headers, body)
 
       begin
+        response = HttpResponse.from_parts(status, headers, body)
         process_response(
           response: response,
           env: env,
