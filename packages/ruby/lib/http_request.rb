@@ -1,7 +1,10 @@
 require "rack"
 require "rack/request"
+require "content_type_helper"
 
 class HttpRequest
+  include ContentTypeHelper
+
   HTTP_NON_HEADERS = [
     Rack::HTTP_COOKIE,
     Rack::HTTP_VERSION,

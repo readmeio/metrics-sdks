@@ -19,6 +19,10 @@ class Filter
     def filter(hash)
       hash.select { |key, _value| @filter_values.include?(key) }
     end
+
+    def pass_through?
+      false
+    end
   end
 
   class RejectParams
@@ -29,11 +33,19 @@ class Filter
     def filter(hash)
       hash.reject { |key, _value| @filter_values.include?(key) }
     end
+
+    def pass_through?
+      false
+    end
   end
 
   class None
     def filter(hash)
       hash
+    end
+
+    def pass_through?
+      true
     end
   end
 

@@ -4,8 +4,6 @@ require "readme/har/collection"
 module Readme
   module Har
     class ResponseSerializer
-      JSON_MIME_TYPES = ["application/json", "application/x-json", "text/json", "text/x-json", "+json"]
-
       def initialize(request, response, filter)
         @request = request
         @response = response
@@ -31,7 +29,7 @@ module Readme
       def content
         if response_body.nil?
           empty_content
-        elsif content_type_is_json?
+        elsif @response.json?
           json_content
         else
           pass_through_content
@@ -70,10 +68,6 @@ module Readme
         else
           @response.body.each.reduce(:+)
         end
-      end
-
-      def content_type_is_json?
-        JSON_MIME_TYPES.include? @response.content_type
       end
     end
   end

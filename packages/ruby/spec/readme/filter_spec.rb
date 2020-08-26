@@ -34,6 +34,14 @@ RSpec.describe Filter::RejectParams do
       expect(result.keys).to eq ["keep"]
     end
   end
+
+  describe "#pass_through?" do
+    it "is false" do
+      filter = Filter::RejectParams.new([])
+
+      expect(filter).not_to be_pass_through
+    end
+  end
 end
 
 RSpec.describe Filter::AllowOnly do
@@ -45,6 +53,14 @@ RSpec.describe Filter::AllowOnly do
       expect(result.keys).to eq ["keep"]
     end
   end
+
+  describe "#pass_through?" do
+    it "is false" do
+      filter = Filter::AllowOnly.new([])
+
+      expect(filter).not_to be_pass_through
+    end
+  end
 end
 
 RSpec.describe Filter::None do
@@ -54,6 +70,14 @@ RSpec.describe Filter::None do
       result = Filter::None.new.filter(hash)
 
       expect(result.keys).to match_array ["keep", "reject"]
+    end
+  end
+
+  describe "#pass_through?" do
+    it "is true" do
+      filter = Filter::None.new
+
+      expect(filter).to be_pass_through
     end
   end
 end

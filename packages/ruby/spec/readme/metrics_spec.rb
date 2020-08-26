@@ -25,7 +25,7 @@ RSpec.describe Readme::Metrics do
     end
 
     def app
-      app_with_middleware(buffer_length: 1)
+      json_app_with_middleware(buffer_length: 1)
     end
   end
 
@@ -136,7 +136,90 @@ RSpec.describe Readme::Metrics do
     end
 
     def app
-      app_with_middleware(buffer_length: 1)
+      json_app_with_middleware(buffer_length: 1)
+    end
+  end
+
+  describe "unsupported request bodies" do
+    before do
+      stub_request(:post, Readme::Metrics::ENDPOINT)
+      allow(Thread).to receive(:new).and_yield
+    end
+
+    it "is not submitted to Readme with a reject configured" do
+      def app
+        json_app_with_middleware(buffer_length: 1, reject_params: ["reject"])
+      end
+
+      header "Content-Type", "text/plain"
+      post "/api/foo", "[BODY]"
+
+      expect(WebMock).to_not have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 200
+    end
+
+    it "is not submitted to Readme with allow-only configured" do
+      def app
+        json_app_with_middleware(buffer_length: 1, allow_only: ["allowed"])
+      end
+
+      header "Content-Type", "text/plain"
+      post "/api/foo", "[BODY]"
+
+      expect(WebMock).to_not have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 200
+    end
+
+    it "is submitted to Readme with no filter configured" do
+      def app
+        json_app_with_middleware(buffer_length: 1)
+      end
+
+      header "Content-Type", "text/plain"
+      post "/api/foo", "[BODY]"
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 200
+    end
+  end
+
+  describe "unsupported response bodies" do
+    before do
+      stub_request(:post, Readme::Metrics::ENDPOINT)
+      allow(Thread).to receive(:new).and_yield
+    end
+
+    it "is submitted to Readme with no filter configured" do
+      def app
+        text_app_with_middleware(buffer_length: 1)
+      end
+
+      post "/api/foo"
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 200
+    end
+
+    it "is not submitted to Readme with an allow-only configured" do
+      def app
+        text_app_with_middleware(buffer_length: 1, allow_only: ["allowed"])
+      end
+
+      post "/api/foo"
+
+      expect(WebMock).not_to have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 200
+    end
+
+    it "is not submitted to Readme with  reject_params configured" do
+      def app
+        text_app_with_middleware(buffer_length: 1, reject_params: ["reject"])
+      end
+
+      post "/api/foo"
+
+      expect(WebMock).not_to have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 200
     end
   end
 
@@ -158,7 +241,7 @@ RSpec.describe Readme::Metrics do
     end
 
     def app
-      app_with_middleware(buffer_length: 2)
+      json_app_with_middleware(buffer_length: 2)
     end
   end
 
@@ -249,9 +332,17 @@ RSpec.describe Readme::Metrics do
     end
   end
 
-  def app_with_middleware(overrides = {})
+  def json_app_with_middleware(overrides = {})
+    app_with_middleware(JsonApp.new, overrides)
+  end
+
+  def text_app_with_middleware(overrides = {})
+    app_with_middleware(TextApp.new, overrides)
+  end
+
+  def app_with_middleware(app, overrides = {})
     defaults = {api_key: "API KEY", buffer_length: 1}
-    app = Readme::Metrics.new(noop_app, defaults.merge(overrides)) { |env|
+    with_metrics = Readme::Metrics.new(app, defaults.merge(overrides)) { |env|
       {
         id: env["CURRENT_USER"].id,
         label: env["CURRENT_USER"].name,
@@ -259,14 +350,24 @@ RSpec.describe Readme::Metrics do
       }
     }
 
-    SetCurrentUser.new(SetHttpVersion.new(app))
+    SetCurrentUser.new(SetHttpVersion.new(with_metrics))
   end
 
   def noop_app
-    NoopApp.new
+    JsonApp.new
   end
 
-  class NoopApp
+  class JsonApp
+    def call(env)
+      [
+        200,
+        {"Content-Type" => "application/json", "Content-Length" => "15"},
+        [{key: "value"}.to_json]
+      ]
+    end
+  end
+
+  class TextApp
     def call(env)
       [200, {"Content-Type" => "text/plain", "Content-Length" => "2"}, ["OK"]]
     end
