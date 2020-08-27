@@ -58,13 +58,21 @@ options = {
 }
 
 config.middleware.use Readme::Metrics, options do |env|
-  current_user = env['warden'].authenticate(scope: :current_user)
+  current_user = env['warden'].authenticate
 
-  {
-    id: current_user.id
-    label: current_user.full_name,
-    email: current_user.email
-  }
+  if current_user.present?
+    {
+      id: current_user.id,
+      label: current_user.name,
+      email: current_user.email
+    }
+  else
+    {
+      id: "guest",
+      label: "Guest User",
+      email: "guest@example.com"
+    }
+  end
 end
 ```
 
