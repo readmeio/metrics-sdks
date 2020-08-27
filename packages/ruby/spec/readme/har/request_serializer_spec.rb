@@ -93,6 +93,26 @@ RSpec.describe Readme::Har::RequestSerializer do
           {name: "other", value: "2"}]
       )
     end
+
+    context "when the content type is wrong" do
+      it "does a pass-through if no filter is set" do
+        http_request = build_http_request(json?: true, body: "not json")
+        filter = double(:filter, pass_through?: true, filter: [])
+        serializer = Readme::Har::RequestSerializer.new(http_request, filter)
+
+        json = serializer.as_json
+
+        expect(json.dig(:postData, :text)).to eq http_request.body
+      end
+
+      it "raises if there is a filter set" do
+        http_request = build_http_request(json?: true, body: "not json")
+        filter = double(:filter, pass_through?: false, filter: [])
+        serializer = Readme::Har::RequestSerializer.new(http_request, filter)
+
+        expect { serializer.as_json }.to raise_error(JSON::ParserError)
+      end
+    end
   end
 
   # if overriding `url` to have query parameters make sure to also override
