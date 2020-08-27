@@ -9,6 +9,11 @@ RSpec.describe ContentTypeHelper do
       end
     end
 
+    it "is true when the content_type has the charset appended" do
+      request = FakeRequest.new("application/json; charset=utf-8")
+      expect(request).to be_json
+    end
+
     it "is false for non-json types" do
       request = FakeRequest.new("text/plain")
 
