@@ -1,4 +1,4 @@
-# readmeio
+# readme-metrics
 
 Track your API metrics within ReadMe.
 
