@@ -13,14 +13,13 @@ jobs:
       fail-fast: true
       matrix:
         php: [7.2, 7.3, 7.4]
-        guzzle: [6.*, 7.*]
         laravel: [6.*, 7.*]
         dependency-version: [prefer-lowest, prefer-stable]
         include:
           - laravel: 7.*
           - laravel: 6.*
 
-    name: build (${{ matrix.php }} w/ Laravel ${{ matrix.laravel }} and Guzzle ${{ matrix.guzzle }} @${{ matrix.dependency-version }})
+    name: build (${{ matrix.php }} w/ Laravel ${{ matrix.laravel }}  @${{ matrix.dependency-version }})
 
     steps:
       - uses: actions/checkout@v2.3.1
@@ -29,7 +28,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.composer/cache/files
-          key: dependencies-laravel-${{ matrix.laravel }}-guzzle-${{ matrix.guzzle }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
+          key: dependencies-laravel-${{ matrix.laravel }}--php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -39,7 +38,6 @@ jobs:
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
-          composer require "guzzlehttp/guzzle:${{ matrix.guzzle }}" --no-interaction --no-update
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
 
       - name: Check code standards

@@ -17,10 +17,10 @@
     "php": "^7.2",
     "illuminate/http": "^6.8 | ^7.0",
     "illuminate/support": "^6.8 | ^7.0",
-    "guzzlehttp/guzzle": "^6.4 | ^7.0",
     "ocramius/package-versions": "^1.4",
     "ramsey/uuid": "^3.7 | ^4.0",
-    "composer/composer": "^1.10"
+    "composer/composer": "^1.10",
+    "guzzlehttp/guzzle": "^7.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^8.5",
