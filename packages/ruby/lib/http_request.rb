@@ -58,6 +58,7 @@ class HttpRequest
       .select { |key, _| http_header?(key) }
       .to_h
       .transform_keys { |header| normalize_header_name(header) }
+      .merge unprefixed_headers
   end
 
   def body
@@ -87,5 +88,12 @@ class HttpRequest
   # `"HTTP_CONTENT_TYPE" => "application/json"`.
   def normalize_header_name(header)
     header.delete_prefix("HTTP_").split("_").map(&:capitalize).join("-")
+  end
+
+  # These special headers are explicitly _not_ prefixed with HTTP_ in the Rack
+  # env so we need to add them in manually
+  def unprefixed_headers
+    {"Content-Type" => @request.content_type,
+     "Content-Length" => @request.content_length}.compact
   end
 end

@@ -129,18 +129,25 @@ RSpec.describe HttpRequest do
   end
 
   describe "#headers" do
-    it "is the normalized Rack HTTP_ keys minus a few non-header ones" do
+    it "is the normalized Rack HTTP_ keys minus a few non-header ones plus content type and length" do
       env = {
         "HTTP_COOKIE" => "cookie1=value1; cookie2=value2",
         "HTTP_VERSION" => "HTTP/1.1",
         "HTTP_X_CUSTOM" => "custom",
         "HTTP_ACCEPT" => "text/plain",
         "HTTP_PORT" => "8080",
-        "HTTP_HOST" => "example.com"
+        "HTTP_HOST" => "example.com",
+        "CONTENT_TYPE" => "application/json",
+        "CONTENT_LENGTH" => "10"
       }
       request = HttpRequest.new(env)
 
-      expect(request.headers).to eq({"X-Custom" => "custom", "Accept" => "text/plain"})
+      expect(request.headers).to eq(
+        {"X-Custom" => "custom",
+         "Accept" => "text/plain",
+         "Content-Type" => "application/json",
+         "Content-Length" => "10"}
+      )
     end
   end
 
