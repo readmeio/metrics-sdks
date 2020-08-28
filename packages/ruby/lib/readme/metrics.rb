@@ -86,11 +86,11 @@ module Readme
     end
 
     def parseable_response?(response)
-      response.json?
+      response.body.empty? || response.json?
     end
 
     def parseable_request?(request)
-      request.json? || request.form_data?
+      request.body.empty? || request.json? || request.form_data?
     end
 
     def validate_options(options)

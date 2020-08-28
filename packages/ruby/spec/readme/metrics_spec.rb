@@ -181,6 +181,28 @@ RSpec.describe Readme::Metrics do
       expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
       expect(last_response.status).to eq 200
     end
+
+    it "is submitted to Readme when the body is empty with allow-only configured" do
+      def app
+        json_app_with_middleware(buffer_length: 1, allow_only: ["allowed"])
+      end
+
+      get "/api/foo"
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 200
+    end
+
+    it "is submitted to Readme when the body is empty with reject_params configured" do
+      def app
+        json_app_with_middleware(buffer_length: 1, reject_params: ["reject"])
+      end
+
+      get "/api/foo"
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 200
+    end
   end
 
   describe "unsupported response bodies" do
@@ -220,6 +242,28 @@ RSpec.describe Readme::Metrics do
 
       expect(WebMock).not_to have_requested(:post, Readme::Metrics::ENDPOINT)
       expect(last_response.status).to eq 200
+    end
+
+    it "is submitted to Readme with  reject_params configured for empty bodies" do
+      def app
+        empty_app_with_middleware(buffer_length: 1, reject_params: ["reject"])
+      end
+
+      post "/api/foo"
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 204
+    end
+
+    it "is submitted to Readme with  allow_only configured for empty bodies" do
+      def app
+        empty_app_with_middleware(buffer_length: 1, allow_only: ["allowed"])
+      end
+
+      post "/api/foo"
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 204
     end
   end
 
@@ -340,6 +384,10 @@ RSpec.describe Readme::Metrics do
     app_with_middleware(TextApp.new, overrides)
   end
 
+  def empty_app_with_middleware(overrides = {})
+    app_with_middleware(EmptyApp.new, overrides)
+  end
+
   def app_with_middleware(app, overrides = {})
     defaults = {api_key: "API KEY", buffer_length: 1}
     with_metrics = Readme::Metrics.new(app, defaults.merge(overrides)) { |env|
@@ -370,6 +418,12 @@ RSpec.describe Readme::Metrics do
   class TextApp
     def call(env)
       [200, {"Content-Type" => "text/plain", "Content-Length" => "2"}, ["OK"]]
+    end
+  end
+
+  class EmptyApp
+    def call(env)
+      [204, {}, []]
     end
   end
 
