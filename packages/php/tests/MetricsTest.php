@@ -244,7 +244,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         // Exceptions **should** be thrown under development mode!
         if ($development_mode) {
             $this->expectException(ServerException::class);
-            $this->expectExceptionMessageMatches('/(500 Internal Server Error)/');
+            $this->expectExceptionMessageMatches('/500 Internal Server Error/');
         }
 
         $handlers = $this->getMockHandlers(
@@ -703,7 +703,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     public function testProjectBaseUrlFailsInDevelopmentModeIfItCantTalkToReadMe(): void
     {
         $this->expectException(MetricsException::class);
-        $this->expectExceptionMessageMatches('/(500 Internal Server Error)/');
+        $this->expectExceptionMessageMatches('/500 Internal Server Error/');
 
         $handlers = $this->getMockHandlers(
             new \GuzzleHttp\Psr7\Response(200),
