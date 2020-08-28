@@ -703,7 +703,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     public function testProjectBaseUrlFailsInDevelopmentModeIfItCantTalkToReadMe(): void
     {
         $this->expectException(MetricsException::class);
-        $this->expectExceptionMessageMatches('/500 Internal Server Error/');
+        $this->expectExceptionMessageMatches('/(Server error: 500|500 Internal Server Error)/');
 
         $handlers = $this->getMockHandlers(
             new \GuzzleHttp\Psr7\Response(200),
