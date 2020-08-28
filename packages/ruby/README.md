@@ -76,25 +76,25 @@ config.middleware.use Readme::Metrics, options do |env|
 end
 ```
 
-### Rack::Builder
+### Rack
 
 ```ruby
-Rack::Builder.new do |builder|
-  options = {
-    api_key: "YOUR_API_KEY",
-    development: false,
-    reject_params: ["not_included", "dont_send"]
-  }
+# config.ru
+options = {
+  api_key: "YOUR_API_KEY",
+  development: false,
+  reject_params: ["not_included", "dont_send"]
+}
 
-  builder.use Readme::Metrics, options do |env|
+use Readme::Metrics, options do |env|
     {
       id: "my_application_id"
       label: "My Application",
       email: "my.application@example.com"
     }
-  end
-  builder.run your_app
 end
+
+run YourApp.new
 ```
 
 ### Sample Applications
