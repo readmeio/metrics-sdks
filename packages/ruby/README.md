@@ -97,6 +97,12 @@ Rack::Builder.new do |builder|
 end
 ```
 
+### Sample Applications
+
+- [Rails](https://github.com/readmeio/metrics-sdk-rails-sample)
+- [Rack](https://github.com/readmeio/metrics-sdk-racks-sample)
+- [Sinatra](https://github.com/readmeio/metrics-sdk-sinatra-example)
+
 ## License
 
 [View our license here](https://github.com/readmeio/metrics-sdks/tree/master/packages/ruby/LICENSE)
