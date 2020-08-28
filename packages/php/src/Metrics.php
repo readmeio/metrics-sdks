@@ -102,6 +102,7 @@ class Metrics
             'timeout' => $curl_timeout,
         ]);
 
+        /** @psalm-suppress DeprecatedClass */
         $this->package_version = Versions::getVersion(self::PACKAGE_NAME);
         $this->cache_dir = Factory::createConfig()->get('cache-dir');
 
