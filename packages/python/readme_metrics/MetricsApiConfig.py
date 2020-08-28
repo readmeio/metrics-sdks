@@ -2,7 +2,7 @@ from typing import List
 
 
 class MetricsApiConfig:
-    """ ReadMe Metrics API configuration object
+    """ReadMe Metrics API configuration object
 
     Attributes:
         README_API_KEY (str): (required) Your ReadMe API key
