@@ -244,7 +244,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         // Exceptions **should** be thrown under development mode!
         if ($development_mode) {
             $this->expectException(ServerException::class);
-            $this->expectExceptionMessageMatches('/500 Internal Server Error/');
+            $this->expectExceptionMessageMatches('/(Server error: 500|500 Internal Server Error)/');
         }
 
         $handlers = $this->getMockHandlers(
