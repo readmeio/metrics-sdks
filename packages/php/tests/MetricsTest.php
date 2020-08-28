@@ -4,7 +4,6 @@ namespace ReadMe\Tests;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Middleware;
-use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
