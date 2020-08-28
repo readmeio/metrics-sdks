@@ -1,3 +1,46 @@
+## 4.0.0 (2020-08-28)
+
+* docs: add version badges for ruby and python (#83) ([0b11476](https://github.com/readmeio/metrics-sdks/commit/0b11476)), closes [#83](https://github.com/readmeio/metrics-sdks/issues/83)
+* chore: updating the root package-lock file ([10e59a0](https://github.com/readmeio/metrics-sdks/commit/10e59a0))
+* chore(deps-dev): bump @commitlint/cli from 9.1.1 to 9.1.2 (#39) ([e98ee3c](https://github.com/readmeio/metrics-sdks/commit/e98ee3c)), closes [#39](https://github.com/readmeio/metrics-sdks/issues/39)
+* chore(deps-dev): bump @commitlint/config-conventional (#38) ([3e4c345](https://github.com/readmeio/metrics-sdks/commit/3e4c345)), closes [#38](https://github.com/readmeio/metrics-sdks/issues/38)
+* chore(deps-dev): bump conventional-changelog-cli from 2.0.34 to 2.1.0 (#40) ([526959c](https://github.com/readmeio/metrics-sdks/commit/526959c)), closes [#40](https://github.com/readmeio/metrics-sdks/issues/40)
+* chore(deps): bump actions/checkout from v2.3.1 to v2.3.2 (#79) ([590505f](https://github.com/readmeio/metrics-sdks/commit/590505f)), closes [#79](https://github.com/readmeio/metrics-sdks/issues/79)
+* chore(deps): bump actions/setup-node from v2.1.0 to v2.1.1 (#21) ([cdfc601](https://github.com/readmeio/metrics-sdks/commit/cdfc601)), closes [#21](https://github.com/readmeio/metrics-sdks/issues/21)
+* chore(deps): bump actions/setup-python from v2.1.1 to v2.1.2 (#78) ([488b3f5](https://github.com/readmeio/metrics-sdks/commit/488b3f5)), closes [#78](https://github.com/readmeio/metrics-sdks/issues/78)
+* chore(deps): bump actions/setup-ruby from v1 to v1.1.1 (#77) ([e184872](https://github.com/readmeio/metrics-sdks/commit/e184872)), closes [#77](https://github.com/readmeio/metrics-sdks/issues/77)
+* ci: python workflow (#53) ([f4d4221](https://github.com/readmeio/metrics-sdks/commit/f4d4221)), closes [#53](https://github.com/readmeio/metrics-sdks/issues/53)
+* ci: release strategy (#63) ([a0af80c](https://github.com/readmeio/metrics-sdks/commit/a0af80c)), closes [#63](https://github.com/readmeio/metrics-sdks/issues/63)
+
+### Node SDK
+* chore(deps-dev): bump @readme/eslint-config from 3.3.3 to 3.4.0 (#25) ([4e643c1](https://github.com/readmeio/metrics-sdks/commit/4e643c1)), closes [#25](https://github.com/readmeio/metrics-sdks/issues/25)
+* chore(deps-dev): bump @readme/eslint-config from 3.4.0 to 3.4.1 (#27) ([e337cec](https://github.com/readmeio/metrics-sdks/commit/e337cec)), closes [#27](https://github.com/readmeio/metrics-sdks/issues/27)
+* chore(deps-dev): bump @readme/eslint-config from 3.4.1 to 3.4.2 (#65) ([9d98bcf](https://github.com/readmeio/metrics-sdks/commit/9d98bcf)), closes [#65](https://github.com/readmeio/metrics-sdks/issues/65)
+* chore(deps-dev): bump eslint from 7.5.0 to 7.6.0 (#23) ([454f245](https://github.com/readmeio/metrics-sdks/commit/454f245)), closes [#23](https://github.com/readmeio/metrics-sdks/issues/23)
+* chore(deps-dev): bump eslint from 7.6.0 to 7.7.0 (#37) ([b03a5be](https://github.com/readmeio/metrics-sdks/commit/b03a5be)), closes [#37](https://github.com/readmeio/metrics-sdks/issues/37)
+* chore(deps-dev): bump jest from 26.1.0 to 26.2.2 (#26) ([ce62d12](https://github.com/readmeio/metrics-sdks/commit/ce62d12)), closes [#26](https://github.com/readmeio/metrics-sdks/issues/26)
+* chore(deps-dev): bump jest from 26.2.2 to 26.4.0 (#36) ([78130c0](https://github.com/readmeio/metrics-sdks/commit/78130c0)), closes [#36](https://github.com/readmeio/metrics-sdks/issues/36)
+* chore(deps-dev): bump jest from 26.4.0 to 26.4.2 (#66) ([ca8965f](https://github.com/readmeio/metrics-sdks/commit/ca8965f)), closes [#66](https://github.com/readmeio/metrics-sdks/issues/66)
+* chore(deps-dev): bump nock from 13.0.2 to 13.0.3 (#22) ([1658409](https://github.com/readmeio/metrics-sdks/commit/1658409)), closes [#22](https://github.com/readmeio/metrics-sdks/issues/22)
+* chore(deps-dev): bump nock from 13.0.3 to 13.0.4 (#35) ([9f75b84](https://github.com/readmeio/metrics-sdks/commit/9f75b84)), closes [#35](https://github.com/readmeio/metrics-sdks/issues/35)
+* chore(deps-dev): bump prettier from 2.0.5 to 2.1.1 (#82) ([7ae4274](https://github.com/readmeio/metrics-sdks/commit/7ae4274)), closes [#82](https://github.com/readmeio/metrics-sdks/issues/82)
+* chore(deps): bump lodash from 4.17.19 to 4.17.20 (#41) ([b1bb337](https://github.com/readmeio/metrics-sdks/commit/b1bb337)), closes [#41](https://github.com/readmeio/metrics-sdks/issues/41)
+* chore(deps): bump uuid from 8.2.0 to 8.3.0 (#24) ([fd224bb](https://github.com/readmeio/metrics-sdks/commit/fd224bb)), closes [#24](https://github.com/readmeio/metrics-sdks/issues/24)
+
+### PHP SDK
+* fix: updating the php sdk to support guzzle 7 (#76) ([7340eca](https://github.com/readmeio/metrics-sdks/commit/7340eca)), closes [#76](https://github.com/readmeio/metrics-sdks/issues/76)
+
+### Python SDK
+* Add python sdk ([e1864bb](https://github.com/readmeio/metrics-sdks/commit/e1864bb))
+* chore: python package renaming (#34) ([a7ba6b8](https://github.com/readmeio/metrics-sdks/commit/a7ba6b8)), closes [#34](https://github.com/readmeio/metrics-sdks/issues/34)
+* chore(deps): bump attrs from 19.3.0 to 20.1.0 in /packages/python (#80) ([229fab9](https://github.com/readmeio/metrics-sdks/commit/229fab9)), closes [#80](https://github.com/readmeio/metrics-sdks/issues/80)
+* chore(deps): bump black from 19.10b0 to 20.8b1 in /packages/python (#81) ([f5afbec](https://github.com/readmeio/metrics-sdks/commit/f5afbec)), closes [#81](https://github.com/readmeio/metrics-sdks/issues/81)
+
+### Ruby SDK
+* v1.0.0 ([40cd87b](https://github.com/readmeio/metrics-sdks/commit/40cd87b))
+
+
+
 ## <small>3.1.2 (2020-07-28)</small>
 
 * fix: prevent potentially null base log urls from being used (#20) ([d48e0d2](https://github.com/readmeio/metrics-sdks/commit/d48e0d2)), closes [#20](https://github.com/readmeio/metrics-sdks/issues/20)
