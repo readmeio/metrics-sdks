@@ -1,6 +1,6 @@
 .github/
 coverage/
-test/
+__tests__/
 .eslint*
 .jsinspectrc
 .prettier*
