@@ -24,11 +24,13 @@ class MetricsApiConfig:
             If you configure a blacklist, it will override any whitelist configuration.
         WHITELIST (List[str], optional): An array of headers and JSON body properties to
             send to ReadMe.
-        ALLOWED_HTTP_HOSTS List[str] (optional): A list of allowed http hosts for sending
+
+            If this option is configured, ONLY the whitelisted properties will be sent.
+        ALLOWED_HTTP_HOSTS (List[str] (optional)): A list of allowed http hosts for sending
             data to the ReadMe API.
 
-        If this option is configured, ONLY the whitelisted properties will be sent.
     """
+
     README_API_KEY: str = None
     BUFFER_LENGTH: int = 10
     GROUPING_FUNCTION: Callable[[Any], None] = lambda req: None
@@ -36,6 +38,7 @@ class MetricsApiConfig:
     IS_BACKGROUND_MODE: bool = True
     BLACKLIST: List[str] = []
     WHITELIST: List[str] = []
+    ALLOWED_HTTP_HOSTS: List[str] = []
 
     def __init__(
         self,
@@ -46,7 +49,7 @@ class MetricsApiConfig:
         background_worker_mode: bool = True,
         blacklist: List[str] = None,
         whitelist: List[str] = None,
-        allowed_http_hosts: List[str] = None
+        allowed_http_hosts: List[str] = None,
     ):
         """Initializes an instance of the MetricsApiConfig object
 
@@ -74,7 +77,7 @@ class MetricsApiConfig:
 
                 If this option is configured, ONLY the whitelisted properties will be
                 sent.
-            allowed_http_hosts (optional): A list of allowed http hosts for sending data
+            allowed_http_hosts (List[str], optional): A list of allowed http hosts for sending data
                 to the ReadMe API.
         """
         self.README_API_KEY = api_key
