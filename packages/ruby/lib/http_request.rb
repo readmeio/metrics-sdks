@@ -1,7 +1,10 @@
 require "rack"
 require "rack/request"
+require "content_type_helper"
 
 class HttpRequest
+  include ContentTypeHelper
+
   HTTP_NON_HEADERS = [
     Rack::HTTP_COOKIE,
     Rack::HTTP_VERSION,
@@ -45,12 +48,17 @@ class HttpRequest
     @request.content_length.to_i
   end
 
+  def options?
+    @request.request_method == "OPTIONS"
+  end
+
   def headers
     @request
       .each_header
       .select { |key, _| http_header?(key) }
       .to_h
       .transform_keys { |header| normalize_header_name(header) }
+      .merge unprefixed_headers
   end
 
   def body
@@ -80,5 +88,12 @@ class HttpRequest
   # `"HTTP_CONTENT_TYPE" => "application/json"`.
   def normalize_header_name(header)
     header.delete_prefix("HTTP_").split("_").map(&:capitalize).join("-")
+  end
+
+  # These special headers are explicitly _not_ prefixed with HTTP_ in the Rack
+  # env so we need to add them in manually
+  def unprefixed_headers
+    {"Content-Type" => @request.content_type,
+     "Content-Length" => @request.content_length}.compact
   end
 end

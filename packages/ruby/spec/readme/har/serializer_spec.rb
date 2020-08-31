@@ -17,13 +17,10 @@ RSpec.describe Readme::Har::Serializer do
         cookies: {"cookie1" => "value1"},
         http_version: "HTTP/1.1"
       )
-      allow(HttpRequest).to receive(:new).and_return(http_request)
-
-      env = double(:env)
       start_time = Time.now
       end_time = start_time + 1
       har = Readme::Har::Serializer.new(
-        env,
+        http_request,
         double(:rack_response),
         start_time,
         end_time,

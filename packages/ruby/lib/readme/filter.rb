@@ -13,27 +13,39 @@ class Filter
 
   class AllowOnly
     def initialize(filter_values)
-      @filter_values = filter_values
+      @filter_values = filter_values.map(&:downcase)
     end
 
     def filter(hash)
-      hash.select { |key, _value| @filter_values.include?(key) }
+      hash.select { |key, _value| @filter_values.include?(key.downcase) }
+    end
+
+    def pass_through?
+      false
     end
   end
 
   class RejectParams
     def initialize(filter_values)
-      @filter_values = filter_values
+      @filter_values = filter_values.map(&:downcase)
     end
 
     def filter(hash)
-      hash.reject { |key, _value| @filter_values.include?(key) }
+      hash.reject { |key, _value| @filter_values.include?(key.downcase) }
+    end
+
+    def pass_through?
+      false
     end
   end
 
   class None
     def filter(hash)
       hash
+    end
+
+    def pass_through?
+      true
     end
   end
 

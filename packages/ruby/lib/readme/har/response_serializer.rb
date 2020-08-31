@@ -4,8 +4,6 @@ require "readme/har/collection"
 module Readme
   module Har
     class ResponseSerializer
-      JSON_MIME_TYPES = ["application/json", "application/x-json", "text/json", "text/x-json", "+json"]
-
       def initialize(request, response, filter)
         @request = request
         @response = response
@@ -29,9 +27,9 @@ module Readme
       private
 
       def content
-        if response_body.nil?
+        if @response.body.empty?
           empty_content
-        elsif content_type_is_json?
+        elsif @response.json?
           json_content
         else
           pass_through_content
@@ -43,37 +41,23 @@ module Readme
       end
 
       def json_content
-        parsed_body = JSON.parse(response_body)
+        parsed_body = JSON.parse(@response.body)
 
-        {mimeType: @response.content_type,
-         size: @response.content_length,
-         text: Har::Collection.new(@filter, parsed_body).to_h.to_json}
+        {
+          mimeType: @response.content_type,
+          size: @response.content_length,
+          text: Har::Collection.new(@filter, parsed_body).to_h.to_json
+        }
       rescue
         pass_through_content
       end
 
       def pass_through_content
-        {mimeType: @response.content_type,
-         size: @response.content_length,
-         text: response_body}
-      end
-
-      def response_body
-        if @response.body.nil?
-          nil
-        elsif @response.body.respond_to?(:rewind)
-          @response.body.rewind
-          body = @response.body.each.reduce(:+)
-          @response.body.rewind
-
-          body
-        else
-          @response.body.each.reduce(:+)
-        end
-      end
-
-      def content_type_is_json?
-        JSON_MIME_TYPES.include? @response.content_type
+        {
+          mimeType: @response.content_type,
+          size: @response.content_length,
+          text: @response.body
+        }
       end
     end
   end

@@ -46,9 +46,21 @@ module Readme
       end
 
       def request_body
+        if @filter.pass_through?
+          pass_through_body
+        else
+          # Only JSON allowed for non-pass-through situations. It will raise
+          # if the body can't be parsed as JSON, aborting the request.
+          json_body
+        end
+      end
+
+      def json_body
         parsed_body = JSON.parse(@request.body)
         Har::Collection.new(@filter, parsed_body).to_h.to_json
-      rescue
+      end
+
+      def pass_through_body
         @request.body
       end
     end

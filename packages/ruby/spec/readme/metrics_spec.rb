@@ -5,15 +5,36 @@ require "webmock/rspec"
 RSpec.describe Readme::Metrics do
   include Rack::Test::Methods
 
-  before do
-    stub_request(:post, Readme::Metrics::ENDPOINT)
-  end
-
   it "has a version number" do
     expect(Readme::Metrics::VERSION).not_to be nil
   end
 
+  context "in a multi-threaded environment" do
+    it "doesn't wait for the HTTP request to Readme to finish" do
+      readme_request_completion_time = 1 # seconds
+      allow(HTTParty).to receive(:post) do
+        sleep readme_request_completion_time
+      end
+
+      start_time = Time.now
+      get "/api/foo"
+      completion_time = Time.now - start_time
+
+      expect(HTTParty).to have_received(:post).once
+      expect(completion_time).to be < readme_request_completion_time
+    end
+
+    def app
+      json_app_with_middleware(buffer_length: 1)
+    end
+  end
+
   context "without batching" do
+    before do
+      stub_request(:post, Readme::Metrics::ENDPOINT)
+      allow(Thread).to receive(:new).and_yield
+    end
+
     it "doesn't modify the response" do
       post "/"
 
@@ -75,22 +96,183 @@ RSpec.describe Readme::Metrics do
         .with { |request| validate_json("readmeMetrics", request.body) }
     end
 
+    it "returns a response when the middleware raises an error" do
+      allow_any_instance_of(Readme::Metrics).to receive(:process_response).and_raise
+
+      post "/api/foo"
+
+      expect(last_response.status).to eq 200
+    end
+
+    it "returns a response when the Payload raises an error" do
+      allow(Readme::Payload).to receive(:new).and_raise
+
+      post "/api/foo"
+
+      expect(last_response.status).to eq 200
+    end
+
+    it "returns a response when the Har::Serializer raises an error" do
+      allow(Readme::Har::Serializer).to receive(:new).and_raise
+
+      post "/api/foo"
+
+      expect(last_response.status).to eq 200
+    end
+
+    it "returns a response when the RequestQueue raises an error" do
+      allow_any_instance_of(Readme::RequestQueue).to receive(:push).and_raise
+
+      post "/api/foo"
+
+      expect(last_response.status).to eq 200
+    end
+
+    it "doesn't send a request to Readme with an OPTIONS request" do
+      options "api/foo"
+
+      expect(WebMock).to_not have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 200
+    end
+
     def app
-      options = {api_key: "API KEY", development: true, buffer_length: 1}
-      app = Readme::Metrics.new(noop_app, options) { |env|
-        {
-          id: env["CURRENT_USER"].id,
-          label: env["CURRENT_USER"].name,
-          email: env["CURRENT_USER"].email
-        }
-      }
-      app_with_http_version = SetHttpVersion.new(app)
-      app_with_current_user = SetCurrentUser.new(app_with_http_version)
-      app_with_current_user
+      json_app_with_middleware(buffer_length: 1)
+    end
+  end
+
+  describe "unsupported request bodies" do
+    before do
+      stub_request(:post, Readme::Metrics::ENDPOINT)
+      allow(Thread).to receive(:new).and_yield
+    end
+
+    it "is not submitted to Readme with a reject configured" do
+      def app
+        json_app_with_middleware(buffer_length: 1, reject_params: ["reject"])
+      end
+
+      header "Content-Type", "text/plain"
+      post "/api/foo", "[BODY]"
+
+      expect(WebMock).to_not have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 200
+    end
+
+    it "is not submitted to Readme with allow-only configured" do
+      def app
+        json_app_with_middleware(buffer_length: 1, allow_only: ["allowed"])
+      end
+
+      header "Content-Type", "text/plain"
+      post "/api/foo", "[BODY]"
+
+      expect(WebMock).to_not have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 200
+    end
+
+    it "is submitted to Readme with no filter configured" do
+      def app
+        json_app_with_middleware(buffer_length: 1)
+      end
+
+      header "Content-Type", "text/plain"
+      post "/api/foo", "[BODY]"
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 200
+    end
+
+    it "is submitted to Readme when the body is empty with allow-only configured" do
+      def app
+        json_app_with_middleware(buffer_length: 1, allow_only: ["allowed"])
+      end
+
+      get "/api/foo"
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 200
+    end
+
+    it "is submitted to Readme when the body is empty with reject_params configured" do
+      def app
+        json_app_with_middleware(buffer_length: 1, reject_params: ["reject"])
+      end
+
+      get "/api/foo"
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 200
+    end
+  end
+
+  describe "unsupported response bodies" do
+    before do
+      stub_request(:post, Readme::Metrics::ENDPOINT)
+      allow(Thread).to receive(:new).and_yield
+    end
+
+    it "is submitted to Readme with no filter configured" do
+      def app
+        text_app_with_middleware(buffer_length: 1)
+      end
+
+      post "/api/foo"
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 200
+    end
+
+    it "is not submitted to Readme with an allow-only configured" do
+      def app
+        text_app_with_middleware(buffer_length: 1, allow_only: ["allowed"])
+      end
+
+      post "/api/foo"
+
+      expect(WebMock).not_to have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 200
+    end
+
+    it "is not submitted to Readme with  reject_params configured" do
+      def app
+        text_app_with_middleware(buffer_length: 1, reject_params: ["reject"])
+      end
+
+      post "/api/foo"
+
+      expect(WebMock).not_to have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 200
+    end
+
+    it "is submitted to Readme with  reject_params configured for empty bodies" do
+      def app
+        empty_app_with_middleware(buffer_length: 1, reject_params: ["reject"])
+      end
+
+      post "/api/foo"
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 204
+    end
+
+    it "is submitted to Readme with  allow_only configured for empty bodies" do
+      def app
+        empty_app_with_middleware(buffer_length: 1, allow_only: ["allowed"])
+      end
+
+      post "/api/foo"
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+      expect(last_response.status).to eq 204
     end
   end
 
   context "with batching" do
+    before do
+      stub_request(:post, Readme::Metrics::ENDPOINT)
+      allow(Thread).to receive(:new).and_yield
+    end
+
     it "batches requests to the Readme API" do
       post "/api/foo"
       post "/api/bar"
@@ -103,17 +285,7 @@ RSpec.describe Readme::Metrics do
     end
 
     def app
-      options = {api_key: "API KEY", development: true, buffer_length: 2}
-      app = Readme::Metrics.new(noop_app, options) { |env|
-        {
-          id: env["CURRENT_USER"].id,
-          label: env["CURRENT_USER"].name,
-          email: env["CURRENT_USER"].email
-        }
-      }
-      app_with_http_version = SetHttpVersion.new(app)
-      app_with_current_user = SetCurrentUser.new(app_with_http_version)
-      app_with_current_user
+      json_app_with_middleware(buffer_length: 2)
     end
   end
 
@@ -204,9 +376,54 @@ RSpec.describe Readme::Metrics do
     end
   end
 
+  def json_app_with_middleware(overrides = {})
+    app_with_middleware(JsonApp.new, overrides)
+  end
+
+  def text_app_with_middleware(overrides = {})
+    app_with_middleware(TextApp.new, overrides)
+  end
+
+  def empty_app_with_middleware(overrides = {})
+    app_with_middleware(EmptyApp.new, overrides)
+  end
+
+  def app_with_middleware(app, overrides = {})
+    defaults = {api_key: "API KEY", buffer_length: 1}
+    with_metrics = Readme::Metrics.new(app, defaults.merge(overrides)) { |env|
+      {
+        id: env["CURRENT_USER"].id,
+        label: env["CURRENT_USER"].name,
+        email: env["CURRENT_USER"].email
+      }
+    }
+
+    SetCurrentUser.new(SetHttpVersion.new(with_metrics))
+  end
+
   def noop_app
-    lambda do |env|
+    JsonApp.new
+  end
+
+  class JsonApp
+    def call(env)
+      [
+        200,
+        {"Content-Type" => "application/json", "Content-Length" => "15"},
+        [{key: "value"}.to_json]
+      ]
+    end
+  end
+
+  class TextApp
+    def call(env)
       [200, {"Content-Type" => "text/plain", "Content-Length" => "2"}, ["OK"]]
+    end
+  end
+
+  class EmptyApp
+    def call(env)
+      [204, {}, []]
     end
   end
 

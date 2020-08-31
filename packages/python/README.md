@@ -2,6 +2,9 @@
 
 Track your API metrics within ReadMe.
 
+[![PyPi](https://img.shields.io/pypi/v/readme-metrics)](https://pypi.org/project/readme-metrics/)
+[![Build](https://github.com/readmeio/metrics-sdks/workflows/python/badge.svg)](https://github.com/readmeio/metrics-sdks)
+
 [![](https://d3vv6lp55qjaqc.cloudfront.net/items/1M3C3j0I0s0j3T362344/Untitled-2.png)](https://readme.io)
 
 ## Installation
@@ -12,7 +15,7 @@ pip install readme-metrics
 
 ## Usage
 
-Just include the MetricsMiddleware into your API!
+Just include the `MetricsMiddleware` into your API!
 
 ```python
 from readme_metrics import MetricsApiConfig, MetricsMiddleware
@@ -32,9 +35,8 @@ app.wsgi_app = MetricsMiddleware(
 )
 ```
 
-
 ### Configuration Options
-There are a few options you can pass in to change how the logs are sent to ReadMe. These can be passed in MetricsApiConfig`.
+There are a few options you can pass in to change how the logs are sent to ReadMe. These can be passed in `MetricsApiConfig`.
 
 Ex)
 
@@ -49,7 +51,6 @@ MetricsApiConfig(
     buffer_length=1,
     blacklist=['credit_card'] # Prevents credit_card in the request from being sent to readme
 )
-
 ```
 
 | Option | Use |

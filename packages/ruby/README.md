@@ -1,7 +1,8 @@
-# readmeio
+# readme-metrics
 
 Track your API metrics within ReadMe.
 
+[![RubyGems](https://img.shields.io/gem/v/readme-metrics)](https://rubygems.org/gems/readme-metrics)
 [![Build](https://github.com/readmeio/metrics-sdks/workflows/ruby/badge.svg)](https://github.com/readmeio/metrics-sdks)
 
 [![](https://d3vv6lp55qjaqc.cloudfront.net/items/1M3C3j0I0s0j3T362344/Untitled-2.png)](https://readme.io)
@@ -47,7 +48,7 @@ You may only specify either `reject_params` or `allow_only` keys, not both.
 ### Rails
 
 ```ruby
-# application.rb
+# config/environments/development.rb or config/environments/production.rb
 require "readme/metrics"
 
 options = {
@@ -58,39 +59,51 @@ options = {
 }
 
 config.middleware.use Readme::Metrics, options do |env|
-  current_user = env['warden'].authenticate(scope: :current_user)
+  current_user = env['warden'].authenticate
 
-  {
-    id: current_user.id
-    label: current_user.full_name,
-    email: current_user.email
-  }
+  if current_user.present?
+    {
+      id: current_user.id,
+      label: current_user.name,
+      email: current_user.email
+    }
+  else
+    {
+      id: "guest",
+      label: "Guest User",
+      email: "guest@example.com"
+    }
+  end
 end
 ```
 
-### Rack::Builder
+### Rack
 
 ```ruby
-Rack::Builder.new do |builder|
-  options = {
-    api_key: "YOUR_API_KEY",
-    development: false,
-    reject_params: ["not_included", "dont_send"]
-  }
+# config.ru
+options = {
+  api_key: "YOUR_API_KEY",
+  development: false,
+  reject_params: ["not_included", "dont_send"]
+}
 
-  builder.use Readme::Metrics, options do |env|
+use Readme::Metrics, options do |env|
     {
       id: "my_application_id"
       label: "My Application",
       email: "my.application@example.com"
     }
-  end
-  builder.run your_app
 end
+
+run YourApp.new
 ```
+
+### Sample Applications
+
+- [Rails](https://github.com/readmeio/metrics-sdk-rails-sample)
+- [Rack](https://github.com/readmeio/metrics-sdk-racks-sample)
+- [Sinatra](https://github.com/readmeio/metrics-sdk-sinatra-example)
 
 ## License
 
 [View our license here](https://github.com/readmeio/metrics-sdks/tree/master/packages/ruby/LICENSE)
-
-

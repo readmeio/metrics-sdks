@@ -28,10 +28,18 @@ end
 RSpec.describe Filter::RejectParams do
   describe "#filter" do
     it "returns the given hash without the given filter values" do
-      hash = {"reject" => "rejected", "keep" => "kept"}
+      hash = {"reject" => "rejected", "REJECT" => "rejected", "keep" => "kept"}
       result = Filter::RejectParams.new(["reject"]).filter(hash)
 
-      expect(result.keys).to eq ["keep"]
+      expect(result.keys).to match_array(["keep"])
+    end
+  end
+
+  describe "#pass_through?" do
+    it "is false" do
+      filter = Filter::RejectParams.new([])
+
+      expect(filter).not_to be_pass_through
     end
   end
 end
@@ -39,10 +47,18 @@ end
 RSpec.describe Filter::AllowOnly do
   describe "#filter" do
     it "returns the given hash with only the given filter values" do
-      hash = {"reject" => "rejected", "keep" => "kept"}
+      hash = {"reject" => "rejected", "keep" => "kept", "KEEP" => "kept"}
       result = Filter::AllowOnly.new(["keep"]).filter(hash)
 
-      expect(result.keys).to eq ["keep"]
+      expect(result.keys).to match_array(["keep", "KEEP"])
+    end
+  end
+
+  describe "#pass_through?" do
+    it "is false" do
+      filter = Filter::AllowOnly.new([])
+
+      expect(filter).not_to be_pass_through
     end
   end
 end
@@ -54,6 +70,14 @@ RSpec.describe Filter::None do
       result = Filter::None.new.filter(hash)
 
       expect(result.keys).to match_array ["keep", "reject"]
+    end
+  end
+
+  describe "#pass_through?" do
+    it "is true" do
+      filter = Filter::None.new
+
+      expect(filter).to be_pass_through
     end
   end
 end

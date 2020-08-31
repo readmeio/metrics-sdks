@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    readme-metrics (0.1.0)
+    readme-metrics (0.2.0)
       httparty (~> 0.18)
 
 GEM
