@@ -1,19 +1,5 @@
 version: 2
 updates:
-  - package-ecosystem: composer
-    directory: "/packages/php"
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 10
-    reviewers:
-      - erunion
-    labels:
-      - scope:dependency
-      - area:php
-    commit-message:
-      prefix: chore(deps)
-      prefix-development: chore(deps-dev)
-
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
@@ -27,7 +13,7 @@ updates:
   - package-ecosystem: npm
     directory: "/"
     schedule:
-      interval: weekly
+      interval: monthly
     open-pull-requests-limit: 10
     reviewers:
       - erunion
@@ -38,10 +24,38 @@ updates:
       prefix: chore(deps)
       prefix-development: chore(deps-dev)
 
+  - package-ecosystem: bundler
+    directory: "/packages/ruby"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 10
+    reviewers:
+      - erunion
+    labels:
+      - scope:dependency
+      - area:ruby
+    commit-message:
+      prefix: chore(deps)
+      prefix-development: chore(deps-dev)
+
+  - package-ecosystem: composer
+    directory: "/packages/php"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 10
+    reviewers:
+      - erunion
+    labels:
+      - scope:dependency
+      - area:php
+    commit-message:
+      prefix: chore(deps)
+      prefix-development: chore(deps-dev)
+
   - package-ecosystem: pip
     directory: "/packages/python"
     schedule:
-      interval: weekly
+      interval: monthly
     open-pull-requests-limit: 10
     reviewers:
       - erunion
