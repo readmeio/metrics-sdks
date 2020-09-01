@@ -16,10 +16,13 @@ module.exports = (req, options = {}) => {
     req.headers = removeOtherProperties(req.headers, options.whitelist);
   }
 
-  const postData = {};
+  let postData;
   if (req.body && Object.keys(req.body).length > 0) {
-    // parse mimetype from content-type header, default to JSON
-    postData.mimeType = 'application/json';
+    postData = {
+      // parse mimetype from content-type header, default to JSON
+      mimeType: 'application/json',
+    };
+
     try {
       postData.mimeType = contentType.parse(req).type;
     } catch (e) {} // eslint-disable-line no-empty
