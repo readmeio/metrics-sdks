@@ -35,10 +35,13 @@
     "express": "^4.17.1",
     "is-valid-uuid-v4": "^1.2.0",
     "jest": "^26.0.1",
+    "jest-expect-har": "^1.0.3",
+    "jest-expect-message": "^1.0.2",
     "jsinspect": "^0.12.7",
     "nock": "^13.0.0",
     "prettier": "^2.0.1",
     "rimraf": "^3.0.2",
+    "socket.io-client": "^2.3.0",
     "supertest": "^4.0.2"
   },
   "scripts": {
@@ -52,6 +55,10 @@
   "jest": {
     "coveragePathIgnorePatterns": [
       "<rootDir>/config/"
+    ],
+    "setupFilesAfterEnv": [
+      "jest-expect-har",
+      "jest-expect-message"
     ]
   },
   "prettier": "@readme/eslint-config/prettier"

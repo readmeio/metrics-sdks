@@ -10,7 +10,11 @@ module.exports = (req, res, group, options = {}, { logId, startedDateTime }) => 
   development: options.development,
   request: {
     log: {
-      creator: { name, version, comment: `${process.platform}/${process.version}` },
+      creator: {
+        name,
+        version,
+        comment: `${process.platform}/${process.version}`,
+      },
       entries: [
         {
           pageref: req.route

@@ -6,6 +6,10 @@ const flatCache = require('flat-cache');
 const findCacheDir = require('find-cache-dir');
 const pkg = require('./package.json');
 
+console.logx = obj => {
+  console.log(require('util').inspect(obj, false, null, true /* enable colors */))
+}
+
 const constructPayload = require('./lib/construct-payload');
 
 // We're doing this to buffer up the response body
@@ -50,7 +54,8 @@ async function getProjectBaseUrl(encodedApiKey) {
     (lastUpdated !== undefined && Math.abs(lastUpdated - Math.round(Date.now() / 1000)) >= 86400)
   ) {
     let baseUrl;
-    await fetch(`${config.readmeApiUrl}/v1/`, {
+    // await fetch(`${config.readmeApiUrl}/v1/`, {
+    await fetch(`http://localhost:3000/readme-api/v1/`, {
       method: 'get',
       headers: {
         Authorization: `Basic ${encodedApiKey}`,
@@ -89,6 +94,8 @@ module.exports.metrics = (apiKey, group, options = {}) => {
   if (!apiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a grouping function');
 
+  const developmentMode = options.developmentMode || false;
+  const testMode = options.testMode || false;
   const bufferLength = options.bufferLength || config.bufferLength;
   const encodedApiKey = Buffer.from(`${apiKey}:`).toString('base64');
   let baseLogUrl = options.baseLogUrl || undefined;
@@ -117,7 +124,8 @@ module.exports.metrics = (apiKey, group, options = {}) => {
       if (queue.length >= bufferLength) {
         const json = queue.slice();
         queue = [];
-        fetch(`${config.host}/v1/request`, {
+        // fetch(`${config.host}/v1/request`, {
+        fetch(`http://localhost:3000/metrics-api/v1/request`, {
           method: 'post',
           body: JSON.stringify(json),
           headers: {
@@ -126,8 +134,20 @@ module.exports.metrics = (apiKey, group, options = {}) => {
             'User-Agent': `${pkg.name}/${pkg.version}`,
           },
         })
-          .then(() => {})
-          .catch(() => {});
+          .then(async (res) => {
+            // If we're running in development or unit test mode, toss any errors that happen when we try to call the
+            // API.
+            if (developmentMode) {
+              if (res.status >= 400 && res.status <= 599) {
+                throw res;
+              }
+            }
+          })
+          .catch((err) => {
+            if (developmentMode) {
+              throw err
+            }
+          });
       }
 
       cleanup(); // eslint-disable-line no-use-before-define

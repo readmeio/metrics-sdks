@@ -9,6 +9,9 @@
           "request.**.expect"
         ]
       }
-    ]
+    ],
+
+    // Bump up maxArgs to 2 so we can use jest-expect-message without errors.
+    "jest/valid-expect": ["error", {"maxArgs": 2}]
   }
 }

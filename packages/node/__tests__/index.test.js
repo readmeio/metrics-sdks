@@ -1,22 +1,43 @@
+/* eslint-disable global-require */
 const express = require('express');
 const request = require('supertest');
-const nock = require('nock');
+// const nock = require('nock');
 const rimraf = require('rimraf');
 const crypto = require('crypto');
 const flatCache = require('flat-cache');
 const findCacheDir = require('find-cache-dir');
 const { isValidUUIDV4 } = require('is-valid-uuid-v4');
+const io = require('socket.io-client');
 
-const config = require('../config');
+// const config = require('../config');
 const pkg = require('../package.json');
 const middleware = require('..');
 
+/* const harFixtures = {
+  standard: require('../../../fixtures/standard.har'),
+}; */
+
 const apiKey = 'mockReadMeApiKey';
-const group = '5afa21b97011c63320226ef3';
+const group = {
+  id: '5afa21b97011c63320226ef3',
+  label: 'example user',
+  email: 'user@example.com',
+};
+
 const baseLogUrl = 'https://docs.example.com';
 const cacheDir = findCacheDir({ name: pkg.name });
 
-function getReadMeApiMock(numberOfTimes) {
+console.logx = obj => {
+  console.log(require('util').inspect(obj, false, null, true /* enable colors */))
+}
+
+const asyncWrap = fn => {
+  return (req, res, next) => {
+    fn(req, res, next).catch(next);
+  };
+};
+
+/* function getReadMeApiMock(numberOfTimes) {
   return nock(config.readmeApiUrl, {
     reqheaders: {
       'User-Agent': `${pkg.name}/${pkg.version}`,
@@ -26,7 +47,7 @@ function getReadMeApiMock(numberOfTimes) {
     .basicAuth({ user: apiKey })
     .times(numberOfTimes)
     .reply(200, { baseUrl: baseLogUrl });
-}
+} */
 
 function getCache() {
   const encodedApiKey = Buffer.from(`${apiKey}:`).toString('base64');
@@ -46,6 +67,12 @@ function hydrateCache(lastUpdated) {
 }
 
 expect.extend({
+  /**
+   * Assert that a given response contains the `x-documentation-url` header.
+   *
+   * @param {Response} res
+   * @returns {Object}
+   */
   toHaveDocumentationHeader(res) {
     const { matcherHint, printExpected, printReceived } = this.utils;
     const message = (pass, actual) => () => {
@@ -72,13 +99,13 @@ expect.extend({
 });
 
 describe('#metrics', () => {
-  beforeEach(() => {
+  /* beforeEach(() => {
     nock.disableNetConnect();
     nock.enableNetConnect('127.0.0.1');
-  });
+  }); */
 
   afterEach(() => {
-    nock.cleanAll();
+    // nock.cleanAll();
 
     // Clean up the cache dir between tests.
     rimraf.sync(cacheDir);
@@ -96,24 +123,46 @@ describe('#metrics', () => {
     }).toThrow('You must provide a grouping function');
   });
 
-  it('should send a request to the metrics server', () => {
-    const apiMock = getReadMeApiMock(1);
-    const mock = nock(config.host, {
+  it.only('should send a request to the metrics server', () => {
+    const socket = io('http://localhost:3000');
+    socket.on('connect', function(){
+      console.log('connected')
+    });
+
+    socket.on('testResult', function(data){
+      console.logx(data);
+    });
+
+    socket.on('disconnect', function(){
+      console.log('disconnected')
+    });
+
+    // const apiMock = getReadMeApiMock(1);
+    /* const mock = nock(config.host, {
       reqheaders: {
         'Content-Type': 'application/json',
         'User-Agent': `${pkg.name}/${pkg.version}`,
       },
     })
-      .post('/v1/request', ([body]) => {
-        expect(body.group).toBe(group);
-        expect(typeof body.request.log.entries[0].startedDateTime).toBe('string');
-        return true;
+      .post('/v1/request', async ([body]) => {
+        await toHaveValidPayload(body, 'standard');
       })
       .basicAuth({ user: apiKey })
-      .reply(200);
+      .reply(200); */
 
     const app = express();
-    app.use(middleware.metrics(apiKey, () => group));
+    app.use(
+      middleware.metrics(
+        apiKey,
+        () => ({
+          ...group,
+          id: 'standard',
+        }),
+        {
+          developmentMode: true,
+        }
+      )
+    );
     app.get('/test', (req, res) => res.sendStatus(200));
 
     return request(app)
@@ -121,12 +170,16 @@ describe('#metrics', () => {
       .expect(200)
       .expect(res => expect(res).toHaveDocumentationHeader())
       .then(() => {
-        apiMock.done();
-        mock.done();
+        // apiMock.done();
+        // mock.done();
+        socket.disconnect();
+      })
+      .catch(err => {
+        console.log('📮', err)
       });
   });
 
-  describe('#bufferLength', () => {
+  /* describe('#bufferLength', () => {
     it('should send requests when number hits `bufferLength` size', async function test() {
       const apiMock = getReadMeApiMock(1);
       const mock = nock(config.host, {
@@ -231,9 +284,9 @@ describe('#metrics', () => {
         mocks.map(mock => mock.done());
       });
     });
-  });
+  }); */
 
-  describe('#baseLogUrl', () => {
+  /* describe('#baseLogUrl', () => {
     it('should not call the API if the baseLogUrl supplied as a middleware option', async () => {
       const mock = nock(config.host, {
         reqheaders: {
@@ -244,6 +297,7 @@ describe('#metrics', () => {
         .post('/v1/request')
         .basicAuth({ user: apiKey })
         .reply(200);
+
       const app = express();
       app.use(middleware.metrics(apiKey, () => group, { baseLogUrl }));
       app.get('/test', (req, res) => res.sendStatus(200));
@@ -391,9 +445,9 @@ describe('#metrics', () => {
       apiMock.done();
       metricsMock.done();
     });
-  });
+  }); */
 
-  describe('`res._body`', () => {
+  /* describe('`res._body`', () => {
     let apiMock;
     const responseBody = { a: 1, b: 2, c: 3 };
     function createMock() {
@@ -461,5 +515,5 @@ describe('#metrics', () => {
 
       mock.done();
     });
-  });
+  }); */
 });
