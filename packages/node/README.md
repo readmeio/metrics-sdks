@@ -57,8 +57,8 @@ app.use(readme.metrics('', req => ({
 
 | Option | Use |
 | :--- | :--- |
-| development | **default: false** If true, the log will be separate from normal production logs. This is great for separating staging or test data from data coming from customers |
-| bufferLength | **default: 10** By default, we only send logs to ReadMe after 10 requests are made. Depending on the usage of your API it make make sense to send logs more or less frequently |
+| development | **default: false** If true, the log will be separate from normal production logs. This is great for separating staging or test data from data coming from customers. Additionally with this option enabled, any errors that occur when talking to ReadMe will be surfaced to you. This is helpful for debugging invalid API keys or anything else that might go astray. |
+| bufferLength | **default: 10** By default, we only send logs to ReadMe after 10 requests are made. Depending on the usage of your API it make make sense to send logs more or less frequently. |
 | blacklist | **optional** An array of keys from your API requests and responses headers and bodies that you wish to blacklist from sending to ReadMe.<br /><br />If you configure a blacklist, it will override any whitelist configuration. |
 | whitelist | **optional** An array of keys from your API requests and responses headers and bodies that you only wish to send to ReadMe. |
 | baseLogUrl | **optional** This is the base URL for your ReadMe project. Normally this would be `https://projectName.readme.io` or `https://docs.yourdomain.com`, however if this value is not supplied, a request to the ReadMe API will be made once a day to retrieve it. This data is cached into `node_modules/.cache/readmeio`.

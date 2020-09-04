@@ -35,7 +35,7 @@ function patchResponse(res) {
   };
 }
 
-async function getProjectBaseUrl(encodedApiKey) {
+async function getProjectBaseUrl(encodedApiKey, options) {
   const cacheDir = findCacheDir({ name: pkg.name, create: true });
   const fsSafeApikey = crypto.createHash('md5').update(encodedApiKey).digest('hex');
 
@@ -75,7 +75,11 @@ async function getProjectBaseUrl(encodedApiKey) {
         cache.setKey('baseUrl', project.baseUrl);
         cache.setKey('lastUpdated', Math.round(Date.now() / 1000));
       })
-      .catch(() => {
+      .catch(err => {
+        if (options.development && (res.status >= 400 && res.status <= 599)) {
+          throw err;
+        }
+
         // If unable to access the ReadMe API for whatever reason, let's set the last updated time to two minutes from
         // now yesterday so that in 2 minutes we'll automatically make another attempt.
         cache.setKey('baseUrl', null);
@@ -94,8 +98,6 @@ module.exports.metrics = (apiKey, group, options = {}) => {
   if (!apiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a grouping function');
 
-  const developmentMode = options.developmentMode || false;
-  const testMode = options.testMode || false;
   const bufferLength = options.bufferLength || config.bufferLength;
   const encodedApiKey = Buffer.from(`${apiKey}:`).toString('base64');
   let baseLogUrl = options.baseLogUrl || undefined;
@@ -103,7 +105,7 @@ module.exports.metrics = (apiKey, group, options = {}) => {
 
   return async (req, res, next) => {
     if (baseLogUrl === undefined) {
-      baseLogUrl = await getProjectBaseUrl(encodedApiKey);
+      baseLogUrl = await getProjectBaseUrl(encodedApiKey, options);
     }
 
     const startedDateTime = new Date();
@@ -137,15 +139,8 @@ module.exports.metrics = (apiKey, group, options = {}) => {
           .then(async (res) => {
             // If we're running in development or unit test mode, toss any errors that happen when we try to call the
             // API.
-            if (developmentMode) {
-              if (res.status >= 400 && res.status <= 599) {
-                throw res;
-              }
-            }
-          })
-          .catch((err) => {
-            if (developmentMode) {
-              throw err
+            if (options.development && (res.status >= 400 && res.status <= 599)) {
+              throw res;
             }
           });
       }
