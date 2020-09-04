@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any, Callable
 
 
 class MetricsApiConfig:
@@ -26,15 +26,19 @@ class MetricsApiConfig:
             send to ReadMe.
 
             If this option is configured, ONLY the whitelisted properties will be sent.
+        ALLOWED_HTTP_HOSTS (List[str] (optional)): A list of allowed http hosts for sending
+            data to the ReadMe API.
+
     """
 
     README_API_KEY: str = None
     BUFFER_LENGTH: int = 10
-    GROUPING_FUNCTION = lambda req: None
+    GROUPING_FUNCTION: Callable[[Any], None] = lambda req: None
     IS_DEVELOPMENT_MODE: bool = False
     IS_BACKGROUND_MODE: bool = True
     BLACKLIST: List[str] = []
     WHITELIST: List[str] = []
+    ALLOWED_HTTP_HOSTS: List[str] = []
 
     def __init__(
         self,
@@ -45,6 +49,7 @@ class MetricsApiConfig:
         background_worker_mode: bool = True,
         blacklist: List[str] = None,
         whitelist: List[str] = None,
+        allowed_http_hosts: List[str] = None,
     ):
         """Initializes an instance of the MetricsApiConfig object
 
@@ -72,6 +77,8 @@ class MetricsApiConfig:
 
                 If this option is configured, ONLY the whitelisted properties will be
                 sent.
+            allowed_http_hosts (List[str], optional): A list of allowed http hosts for sending data
+                to the ReadMe API.
         """
         self.README_API_KEY = api_key
         self.GROUPING_FUNCTION = grouping_function
@@ -80,3 +87,4 @@ class MetricsApiConfig:
         self.IS_BACKGROUND_MODE = background_worker_mode
         self.BLACKLIST = blacklist or []
         self.WHITELIST = whitelist or []
+        self.ALLOWED_HTTP_HOSTS = allowed_http_hosts

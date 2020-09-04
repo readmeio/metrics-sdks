@@ -1,7 +1,7 @@
 from readme_metrics.Metrics import Metrics
 from readme_metrics.MetricsApiConfig import MetricsApiConfig
 from readme_metrics.ResponseInfoWrapper import ResponseInfoWrapper
-from werkzeug import Request, Response
+from werkzeug import Request
 import io
 import time
 import datetime
@@ -100,8 +100,13 @@ class MetricsMiddleware:
                     data.decode("utf-8"),
                 )
 
-                # Send off data to be queued (and processed) by ReadMe
-                self.metrics_core.process(req, res)
+                # Send off data to be queued (and processed) by ReadMe if allowed
+                if self.config.ALLOWED_HTTP_HOSTS:
+                    if environ["HTTP_HOST"] in self.config.ALLOWED_HTTP_HOSTS:
+                        self.metrics_core.process(req, res)
+                else:
+                    # If the allowed_http_hosts has not been set (None by default), send off the data to be queued
+                    self.metrics_core.process(req, res)
 
                 yield data
 
