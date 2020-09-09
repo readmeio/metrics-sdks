@@ -41,7 +41,7 @@ module.exports = (res, options = {}) => {
     headers: objectToArray(headers),
     content: {
       text: JSON.stringify(body),
-      size: res.get('content-length') || 0,
+      size: parseFloat(res.get('content-length')) || 0,
       mimeType: res.get('content-type'),
     },
   };
