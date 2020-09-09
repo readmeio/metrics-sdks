@@ -59,3 +59,4 @@ MetricsApiConfig(
 | blacklist | **optional** An array of keys from your API requests and responses headers and bodies that you wish to blacklist from sending to ReadMe.<br /><br />If you configure a blacklist, it will override any whitelist configuration. |
 | whitelist | **optional** An array of keys from your API requests and responses headers and bodies that you only wish to send to ReadMe. |
 | buffer_length | **default: 10** Sets the number of API calls that should be recieved before the requests are sent to ReadMe |
+| allowed_http_hosts | A list of allowed http hosts for sending data to the ReadMe API.|
