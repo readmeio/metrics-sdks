@@ -1,4 +1,3 @@
-/* eslint-disable global-require */
 const assert = require('assert').strict;
 const { AssertionError } = require('assert');
 const expect = require('expect');
@@ -10,8 +9,8 @@ const Ajv = require('ajv');
 const bodyParser = require('body-parser');
 const { isValidUUIDV4 } = require('is-valid-uuid-v4');
 
-const metricsApi = require('./fixtures/openapi.json');
-const harFixtures = require('./fixtures/har');
+const metricsApi = require('./openapi.json');
+const harFixtures = require('./payloads');
 
 const port = 3000;
 const baseLogUrl = 'https://docs.example.com';
@@ -23,18 +22,17 @@ const baseLogUrl = 'https://docs.example.com';
 }; */
 
 console.logx = obj => {
+  // eslint-disable-next-line global-require
   console.log(require('util').inspect(obj, false, null, true /* enable colors */));
 };
 
+app.use(bodyParser.json({}));
 app.use((req, res, next) => {
   res.io = io;
   next();
 });
 
-app.use(bodyParser.json({}));
-
 app.use((req, res, next) => {
-  // Make sure all requests are authorized.
   const auth = req.header('authorization');
   if (!auth) {
     return res.status(401).json({
@@ -42,7 +40,6 @@ app.use((req, res, next) => {
     });
   }
 
-  // Make sure that all requests have a well-formated user agent.
   const userAgent = req.header('user-agent');
   if (!userAgent) {
     return res.status(400).json({
@@ -58,14 +55,12 @@ app.use((req, res, next) => {
   return next();
 });
 
-// ReadMe API calls
 app.get('/readme-api/v1', (req, res) => {
   return res.json({
     baseUrl: baseLogUrl,
   });
 });
 
-// Metrics API calls
 app.post('/metrics-api/v1/request', async (req, res) => {
   try {
     // Assert that we have the proper shell of a Metrics API call here
@@ -129,9 +124,12 @@ app.post('/metrics-api/v1/request', async (req, res) => {
 
         const entry = payload.request.log.entries[0];
 
-        // Ensure that our payload response headers contains the `x-documentation-url` and that it contains the same UUID.
+        // Since we're doing wildcard matches on our headers later, let's make sure that we at least have some headers
+        // present.
+        assert.ok(entry.request.headers.length > 0, 'Entry request headers is empty.');
         assert.ok(entry.response.headers.length > 1, 'Entry response headers should have more than one entry.');
 
+        // Ensure that our payload response headers contains the `x-documentation-url` and that it contains the same UUID.
         const docsHeader = entry.response.headers.find(header => header.name === 'x-documentation-url');
         assert.ok(docsHeader, 'No `x-documentation-url` header could be located in the entry response headers');
 
@@ -150,8 +148,9 @@ app.post('/metrics-api/v1/request', async (req, res) => {
           'Entry `request.url` should point to localhost.'
         );
 
-        // Update our test fixture to contain the UUID we're working with, as well as allow dynamic matching on dates and
-        // times.
+        // Update our test fixture to contain the UUID we're working with, as well as allow dynamic matching on dates
+        // and times. We need to use `expect` instead of `assert` for this assertion because Expect allow us to dynamic
+        // matching on deep objects with `expect.any()`.
         expected._id = uuid;
         expected.request.log.entries.forEach((ent, i) => {
           expected.request.log.entries[i].pageref = expect.any(String);
@@ -196,7 +195,6 @@ app.all('*', (req, res) => {
   });
 });
 
-// server.listen(port);
 server.listen(port);
 server.on('listening', () => {
   const addr = server.address();

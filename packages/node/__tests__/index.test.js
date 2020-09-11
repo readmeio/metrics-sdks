@@ -1,4 +1,3 @@
-/* eslint-disable global-require */
 const express = require('express');
 const request = require('supertest');
 // const nock = require('nock');
@@ -13,10 +12,6 @@ const io = require('socket.io-client');
 const pkg = require('../package.json');
 const middleware = require('..');
 
-/* const harFixtures = {
-  standard: require('../../../fixtures/standard.har'),
-}; */
-
 const apiKey = 'mockReadMeApiKey';
 const group = {
   id: '5afa21b97011c63320226ef3',
@@ -30,12 +25,6 @@ const cacheDir = findCacheDir({ name: pkg.name });
 console.logx = obj => {
   console.log(require('util').inspect(obj, false, null, true /* enable colors */))
 }
-
-const asyncWrap = fn => {
-  return (req, res, next) => {
-    fn(req, res, next).catch(next);
-  };
-};
 
 /* function getReadMeApiMock(numberOfTimes) {
   return nock(config.readmeApiUrl, {
@@ -107,7 +96,6 @@ describe('#metrics', () => {
 
   afterEach(() => {
     socket.disconnect();
-    // nock.cleanAll();
 
     // Clean up the cache dir between tests.
     rimraf.sync(cacheDir);
