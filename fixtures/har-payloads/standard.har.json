@@ -28,19 +28,12 @@
               { "name": "user-agent", "value": "node-superagent/3.8.3" },
               { "name": "connection", "value": "close" }
             ],
-            "queryString": [],
-            "headersSize": -1,
-            "bodySize": -1,
-            "cookies": []
+            "queryString": []
           },
           "response": {
             "status": 200,
             "statusText": "OK",
             "headers": [
-              {
-                "name": "x-powered-by",
-                "value": "Express"
-              },
               {
                 "name": "x-documentation-url",
                 "value": "https://docs.example.com/logs/369a33a3-80b6-4bf0-8b01-79cdd6797239"
@@ -52,15 +45,11 @@
               {
                 "name": "content-length",
                 "value": "2"
-              },
-              {
-                "name": "etag",
-                "value": "W/\"2-nOO9QiTIwXgNtWtBJezz8kv3SLc\""
               }
             ],
             "content": {
               "text": "\"OK\"",
-              "size": "2",
+              "size": 2,
               "mimeType": "text/plain; charset=utf-8"
             }
           }

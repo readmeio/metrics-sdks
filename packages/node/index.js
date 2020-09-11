@@ -6,11 +6,10 @@ const flatCache = require('flat-cache');
 const findCacheDir = require('find-cache-dir');
 const pkg = require('./package.json');
 
-console.logx = obj => {
-  console.log(require('util').inspect(obj, false, null, true /* enable colors */))
-}
-
 const constructPayload = require('./lib/construct-payload');
+
+config.readmeApiUrl = 'http://localhost:3000/readme-api';
+config.host = 'http://localhost:3000/metrics-api';
 
 // We're doing this to buffer up the response body
 // so we can send it off to the metrics server
@@ -54,8 +53,7 @@ async function getProjectBaseUrl(encodedApiKey, options) {
     (lastUpdated !== undefined && Math.abs(lastUpdated - Math.round(Date.now() / 1000)) >= 86400)
   ) {
     let baseUrl;
-    // await fetch(`${config.readmeApiUrl}/v1/`, {
-    await fetch(`http://localhost:3000/readme-api/v1/`, {
+    await fetch(`${config.readmeApiUrl}/v1/`, {
       method: 'get',
       headers: {
         Authorization: `Basic ${encodedApiKey}`,
@@ -76,7 +74,7 @@ async function getProjectBaseUrl(encodedApiKey, options) {
         cache.setKey('lastUpdated', Math.round(Date.now() / 1000));
       })
       .catch(err => {
-        if (options.development && (res.status >= 400 && res.status <= 599)) {
+        if (options.development) {
           throw err;
         }
 

@@ -99,12 +99,14 @@ expect.extend({
 });
 
 describe('#metrics', () => {
-  /* beforeEach(() => {
-    nock.disableNetConnect();
-    nock.enableNetConnect('127.0.0.1');
-  }); */
+  let socket;
+
+  beforeEach(() => {
+    socket = io('http://localhost:3000');
+  });
 
   afterEach(() => {
+    socket.disconnect();
     // nock.cleanAll();
 
     // Clean up the cache dir between tests.
@@ -123,60 +125,20 @@ describe('#metrics', () => {
     }).toThrow('You must provide a grouping function');
   });
 
-  it.only('should send a request to the metrics server', () => {
-    const socket = io('http://localhost:3000');
-    socket.on('connect', function(){
-      console.log('connected')
+  it.only('should send a request to the metrics server', async (done) => {
+    socket.on('sdk-assertion', (assertion) => {
+      expect(assertion.error, assertion.reason).toBeUndefined();
+      done();
     });
-
-    socket.on('testResult', function(data){
-      console.logx(data);
-    });
-
-    socket.on('disconnect', function(){
-      console.log('disconnected')
-    });
-
-    // const apiMock = getReadMeApiMock(1);
-    /* const mock = nock(config.host, {
-      reqheaders: {
-        'Content-Type': 'application/json',
-        'User-Agent': `${pkg.name}/${pkg.version}`,
-      },
-    })
-      .post('/v1/request', async ([body]) => {
-        await toHaveValidPayload(body, 'standard');
-      })
-      .basicAuth({ user: apiKey })
-      .reply(200); */
 
     const app = express();
-    app.use(
-      middleware.metrics(
-        apiKey,
-        () => ({
-          ...group,
-          id: 'standard',
-        }),
-        {
-          developmentMode: true,
-        }
-      )
-    );
+    app.use(middleware.metrics(apiKey, () => ({ ...group, id: 'standard' })));
     app.get('/test', (req, res) => res.sendStatus(200));
 
-    return request(app)
+    await request(app)
       .get('/test')
       .expect(200)
-      .expect(res => expect(res).toHaveDocumentationHeader())
-      .then(() => {
-        // apiMock.done();
-        // mock.done();
-        socket.disconnect();
-      })
-      .catch(err => {
-        console.log('📮', err)
-      });
+      .expect(res => expect(res).toHaveDocumentationHeader());
   });
 
   /* describe('#bufferLength', () => {

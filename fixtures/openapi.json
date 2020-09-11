@@ -1,0 +1,948 @@
+{
+  "openapi": "3.0.2",
+  "x-api-id": "readme-metrics-api",
+  "info": {
+    "description": "Developer Metrics API",
+    "version": "1.0.0",
+    "title": "Developer Metrics API"
+  },
+  "servers": [
+    {
+      "url": "https://metrics.readme.io"
+    }
+  ],
+  "paths": {
+    "/apiexplorer/successrate": {
+      "get": {
+        "description": "Get total number of successful calls vs calls that resulted in an error. Gets calls your users made via the Try It buttons in your API Explorer. Like all the API Explorer endpoints, this doesn't get calls users made to your API made via other methods.",
+        "summary": "Get success vs error for API explorer",
+        "tags": [
+          "API Explorer"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API explorer requests"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/apiexplorer/total": {
+      "get": {
+        "description": "Get total calls your users made via the Try It buttons in your API Explorer.",
+        "summary": "Get total API Explorer requests",
+        "tags": [
+          "API Explorer"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API explorer requests"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/apiexplorer/urls": {
+      "get": {
+        "description": "Get list of top URLs your users called via the Try It buttons in your API explorer, with the count for each of the top calls.",
+        "summary": "Get top URLs for API explorer",
+        "tags": [
+          "API Explorer"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API explorer requests"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/apiexplorer/statuscode": {
+      "get": {
+        "description": "Get top status codes that were returned to users who called your API via the Try It buttons in your API Explorer, and their counts.",
+        "summary": "Get top status codes for API Explorer",
+        "tags": [
+          "API Explorer"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API explorer requests"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/apiexplorer/statuscode_url": {
+      "get": {
+        "description": "Get top status codes that were returned to users who called your API via the Try It buttons in your API Explorer. For each status code, see the URLs that were called that returned that code and the number of times that URL was called.",
+        "summary": "Get top status codes for API explorer by URL",
+        "tags": [
+          "API Explorer"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API explorer requests"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/apiexplorer/{url}": {
+      "get": {
+        "description": "For a URL, get the number of calls and who made the call. Only tracks calls made by using the Try It button in your API Explorer.",
+        "summary": "Get a breakdown of API Explorer requests to an URL",
+        "tags": [
+          "API Explorer"
+        ],
+        "parameters": [
+          {
+            "name": "url",
+            "in": "path",
+            "description": "URL to retrieve requests for.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API explorer requests"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/apiexplorer": {
+      "get": {
+        "description": "See details on all the calls users made using the Try It button in your API Explorer, for the given time range.",
+        "summary": "Get API Explorer requests",
+        "tags": [
+          "API Explorer"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API explorer requests"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/companies": {
+      "get": {
+        "description": "Get list of companies that have viewed docs, in order to identify sales leads. Powered by Clearbit, which delivers company data based on a viewer's IP address regardless of whether they are logged into ReadMe. This information is also available on your Project Metrics dashboard under the Leads tab.",
+        "summary": "Get list of companies that have viewed docs",
+        "tags": [
+          "Companies"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of companies that have viewed docs"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/companies/{project}/{company}": {
+      "get": {
+        "description": "Get all data on a given company's activity for one of your docs project, such page view metrics, search term metrics, voting metrics, and interactions with your API explorer. This information is also available on your Project Metrics dashboard under the Leads tab.",
+        "summary": "Get all data on company for docs project",
+        "tags": [
+          "Companies"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/projectPath"
+          },
+          {
+            "name": "company",
+            "in": "path",
+            "description": "Company to get Clearbit data for",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get all data on company for project"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/pageview": {
+      "get": {
+        "description": "Get most visited pages for your docs project and the number of times each page was visited. Counts both unauthenticated and authenticated viewers.  This info is also available on your Project Metrics dashboard.",
+        "summary": "Get most visited pages for project",
+        "tags": [
+          "Page Views"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page views"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/pageview/total": {
+      "get": {
+        "description": "Get total page views for your docs project. Counts both unauthenticated and authenticated viewer. This info is also available on your Project Metrics dashboard.",
+        "summary": "Get total page views for docs project",
+        "tags": [
+          "Page Views"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total page views for project"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/pageview/historical/unique": {
+      "get": {
+        "description": "Get total unique page views for previous period for your docs project. Counts both authenticated and unauthenticated viewers. This info is also available (with less time period granularity) on your Project Metrics dashboard. The previous period is defined by taking the `timeAgo` parameter and offsetting it from the current date, rather than simply subtracting it from the current date like other endpoints.  So if `timeAgo` were set to 30, this endpoint would get the data from 60 days ago to 30 days ago. If `timeAgo` were set to 20, this endpoint would get the data from 40 days ago to 20 days ago.",
+        "summary": "Get total unique page views for previous period",
+        "tags": [
+          "Page Views"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total page views for project"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/pageview/time": {
+      "get": {
+        "description": "For the days in a specified time period, get the total number of pages that were viewed for each day. Counts both authenticated and unauthenticated viewers. This info is also available (with less time period granularity) on your Project Metrics dashboard.",
+        "summary": "Get page views by day",
+        "tags": [
+          "Page Views"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page views per day"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/pageview/unique": {
+      "get": {
+        "description": "Gets total unique page views for your docs project. Counts both authenticated and unauthenticated viewers. This info is also available (with less time period granularity) on your Project Metrics dashboard.",
+        "summary": "Get total total unique page views",
+        "tags": [
+          "Page Views"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Unique page views"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/pageview/users": {
+      "get": {
+        "description": "Get the email addresses of the authenticated users with the most views for your docs project, sorted by total views per user.  This info is also available (with less time period granularity) on your Project Metrics dashboard.",
+        "summary": "Get top logged in users for docs project",
+        "tags": [
+          "Page Views"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page views"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/pageview/{path}": {
+      "get": {
+        "description": "For a given page, see which viewers visited the page and how many times they visited that page, ordered by top viewers. Counts both authenticated and unauthenticated viewers.",
+        "summary": "Get top viewers for a page",
+        "tags": [
+          "Page Views"
+        ],
+        "parameters": [
+          {
+            "name": "path",
+            "in": "path",
+            "description": "Page view",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page views broken down by unique user"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/request": {
+      "post": {
+        "description": "Send an API Log to ReadMe, so that you can view developer usage metrics about your API. For more information see https://docs.readme.com/metrics/docs/viewing-api-metrics-in-readme.",
+        "summary": "Send an API Log to ReadMe",
+        "tags": [
+          "API Logs"
+        ],
+        "requestBody": {
+          "description": "Request object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Finished saving (not necessarily successful)"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/search": {
+      "get": {
+        "description": "Get the top search phrases that users looked for in your docs project, ordered by search count. This information is also available (with less time period granularity) on the Project Metrics dashboard.",
+        "summary": "Get most searched terms for docs project",
+        "tags": [
+          "Search"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Page views"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/search/{search}": {
+      "get": {
+        "description": "Get metrics for a particular search phrase in your docs project, including who searched and search count. Returns the IP addresses of unauthenticated users, or email of authenticated viewers. This information is also available on the Project Metrics dashboard.",
+        "summary": "Get metrics for specific search term",
+        "tags": [
+          "Search"
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "path",
+            "description": "Search term",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Searches down by unique user"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/thumb/worst": {
+      "get": {
+        "description": "Get the pages in your docs project with the highest number of 'thumbs-down' votes. This information is also available on the Project Metrics dashboard.",
+        "summary": "Get worst pages",
+        "tags": [
+          "Thumb Vote"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pages with worst ratings"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/thumb/best": {
+      "get": {
+        "description": "Get the pages in your docs project with the highest number of 'thumbs-up' votes. This information is also available on the Project Metrics dashboard.",
+        "summary": "Get best pages",
+        "tags": [
+          "Thumb Vote"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pages with best ratings"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/thumb/average": {
+      "get": {
+        "description": "Get the total number of thumbs-up/thumbs-down votes on page quality for your docs project for the specified time period, and see how many of those votes were positive.",
+        "summary": "Get average votes for a time period",
+        "tags": [
+          "Thumb Vote"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Monthly scores"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/thumb/comments": {
+      "get": {
+        "description": "Get the comments viewers left when they voted with a thumbs-up/thumbs-down pages in your docs project (vote = 1 indicates a thumbs-up, vote = 0 indicates a thumbs-down.) Returns only those votes for which viewers included comments.",
+        "summary": "Get comments for thumbs votes",
+        "tags": [
+          "Thumb Vote"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get comments based on a time"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/thumb/{path}": {
+      "get": {
+        "description": "Get votes for a particular page in your docs project.",
+        "summary": "Get votes for page",
+        "tags": [
+          "Thumb Vote"
+        ],
+        "parameters": [
+          {
+            "name": "path",
+            "in": "path",
+            "description": "Page path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "$ref": "#/components/parameters/timeAgo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Votes for page at path"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKey": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
+    "parameters": {
+      "projectPath": {
+        "name": "project",
+        "in": "path",
+        "description": "ReadMe subdomain",
+        "schema": {
+          "type": "string"
+        },
+        "required": true
+      },
+      "timeAgo": {
+        "name": "timeAgo",
+        "in": "query",
+        "description": "The number of days to fetch data for.",
+        "schema": {
+          "type": "integer",
+          "default": 30,
+          "minimum": 1
+        }
+      }
+    },
+    "schemas": {
+      "Request": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "clientIPAddress",
+            "group",
+            "request"
+          ],
+          "properties": {
+            "clientIPAddress": {
+              "type": "string",
+              "description": "IP Address making request"
+            },
+            "development": {
+              "type": "boolean",
+              "default": true
+            },
+            "group": {
+              "type": "object",
+              "description": "Data about the user or project making the API call",
+              "required": [
+                "id"
+              ],
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "Email associated with the API call"
+                },
+                "label": {
+                  "type": "string",
+                  "description": "Human-readable description of user or project making the API call. Ex) Company Name/User Name/Project Name"
+                },
+                "id": {
+                  "type": "string",
+                  "description": "Unique ID for user or project making API call. Ex) API Key/ObjectId"
+                }
+              }
+            },
+            "request": {
+              "type": "object",
+              "description": "HAR Object for Request",
+              "properties": {
+                "log": {
+                  "type": "object",
+                  "description": "Root of HAR object",
+                  "properties": {
+                    "creator": {
+                      "type": "object",
+                      "description": "Information about the package or HTTP module used to log the request.",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Name of the package or HTTP module used.",
+                          "example": "readmeio"
+                        },
+                        "version": {
+                          "type": "string",
+                          "description": "Version of the package or HTTP module.",
+                          "example": "1.2.1"
+                        },
+                        "comment": {
+                          "type": "string",
+                          "description": "Additional data to be used to identify the origin of the log.",
+                          "example": "darwin/v10.16.0"
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "version"
+                      ]
+                    },
+                    "entries": {
+                      "type": "array",
+                      "description": "HTTP Requests made",
+                      "items": {
+                        "required": [
+                          "request",
+                          "response",
+                          "startedDateTime",
+                          "time"
+                        ],
+                        "type": "object",
+                        "properties": {
+                          "pageref": {
+                            "type": "string",
+                            "description": "The API endpoint or page that was accessed.",
+                            "example": "https://api.example.com/v1/pets"
+                          },
+                          "startedDateTime": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "HTTP request start time",
+                            "example": "2020-09-09T18:54:02.797Z"
+                          },
+                          "time": {
+                            "type": "number",
+                            "description": "Total elapsed time in MS"
+                          },
+                          "request": {
+                            "required": [
+                              "headers",
+                              "httpVersion",
+                              "method",
+                              "queryString",
+                              "url"
+                            ],
+                            "type": "object",
+                            "properties": {
+                              "method": {
+                                "type": "string",
+                                "description": "HTTP Method"
+                              },
+                              "url": {
+                                "type": "string",
+                                "description": "Full URL of Request"
+                              },
+                              "httpVersion": {
+                                "type": "string",
+                                "description": "Name and revision of the information protocol via which the page was requested."
+                              },
+                              "headers": {
+                                "type": "array",
+                                "description": "Headers",
+                                "items": {
+                                  "required": [
+                                    "name",
+                                    "value"
+                                  ],
+                                  "type": "object",
+                                  "properties": {
+                                    "name": {
+                                      "type": "string"
+                                    },
+                                    "value": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              },
+                              "queryString": {
+                                "type": "array",
+                                "items": {
+                                  "required": [
+                                    "name",
+                                    "value"
+                                  ],
+                                  "type": "object",
+                                  "properties": {
+                                    "name": {
+                                      "type": "string"
+                                    },
+                                    "value": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              },
+                              "postData": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "mimeType": {
+                                      "type": "string"
+                                    },
+                                    "params": {
+                                      "type": "array",
+                                      "items": {
+                                        "required": [
+                                          "name",
+                                          "value"
+                                        ],
+                                        "type": "object",
+                                        "properties": {
+                                          "name": {
+                                            "type": "string"
+                                          },
+                                          "value": {
+                                            "type": "string"
+                                          },
+                                          "fileName": {
+                                            "type": "string"
+                                          },
+                                          "contentType": {
+                                            "type": "string",
+                                            "description": "Content type of posted file"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "text": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "response": {
+                            "required": [
+                              "headers",
+                              "status",
+                              "statusText"
+                            ],
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "type": "number",
+                                "description": "HTTP Status Code"
+                              },
+                              "statusText": {
+                                "type": "string",
+                                "description": "Response status description"
+                              },
+                              "headers": {
+                                "type": "array",
+                                "items": {
+                                  "required": [
+                                    "name",
+                                    "value"
+                                  ],
+                                  "type": "object",
+                                  "properties": {
+                                    "name": {
+                                      "type": "string"
+                                    },
+                                    "value": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              },
+                              "content": {
+                                "type": "object",
+                                "description": "Details about the response body",
+                                "required": [
+                                  "mimeType",
+                                  "size"
+                                ],
+                                "properties": {
+                                  "size": {
+                                    "type": "number",
+                                    "description": "Length of the returned content in bytes"
+                                  },
+                                  "mimeType": {
+                                    "type": "string"
+                                  },
+                                  "text": {
+                                    "type": "string",
+                                    "description": "Response body sent from the server or loaded from the browser cache. This field is populated with textual content only. The text field is either HTTP decoded text or an encoded (e.g. \"base64\") representation of the response body. Leave out this field if the information is not available."
+                                  },
+                                  "encoding": {
+                                    "type": "string",
+                                    "description": "Encoding used for response text field. Leave out this field if the text field is HTTP decoded (decompressed and unchunked), then transcoded from its original character set into UTF-8.",
+                                    "example": "base64"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

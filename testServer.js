@@ -1,18 +1,21 @@
-/* eslint-disable prettier/prettier */
 /* eslint-disable global-require */
+const assert = require('assert').strict;
+const { AssertionError } = require('assert');
+const expect = require('expect');
 const app = require('express')();
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
+const toJsonSchema = require('@openapi-contrib/openapi-schema-to-json-schema');
+const Ajv = require('ajv');
 const bodyParser = require('body-parser');
+const { isValidUUIDV4 } = require('is-valid-uuid-v4');
 
-const harFixtures = {
-  standard: require('./fixtures/standard.har'),
-};
+const metricsApi = require('./fixtures/openapi.json');
+const harFixtures = require('./fixtures/har');
 
 const port = 3000;
-// const socketPort = 3001;
 const baseLogUrl = 'https://docs.example.com';
-const apiKey = 'mockReadMeApiKey';
+// const apiKey = 'mockReadMeApiKey';
 /* const group = {
   id: '5afa21b97011c63320226ef3',
   label: 'example user',
@@ -20,8 +23,13 @@ const apiKey = 'mockReadMeApiKey';
 }; */
 
 console.logx = obj => {
-  console.log(require('util').inspect(obj, false, null, true /* enable colors */))
-}
+  console.log(require('util').inspect(obj, false, null, true /* enable colors */));
+};
+
+app.use((req, res, next) => {
+  res.io = io;
+  next();
+});
 
 app.use(bodyParser.json({}));
 
@@ -30,14 +38,7 @@ app.use((req, res, next) => {
   const auth = req.header('authorization');
   if (!auth) {
     return res.status(401).json({
-      message: "You must pass in an API key",
-      suggestion: "API keys can be passed in as the username part of basic auth. You can find a code snippet in our docs! You can get your API key in Configuration > API Key, or in the docs.",
-      poem: [
-        "A very little key",
-        "Can open a heavy door",
-        "So include your authentication",
-        "To see what our API has in store!"
-      ]
+      message: 'You must pass in an API key',
     });
   }
 
@@ -46,132 +47,160 @@ app.use((req, res, next) => {
   if (!userAgent) {
     return res.status(400).json({
       message: 'No user agent was supplied in a request from the SDK.',
-    })
+    });
   } else if (userAgent !== 'readmeio/4.0.0') {
     // @todo split the UA and make sure that the first part is recognized and that the latter is valid semver
     return res.status(400).json({
       message: `An improperly formatted user agent (${userAgent}) was supplied. SDK user agents must be in a \`sdkName/versionSemver\` scheme.`,
-    })
+    });
   }
 
   return next();
-})
+});
 
-io.on('connection', function(socket) {
-  console.log('A user connected');
-
-  // Send a message after a timeout of 4seconds
-  /* setTimeout(function() {
-     socket.send('Sent a message 4seconds after connection!');
-  }, 4000); */
-
-  // console.log(socket)
-
-  // socket.emit('event', {msg:'abc1'});
-  socket.emit('testResult', {msg:'abc1'});
-
-  socket.on('disconnect', function () {
-     console.log('A user disconnected');
+// ReadMe API calls
+app.get('/readme-api/v1', (req, res) => {
+  return res.json({
+    baseUrl: baseLogUrl,
   });
+});
 
-  // ReadMe API calls
-  app.get('/readme-api/v1', (req, res) => {
-    return res.json({
-      baseUrl: baseLogUrl,
-    });
-  });
+// Metrics API calls
+app.post('/metrics-api/v1/request', async (req, res) => {
+  try {
+    // Assert that we have the proper shell of a Metrics API call here
+    const metricsSchema = {
+      $id: 'readme-metrics.json',
+      ...toJsonSchema(metricsApi.components.schemas.Request),
+    };
 
-  // Metrics API calls
-  app.post('/metrics-api/v1/request', (req, res) => {
-    // io.sockets.emit('hello', {msg:'abc'});
-    // io.sockets.emit('event', {msg:'abc'});
+    // `openapi-schema-to-json-schema` spits out draft-04 schemas, but AJV needs a bunch of custom handling in order to
+    // deal with them, which if we don't add AJV will throw an "Error: no schema with key or ref
+    // http://json-schema.org/draft-04/schema# error. However, if we just remove the `$schema` key from our schema, it'll
+    // validate it just fine.
+    //
+    // Maybe not ideal, but it skirts us having to add a bunch of potential flaky boilerplate.
+    //
+    // @link https://github.com/ajv-validator/ajv/releases/tag/5.0.0
+    delete metricsSchema.$schema;
 
-    // socket.emit('testResult', {msg:'abc1'});
+    const ajv = new Ajv({ allErrors: true });
+    ajv.addSchema(metricsSchema);
 
-    // console.logx(req.body)
+    const validate = ajv.getSchema('readme-metrics.json');
 
+    assert.ok(
+      validate(req.body),
+      new AssertionError({
+        message: 'Incoming Metrics payload does match what we expect it to look like.',
+        actual: validate.errors,
+        expected: {},
+      })
+    );
+
+    await Promise.all(
+      req.body.map(async payload => {
+        // Determine that we have a group ID set to a test fixture.
+        assert.ok(
+          payload.group.id in harFixtures,
+          new AssertionError({
+            message: 'An unknown test fixture was set as `group.id` See the `fixtures/` directory for valid options.',
+            actual: payload.group.id,
+          })
+        );
+
+        const expected = harFixtures[payload.group.id];
+
+        // Make sure that we have a valid UUIDs.
+        const uuid = payload._id;
+        assert.ok(
+          isValidUUIDV4(uuid),
+          new AssertionError({
+            message: `An \`_id\` within the payload is not a valid v4 UUID.`,
+            actual: uuid,
+          })
+        );
+
+        assert.strictEqual(
+          payload.request.log.entries.length,
+          1,
+          "Amount of request log entries in a HAR payload did not equal 1. This typically shouldn't happen?"
+        );
+
+        const entry = payload.request.log.entries[0];
+
+        // Ensure that our payload response headers contains the `x-documentation-url` and that it contains the same UUID.
+        assert.ok(entry.response.headers.length > 1, 'Entry response headers should have more than one entry.');
+
+        const docsHeader = entry.response.headers.find(header => header.name === 'x-documentation-url');
+        assert.ok(docsHeader, 'No `x-documentation-url` header could be located in the entry response headers');
+
+        assert.strictEqual(
+          docsHeader.value,
+          `${baseLogUrl}/logs/${uuid}`,
+          '`x-documentation-url` header is not what is expected.'
+        );
+
+        // Since our fake environment creates variable ports, we need to ensure that our pagerefs and URLs in the payload
+        // are valid URLs.
+        assert.strictEqual(new URL(entry.pageref).hostname, '127.0.0.1', 'Entry `pageref` should point to localhost.');
+        assert.strictEqual(
+          new URL(entry.request.url).hostname,
+          '127.0.0.1',
+          'Entry `request.url` should point to localhost.'
+        );
+
+        // Update our test fixture to contain the UUID we're working with, as well as allow dynamic matching on dates and
+        // times.
+        expected._id = uuid;
+        expected.request.log.entries.forEach((ent, i) => {
+          expected.request.log.entries[i].pageref = expect.any(String);
+          expected.request.log.entries[i].request.headers = expect.any(Array);
+          expected.request.log.entries[i].request.url = expect.any(String);
+          expected.request.log.entries[i].response.headers = expect.any(Array);
+          expected.request.log.entries[i].startedDateTime = expect.any(String);
+          expected.request.log.entries[i].time = expect.any(Number);
+        });
+
+        try {
+          await expect(payload).toStrictEqual(expected);
+        } catch (err) {
+          if (err.matcherResult && err.matcherResult.name !== 'toStrictEqual') {
+            throw err;
+          }
+
+          throw new AssertionError({
+            message: 'Payload does not line up with the test fixture.',
+            actual: err.message,
+          });
+        }
+      })
+    );
+  } catch (err) {
+    if (!(err instanceof AssertionError)) {
+      throw err;
+    }
+
+    res.io.emit('sdk-assertion', { success: false, reason: err.message, error: err });
     return res.sendStatus(200);
-    // return res.status(400).json({ error: 'idk' });
-  });
+  }
 
-  app.all('*', (req, res) => {
-    return res.status(404).json({
-      error: 'Unknown test runner endpoint accessed. Hit `GET /readme-api/v1` or `POST /metrics-api/v1/request`.'
-    });
+  res.io.emit('sdk-assertion', { success: true });
+
+  return res.sendStatus(200);
+});
+
+app.all('*', (req, res) => {
+  return res.status(404).json({
+    error: `Unknown or unmocked test runner endpoint accessed: ${req.path}`,
   });
 });
 
-http.listen(port, function() {
-  console.log(`Test server running at http://localhost:${port}`);
+// server.listen(port);
+server.listen(port);
+server.on('listening', () => {
+  const addr = server.address();
+  const bind = typeof addr === 'string' ? `pipe ${addr}` : `port ${addr.port}`;
+
+  console.log(`Listening on ${bind}`);
 });
-
-/**
- * Given a real payload from a call to the Metrics API, assert that it's valid against what we expect for a type of
- * test.
- *
- * @param {Object} payload
- * @param {String} fixtureName The testing framework HAR payload fixture for the type of test you're writing against.
- *    Supported fixtures can be found in the root `fixtures/` directory.
- */
-/* async function toHaveValidPayload(actual, stubName) {
-  const expected = harFixtures[stubName];
-  const payload = actual;
-
-  // Make sure that the payload structure is right.
-  expect(payload).toStrictEqual({
-    _id: expect.any(String),
-    group: expect.any(Object),
-    clientIPAddress: expect.any(String),
-    request: expect.any(Object),
-  });
-
-  // Make sure that we have a valid UUID.
-  const uuid = payload._id;
-  expect(isValidUUIDV4(uuid)).toBe(true);
-
-  // Assert that the data request we're packaging up is a valid HAR.
-  payload.request.log.entries.forEach((entry, i) => {
-    // We don't fill this data in the SDK but let's mock it out so that we have a HAR that validates.
-    payload.request.log.entries[i].request.headersSize = -1;
-    payload.request.log.entries[i].request.bodySize = -1;
-    payload.request.log.entries[i].request.cookies = [];
-
-    // We can't assert that the dates and times match each other, but can at least make sure that they're right.
-    expect(
-      Number.isNaN(Date.parse(payload.request.log.entries[i].startedDateTime)),
-      `startedDateTime (${payload.request.log.entries[i].startedDateTime}) should be a date`
-    ).toBe(false);
-
-    expect(typeof payload.request.log.entries[i].time).toBe('number');
-
-    // Ensure that our payload response headers contains the `x-documentation-url`.
-    const docsHeader = entry.response.headers.find(header => header.name === 'x-documentation-url');
-
-    console.logx(payload)
-
-    expect(docsHeader).not.toBeUndefined();
-    expect(docsHeader.value).toBe(`${baseLogUrl}/logs/${uuid}`);
-
-    // Since our fake environment creates variable ports, we need to ensure that our pagerefs and URLs in the payload
-    // are valid URLs.
-    expect(new URL(entry.pageref).hostname).toBe('127.0.0.1');
-    expect(new URL(entry.request.url).hostname).toBe('127.0.0.1');
-  });
-
-  await expect(payload.request).toBeAValidHAR();
-
-  // Update our test fixture to contain the UUID we're working with, as well as allow dynamic matching on dates and
-  // times.
-  expected._id = uuid;
-  expected.request.log.entries.forEach((entry, i) => {
-    expected.request.log.entries[i].pageref = expect.any(String);
-    expected.request.log.entries[i].request.headers = expect.any(Array);
-    expected.request.log.entries[i].request.url = expect.any(String);
-    expected.request.log.entries[i].response.headers = expect.any(Array);
-    expected.request.log.entries[i].startedDateTime = expect.any(String);
-    expected.request.log.entries[i].time = expect.any(Number);
-  });
-
-  // See if our payload matches what we're expecting it to!
-  expect(payload).toStrictEqual(expected);
-} */
