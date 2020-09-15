@@ -24,12 +24,12 @@ jobs:
         run: npm ci
 
       - name: Start test server
-        working-directory: ../../
-        run: make start
+        working-directory: ./
+        run: make help
 
-      - name: Run tests
-        run: npm test
+      #- name: Run tests
+      #  run: npm test
 
-      - name: Cleanup
-        working-directory: ../../
-        run: make stop
+      #- name: Cleanup
+      #  working-directory: ../../
+      #  run: make stop
