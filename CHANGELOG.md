@@ -1,26 +1,3 @@
-## <small>4.0.1 (2020-09-15)</small>
-
-* ci: debugging ([8cde994](https://github.com/readmeio/metrics-sdks/commit/8cde994))
-* ci: setting up dependabot for the ruby sdk ([b5d29d3](https://github.com/readmeio/metrics-sdks/commit/b5d29d3))
-* test: debugging ([8a06acd](https://github.com/readmeio/metrics-sdks/commit/8a06acd))
-* test: getting the test server working behind a Makefile ([62eb336](https://github.com/readmeio/metrics-sdks/commit/62eb336))
-* test: porting over more node tests into the unified framework ([945bf3d](https://github.com/readmeio/metrics-sdks/commit/945bf3d))
-* chore: cleaning up the node sdk jest config ([7917b8a](https://github.com/readmeio/metrics-sdks/commit/7917b8a))
-* chore: ignore the __tests__ directory in the published node sdk ([bc32340](https://github.com/readmeio/metrics-sdks/commit/bc32340))
-* chore: moving the test server around a bit ([2b4d85a](https://github.com/readmeio/metrics-sdks/commit/2b4d85a))
-* chore: wip ([d1057f7](https://github.com/readmeio/metrics-sdks/commit/d1057f7))
-* chore(deps-dev): bump eslint from 7.7.0 to 7.8.0 (#89) ([f2bfcbd](https://github.com/readmeio/metrics-sdks/commit/f2bfcbd)), closes [#89](https://github.com/readmeio/metrics-sdks/issues/89)
-* chore(deps): bump more-itertools from 8.4.0 to 8.5.0 in /packages/python (#88) ([7b9982d](https://github.com/readmeio/metrics-sdks/commit/7b9982d)), closes [#88](https://github.com/readmeio/metrics-sdks/issues/88)
-* feat: another pass at the unified testing framework ([cad2e7b](https://github.com/readmeio/metrics-sdks/commit/cad2e7b))
-* feat: enabling development mode in the node sdk ([b133787](https://github.com/readmeio/metrics-sdks/commit/b133787))
-* feat: running php sdk tests against laravel 8 (#92) ([d24e244](https://github.com/readmeio/metrics-sdks/commit/d24e244)), closes [#92](https://github.com/readmeio/metrics-sdks/issues/92)
-* feat(python): Add allowed_http_hosts option to allow for only sending… (#64) ([66b3f48](https://github.com/readmeio/metrics-sdks/commit/66b3f48)), closes [#64](https://github.com/readmeio/metrics-sdks/issues/64)
-* fix: `response.content.size` should be always be a number ([eb3c5ee](https://github.com/readmeio/metrics-sdks/commit/eb3c5ee))
-* fix(node): only record a postData if there is one ([07057f4](https://github.com/readmeio/metrics-sdks/commit/07057f4))
-* v1.0.3 ([64b6999](https://github.com/readmeio/metrics-sdks/commit/64b6999))
-
-
-
 ## 4.0.0 (2020-08-28)
 
 * docs: add version badges for ruby and python (#83) ([0b11476](https://github.com/readmeio/metrics-sdks/commit/0b11476)), closes [#83](https://github.com/readmeio/metrics-sdks/issues/83)
