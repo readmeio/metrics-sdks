@@ -23,5 +23,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Start test server
+        working-directory: ../../
+        run: make start
+
       - name: Run tests
         run: npm test
+
+      - name: Cleanup
+        working-directory: ../../
+        run: make stop
