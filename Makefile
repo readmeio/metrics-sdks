@@ -2,6 +2,10 @@
 .DEFAULT_GOAL := help
 .SILENT: server.pid
 
+install: ## Install dependencies for local development
+	npm ci
+	cd packages/node; npm ci
+
 start: server.pid ## Start the local test server
 
 server.pid:
