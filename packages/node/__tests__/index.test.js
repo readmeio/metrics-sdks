@@ -1,45 +1,32 @@
 const express = require('express');
 const request = require('supertest');
-// const nock = require('nock');
 const rimraf = require('rimraf');
 const crypto = require('crypto');
 const flatCache = require('flat-cache');
 const findCacheDir = require('find-cache-dir');
 const { isValidUUIDV4 } = require('is-valid-uuid-v4');
 const io = require('socket.io-client');
-
-// const config = require('../config');
 const pkg = require('../package.json');
 const middleware = require('..');
 
-const apiKey = 'mockReadMeApiKey';
+const baseLogUrl = 'https://docs.example.com';
+const cacheDir = findCacheDir({ name: pkg.name });
+const apiKey = 'validApiKey';
 const group = {
   id: '5afa21b97011c63320226ef3',
   label: 'example user',
   email: 'user@example.com',
 };
 
-const baseLogUrl = 'https://docs.example.com';
-const cacheDir = findCacheDir({ name: pkg.name });
-
-console.logx = obj => {
-  console.log(require('util').inspect(obj, false, null, true /* enable colors */))
+function constructGroup(testFixture) {
+  return {
+    ...group,
+    id: testFixture,
+  };
 }
 
-/* function getReadMeApiMock(numberOfTimes) {
-  return nock(config.readmeApiUrl, {
-    reqheaders: {
-      'User-Agent': `${pkg.name}/${pkg.version}`,
-    },
-  })
-    .get('/v1/')
-    .basicAuth({ user: apiKey })
-    .times(numberOfTimes)
-    .reply(200, { baseUrl: baseLogUrl });
-} */
-
-function getCache() {
-  const encodedApiKey = Buffer.from(`${apiKey}:`).toString('base64');
+function getCache(key = apiKey) {
+  const encodedApiKey = Buffer.from(`${key}:`).toString('base64');
   const fsSafeApikey = crypto.createHash('md5').update(encodedApiKey).digest('hex');
   const cacheKey = [pkg.name, pkg.version, fsSafeApikey].join('-');
 
@@ -92,6 +79,10 @@ describe('#metrics', () => {
 
   beforeEach(() => {
     socket = io('http://localhost:3000');
+
+    socket.on('connect_error', () => {
+      throw new Error('Could not connect to the local test server. Is it running?');
+    });
   });
 
   afterEach(() => {
@@ -113,14 +104,14 @@ describe('#metrics', () => {
     }).toThrow('You must provide a grouping function');
   });
 
-  it.only('should send a request to the metrics server', async (done) => {
-    socket.on('sdk-assertion', (assertion) => {
+  it('should send a request to the metrics server', async done => {
+    socket.on('sdk:metrics:assertion', assertion => {
       expect(assertion.error, assertion.reason).toBeUndefined();
       done();
     });
 
     const app = express();
-    app.use(middleware.metrics(apiKey, () => ({ ...group, id: 'standard' })));
+    app.use(middleware.metrics(apiKey, () => constructGroup('standard')));
     app.get('/test', (req, res) => res.sendStatus(200));
 
     await request(app)
@@ -129,64 +120,8 @@ describe('#metrics', () => {
       .expect(res => expect(res).toHaveDocumentationHeader());
   });
 
-  /* describe('#bufferLength', () => {
-    it('should send requests when number hits `bufferLength` size', async function test() {
-      const apiMock = getReadMeApiMock(1);
-      const mock = nock(config.host, {
-        reqheaders: {
-          'Content-Type': 'application/json',
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .post('/v1/request', body => {
-          expect(body).toHaveLength(3);
-          return true;
-        })
-        .reply(200);
-
-      const app = express();
-      app.use(middleware.metrics(apiKey, () => group, { bufferLength: 3 }));
-      app.get('/test', (req, res) => res.sendStatus(200));
-
-      // We need to make sure that the logId isn't being preserved between buffered requests.
-      let logUrl;
-
-      await request(app)
-        .get('/test')
-        .expect(200)
-        .expect(res => {
-          expect(res).toHaveDocumentationHeader();
-          logUrl = res.headers['x-documentation-url'];
-        });
-
-      expect(apiMock.isDone()).toBe(true);
-      expect(mock.isDone()).toBe(false);
-
-      await request(app)
-        .get('/test')
-        .expect(200)
-        .expect(res => {
-          expect(res).toHaveDocumentationHeader();
-          expect(res.headers['x-documentation-url']).not.toBe(logUrl);
-          logUrl = res.headers['x-documentation-url'];
-        });
-
-      expect(mock.isDone()).toBe(false);
-
-      await request(app)
-        .get('/test')
-        .expect(200)
-        .expect(res => {
-          expect(res).toHaveDocumentationHeader();
-          expect(res.headers['x-documentation-url']).not.toBe(logUrl);
-        });
-
-      expect(mock.isDone()).toBe(true);
-      apiMock.done();
-      mock.done();
-    });
-
-    it('should clear out the queue when sent', () => {
+  describe('#bufferLength', () => {
+    it('should send requests when number hits `bufferLength` size', async done => {
       // Hydrate the cache so we don't need to mess with mocking out the API.
       hydrateCache(Math.round(Date.now() / 1000));
 
@@ -194,86 +129,70 @@ describe('#metrics', () => {
       const numberOfMocks = 4;
       const bufferLength = numberOfLogs / numberOfMocks;
 
-      const seenLogs = [];
+      const buffersReceived = [];
+      socket.on('sdk:metrics:buffer', buffer => {
+        buffersReceived.push(buffer);
+        if (buffersReceived.length === numberOfMocks) {
+          done();
+        }
+      });
 
-      const mocks = [...new Array(numberOfMocks).keys()].map(() =>
-        nock(config.host, {
-          reqheaders: {
-            'Content-Type': 'application/json',
-            'User-Agent': `${pkg.name}/${pkg.version}`,
-          },
-        })
-          .post('/v1/request', body => {
-            expect(body).toHaveLength(bufferLength);
-
-            // Ensure that our executed requests and the buffered queue they're in remain unique.
-            body.forEach(req => {
-              const requestHash = crypto.createHash('md5').update(JSON.stringify(req)).digest('hex');
-              expect(seenLogs).not.toContain(requestHash);
-              seenLogs.push(requestHash);
-            });
-
-            return true;
-          })
-          // This is the important part of this test,
-          // the delay mimics the latency of a real
-          // HTTP request
-          .delay(1000)
-          .reply(200)
-      );
+      socket.on('sdk:metrics:assertion', assertion => {
+        expect(assertion.error, assertion.reason).toBeUndefined();
+      });
 
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group, { bufferLength }));
+      app.use(middleware.metrics(apiKey, () => constructGroup('buffered-requests'), { bufferLength }));
       app.get('/test', (req, res) => res.sendStatus(200));
 
-      return Promise.all(
+      await Promise.all(
         [...new Array(numberOfLogs).keys()].map(i => {
           return request(app).get(`/test?log=${i}`).expect(200);
         })
-      ).then(() => {
-        mocks.map(mock => mock.done());
-      });
+      );
     });
-  }); */
+  });
 
-  /* describe('#baseLogUrl', () => {
-    it('should not call the API if the baseLogUrl supplied as a middleware option', async () => {
-      const mock = nock(config.host, {
-        reqheaders: {
-          'Content-Type': 'application/json',
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .post('/v1/request')
-        .basicAuth({ user: apiKey })
-        .reply(200);
+  describe('#baseLogUrl', () => {
+    it('should not call the API if the baseLogUrl supplied as a middleware option', async done => {
+      socket.on('sdk:readme:call', () => {
+        throw new Error('ReadMe API should not have been called');
+      });
+
+      socket.on('sdk:metrics:assertion', assertion => {
+        expect(assertion.error, assertion.reason).toBeUndefined();
+        done();
+      });
 
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group, { baseLogUrl }));
+      app.use(middleware.metrics(apiKey, () => constructGroup('standard'), { baseLogUrl }));
       app.get('/test', (req, res) => res.sendStatus(200));
 
       await request(app)
         .get('/test')
         .expect(200)
         .expect(res => expect(res).toHaveDocumentationHeader());
-
-      mock.done();
     });
 
-    it('should not call the API for project data if the cache is fresh', async () => {
-      const apiMock = getReadMeApiMock(1);
-      const metricsMock = nock(config.host, {
-        reqheaders: {
-          'Content-Type': 'application/json',
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .post('/v1/request')
-        .basicAuth({ user: apiKey })
-        .reply(200);
+    it('should not call the API for project data if the cache is fresh', async done => {
+      let readmeCalls = 0;
+      let metricsCalls = 0;
+      socket.on('sdk:readme:call', () => {
+        readmeCalls += 1;
+      });
+
+      socket.on('sdk:metrics:assertion', assertion => {
+        metricsCalls += 1;
+        expect(readmeCalls).toBe(1);
+        expect(assertion.error, assertion.reason).toBeUndefined();
+
+        if (metricsCalls === 2) {
+          done();
+        }
+      });
 
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group));
+      app.use(middleware.metrics(apiKey, () => constructGroup('standard')));
       app.get('/test', (req, res) => res.sendStatus(200));
 
       // Cache will be populated with this call as the cache doesn't exist yet.
@@ -285,7 +204,7 @@ describe('#metrics', () => {
       // Spin up a new app so we're forced to look for the baseUrl in the cache instead of what's saved in-memory
       // within the middleware.
       const app2 = express();
-      app2.use(middleware.metrics(apiKey, () => group));
+      app2.use(middleware.metrics(apiKey, () => constructGroup('standard')));
       app2.get('/test', (req, res) => res.sendStatus(200));
 
       // Cache will be hit with this request and shouldn't make another call to the API for data it already has.
@@ -293,139 +212,90 @@ describe('#metrics', () => {
         .get('/test')
         .expect(200)
         .expect(res => expect(res).toHaveDocumentationHeader());
-
-      apiMock.done();
-      metricsMock.done();
     });
 
-    it('should populate the cache if not present', async () => {
-      const apiMock = getReadMeApiMock(1);
-      const metricsMock = nock(config.host, {
-        reqheaders: {
-          'Content-Type': 'application/json',
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .post('/v1/request')
-        .basicAuth({ user: apiKey })
-        .reply(200);
+    it('should populate the cache if not present', async done => {
+      let readmeCalls = 0;
+      socket.on('sdk:readme:call', () => {
+        readmeCalls += 1;
+      });
+
+      socket.on('sdk:metrics:assertion', assertion => {
+        expect(readmeCalls).toBe(1);
+        expect(assertion.error, assertion.reason).toBeUndefined();
+        done();
+      });
 
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group));
+      app.use(middleware.metrics(apiKey, () => constructGroup('standard')));
       app.get('/test', (req, res) => res.sendStatus(200));
 
       await request(app)
         .get('/test')
         .expect(200)
         .expect(res => expect(res).toHaveDocumentationHeader());
-
-      apiMock.done();
-      metricsMock.done();
     });
 
-    it('should refresh the cache if stale', async () => {
+    it('should refresh the cache if stale', async done => {
       // Hydate and postdate the cache to two days ago so it'll bee seen as stale.
       hydrateCache(Math.round(Date.now() / 1000 - 86400 * 2));
 
-      const apiMock = getReadMeApiMock(1);
-      const metricsMock = nock(config.host, {
-        reqheaders: {
-          'Content-Type': 'application/json',
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .post('/v1/request')
-        .basicAuth({ user: apiKey })
-        .reply(200);
+      let readmeCalls = 0;
+      socket.on('sdk:readme:call', () => {
+        readmeCalls += 1;
+      });
+
+      socket.on('sdk:metrics:assertion', assertion => {
+        expect(readmeCalls).toBe(1);
+        expect(assertion.error, assertion.reason).toBeUndefined();
+        done();
+      });
 
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group));
+      app.use(middleware.metrics(apiKey, () => constructGroup('standard')));
       app.get('/test', (req, res) => res.sendStatus(200));
 
       await request(app)
         .get('/test')
         .expect(200)
         .expect(res => expect(res).toHaveDocumentationHeader());
-
-      apiMock.done();
-      metricsMock.done();
     });
 
-    it('should temporarily set baseUrl to null if the call to the ReadMe API fails for whatever reason', async () => {
-      const apiMock = nock(config.readmeApiUrl, {
-        reqheaders: {
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .get('/v1/')
-        .basicAuth({ user: apiKey })
-        .reply(401, {
-          error: 'APIKEY_NOTFOUNDD',
-          message: "We couldn't find your API key",
-          suggestion:
-            "The API key you passed in (moc··········Key) doesn't match any keys we have in our system. API keys must be passed in as the username part of basic auth. You can get your API key in Configuration > API Key, or in the docs.",
-          docs: 'https://docs.readme.com/developers/logs/fake-uuid',
-          help: "If you need help, email support@readme.io and mention log 'fake-uuid'.",
-        });
+    it('should temporarily set baseUrl to null if the call to the ReadMe API fails for whatever reason', async done => {
+      const simmedApiKey = 'apiKeyToSimReadmeBeingDown';
 
-      const metricsMock = nock(config.host, {
-        reqheaders: {
-          'Content-Type': 'application/json',
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .post('/v1/request')
-        .basicAuth({ user: apiKey })
-        .reply(200);
+      socket.on('sdk:metrics:assertion', assertion => {
+        expect(assertion.error, assertion.reason).toBeUndefined();
+        done();
+      });
 
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group));
+      app.use(middleware.metrics(simmedApiKey, () => constructGroup('no-log-url')));
       app.get('/test', (req, res) => res.sendStatus(200));
 
       await request(app)
         .get('/test')
         .expect(200)
         .expect(res => {
-          expect(getCache().getKey('baseUrl')).toBeNull();
+          expect(getCache(simmedApiKey).getKey('baseUrl')).toBeNull();
 
           // `x-documentation-url` header should not be present since we couldn't get the base URL!
           expect(Object.keys(res.headers)).not.toContain('x-documentation-url');
         });
-
-      apiMock.done();
-      metricsMock.done();
     });
-  }); */
+  });
 
-  /* describe('`res._body`', () => {
-    let apiMock;
+  describe('`res._body`', () => {
     const responseBody = { a: 1, b: 2, c: 3 };
-    function createMock() {
-      return nock(config.host, {
-        reqheaders: {
-          'Content-Type': 'application/json',
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .post('/v1/request', ([body]) => {
-          expect(body.request.log.entries[0].response.content.text).toBe(JSON.stringify(responseBody));
-          return true;
-        })
-        .reply(200);
-    }
 
-    beforeEach(() => {
-      apiMock = getReadMeApiMock(1);
-    });
+    it('should buffer up res.write() calls', async done => {
+      socket.on('sdk:metrics:assertion', assertion => {
+        expect(assertion.error, assertion.reason).toBeUndefined();
+        done();
+      });
 
-    afterEach(() => {
-      apiMock.done();
-    });
-
-    it('should buffer up res.write() calls', async () => {
-      const mock = createMock();
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group));
+      app.use(middleware.metrics(apiKey, () => constructGroup('buffered-payload')));
       app.get('/test', (req, res) => {
         res.write('{"a":1,');
         res.write('"b":2,');
@@ -434,36 +304,38 @@ describe('#metrics', () => {
       });
 
       await request(app).get('/test').expect(200);
-
-      mock.done();
     });
 
-    it('should buffer up res.end() calls', async () => {
-      const mock = createMock();
+    it('should buffer up res.end() calls', async done => {
+      socket.on('sdk:metrics:assertion', assertion => {
+        expect(assertion.error, assertion.reason).toBeUndefined();
+        done();
+      });
+
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group));
+      app.use(middleware.metrics(apiKey, () => constructGroup('buffered-payload')));
       app.get('/test', (req, res) => res.end(JSON.stringify(responseBody)));
 
       await request(app)
         .get('/test')
         .expect(200)
         .expect(res => expect(res).toHaveDocumentationHeader());
-
-      mock.done();
     });
 
-    it('should work for res.send() calls', async () => {
-      const mock = createMock();
+    it('should work for res.send() calls', async done => {
+      socket.on('sdk:metrics:assertion', assertion => {
+        expect(assertion.error, assertion.reason).toBeUndefined();
+        done();
+      });
+
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group));
+      app.use(middleware.metrics(apiKey, () => constructGroup('buffered-payload-of-json')));
       app.get('/test', (req, res) => res.send(responseBody));
 
       await request(app)
         .get('/test')
         .expect(200)
         .expect(res => expect(res).toHaveDocumentationHeader());
-
-      mock.done();
     });
-  }); */
+  });
 });

@@ -1,0 +1,66 @@
+[
+  {
+    "_id": "87e43590-841c-4bb7-a13a-5a2c8efe2979",
+    "group": {
+      "id": "buffered-payload-of-json",
+      "label": "example user",
+      "email": "user@example.com"
+    },
+    "clientIPAddress": "::ffff:127.0.0.1",
+    "request": {
+      "log": {
+        "creator": {
+          "name": "readmeio",
+          "version": "4.0.0",
+          "comment": "darwin/v10.16.0"
+        },
+        "entries": [
+          {
+            "pageref": "http://127.0.0.1:49226/test",
+            "startedDateTime": "2020-09-15T19:30:37.838Z",
+            "time": 2,
+            "request": {
+              "method": "GET",
+              "url": "http://127.0.0.1:49226/test",
+              "httpVersion": "HTTP/1.1",
+              "headers": [
+                {
+                  "name": "host",
+                  "value": "127.0.0.1:49226"
+                },
+                {
+                  "name": "accept-encoding",
+                  "value": "gzip, deflate"
+                },
+                {
+                  "name": "user-agent",
+                  "value": "node-superagent/3.8.3"
+                },
+                {
+                  "name": "connection",
+                  "value": "close"
+                }
+              ],
+              "queryString": []
+            },
+            "response": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": [
+                {
+                  "name": "x-documentation-url",
+                  "value": "https://docs.example.com/logs/87e43590-841c-4bb7-a13a-5a2c8efe2979"
+                }
+              ],
+              "content": {
+                "text": "{\"a\":1,\"b\":2,\"c\":3}",
+                "size": 19,
+                "mimeType": "application/json; charset=utf-8"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+]

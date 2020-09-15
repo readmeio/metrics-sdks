@@ -8,9 +8,6 @@ const pkg = require('./package.json');
 
 const constructPayload = require('./lib/construct-payload');
 
-config.readmeApiUrl = 'http://localhost:3000/readme-api';
-config.host = 'http://localhost:3000/metrics-api';
-
 // We're doing this to buffer up the response body
 // so we can send it off to the metrics server
 // It's unfortunate that this isn't accessible
@@ -77,7 +74,6 @@ async function getProjectBaseUrl(encodedApiKey, options) {
         if (options.development) {
           throw err;
         }
-
         // If unable to access the ReadMe API for whatever reason, let's set the last updated time to two minutes from
         // now yesterday so that in 2 minutes we'll automatically make another attempt.
         cache.setKey('baseUrl', null);
@@ -133,14 +129,13 @@ module.exports.metrics = (apiKey, group, options = {}) => {
             'Content-Type': 'application/json',
             'User-Agent': `${pkg.name}/${pkg.version}`,
           },
-        })
-          .then(async (res) => {
-            // If we're running in development or unit test mode, toss any errors that happen when we try to call the
-            // API.
-            if (options.development && (res.status >= 400 && res.status <= 599)) {
-              throw res;
-            }
-          });
+        }).then(async metricsRes => {
+          // If we're running in development or unit test mode, toss any errors that happen when we try to call the
+          // API.
+          if (options.development && metricsRes.status >= 400 && metricsRes.status <= 599) {
+            throw metricsRes;
+          }
+        });
       }
 
       cleanup(); // eslint-disable-line no-use-before-define

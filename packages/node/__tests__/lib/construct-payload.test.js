@@ -26,6 +26,21 @@ function createApp(options, existingPayload = { logId: uuidv4(), startedDateTime
 
 describe('constructPayload()', () => {
   it('should construct a har file from the request/response', () => {
+    return request(createApp())
+      .post('/')
+      .send({ password: '123456' })
+      .expect(({ body }) => {
+        expect(isValidUUIDV4(body._id)).toBe(true);
+        expect(typeof body.request.log.entries[0].request).toBe('object');
+        expect(typeof body.request.log.entries[0].response).toBe('object');
+        expect(body.request.log.entries[0].request.postData).toStrictEqual({
+          mimeType: 'application/json',
+          text: JSON.stringify({ password: '123456' }),
+        });
+      });
+  });
+
+  it('should construct a har file from the request/response excluding data from a blacklist', () => {
     return request(createApp({ blacklist: ['password'] }))
       .post('/')
       .send({ password: '123456' })
@@ -33,7 +48,7 @@ describe('constructPayload()', () => {
         expect(isValidUUIDV4(body._id)).toBe(true);
         expect(typeof body.request.log.entries[0].request).toBe('object');
         expect(typeof body.request.log.entries[0].response).toBe('object');
-        expect(body.request.log.entries[0].request.postData).toStrictEqual({});
+        expect(body.request.log.entries[0].request.postData).toBeUndefined();
       });
   });
 

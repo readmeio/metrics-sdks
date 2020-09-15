@@ -42,7 +42,7 @@ module.exports = (res, options = {}) => {
     content: {
       text: JSON.stringify(body),
       size: parseFloat(res.get('content-length')) || 0,
-      mimeType: res.get('content-type'),
+      mimeType: res.get('content-type') || '',
     },
   };
 };

@@ -11,7 +11,11 @@
       }
     ],
 
-    // Bump up maxArgs to 2 so we can use jest-expect-message without errors.
+    // Because our tests utilize responses from a socket server to determine their success/failures, we can't run our
+    // awaits as returns in the test because they'll finish before the actual test backend has.
+    "jest/no-test-callback": "off",
+
+    // Bump up maxArgs for `expect()` assertions to 2 so we can use `jest-expect-message`.
     "jest/valid-expect": ["error", {"maxArgs": 2}]
   }
 }

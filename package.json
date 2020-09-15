@@ -4,9 +4,9 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "clean": "lerna clean",
-    "lint": "eslint .",
+    "lint": "eslint test/",
     "postinstall": "lerna bootstrap --hoist",
-    "prettier": "prettier --list-different --write \"./**/**.js\"",
+    "prettier": "prettier --list-different --write \"./test/**.js\"",
     "publish": "lerna publish",
     "start": "nodemon test/server.js",
     "test": "lerna run test --stream",

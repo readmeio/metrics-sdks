@@ -1,0 +1,74 @@
+[
+  {
+    "_id": "369a33a3-80b6-4bf0-8b01-79cdd6797239",
+    "group": {
+      "id": "standard",
+      "label": "example user",
+      "email": "user@example.com"
+    },
+    "clientIPAddress": "::ffff:127.0.0.1",
+    "request": {
+      "log": {
+        "creator": {
+          "name": "readmeio",
+          "version": "4.0.0",
+          "comment": "darwin/v10.16.0"
+        },
+        "entries": [
+          {
+            "pageref": "http://127.0.0.1:54210/test",
+            "startedDateTime": "2020-09-02T19:51:16.556Z",
+            "time": 4,
+            "request": {
+              "method": "GET",
+              "url": "http://127.0.0.1:54210/test",
+              "httpVersion": "HTTP/1.1",
+              "headers": [
+                {
+                  "name": "host",
+                  "value": "127.0.0.1:54210"
+                },
+                {
+                  "name": "accept-encoding",
+                  "value": "gzip, deflate"
+                },
+                {
+                  "name": "user-agent",
+                  "value": "node-superagent/3.8.3"
+                },
+                {
+                  "name": "connection",
+                  "value": "close"
+                }
+              ],
+              "queryString": []
+            },
+            "response": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": [
+                {
+                  "name": "x-documentation-url",
+                  "value": "https://docs.example.com/logs/369a33a3-80b6-4bf0-8b01-79cdd6797239"
+                },
+                {
+                  "name": "content-type",
+                  "value": "text/plain; charset=utf-8"
+                },
+                {
+                  "name": "content-length",
+                  "value": "2"
+                }
+              ],
+              "content": {
+                "text": "\"OK\"",
+                "size": 2,
+                "mimeType": "text/plain; charset=utf-8"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+]

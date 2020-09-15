@@ -1,0 +1,5 @@
+{
+  "host": "http://localhost:3000/metrics-api",
+  "readmeApiUrl": "http://localhost:3000/readme-api",
+  "bufferLength": 1
+}

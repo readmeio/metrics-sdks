@@ -265,12 +265,12 @@ describe('processRequest()', () => {
     it('should be an empty object if request is a GET', () =>
       request(createApp())
         .get('/')
-        .expect(({ body }) => expect(body.postData).toStrictEqual({})));
+        .expect(({ body }) => expect(body.postData).toBeUndefined()));
 
     it('should be an empty object if req.body is empty', () =>
       request(createApp())
         .post('/')
-        .expect(({ body }) => expect(body.postData).toStrictEqual({})));
+        .expect(({ body }) => expect(body.postData).toBeUndefined()));
 
     it('#text should contain stringified body', () => {
       const body = { a: 1, b: 2 };
