@@ -66,6 +66,8 @@ app.get('/readme-api/v1', (req, res) => {
 app.post('/metrics-api/v1/request', async (req, res) => {
   res.io.emit('sdk:metrics:call', { time: Date.now() });
 
+  const [sdkName, sdkVersion] = req.header('user-agent').split('/');
+
   try {
     // Assert that we have the proper shell of a Metrics API call here
     const metricsSchema = {
@@ -159,9 +161,6 @@ app.post('/metrics-api/v1/request', async (req, res) => {
       })
     );
 
-    // Update our test fixture to allow us to dynamically do assertions on dates, times, and variable headers coming
-    // from our different SDK test servers. We need to use `expect` instead of `assert` for this assertion because the
-    // expect module allow us to dynamic matching on deep objects with `expect.any()`.
     const fixture = harFixtures[req.body[0].group.id];
     let expected;
     let end;
@@ -191,8 +190,16 @@ app.post('/metrics-api/v1/request', async (req, res) => {
       expected = fixture;
     }
 
+    // Update our test fixture to allow us to dynamically do assertions on dates, times, and variable headers coming
+    // from our different SDK test servers. We need to use `expect` instead of `assert` for this assertion because the
+    // expect module allow us to dynamic matching on deep objects with `expect.any()`.
     expected.forEach((ex, i) => {
       expected[i]._id = expect.any(String);
+
+      expected[i].request.log.creator.comment = expect.any(String);
+      expected[i].request.log.creator.name = sdkName;
+      expected[i].request.log.creator.version = sdkVersion;
+
       expected[i].request.log.entries.forEach((ent, ii) => {
         expected[i].request.log.entries[ii].pageref = expect.any(String);
         expected[i].request.log.entries[ii].request.headers = expect.any(Array);
