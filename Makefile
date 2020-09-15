@@ -12,7 +12,6 @@ stop: server.pid ## Stop the local test server
 
 test: start ## Run all SDK tests
 	cd packages/node; npm test
-	cd packages/php; composer test
 	make stop
 
 help: ## Display this help menu

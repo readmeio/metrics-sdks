@@ -25,11 +25,11 @@ jobs:
 
       - name: Start test server
         working-directory: ./
-        run: make help
+        run: make start
 
-      #- name: Run tests
-      #  run: npm test
+      - name: Run tests
+        run: npm test
 
-      #- name: Cleanup
-      #  working-directory: ../../
-      #  run: make stop
+      - name: Cleanup
+        working-directory: ./
+        run: make stop
