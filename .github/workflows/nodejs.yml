@@ -23,11 +23,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install test server dependencies
+        working-directory: ./
+        run: npm ci
+
       - name: Boot test server
         working-directory: ./
-        run:
-          npm ci
-          make start
+        run: make start
 
       - name: Run tests
         run: npm test
