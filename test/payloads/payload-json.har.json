@@ -2,7 +2,7 @@
   {
     "_id": "87e43590-841c-4bb7-a13a-5a2c8efe2979",
     "group": {
-      "id": "buffered-payload-of-json",
+      "id": "payload-json",
       "label": "example user",
       "email": "user@example.com"
     },

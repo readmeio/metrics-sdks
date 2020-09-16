@@ -295,7 +295,7 @@ describe('#metrics', () => {
       });
 
       const app = express();
-      app.use(middleware.metrics(apiKey, () => constructGroup('buffered-payload')));
+      app.use(middleware.metrics(apiKey, () => constructGroup('payload-plaintext')));
       app.get('/test', (req, res) => {
         res.write('{"a":1,');
         res.write('"b":2,');
@@ -313,7 +313,7 @@ describe('#metrics', () => {
       });
 
       const app = express();
-      app.use(middleware.metrics(apiKey, () => constructGroup('buffered-payload')));
+      app.use(middleware.metrics(apiKey, () => constructGroup('payload-plaintext')));
       app.get('/test', (req, res) => res.end(JSON.stringify(responseBody)));
 
       await request(app)
@@ -329,7 +329,7 @@ describe('#metrics', () => {
       });
 
       const app = express();
-      app.use(middleware.metrics(apiKey, () => constructGroup('buffered-payload-of-json')));
+      app.use(middleware.metrics(apiKey, () => constructGroup('payload-json')));
       app.get('/test', (req, res) => res.send(responseBody));
 
       await request(app)
