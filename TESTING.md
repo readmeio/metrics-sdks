@@ -67,6 +67,7 @@ Adding a new test case is as easy as dropping in a full ReadMe Metrics HAR paylo
 
 * Since these test cases need to run cross-language and cross-framework, we can't run assertions on request and response headers (other than `x-documentation-url` being present) as one framework might add an `x-powered-by` that another doesn't. Because of this we do wildcard assertions on a couple pieces of data in `request.log.entries.*` including but not limited to `request.headers` and `response.headers`. If you need to run specific assertions on those headers, either do it within the SDK test, or figure out a way to normalize it for every SDK
 * Since the assertions coming back over the socket from the test server are coming from the Node `assert` module and Jest's `expect`, errors you receive might be a bit difficult to decode. We've done our best to try to normalize them into something that can be decipherd, but your mileage may vary.
+* Since the test server cannot assert what the individual SDK returns, just what the Metrics server received, in order to test that the SDK added the `x-documentation-url` header for the end-user you'll still need to write those tests within the SDK test.
 
 ## 🏃‍♀️ Running tests
 
