@@ -2,13 +2,13 @@
 
 Our Metrics SDKs implement a bespoke unified testing framework that allows us to test core functionality cross-language.
 
-* [How it works]()
-* [Writing tests]()
-    * [Test cases]()
-    * [Socket events]()
-    * [Adding new test cases]()
-    * [Caveats]()
-* [Running tests]()
+* [How it works](#%EF%B8%8F-how-it-works)
+* [Writing tests](#-writing-tests)
+    * [Test cases](#test-cases)
+    * [Socket events](#socket-events)
+    * [Adding new test cases](#adding-new-test-cases)
+    * [Caveats](#caveats)
+* [Running tests](#%EF%B8%8F-running-tests)
 
 
 ## 🧙‍♂️ How it works
