@@ -120,8 +120,7 @@ module.exports.metrics = (apiKey, group, options = {}) => {
       if (queue.length >= bufferLength) {
         const json = queue.slice();
         queue = [];
-        // fetch(`${config.host}/v1/request`, {
-        fetch(`http://localhost:3000/metrics-api/v1/request`, {
+        fetch(`${config.host}/v1/request`, {
           method: 'post',
           body: JSON.stringify(json),
           headers: {
