@@ -65,7 +65,7 @@ class MetricsMiddleware:
                 #
                 # For more info: https://stackoverflow.com/a/13106009/643951
 
-                content_length = int(environ["CONTENT_LENGTH"])
+                content_length = int(environ.get("CONTENT_LENGTH", 0))
                 content_body = environ["wsgi.input"].read(content_length)
 
                 environ["wsgi.input"].close()
