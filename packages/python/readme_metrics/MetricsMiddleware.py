@@ -67,7 +67,7 @@ class MetricsMiddleware:
 
                 # the environment variable CONTENT_LENGTH may be empty or missing
                 try:
-                    content_length = int(environ.get('CONTENT_LENGTH', 0))
+                    content_length = int(environ.get("CONTENT_LENGTH", 0))
                 except (ValueError):
                     content_length = 0
                 content_body = environ["wsgi.input"].read(content_length)
