@@ -2,7 +2,7 @@ import json
 import io
 import os
 
-from django.core.handlers.wsgi import LimitedStream
+from werkzeug import wsgi
 
 
 class MockEnviron:
@@ -26,6 +26,6 @@ class MockEnviron:
 
         contentLength = len(jsonByteString)
         stream = io.BytesIO(jsonByteString)
-        environ["wsgi.input"] = LimitedStream(stream, contentLength)
+        environ["wsgi.input"] = wsgi.LimitedStream(stream, contentLength)
         environ["CONTENT_LENGTH"] = contentLength
         return environ
