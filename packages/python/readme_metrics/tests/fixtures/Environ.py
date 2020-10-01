@@ -7,14 +7,10 @@ from werkzeug import wsgi
 
 class MockEnviron:
     def __init__(self):
-        with open(
-            "./readme_metrics/tests/fixtures/environ_get.json"
-        ) as json_file:
+        with open("./readme_metrics/tests/fixtures/environ_get.json") as json_file:
             self.environGetData = json.load(json_file)
 
-        with open(
-            "./readme_metrics/tests/fixtures/environ_post.json"
-        ) as json_file:
+        with open("./readme_metrics/tests/fixtures/environ_post.json") as json_file:
             self.environPostData = json.load(json_file)
 
     def getEnvironForRequest(self, jsonByteString, httpRequestMethod):
