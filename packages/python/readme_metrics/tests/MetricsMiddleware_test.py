@@ -2,9 +2,10 @@ import pytest
 import requests
 import json
 
+from .fixtures import Environ
+
 from readme_metrics import MetricsApiConfig
 from readme_metrics import MetricsMiddleware
-
 
 # for this, I'm not exactly sure how to test the __call__ function
 # possible options I considered was making a mock server inside this test case
@@ -36,21 +37,86 @@ class MockServer:
         return requestQueue
 
 
+# Mock middleware config
+def mockMiddlewareConfig():
+    return MetricsApiConfig(
+        "koSyKkViOR5gD6yjBxlsprHfjAIlWOh6",
+        lambda req: {"id": "123", "label": "testuser", "email": "user@email.com"},
+        buffer_length=1,
+    )
+
+
+# Mock callback for handling middleware response
+class MetricsCoreMock:
+    def process(self, req, res):
+        self.req = req
+        self.res = res
+
+
+# Mock application
+class MockApplication:
+    def __init__(self, responseObjectString):
+        self.responseObjectString = responseObjectString
+
+    def __call__(self, environ, start_response):
+        self.environ = environ
+        self.start_response = start_response
+        return [self.responseObjectString.encode("utf-8")]
+
+    def mockStartResponse(self, status, headers):
+        self.status = status
+        self.headers = headers
+
+
 class TestMetricsMiddleware:
     def setUp(self):
         self.mockserver = MockServer()
 
-    @pytest.mark.skip(reason="@todo")
+    # @pytest.mark.skip(reason="@todo")
     def testNoRequest(self):
-        # Test no request (None) but the function is called
-        # Test no request ([]) but the function is called
         pass
 
-    @pytest.mark.skip(reason="@todo")
-    def testSingleRequest(self):
-        # Test if a single request got through and processed
-        # Test if a single request is sent but with trash data(?)
-        pass
+    def testGetRequest(self):
+        emptyByteString = b""
+        responseObjectString = "{ responseObject: 'value' }"
+        environ = Environ.MockEnviron().getEnvironForRequest(emptyByteString, "GET")
+        app = MockApplication(responseObjectString)
+        metrics = MetricsCoreMock()
+        middleware = MetricsMiddleware(app, mockMiddlewareConfig())
+        middleware.metrics_core = metrics
+        next(middleware(environ, app.mockStartResponse))
+        requestBody = middleware.metrics_core.req.data
+        assert requestBody == emptyByteString
+        assert metrics.req.method == "GET"
+        assert metrics.res.body == responseObjectString
+
+    def testEmptyPostRequest(self):
+        jsonString = b""
+        responseObjectString = "{ responseObject: 'value' }"
+        environ = Environ.MockEnviron().getEnvironForRequest(jsonString, "POST")
+        app = MockApplication(responseObjectString)
+        metrics = MetricsCoreMock()
+        middleware = MetricsMiddleware(app, mockMiddlewareConfig())
+        middleware.metrics_core = metrics
+        next(middleware(environ, app.mockStartResponse))
+        requestBody = middleware.metrics_core.req.data
+        assert requestBody == jsonString
+        assert metrics.req.method == "POST"
+        assert metrics.res.body == responseObjectString
+
+    def testNonEmptyPostRequest(self):
+        jsonString = b"{abc: 123}"
+        responseObjectString = "{ responseObject: 'value' }"
+        environ = Environ.MockEnviron().getEnvironForRequest(jsonString, "POST")
+        app = MockApplication(responseObjectString)
+        metrics = MetricsCoreMock()
+        middleware = MetricsMiddleware(app, mockMiddlewareConfig())
+        middleware.metrics_core = metrics
+        next(middleware(environ, app.mockStartResponse))
+        requestBody = middleware.metrics_core.req.data
+        assert requestBody == jsonString
+        assert metrics.req.method == "POST"
+        assert metrics.res.body == responseObjectString
 
     @pytest.mark.skip(reason="@todo")
     def testMultipleRequests(self):

@@ -67,8 +67,11 @@ class MetricsMiddleware:
 
                 content_length = int(environ["CONTENT_LENGTH"])
                 content_body = environ["wsgi.input"].read(content_length)
+            
+                # guarding check to close stream
+                if hasattr(environ["CONTENT_LENGTH"], "close"):
+                    environ["wsgi.input"].close()
 
-                environ["wsgi.input"].close()
                 environ["wsgi.input"] = io.BytesIO(content_body)
 
                 req.rm_content_length = content_length
