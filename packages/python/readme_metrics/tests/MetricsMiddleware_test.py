@@ -85,8 +85,7 @@ class TestMetricsMiddleware:
         middleware = MetricsMiddleware(app, mockMiddlewareConfig())
         middleware.metrics_core = metrics
         next(middleware(environ, app.mockStartResponse))
-        requestBody = middleware.metrics_core.req.data
-        assert requestBody == emptyByteString
+        assert metrics.req.data == emptyByteString
         assert metrics.req.method == "GET"
         assert metrics.res.body == responseObjectString
 
@@ -99,8 +98,7 @@ class TestMetricsMiddleware:
         middleware = MetricsMiddleware(app, mockMiddlewareConfig())
         middleware.metrics_core = metrics
         next(middleware(environ, app.mockStartResponse))
-        requestBody = middleware.metrics_core.req.data
-        assert requestBody == jsonString
+        assert metrics.req.data == jsonString
         assert metrics.req.method == "POST"
         assert metrics.res.body == responseObjectString
 
@@ -113,8 +111,7 @@ class TestMetricsMiddleware:
         middleware = MetricsMiddleware(app, mockMiddlewareConfig())
         middleware.metrics_core = metrics
         next(middleware(environ, app.mockStartResponse))
-        requestBody = middleware.metrics_core.req.data
-        assert requestBody == jsonString
+        assert metrics.req.data == jsonString
         assert metrics.req.method == "POST"
         assert metrics.res.body == responseObjectString
 
