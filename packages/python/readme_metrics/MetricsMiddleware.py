@@ -65,10 +65,17 @@ class MetricsMiddleware:
                 #
                 # For more info: https://stackoverflow.com/a/13106009/643951
 
-                content_length = int(environ["CONTENT_LENGTH"])
+                # the environment variable CONTENT_LENGTH may be empty or missing
+                try:
+                    content_length = int(environ.get("CONTENT_LENGTH", 0))
+                except (ValueError):
+                    content_length = 0
                 content_body = environ["wsgi.input"].read(content_length)
 
-                environ["wsgi.input"].close()
+                # guarding check to close stream
+                if hasattr(environ["CONTENT_LENGTH"], "close"):
+                    environ["wsgi.input"].close()
+
                 environ["wsgi.input"] = io.BytesIO(content_body)
 
                 req.rm_content_length = content_length
