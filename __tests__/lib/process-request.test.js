@@ -214,7 +214,6 @@ describe('processRequest()', () => {
         expect(body.headers.find(header => header.name === 'host').value).toMatch(/127.0.0.1:\d+/);
         expect(body.headers.filter(header => header.name !== 'host')).toStrictEqual([
           { name: 'accept-encoding', value: 'gzip, deflate' },
-          { name: 'user-agent', value: 'node-superagent/3.8.3' },
           { name: 'a', value: '1' },
           { name: 'connection', value: 'close' },
           { name: 'content-length', value: '0' },
