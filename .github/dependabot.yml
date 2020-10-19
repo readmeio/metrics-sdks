@@ -16,7 +16,8 @@ updates:
       interval: monthly
     open-pull-requests-limit: 10
     reviewers:
-      - erunion
+      - kanadgupta
+      - dpim
     labels:
       - scope:dependency
       - area:node
@@ -30,7 +31,8 @@ updates:
       interval: monthly
     open-pull-requests-limit: 10
     reviewers:
-      - erunion
+      - kanadgupta
+      - dpim
     labels:
       - scope:dependency
       - area:ruby
@@ -58,7 +60,8 @@ updates:
       interval: monthly
     open-pull-requests-limit: 10
     reviewers:
-      - erunion
+      - kanadgupta
+      - dpim
     labels:
       - scope:dependency
       - area:python
