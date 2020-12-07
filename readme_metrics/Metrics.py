@@ -16,6 +16,9 @@ class Metrics:
     handles the creation, queueing, and submission of the requests.
     """
 
+    PACKAGE_NAME: str = "readme/metrics"
+    METRICS_API: str = "https://metrics.readme.io"
+
     def __init__(self, config: MetricsApiConfig):
         """
         Constructs and initializes the ReadMe Metrics controller class with the
