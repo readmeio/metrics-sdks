@@ -15,6 +15,8 @@ class Metrics:
     This is the internal central controller classinvoked by the WSGI middleware. It
     handles the creation, queueing, and submission of the requests.
     """
+    PACKAGE_NAME: str = 'readme/metrics'
+    METRICS_API: str = 'https://metrics.readme.io'
 
     def __init__(self, config: MetricsApiConfig):
         """

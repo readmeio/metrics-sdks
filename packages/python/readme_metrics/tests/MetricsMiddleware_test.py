@@ -6,6 +6,7 @@ from .fixtures import Environ
 
 from readme_metrics import MetricsApiConfig
 from readme_metrics import MetricsMiddleware
+from readme_metrics.Metrics import Metrics
 
 # for this, I'm not exactly sure how to test the __call__ function
 # possible options I considered was making a mock server inside this test case
@@ -45,6 +46,9 @@ def mockMiddlewareConfig():
         buffer_length=1,
     )
 
+# Verify that metrics has fields for metrics API and package name
+assert Metrics.METRICS_API != None
+assert Metrics.PACKAGE_NAME != None
 
 # Mock callback for handling middleware response
 class MetricsCoreMock:
