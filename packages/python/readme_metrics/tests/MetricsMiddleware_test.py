@@ -11,6 +11,8 @@ from readme_metrics.Metrics import Metrics
 # for this, I'm not exactly sure how to test the __call__ function
 # possible options I considered was making a mock server inside this test case
 # connected to the middleware somehow
+
+
 class MockServer:
     def __init__(self):
         # Not working when I tried the first time, but might as well write it
@@ -45,6 +47,7 @@ def mockMiddlewareConfig():
         lambda req: {"id": "123", "label": "testuser", "email": "user@email.com"},
         buffer_length=1,
     )
+
 
 # Verify that metrics has fields for metrics API and package name
 assert Metrics.METRICS_API != None
