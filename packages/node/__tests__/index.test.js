@@ -126,6 +126,40 @@ describe('#metrics', () => {
       });
   });
 
+  it('should have access to group(req,res) objects', () => {
+    const apiMock = getReadMeApiMock(1);
+    const mock = nock(config.host, {
+      reqheaders: {
+        'Content-Type': 'application/json',
+        'User-Agent': `${pkg.name}/${pkg.version}`,
+      },
+    })
+      .post('/v1/request', ([body]) => {
+        expect(body.group.a).toBe('a');
+        expect(body.group.b).toBe('b');
+        return true;
+      })
+      .basicAuth({ user: apiKey })
+      .reply(200);
+
+    const app = express();
+    app.use((req, res, next) => {
+      req.a = 'a';
+      res.b = 'b';
+      next();
+    });
+    app.use(middleware.metrics(apiKey, (req, res) => ({ a: req.a, b: res.b })));
+    app.get('/test', (req, res) => res.sendStatus(200));
+
+    return request(app)
+      .get('/test')
+      .expect(200)
+      .then(() => {
+        apiMock.done();
+        mock.done();
+      });
+  });
+
   describe('#bufferLength', () => {
     it('should send requests when number hits `bufferLength` size', async function test() {
       const apiMock = getReadMeApiMock(1);
