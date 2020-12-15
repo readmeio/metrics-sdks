@@ -20,7 +20,7 @@ Just add the middleware to [Express](https://expressjs.com/), and that's it!
 ```javascript
 const readme = require('readmeio');
 
-app.use(readme.metrics('<<apiKey>>', req => ({
+app.use(readme.metrics('<<apiKey>>', (req, res) => ({
   id: req.<userId>,
   label: req.<userNameToShowInDashboard>,
   email: req.<userEmailAddress>,

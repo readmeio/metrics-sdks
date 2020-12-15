@@ -5,7 +5,7 @@ const { name, version } = require('../package.json');
 
 module.exports = (req, res, group, options = {}, { logId, startedDateTime }) => ({
   _id: logId,
-  group: group(req),
+  group: group(req, res),
   clientIPAddress: req.ip,
   development: options.development,
   request: {
