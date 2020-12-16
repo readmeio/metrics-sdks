@@ -1,3 +1,6 @@
+## 4.0.1 (2020-12-16)
+* Exposing both req and res for grouping (#155) ([4a7a550](https://github.com/readmeio/metrics-sdks/commit/4a7a550))
+
 ## 4.0.0 (2020-08-28)
 
 * docs: add version badges for ruby and python (#83) ([0b11476](https://github.com/readmeio/metrics-sdks/commit/0b11476)), closes [#83](https://github.com/readmeio/metrics-sdks/issues/83)
