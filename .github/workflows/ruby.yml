@@ -10,7 +10,7 @@ jobs:
         working-directory: packages/ruby
 
     steps:
-      - uses: actions/checkout@v2.3.3
+      - uses: actions/checkout@v2.3.4
 
       - uses: actions/setup-ruby@v1.1.2
         with:
