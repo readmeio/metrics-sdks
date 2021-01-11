@@ -133,7 +133,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $this->assertContains('x-documentation-url', array_keys($response->headers->all()));
         $documentation_header = array_shift($response->headers->all()['x-documentation-url']);
         $log_id = $this->getLogIdFromDocumentationHeader($documentation_header);
-        $this->assertRegExp(self::UUID_PATTERN, $log_id);
+        $this->assertMatchesRegularExpression(self::UUID_PATTERN, $log_id);
 
         // Assert that we only tracked a single request and also the payload looks as expected.
         $this->assertCount(1, $this->api_calls);
@@ -299,7 +299,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
         $payload_entry = $payload['request']['log']['entries'][0];
         $this->assertSame($request->url(), $payload_entry['pageref']);
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2})\+(\d{2}:\d{2})/',
             $payload_entry['startedDateTime'],
             'startedDateTime was not in a format matching `2019-12-19T01:17:51+00:00`.'
