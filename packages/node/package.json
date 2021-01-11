@@ -22,7 +22,7 @@
   "dependencies": {
     "content-type": "^1.0.4",
     "find-cache-dir": "^3.3.1",
-    "flat-cache": "^2.0.1",
+    "flat-cache": "^3.0.4",
     "lodash": "^4.17.15",
     "node-fetch": "^2.6.0",
     "uuid": "^8.2.0"
