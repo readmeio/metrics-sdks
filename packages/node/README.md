@@ -61,7 +61,8 @@ app.use(readme.metrics('', req => ({
 | bufferLength | **default: 10** By default, we only send logs to ReadMe after 10 requests are made. Depending on the usage of your API it make make sense to send logs more or less frequently |
 | blacklist | **optional** An array of keys from your API requests and responses headers and bodies that you wish to blacklist from sending to ReadMe.<br /><br />If you configure a blacklist, it will override any whitelist configuration. |
 | whitelist | **optional** An array of keys from your API requests and responses headers and bodies that you only wish to send to ReadMe. |
-| baseLogUrl | **optional** This is the base URL for your ReadMe project. Normally this would be `https://projectName.readme.io` or `https://docs.yourdomain.com`, however if this value is not supplied, a request to the ReadMe API will be made once a day to retrieve it. This data is cached into `node_modules/.cache/readmeio`.
+| baseLogUrl | **optional** This is the base URL for your ReadMe project. Normally this would be `https://projectName.readme.io` or `https://docs.yourdomain.com`, however if this value is not supplied, a request to the ReadMe API will be made once a day to retrieve it. This data is cached into `node_modules/.cache/readmeio`. |
+| timeout | **optional** The amount of milliseconds to wait for a ReadMe Metrics call to complete. Default is 2000ms. |
 
 ### Limitations
 - Currently only supports JSON request bodies. Adding a whitelist/blacklist for non-JSON bodies will not work (unless they're added to `req.body`) the same way that `body-parser` does it. The properties will be passed into [`postData`](http://www.softwareishard.com/blog/har-12-spec/#postData) as a `params` array.
