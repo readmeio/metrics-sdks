@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const timeoutSignal = require('timeout-signal');
 const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
 const config = require('./config');
@@ -90,6 +91,7 @@ module.exports.metrics = (apiKey, group, options = {}) => {
   if (!group) throw new Error('You must provide a grouping function');
 
   const bufferLength = options.bufferLength || config.bufferLength;
+  const requestTimeout = options.timeout || config.timeout;
   const encodedApiKey = Buffer.from(`${apiKey}:`).toString('base64');
   let baseLogUrl = options.baseLogUrl || undefined;
   let queue = [];
@@ -117,6 +119,9 @@ module.exports.metrics = (apiKey, group, options = {}) => {
       if (queue.length >= bufferLength) {
         const json = queue.slice();
         queue = [];
+
+        const signal = timeoutSignal(requestTimeout);
+
         fetch(`${config.host}/v1/request`, {
           method: 'post',
           body: JSON.stringify(json),
@@ -125,9 +130,17 @@ module.exports.metrics = (apiKey, group, options = {}) => {
             'Content-Type': 'application/json',
             'User-Agent': `${pkg.name}/${pkg.version}`,
           },
+          signal,
         })
-          .then(() => {})
-          .catch(() => {});
+          .then(() => {
+            console.log(`request did not timeout after ${requestTimeout}ms`);
+          })
+          .catch(err => {
+            console.log('request aborted', err);
+          })
+          .finally(() => {
+            timeoutSignal.clear(signal);
+          });
       }
 
       cleanup(); // eslint-disable-line no-use-before-define

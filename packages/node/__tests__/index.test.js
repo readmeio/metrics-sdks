@@ -160,6 +160,37 @@ describe('#metrics', () => {
       });
   });
 
+  describe('#timeout', () => {
+    it.only('should silently fail metrics requests if they take longer than the timeout', () => {
+      const apiMock = getReadMeApiMock(1);
+      const mock = nock(config.host, {
+        reqheaders: {
+          'Content-Type': 'application/json',
+          'User-Agent': `${pkg.name}/${pkg.version}`,
+        },
+      })
+        .post('/v1/request')
+        .basicAuth({ user: apiKey })
+        .delay(500)
+        .reply(200);
+
+      const app = express();
+      app.use(middleware.metrics(apiKey, () => group, { timeout: 100 }));
+      app.get('/test', (req, res) => res.sendStatus(200));
+
+      return request(app)
+        .get('/test')
+        .expect(200)
+        // .expect(res => expect(res).toHaveDocumentationHeader())
+        .then(() => {
+          apiMock.done();
+          mock.done();
+        });
+    });
+
+    it.todo('should silently fail baseLogUrl requests if they take longer than the timeout');
+  });
+
   describe('#bufferLength', () => {
     it('should send requests when number hits `bufferLength` size', async function test() {
       const apiMock = getReadMeApiMock(1);
