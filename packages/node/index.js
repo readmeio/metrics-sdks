@@ -97,7 +97,7 @@ module.exports.metrics = (apiKey, group, options = {}) => {
   if (!group) throw new Error('You must provide a grouping function');
 
   const bufferLength = options.bufferLength || config.bufferLength;
-  const requestTimeout = options.timeout || config.timeout;
+  const requestTimeout = config.timeout;
   const encodedApiKey = Buffer.from(`${apiKey}:`).toString('base64');
   let baseLogUrl = options.baseLogUrl || undefined;
   let queue = [];
