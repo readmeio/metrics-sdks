@@ -32,7 +32,7 @@ function patchResponse(res) {
   };
 }
 
-async function getProjectBaseUrl(encodedApiKey) {
+async function getProjectBaseUrl(encodedApiKey, requestTimeout) {
   const cacheDir = findCacheDir({ name: pkg.name, create: true });
   const fsSafeApikey = crypto.createHash('md5').update(encodedApiKey).digest('hex');
 
@@ -50,6 +50,8 @@ async function getProjectBaseUrl(encodedApiKey) {
     lastUpdated === undefined ||
     (lastUpdated !== undefined && Math.abs(lastUpdated - Math.round(Date.now() / 1000)) >= 86400)
   ) {
+    const signal = timeoutSignal(requestTimeout);
+
     let baseUrl;
     await fetch(`${config.readmeApiUrl}/v1/`, {
       method: 'get',
@@ -57,6 +59,7 @@ async function getProjectBaseUrl(encodedApiKey) {
         Authorization: `Basic ${encodedApiKey}`,
         'User-Agent': `${pkg.name}/${pkg.version}`,
       },
+      signal,
     })
       .then(res => {
         if (res.status >= 400 && res.status <= 599) {
@@ -76,6 +79,9 @@ async function getProjectBaseUrl(encodedApiKey) {
         // now yesterday so that in 2 minutes we'll automatically make another attempt.
         cache.setKey('baseUrl', null);
         cache.setKey('lastUpdated', Math.round(Date.now() / 1000) - 86400 + 120);
+      })
+      .finally(() => {
+        timeoutSignal.clear(signal);
       });
 
     cache.save();
@@ -98,7 +104,7 @@ module.exports.metrics = (apiKey, group, options = {}) => {
 
   return async (req, res, next) => {
     if (baseLogUrl === undefined) {
-      baseLogUrl = await getProjectBaseUrl(encodedApiKey);
+      baseLogUrl = await getProjectBaseUrl(encodedApiKey, requestTimeout);
     }
 
     const startedDateTime = new Date();
@@ -132,11 +138,9 @@ module.exports.metrics = (apiKey, group, options = {}) => {
           },
           signal,
         })
-          .then(() => {
-            console.log(`request did not timeout after ${requestTimeout}ms`);
-          })
-          .catch(err => {
-            console.log('request aborted', err);
+          .then(() => {})
+          .catch(() => {
+            // Silently discard errors and timeouts.
           })
           .finally(() => {
             timeoutSignal.clear(signal);
