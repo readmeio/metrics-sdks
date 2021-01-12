@@ -160,6 +160,12 @@ describe('#metrics', () => {
       });
   });
 
+  describe('#timeout', () => {
+    it.todo('should silently fail metrics requests if they take longer than the timeout');
+
+    it.todo('should silently fail baseLogUrl requests if they take longer than the timeout');
+  });
+
   describe('#bufferLength', () => {
     it('should send requests when number hits `bufferLength` size', async function test() {
       const apiMock = getReadMeApiMock(1);
