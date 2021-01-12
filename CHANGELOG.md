@@ -1,3 +1,30 @@
+## <small>4.0.2 (2021-01-12)</small>
+
+* feat: implementing request timeouts in the node sdk (#182) ([c6fab88](https://github.com/readmeio/metrics-sdks/commit/c6fab88)), closes [#182](https://github.com/readmeio/metrics-sdks/issues/182)
+* chore: cleanup our defined python requirements (#180) ([d196acb](https://github.com/readmeio/metrics-sdks/commit/d196acb)), closes [#180](https://github.com/readmeio/metrics-sdks/issues/180)
+* chore: removing support for php 7.2 (#181) ([dda036a](https://github.com/readmeio/metrics-sdks/commit/dda036a)), closes [#181](https://github.com/readmeio/metrics-sdks/issues/181)
+* chore(deps-dev): bump @readme/eslint-config from 3.6.2 to 4.1.0 (#172) ([838eba3](https://github.com/readmeio/metrics-sdks/commit/838eba3)), closes [#172](https://github.com/readmeio/metrics-sdks/issues/172)
+* chore(deps-dev): bump conventional-changelog-cli from 2.1.0 to 2.1.1 (#146) ([9734953](https://github.com/readmeio/metrics-sdks/commit/9734953)), closes [#146](https://github.com/readmeio/metrics-sdks/issues/146)
+* chore(deps-dev): bump eslint from 7.11.0 to 7.16.0 (#168) ([80094d1](https://github.com/readmeio/metrics-sdks/commit/80094d1)), closes [#168](https://github.com/readmeio/metrics-sdks/issues/168)
+* chore(deps-dev): bump husky from 4.3.0 to 4.3.6 (#169) ([97a6463](https://github.com/readmeio/metrics-sdks/commit/97a6463)), closes [#169](https://github.com/readmeio/metrics-sdks/issues/169)
+* chore(deps-dev): bump husky from 4.3.6 to 4.3.7 (#171) ([d02a6ee](https://github.com/readmeio/metrics-sdks/commit/d02a6ee)), closes [#171](https://github.com/readmeio/metrics-sdks/issues/171)
+* chore(deps-dev): bump jest from 26.6.0 to 26.6.3 (#139) ([56b5064](https://github.com/readmeio/metrics-sdks/commit/56b5064)), closes [#139](https://github.com/readmeio/metrics-sdks/issues/139)
+* chore(deps-dev): bump nock from 13.0.4 to 13.0.5 (#137) ([43d9b05](https://github.com/readmeio/metrics-sdks/commit/43d9b05)), closes [#137](https://github.com/readmeio/metrics-sdks/issues/137)
+* chore(deps-dev): bump prettier from 2.1.2 to 2.2.1 (#149) ([0e31cc3](https://github.com/readmeio/metrics-sdks/commit/0e31cc3)), closes [#149](https://github.com/readmeio/metrics-sdks/issues/149)
+* chore(deps-dev): bump supertest from 5.0.0 to 6.0.1 (#145) ([08e417f](https://github.com/readmeio/metrics-sdks/commit/08e417f)), closes [#145](https://github.com/readmeio/metrics-sdks/issues/145)
+* chore(deps): bump actions/checkout from v2.3.3 to v2.3.4 (#136) ([c1d7bd4](https://github.com/readmeio/metrics-sdks/commit/c1d7bd4)), closes [#136](https://github.com/readmeio/metrics-sdks/issues/136)
+* chore(deps): bump actions/setup-node from v2.1.2 to v2.1.4 (#160) ([bd8a597](https://github.com/readmeio/metrics-sdks/commit/bd8a597)), closes [#160](https://github.com/readmeio/metrics-sdks/issues/160)
+* chore(deps): bump actions/setup-python from v2.1.4 to v2.2.1 (#161) ([d0957db](https://github.com/readmeio/metrics-sdks/commit/d0957db)), closes [#161](https://github.com/readmeio/metrics-sdks/issues/161)
+* chore(deps): bump flat-cache from 2.0.1 to 3.0.4 (#138) ([6b92687](https://github.com/readmeio/metrics-sdks/commit/6b92687)), closes [#138](https://github.com/readmeio/metrics-sdks/issues/138)
+* chore(deps): bump ini from 1.3.5 to 1.3.8 (#157) ([f1b3a5d](https://github.com/readmeio/metrics-sdks/commit/f1b3a5d)), closes [#157](https://github.com/readmeio/metrics-sdks/issues/157)
+* chore(deps): bump node-notifier from 8.0.0 to 8.0.1 in /packages/node (#158) ([dada31a](https://github.com/readmeio/metrics-sdks/commit/dada31a)), closes [#158](https://github.com/readmeio/metrics-sdks/issues/158)
+* chore(deps): bump pytest from 6.0.1 to 6.2.1 in /packages/python (#164) ([8ed07d5](https://github.com/readmeio/metrics-sdks/commit/8ed07d5)), closes [#164](https://github.com/readmeio/metrics-sdks/issues/164)
+* chore(deps): bump uuid from 8.3.0 to 8.3.2 (#162) ([b26e78d](https://github.com/readmeio/metrics-sdks/commit/b26e78d)), closes [#162](https://github.com/readmeio/metrics-sdks/issues/162)
+* chore(deps): update composer/composer requirement in /packages/php (#132) ([7c4a310](https://github.com/readmeio/metrics-sdks/commit/7c4a310)), closes [#132](https://github.com/readmeio/metrics-sdks/issues/132)
+* ci: fixing the ruby workflow (#170) ([4b022b2](https://github.com/readmeio/metrics-sdks/commit/4b022b2)), closes [#170](https://github.com/readmeio/metrics-sdks/issues/170)
+
+
+
 ## <small>4.0.1 (2020-12-16)</small>
 
 * build: bumping python to 1.0.4 ([b4f3587](https://github.com/readmeio/metrics-sdks/commit/b4f3587))
