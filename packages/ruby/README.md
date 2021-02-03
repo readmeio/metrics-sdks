@@ -52,7 +52,7 @@ You may only specify either `reject_params` or `allow_only` keys, not both.
 require "readme/metrics"
 
 options = {
-  api_key: "YOUR_API_KEY",
+  api_key: "README_API_KEY",
   development: false,
   reject_params: ["not_included", "dont_send"],
   buffer_length: 5,
@@ -63,13 +63,13 @@ config.middleware.use Readme::Metrics, options do |env|
 
   if current_user.present?
     {
-      id: current_user.id,
+      api_key: current_user.api_key, # Not the same as the ReadMe API Key
       label: current_user.name,
       email: current_user.email
     }
   else
     {
-      id: "guest",
+      api_key: "guest",
       label: "Guest User",
       email: "guest@example.com"
     }
@@ -82,16 +82,16 @@ end
 ```ruby
 # config.ru
 options = {
-  api_key: "YOUR_API_KEY",
+  api_key: "README_API_KEY",
   development: false,
   reject_params: ["not_included", "dont_send"]
 }
 
 use Readme::Metrics, options do |env|
     {
-      id: "my_application_id"
-      label: "My Application",
-      email: "my.application@example.com"
+      api_key: "owlbert_api_key"
+      label: "Owlbert",
+      email: "owlbert@example.com"
     }
 end
 

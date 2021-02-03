@@ -14,7 +14,8 @@ module Readme
     SDK_NAME = "Readme.io Ruby SDK"
     DEFAULT_BUFFER_LENGTH = 10
     ENDPOINT = "https://metrics.readme.io/v1/request"
-    USER_INFO_KEYS = [:id, :label, :email]
+    USER_INFO_KEYS = [:api_key, :label, :email]
+    USER_INFO_KEYS_DEPRECATED = [:id, :label, :email]
 
     def self.logger
       @@logger
@@ -65,7 +66,7 @@ module Readme
       har = Har::Serializer.new(request, response, start_time, end_time, @filter)
       user_info = @get_user_info.call(env)
 
-      if user_info_invalid?(user_info)
+      if !user_info_valid?(user_info)
         Readme::Metrics.logger.warn Errors.bad_block_message(user_info)
       elsif request.options?
         Readme::Metrics.logger.info "OPTIONS request omitted from ReadMe API logging"
@@ -132,10 +133,12 @@ module Readme
       arg == true || arg == false
     end
 
-    def user_info_invalid?(user_info)
-      user_info.nil? ||
-        user_info.values.any?(&:nil?) ||
-        USER_INFO_KEYS.sort != user_info.keys.sort
+    def user_info_valid?(user_info)
+      sorted_user_info_keys = user_info.keys.sort
+      !user_info.nil? &&
+        !user_info.values.any?(&:nil?) &&
+        (sorted_user_info_keys === USER_INFO_KEYS.sort ||
+          sorted_user_info_keys === USER_INFO_KEYS_DEPRECATED.sort)
     end
   end
 end
