@@ -20,8 +20,8 @@ Just add the middleware to [Express](https://expressjs.com/), and that's it!
 ```javascript
 const readme = require('readmeio');
 
-app.use(readme.metrics('<<apiKey>>', (req, res) => ({
-  id: req.<userId>,
+app.use(readme.metrics(README_API_KEY, (req, res) => ({
+  apiKey: req.<userApiKey>,
   label: req.<userNameToShowInDashboard>,
   email: req.<userEmailAddress>,
 })));
@@ -30,6 +30,7 @@ app.use(readme.metrics('<<apiKey>>', (req, res) => ({
 View full documentation here: [https://docs.readme.com/docs/sending-logs-to-readme-with-nodejs](https://docs.readme.com/docs/sending-logs-to-readme-with-nodejs)
 
 ### `res.headers['x-documentation-url']`
+
 With the middleware loaded, all requests that funneled through it will receive a `x-documentation-url` header applied to the response. The value of this header will be the URL on ReadMe Metrics with which you can view the log for that request.
 
 Note that in order to generate this URL, an API request is made to ReadMe once a day, and cached to a local file in `node_modules/.cache/readmeio`, to retrieve your projects `baseUrl`. If this request to ReadMe fails, the `x-documentation-url` header will not be added to responses.
@@ -37,14 +38,15 @@ Note that in order to generate this URL, an API request is made to ReadMe once a
 If you wish to not rely on this cache, you can opt to supply a `baseLogUrl` option into the middleware, which should evaluate to the public-facing URL of your ReadMe project.
 
 ### Configuration Options
+
 There are a few options you can pass in to change how the logs are sent to ReadMe. These are passed in an object as the third parameter to the `readme.metrics`.
 
 ```js
 const readme = require('readmeio');
 const env = process.env.NODE_ENV;
 
-app.use(readme.metrics('', req => ({
-  id: req.<userId>,
+app.use(readme.metrics(README_API_KEY, req => ({
+  apiKey: req.<userApiKey>,
   label: req.<userNameToShowInDashboard>,
   email: req.<userEmailAddress>,
 }), {
