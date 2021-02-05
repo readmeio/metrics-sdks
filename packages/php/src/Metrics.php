@@ -196,10 +196,20 @@ class Metrics
         $request_start = (!defined('LARAVEL_START')) ? LARAVEL_START : $_SERVER['REQUEST_TIME_FLOAT'];
         $group = $this->group_handler::constructGroup($request);
 
-        if (!array_key_exists('id', $group)) {
-            throw new \TypeError('Metrics grouping function did not return an array with an id present.');
-        } elseif (empty($group['id'])) {
+        $api_key_exists = array_key_exists('api_key', $group);
+        $id_key_exists = array_key_exists('id', $group);
+        if (!$api_key_exists and !$id_key_exists) {
+            throw new \TypeError('Metrics grouping function did not return an array with an api_key present.');
+        } elseif ($id_key_exists and empty($group['id'])) {
             throw new \TypeError('Metrics grouping function must not return an empty id.');
+        } elseif ($api_key_exists and empty($group['api_key'])) {
+            throw new \TypeError('Metrics grouping function must not return an empty api_key.');
+        }
+
+        if ($api_key_exists) {
+            // Swap externally documented api_key field into backwards compatible & internally used id field
+            $group['id'] = $group['api_key'];
+            unset($group['api_key']);
         }
 
         return [
