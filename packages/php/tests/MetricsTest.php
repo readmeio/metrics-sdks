@@ -432,7 +432,62 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group processRequest
      */
-    public function testProcessRequestShouldFilterOutItemsInBlacklist(): void
+    public function testProcessRequestShouldFilterOutItemsInDenyList(): void
+    {
+        $metrics = new Metrics($this->api_key, $this->group_handler, [
+            'denylist' => ['val', 'password']
+        ]);
+
+        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS, self::MOCK_POST_PARAMS);
+        $response = $this->getMockJsonResponse();
+        $payload = $metrics->constructPayload('fake-uuid', $request, $response);
+
+        $request_data = $payload['request']['log']['entries'][0]['request'];
+
+        // Denylist should not affect $_GET params.
+        $this->assertSame([
+            ['name' => 'val', 'value' => '1'],
+            ['name' => 'arr', 'value' => '[null,"3"]']
+        ], $request_data['queryString']);
+
+        $params = $request_data['postData']['params'];
+        $this->assertSame([
+            ['name' => 'apiKey', 'value' => 'abcdef'],
+            ['name' => 'another', 'value' => 'Hello world']
+        ], $params);
+    }
+
+    /**
+     * @group processRequest
+     */
+    public function testProcessRequestShouldFilterOnlyItemsInAllowlist(): void
+    {
+        $metrics = new Metrics($this->api_key, $this->group_handler, [
+            'allowlist' => ['val', 'password']
+        ]);
+
+        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS, self::MOCK_POST_PARAMS);
+        $response = $this->getMockJsonResponse();
+        $payload = $metrics->constructPayload('fake-uuid', $request, $response);
+
+        $request_data = $payload['request']['log']['entries'][0]['request'];
+
+        // Allowlist should not affect $_GET params.
+        $this->assertSame([
+            ['name' => 'val', 'value' => '1'],
+            ['name' => 'arr', 'value' => '[null,"3"]']
+        ], $request_data['queryString']);
+
+        $params = $request_data['postData']['params'];
+        $this->assertSame([
+            ['name' => 'password', 'value' => '123456']
+        ], $params);
+    }
+
+    /**
+     * @group processRequest
+     */
+    public function testProcessRequestShouldFilterOutItemsInDeprecatedBlacklist(): void
     {
         $metrics = new Metrics($this->api_key, $this->group_handler, [
             'blacklist' => ['val', 'password']
@@ -460,7 +515,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group processRequest
      */
-    public function testProcessRequestShouldFilterOnlyItemsInWhitelist(): void
+    public function testProcessRequestShouldFilterOnlyItemsInDeprecatedWhitelist(): void
     {
         $metrics = new Metrics($this->api_key, $this->group_handler, [
             'whitelist' => ['val', 'password']

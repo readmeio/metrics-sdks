@@ -12,6 +12,8 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
             'api_key',
             'group_handler',
             'development_mode',
+            'denylist',
+            'allowlist',
             'blacklist',
             'whitelist',
             'base_log_url'
