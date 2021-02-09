@@ -54,7 +54,6 @@ class TestPayloadBuilder:
         # Compare the two contents and check if they are similar(?)
         return True
 
-    @pytest.mark.skip(reason="@todo")
     def testBlackListed(self, url):
 
         # Tests when the website is blacklisted
