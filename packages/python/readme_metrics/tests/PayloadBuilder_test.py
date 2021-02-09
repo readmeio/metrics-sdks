@@ -2,6 +2,8 @@ import pytest
 import requests
 import json
 
+from .fixtures import Environ
+
 from readme_metrics import MetricsApiConfig
 from readme_metrics.PayloadBuilder import PayloadBuilder
 
@@ -54,7 +56,7 @@ class TestPayloadBuilder:
         # Compare the two contents and check if they are similar(?)
         return True
 
-    def testBlackListed(self, url):
+    def testBlackListed(self):
 
         # Tests when the website is blacklisted
         # payload = createPayload(MetricsApiConfig(#params here))
