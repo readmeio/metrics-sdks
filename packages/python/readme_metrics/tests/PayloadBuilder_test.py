@@ -2,7 +2,9 @@ import pytest
 import requests
 import json
 
-from readme_metrics import MetricsApiConfig
+from .fixtures import Environ
+
+from readme_metrics import MetricsApiConfig, MetricsMiddleware
 from readme_metrics.PayloadBuilder import PayloadBuilder
 
 
@@ -19,6 +21,26 @@ class DataFetcher:
     def putJSON(self, url, param):
         res = requests.put(url, data=json.dumps(dict(param)))
         return res.json()
+
+
+class MetricsCoreMock:
+    def process(self, req, res):
+        self.req = req
+        self.res = res
+
+
+class MockApplication:
+    def __init__(self, responseObjectString):
+        self.responseObjectString = responseObjectString
+
+    def __call__(self, environ, start_response):
+        self.environ = environ
+        self.start_response = start_response
+        return [self.responseObjectString.encode("utf-8")]
+
+    def mockStartResponse(self, status, headers):
+        self.status = status
+        self.headers = headers
 
 
 class TestPayloadBuilder:
@@ -54,26 +76,52 @@ class TestPayloadBuilder:
         # Compare the two contents and check if they are similar(?)
         return True
 
-    @pytest.mark.skip(reason="@todo")
-    def testBlackListed(self, url):
+    def mockMiddlewareConfig(self, **kwargs):
+        return MetricsApiConfig(
+            'koSyKkViOR5gD6yjBxlsprHfjAIlWOh6',
+            lambda req: {'id': '123', 'label': 'testuser', 'email': 'user@email.com'},
+            buffer_length=1,
+            blacklist=kwargs.get('blacklist', []),
+            whitelist=kwargs.get('whitelist', []),
+        )
+
+    def testBlackListed(self):
 
         # Tests when the website is blacklisted
-        # payload = createPayload(MetricsApiConfig(#params here))
-        # jsonRes = self.data_fetcher.getJSON(url)
-        # readMeRes = self.getMetricData()
-        # similar = compareRequests(jsonRes, readMeRes)
-        # self.assertTrue(similar)
-        pass
+        config = self.mockMiddlewareConfig(blacklist=['password'])
 
-    @pytest.mark.skip(reason="@todo")
+        jsonString = json.dumps({ 'ok': 123, 'password': 456 }).encode()
+        responseObjectString = "{ \'responseObject\': 'value' }"
+        environ = Environ.MockEnviron().getEnvironForRequest(jsonString, 'POST')
+        app = MockApplication(responseObjectString)
+        metrics = MetricsCoreMock()
+        middleware = MetricsMiddleware(app, config)
+        middleware.metrics_core = metrics
+        next(middleware(environ, app.mockStartResponse))
+        payload = self.createPayload(config)
+        data = payload(metrics.req, metrics.res)
+        text = data['request']['log']['entries'][0]['request']['text']
+
+        assert 'ok' in text
+        assert not 'password' in text
+
     def testWhiteListed(self):
-        # Tests when the website is whitelisted
-        # payload = createPayload(MetricsApiConfig(#params here))
-        # jsonRes = self.data_fetcher.getJSON(url)
-        # readMeRes = self.getMetricData()
-        # similar = compareRequests(jsonRes, readMeRes)
-        # self.assertTrue(similar)
-        pass
+        config = self.mockMiddlewareConfig(whitelist=['ok'])
+
+        jsonString = json.dumps({ 'ok': 123, 'password': 456 }).encode()
+        responseObjectString = "{ \'responseObject\': 'value' }"
+        environ = Environ.MockEnviron().getEnvironForRequest(jsonString, 'POST')
+        app = MockApplication(responseObjectString)
+        metrics = MetricsCoreMock()
+        middleware = MetricsMiddleware(app, config)
+        middleware.metrics_core = metrics
+        next(middleware(environ, app.mockStartResponse))
+        payload = self.createPayload(config)
+        data = payload(metrics.req, metrics.res)
+        text = data['request']['log']['entries'][0]['request']['text']
+
+        assert 'ok' in text
+        assert not 'password' in text
 
     @pytest.mark.skip(reason="@todo")
     def testProduction(self):

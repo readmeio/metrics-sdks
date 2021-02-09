@@ -95,12 +95,14 @@ class PayloadBuilder:
         post_data = {}
         headers = None
 
+        # Convert EnivronHeaders to a dictionary
+        headers_dict = dict(request.headers.items())
         if self.blacklist:
-            headers = util_exclude_keys(request.headers, self.blacklist)
+            headers = util_exclude_keys(headers_dict, self.blacklist)
         elif self.whitelist:
-            headers = util_filter_keys(request.headers, self.whitelist)
+            headers = util_filter_keys(headers_dict, self.whitelist)
         else:
-            headers = request.headers
+            headers = headers_dict
 
         if request.content_length is not None and request.content_length > 0:
 
@@ -175,8 +177,8 @@ class PayloadBuilder:
         for k, v in headers.items():
             hdr_items.append({"name": k, "value": v})
 
-        status_code = int(response.status.split(" ")[0])
-        status_text = response.status.replace(str(status_code) + " ", "")
+        status_code = int(str(response.status).split(" ")[0])
+        status_text = str(response.status).replace(str(status_code) + " ", "")
 
         return {
             "status": status_code,
