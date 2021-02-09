@@ -57,8 +57,12 @@ class PayloadBuilder:
         Returns:
             dict: Payload object (ready to be serialized and sent to ReadMe)
         """
+        group = self.grouping_function(request)
+        if 'api_key' in group:
+            group['id'] = group['api_key']
+            del group['api_key']
         payload = {
-            "group": self.grouping_function(request),
+            "group": group,
             "clientIPAddress": request.remote_addr,
             "development": self.development_mode,
             "request": {

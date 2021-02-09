@@ -27,7 +27,7 @@ app.wsgi_app = MetricsMiddleware(
     MetricsApiConfig(
         README_API_KEY,
         lambda req: {
-            'id': 'unique id of user making call',
+            'api_key': 'unique api_key of the user',
             'label': 'label for us to show for this user (ie email, project name, user name, etc)',
             'email': 'email address for user'
         },
@@ -45,7 +45,7 @@ Ex)
 MetricsApiConfig(
     README_API_KEY,
     lambda req: {
-        'id': 'unique id of user making call',
+        'api_key': 'unique api_key of the user',
         'label': 'label for us to show for this user (ie email, project name, user name, etc)',
         'email': 'email address for user'
     },

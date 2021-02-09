@@ -81,7 +81,7 @@ class TestPayloadBuilder:
             'koSyKkViOR5gD6yjBxlsprHfjAIlWOh6',
             kwargs.get(
                 'grouping_function',
-                lambda req: {'id': '123', 'label': 'testuser', 'email': 'user@email.com'}
+                lambda req: {'api_key': '123', 'label': 'testuser', 'email': 'user@email.com'}
             ),
             buffer_length=1,
             denylist=kwargs.get('denylist', []),
@@ -167,6 +167,30 @@ class TestPayloadBuilder:
         assert not 'password' in text
 
     def testGroupingFunction(self):
+        config = self.mockMiddlewareConfig(
+            grouping_function=lambda req: {
+                'api_key': 'spam',
+                'email': 'flavor@spam.musubi',
+                'label': 'Spam Musubi'
+            }
+        )
+
+        responseObjectString = "{ \'responseObject\': 'value' }"
+        environ = Environ.MockEnviron().getEnvironForRequest(b"", 'POST')
+        app = MockApplication(responseObjectString)
+        metrics = MetricsCoreMock()
+        middleware = MetricsMiddleware(app, config)
+        middleware.metrics_core = metrics
+        next(middleware(environ, app.mockStartResponse))
+        payload = self.createPayload(config)
+        data = payload(metrics.req, metrics.res)
+        group = data['group']
+
+        assert group['id'] == 'spam'
+        assert group['email'] == 'flavor@spam.musubi'
+        assert group['label'] == 'Spam Musubi'
+
+    def testDeprecatedIDField(self):
         config = self.mockMiddlewareConfig(
             grouping_function=lambda req: {
                 'id': 'spam',
