@@ -4,7 +4,8 @@ import json
 
 from .fixtures import Environ
 
-from readme_metrics import MetricsApiConfig, MetricsMiddleware
+from readme_metrics import MetricsApiConfig
+from readme_metrics import MetricsMiddleware
 from readme_metrics.PayloadBuilder import PayloadBuilder
 
 
@@ -78,26 +79,30 @@ class TestPayloadBuilder:
 
     def mockMiddlewareConfig(self, **kwargs):
         return MetricsApiConfig(
-            'koSyKkViOR5gD6yjBxlsprHfjAIlWOh6',
+            "koSyKkViOR5gD6yjBxlsprHfjAIlWOh6",
             kwargs.get(
-                'grouping_function',
-                lambda req: {'api_key': '123', 'label': 'testuser', 'email': 'user@email.com'}
+                "grouping_function",
+                lambda req: {
+                    "api_key": "123",
+                    "label": "testuser",
+                    "email": "user@email.com",
+                },
             ),
             buffer_length=1,
-            denylist=kwargs.get('denylist', []),
-            allowlist=kwargs.get('allowlist', []),
-            blacklist=kwargs.get('blacklist', []),
-            whitelist=kwargs.get('whitelist', []),
+            denylist=kwargs.get("denylist", []),
+            allowlist=kwargs.get("allowlist", []),
+            blacklist=kwargs.get("blacklist", []),
+            whitelist=kwargs.get("whitelist", []),
         )
 
     def testDenylist(self):
 
         # Tests when the website is blacklisted
-        config = self.mockMiddlewareConfig(denylist=['password'])
+        config = self.mockMiddlewareConfig(denylist=["password"])
 
-        jsonString = json.dumps({ 'ok': 123, 'password': 456 }).encode()
-        responseObjectString = "{ \'responseObject\': 'value' }"
-        environ = Environ.MockEnviron().getEnvironForRequest(jsonString, 'POST')
+        jsonString = json.dumps({"ok": 123, "password": 456}).encode()
+        responseObjectString = "{ 'responseObject': 'value' }"
+        environ = Environ.MockEnviron().getEnvironForRequest(jsonString, "POST")
         app = MockApplication(responseObjectString)
         metrics = MetricsCoreMock()
         middleware = MetricsMiddleware(app, config)
@@ -105,17 +110,17 @@ class TestPayloadBuilder:
         next(middleware(environ, app.mockStartResponse))
         payload = self.createPayload(config)
         data = payload(metrics.req, metrics.res)
-        text = data['request']['log']['entries'][0]['request']['text']
+        text = data["request"]["log"]["entries"][0]["request"]["text"]
 
-        assert 'ok' in text
-        assert not 'password' in text
+        assert "ok" in text
+        assert not "password" in text
 
     def testAllowlist(self):
-        config = self.mockMiddlewareConfig(allowlist=['ok'])
+        config = self.mockMiddlewareConfig(allowlist=["ok"])
 
-        jsonString = json.dumps({ 'ok': 123, 'password': 456 }).encode()
-        responseObjectString = "{ \'responseObject\': 'value' }"
-        environ = Environ.MockEnviron().getEnvironForRequest(jsonString, 'POST')
+        jsonString = json.dumps({"ok": 123, "password": 456}).encode()
+        responseObjectString = "{ 'responseObject': 'value' }"
+        environ = Environ.MockEnviron().getEnvironForRequest(jsonString, "POST")
         app = MockApplication(responseObjectString)
         metrics = MetricsCoreMock()
         middleware = MetricsMiddleware(app, config)
@@ -123,19 +128,19 @@ class TestPayloadBuilder:
         next(middleware(environ, app.mockStartResponse))
         payload = self.createPayload(config)
         data = payload(metrics.req, metrics.res)
-        text = data['request']['log']['entries'][0]['request']['text']
+        text = data["request"]["log"]["entries"][0]["request"]["text"]
 
-        assert 'ok' in text
-        assert not 'password' in text
+        assert "ok" in text
+        assert not "password" in text
 
     def testDeprecatedBlackListed(self):
 
         # Tests when the website is blacklisted
-        config = self.mockMiddlewareConfig(blacklist=['password'])
+        config = self.mockMiddlewareConfig(blacklist=["password"])
 
-        jsonString = json.dumps({ 'ok': 123, 'password': 456 }).encode()
-        responseObjectString = "{ \'responseObject\': 'value' }"
-        environ = Environ.MockEnviron().getEnvironForRequest(jsonString, 'POST')
+        jsonString = json.dumps({"ok": 123, "password": 456}).encode()
+        responseObjectString = "{ 'responseObject': 'value' }"
+        environ = Environ.MockEnviron().getEnvironForRequest(jsonString, "POST")
         app = MockApplication(responseObjectString)
         metrics = MetricsCoreMock()
         middleware = MetricsMiddleware(app, config)
@@ -143,17 +148,17 @@ class TestPayloadBuilder:
         next(middleware(environ, app.mockStartResponse))
         payload = self.createPayload(config)
         data = payload(metrics.req, metrics.res)
-        text = data['request']['log']['entries'][0]['request']['text']
+        text = data["request"]["log"]["entries"][0]["request"]["text"]
 
-        assert 'ok' in text
-        assert not 'password' in text
+        assert "ok" in text
+        assert not "password" in text
 
     def testDeprecatedWhiteListed(self):
-        config = self.mockMiddlewareConfig(whitelist=['ok'])
+        config = self.mockMiddlewareConfig(whitelist=["ok"])
 
-        jsonString = json.dumps({ 'ok': 123, 'password': 456 }).encode()
-        responseObjectString = "{ \'responseObject\': 'value' }"
-        environ = Environ.MockEnviron().getEnvironForRequest(jsonString, 'POST')
+        jsonString = json.dumps({"ok": 123, "password": 456}).encode()
+        responseObjectString = "{ 'responseObject': 'value' }"
+        environ = Environ.MockEnviron().getEnvironForRequest(jsonString, "POST")
         app = MockApplication(responseObjectString)
         metrics = MetricsCoreMock()
         middleware = MetricsMiddleware(app, config)
@@ -161,22 +166,22 @@ class TestPayloadBuilder:
         next(middleware(environ, app.mockStartResponse))
         payload = self.createPayload(config)
         data = payload(metrics.req, metrics.res)
-        text = data['request']['log']['entries'][0]['request']['text']
+        text = data["request"]["log"]["entries"][0]["request"]["text"]
 
-        assert 'ok' in text
-        assert not 'password' in text
+        assert "ok" in text
+        assert not "password" in text
 
     def testGroupingFunction(self):
         config = self.mockMiddlewareConfig(
             grouping_function=lambda req: {
-                'api_key': 'spam',
-                'email': 'flavor@spam.musubi',
-                'label': 'Spam Musubi'
+                "api_key": "spam",
+                "email": "flavor@spam.musubi",
+                "label": "Spam Musubi",
             }
         )
 
-        responseObjectString = "{ \'responseObject\': 'value' }"
-        environ = Environ.MockEnviron().getEnvironForRequest(b"", 'POST')
+        responseObjectString = "{ 'responseObject': 'value' }"
+        environ = Environ.MockEnviron().getEnvironForRequest(b"", "POST")
         app = MockApplication(responseObjectString)
         metrics = MetricsCoreMock()
         middleware = MetricsMiddleware(app, config)
@@ -184,23 +189,23 @@ class TestPayloadBuilder:
         next(middleware(environ, app.mockStartResponse))
         payload = self.createPayload(config)
         data = payload(metrics.req, metrics.res)
-        group = data['group']
+        group = data["group"]
 
-        assert group['id'] == 'spam'
-        assert group['email'] == 'flavor@spam.musubi'
-        assert group['label'] == 'Spam Musubi'
+        assert group["id"] == "spam"
+        assert group["email"] == "flavor@spam.musubi"
+        assert group["label"] == "Spam Musubi"
 
     def testDeprecatedIDField(self):
         config = self.mockMiddlewareConfig(
             grouping_function=lambda req: {
-                'id': 'spam',
-                'email': 'flavor@spam.musubi',
-                'label': 'Spam Musubi'
+                "id": "spam",
+                "email": "flavor@spam.musubi",
+                "label": "Spam Musubi",
             }
         )
 
-        responseObjectString = "{ \'responseObject\': 'value' }"
-        environ = Environ.MockEnviron().getEnvironForRequest(b"", 'POST')
+        responseObjectString = "{ 'responseObject': 'value' }"
+        environ = Environ.MockEnviron().getEnvironForRequest(b"", "POST")
         app = MockApplication(responseObjectString)
         metrics = MetricsCoreMock()
         middleware = MetricsMiddleware(app, config)
@@ -208,11 +213,11 @@ class TestPayloadBuilder:
         next(middleware(environ, app.mockStartResponse))
         payload = self.createPayload(config)
         data = payload(metrics.req, metrics.res)
-        group = data['group']
+        group = data["group"]
 
-        assert group['id'] == 'spam'
-        assert group['email'] == 'flavor@spam.musubi'
-        assert group['label'] == 'Spam Musubi'
+        assert group["id"] == "spam"
+        assert group["email"] == "flavor@spam.musubi"
+        assert group["label"] == "Spam Musubi"
 
     @pytest.mark.skip(reason="@todo")
     def testProduction(self):
