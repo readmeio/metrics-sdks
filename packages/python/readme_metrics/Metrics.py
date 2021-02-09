@@ -30,8 +30,8 @@ class Metrics:
 
         self.config = config
         self.payload_builder = PayloadBuilder(
-            config.BLACKLIST,
-            config.WHITELIST,
+            config.DENYLIST,
+            config.ALLOWLIST,
             config.IS_DEVELOPMENT_MODE,
             config.GROUPING_FUNCTION,
         )

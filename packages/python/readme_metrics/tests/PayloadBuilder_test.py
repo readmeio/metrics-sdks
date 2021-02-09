@@ -61,8 +61,8 @@ class TestPayloadBuilder:
         # use this to test different blacklist/whitelist/devmode/groupfunc
         # return the payload from the custom config
         return PayloadBuilder(
-            config.BLACKLIST,
-            config.WHITELIST,
+            config.DENYLIST,
+            config.ALLOWLIST,
             config.IS_DEVELOPMENT_MODE,
             config.GROUPING_FUNCTION,
         )
@@ -84,11 +84,51 @@ class TestPayloadBuilder:
                 lambda req: {'id': '123', 'label': 'testuser', 'email': 'user@email.com'}
             ),
             buffer_length=1,
+            denylist=kwargs.get('denylist', []),
+            allowlist=kwargs.get('allowlist', []),
             blacklist=kwargs.get('blacklist', []),
             whitelist=kwargs.get('whitelist', []),
         )
 
-    def testBlackListed(self):
+    def testDenylist(self):
+
+        # Tests when the website is blacklisted
+        config = self.mockMiddlewareConfig(denylist=['password'])
+
+        jsonString = json.dumps({ 'ok': 123, 'password': 456 }).encode()
+        responseObjectString = "{ \'responseObject\': 'value' }"
+        environ = Environ.MockEnviron().getEnvironForRequest(jsonString, 'POST')
+        app = MockApplication(responseObjectString)
+        metrics = MetricsCoreMock()
+        middleware = MetricsMiddleware(app, config)
+        middleware.metrics_core = metrics
+        next(middleware(environ, app.mockStartResponse))
+        payload = self.createPayload(config)
+        data = payload(metrics.req, metrics.res)
+        text = data['request']['log']['entries'][0]['request']['text']
+
+        assert 'ok' in text
+        assert not 'password' in text
+
+    def testAllowlist(self):
+        config = self.mockMiddlewareConfig(allowlist=['ok'])
+
+        jsonString = json.dumps({ 'ok': 123, 'password': 456 }).encode()
+        responseObjectString = "{ \'responseObject\': 'value' }"
+        environ = Environ.MockEnviron().getEnvironForRequest(jsonString, 'POST')
+        app = MockApplication(responseObjectString)
+        metrics = MetricsCoreMock()
+        middleware = MetricsMiddleware(app, config)
+        middleware.metrics_core = metrics
+        next(middleware(environ, app.mockStartResponse))
+        payload = self.createPayload(config)
+        data = payload(metrics.req, metrics.res)
+        text = data['request']['log']['entries'][0]['request']['text']
+
+        assert 'ok' in text
+        assert not 'password' in text
+
+    def testDeprecatedBlackListed(self):
 
         # Tests when the website is blacklisted
         config = self.mockMiddlewareConfig(blacklist=['password'])
@@ -108,7 +148,7 @@ class TestPayloadBuilder:
         assert 'ok' in text
         assert not 'password' in text
 
-    def testWhiteListed(self):
+    def testDeprecatedWhiteListed(self):
         config = self.mockMiddlewareConfig(whitelist=['ok'])
 
         jsonString = json.dumps({ 'ok': 123, 'password': 456 }).encode()

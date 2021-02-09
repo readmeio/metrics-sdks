@@ -36,6 +36,7 @@ app.wsgi_app = MetricsMiddleware(
 ```
 
 ### Configuration Options
+
 There are a few options you can pass in to change how the logs are sent to ReadMe. These can be passed in `MetricsApiConfig`.
 
 Ex)
@@ -49,14 +50,14 @@ MetricsApiConfig(
         'email': 'email address for user'
     },
     buffer_length=1,
-    blacklist=['credit_card'] # Prevents credit_card in the request from being sent to readme
+    denylist=['credit_card'] # Prevents credit_card in the request from being sent to readme
 )
 ```
 
-| Option | Use |
-| :--- | :--- |
-| development_mode | **default: false** If true, the log will be separate from normal production logs. This is great for separating staging or test data from data coming from customers |
-| blacklist | **optional** An array of keys from your API requests and responses headers and bodies that you wish to blacklist from sending to ReadMe.<br /><br />If you configure a blacklist, it will override any whitelist configuration. |
-| whitelist | **optional** An array of keys from your API requests and responses headers and bodies that you only wish to send to ReadMe. |
-| buffer_length | **default: 10** Sets the number of API calls that should be recieved before the requests are sent to ReadMe |
-| allowed_http_hosts | A list of allowed http hosts for sending data to the ReadMe API.|
+| Option             | Use                                                                                                                                                                                                                           |
+| :----------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| development_mode   | **default: false** If true, the log will be separate from normal production logs. This is great for separating staging or test data from data coming from customers                                                           |
+| denylist           | **optional** An array of keys from your API requests and responses headers and bodies that you wish to denylist from sending to ReadMe.<br /><br />If you configure a denylist, it will override any allowlist configuration. |
+| allowlist          | **optional** An array of keys from your API requests and responses headers and bodies that you only wish to send to ReadMe.                                                                                                   |
+| buffer_length      | **default: 10** Sets the number of API calls that should be recieved before the requests are sent to ReadMe                                                                                                                   |
+| allowed_http_hosts | A list of allowed http hosts for sending data to the ReadMe API.                                                                                                                                                              |
