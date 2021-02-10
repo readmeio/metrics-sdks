@@ -1,11 +1,14 @@
+import importlib
 from setuptools import setup
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+version = importlib.import_module(__package__).__version__
+
 setup(
     name="readme-metrics",
-    version="1.0.6",
+    version=version,
     author="ReadMe",
     author_email="support@readme.io",
     description="ReadMe API Metrics WSGI SDK",

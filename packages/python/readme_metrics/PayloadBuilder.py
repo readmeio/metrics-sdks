@@ -1,7 +1,7 @@
 import json
 import sys
 import time
-import pkg_resources
+import importlib
 from typing import List
 from urllib import parse
 
@@ -69,7 +69,7 @@ class PayloadBuilder:
                 "log": {
                     "creator": {
                         "name": __name__,
-                        "version": pkg_resources.require("readme_metrics")[0].version,
+                        "version": importlib.import_module(__package__).__version__,
                         "comment": sys.version,
                     },
                     "entries": [
