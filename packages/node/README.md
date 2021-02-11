@@ -20,7 +20,7 @@ Just add the middleware to [Express](https://expressjs.com/), and that's it!
 ```javascript
 const readme = require('readmeio');
 
-app.use(readme.metrics(README_API_KEY, (req, res) => ({
+app.use(readme.metrics('<<apiKey>>', (req, res) => ({
   apiKey: req.<userApiKey>,
   label: req.<userNameToShowInDashboard>,
   email: req.<userEmailAddress>,
@@ -45,7 +45,7 @@ There are a few options you can pass in to change how the logs are sent to ReadM
 const readme = require('readmeio');
 const env = process.env.NODE_ENV;
 
-app.use(readme.metrics(README_API_KEY, req => ({
+app.use(readme.metrics('<<apiKey>>', req => ({
   apiKey: req.<userApiKey>,
   label: req.<userNameToShowInDashboard>,
   email: req.<userEmailAddress>,
