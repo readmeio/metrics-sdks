@@ -14,8 +14,6 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
             'development_mode',
             'denylist',
             'allowlist',
-            'blacklist',
-            'whitelist',
             'base_log_url'
         ], array_keys($config));
     }
