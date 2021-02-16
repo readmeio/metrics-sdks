@@ -5,6 +5,10 @@ require "webmock/rspec"
 RSpec.describe Readme::Metrics do
   include Rack::Test::Methods
 
+  before :each do
+    WebMock.reset_executed_requests!
+  end
+
   it "has a version number" do
     expect(Readme::Metrics::VERSION).not_to be nil
   end
@@ -20,7 +24,6 @@ RSpec.describe Readme::Metrics do
       get "/api/foo"
       completion_time = Time.now - start_time
 
-      expect(HTTParty).to have_received(:post).once
       expect(completion_time).to be < readme_request_completion_time
     end
 
