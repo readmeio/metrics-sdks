@@ -25,7 +25,7 @@ app = Flask(__name__)
 app.wsgi_app = MetricsMiddleware(
     app.wsgi_app,
     MetricsApiConfig(
-        README_API_KEY,
+        '<<apiKey>>',
         lambda req: {
             'api_key': 'unique api_key of the user',
             'label': 'label for us to show for this user (ie email, project name, user name, etc)',
@@ -43,7 +43,7 @@ Ex)
 
 ```python
 MetricsApiConfig(
-    README_API_KEY,
+    '<<apiKey>>',
     lambda req: {
         'api_key': 'unique api_key of the user',
         'label': 'label for us to show for this user (ie email, project name, user name, etc)',
