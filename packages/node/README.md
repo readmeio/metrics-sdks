@@ -52,8 +52,8 @@ app.use(readme.metrics('<<apiKey>>', req => ({
 }), {
   development: env !== 'production',
   bufferLength: 1,
-  denylist: [[arrayOfSensitiveKeysToOmit]],
-  allowlist: [[arrayofKeysOnlyToSend]],
+  denylist: [arrayOfSensitiveKeysToOmit],
+  allowlist: [arrayofKeysOnlyToSend],
 }));
 ```
 
@@ -61,13 +61,13 @@ app.use(readme.metrics('<<apiKey>>', req => ({
 | :----------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | development  | **default: false** If true, the log will be separate from normal production logs. This is great for separating staging or test data from data coming from customers.                                                                                                                                                    |
 | bufferLength | **default: 10** By default, we only send logs to ReadMe after 10 requests are made. Depending on the usage of your API it make make sense to send logs more or less frequently.                                                                                                                                         |
-| denylist     | **optional** An array of keys from your API requests and responses headers and bodies that you wish to denylist from sending to ReadMe.<br /><br />If you configure a denylist, it will override any allowlist configuration.                                                                                           |
+| denylist     | **optional** An array of keys from your API requests, responses headers, and request bodies that you wish to not be sent to ReadMe.<br /><br />If you configure a `denylist`, it will override any `allowlist` configuration.                                                                                           |
 | allowlist    | **optional** An array of keys from your API requests and responses headers and bodies that you only wish to send to ReadMe.                                                                                                                                                                                             |
 | baseLogUrl   | **optional** This is the base URL for your ReadMe project. Normally this would be `https://projectName.readme.io` or `https://docs.yourdomain.com`, however if this value is not supplied, a request to the ReadMe API will be made once a day to retrieve it. This data is cached into `node_modules/.cache/readmeio`. |
 
 ### Limitations
 
-- Currently only supports JSON request bodies. Adding a allowlist/denylist for non-JSON bodies will not work (unless they're added to `req.body`) the same way that `body-parser` does it. The properties will be passed into [`postData`](http://www.softwareishard.com/blog/har-12-spec/#postData) as a `params` array.
+- Currently only supports JSON request bodies. Adding a `allowlist` or `denylist` for non-JSON bodies will not work (unless they're added to `req.body`) the same way that [`body-parser`](https://npm.im/body-parser) does it. The properties will be passed into [`postData`](http://www.softwareishard.com/blog/har-12-spec/#postData) as a `params` array.
 - Needs more support for getting URLs when behind a reverse proxy: `x-forwarded-for`, `x-forwarded-proto`, etc.
 - Needs more support for getting client IP address when behind a reverse proxy.
 - Logs are "fire and forget" to the metrics server, so any failed requests (even for incorrect API key!) will currently fail silently.

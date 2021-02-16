@@ -48,16 +48,6 @@ return [
     'allowlist' => [],
 
     /**
-     * Deprecated, prefer denylist
-     */
-    'blacklist' => [],
-
-    /**
-     * Deprecated, prefer allowlist
-     */
-    'whitelist' => [],
-
-    /**
      * Optionally, this is the base URL for your ReadMe project.
      *
      * This URL will be the basis for the `x-documentation-url` that's applied to

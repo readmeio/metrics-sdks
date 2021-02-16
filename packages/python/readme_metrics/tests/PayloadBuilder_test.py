@@ -79,7 +79,7 @@ class TestPayloadBuilder:
 
     def mockMiddlewareConfig(self, **kwargs):
         return MetricsApiConfig(
-            "koSyKkViOR5gD6yjBxlsprHfjAIlWOh6",
+            "README_API_KEY",
             kwargs.get(
                 "grouping_function",
                 lambda req: {

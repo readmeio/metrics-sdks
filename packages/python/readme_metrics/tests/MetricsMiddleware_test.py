@@ -43,7 +43,7 @@ class MockServer:
 # Mock middleware config
 def mockMiddlewareConfig():
     return MetricsApiConfig(
-        "koSyKkViOR5gD6yjBxlsprHfjAIlWOh6",
+        "README_API_KEY",
         lambda req: {"id": "123", "label": "testuser", "email": "user@email.com"},
         buffer_length=1,
     )
