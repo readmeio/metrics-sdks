@@ -7,24 +7,55 @@ const packageJson = require('../../package.json');
 
 const constructPayload = require('../../lib/construct-payload');
 
-function createApp(options, existingPayload = { logId: uuidv4(), startedDateTime: new Date() }) {
+function createApp(options, existingPayload = { logId: uuidv4(), startedDateTime: new Date() }, group = () => {}) {
   const app = express();
   app.use(bodyParser.json());
 
   const router = express.Router();
 
-  router.post('/a', (req, res) => res.json(constructPayload(req, res, () => {}, options, existingPayload)));
+  router.post('/a', (req, res) => res.json(constructPayload(req, res, group, options, existingPayload)));
 
   app.use('/test-base-path', router);
 
   app.post('/*', (req, res) => {
-    res.json(constructPayload(req, res, () => {}, options, existingPayload));
+    res.json(constructPayload(req, res, group, options, existingPayload));
   });
 
   return app;
 }
 
 describe('constructPayload()', () => {
+  it('should convert apiKey should take precedence over id field', () => {
+    const apiKey = 'user_api_key';
+    const group = () => ({
+      apiKey: 'user_api_key',
+      id: 'user_id',
+      label: 'label',
+      email: 'email',
+    });
+    return request(createApp(undefined, undefined, group))
+      .post('/')
+      .expect(({ body }) => {
+        expect(body.group.id).toBe(apiKey);
+        expect(body.group.apiKey).toBeUndefined();
+      });
+  });
+
+  it('should still support id even though it has been deprecated in favor of apiKey', () => {
+    const userId = 'user_id';
+    const group = () => ({
+      id: userId,
+      label: 'label',
+      email: 'email',
+    });
+    return request(createApp(undefined, undefined, group))
+      .post('/')
+      .expect(({ body }) => {
+        expect(body.group.id).toBe(userId);
+        expect(body.group.apiKey).toBeUndefined();
+      });
+  });
+
   it('should construct a har file from the request/response', () => {
     return request(createApp({ blacklist: ['password'] }))
       .post('/')
