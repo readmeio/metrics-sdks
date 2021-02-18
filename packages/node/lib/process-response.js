@@ -8,17 +8,19 @@ module.exports = (res, options = {}) => {
   // from the string that we've buffered up
   // We have to do this so we can strip out
   // any whitelist/blacklist properties
+  const denylist = options.denylist || options.blacklist;
+  const allowlist = options.allowlist || options.whitelist;
   let body;
   try {
     body = JSON.parse(res._body);
 
     // Only apply blacklist/whitelist if it's an object
-    if (options.blacklist) {
-      body = removeProperties(body, options.blacklist);
+    if (denylist) {
+      body = removeProperties(body, denylist);
     }
 
-    if (options.whitelist && !options.blacklist) {
-      body = removeOtherProperties(body, options.whitelist);
+    if (allowlist && !denylist) {
+      body = removeOtherProperties(body, allowlist);
     }
   } catch (e) {
     // Non JSON body
@@ -27,12 +29,12 @@ module.exports = (res, options = {}) => {
 
   let headers = res.getHeaders();
 
-  if (options.blacklist) {
-    headers = removeProperties(headers, options.blacklist);
+  if (denylist) {
+    headers = removeProperties(headers, denylist);
   }
 
-  if (options.whitelist && !options.blacklist) {
-    headers = removeOtherProperties(headers, options.whitelist);
+  if (allowlist && !denylist) {
+    headers = removeOtherProperties(headers, allowlist);
   }
 
   return {

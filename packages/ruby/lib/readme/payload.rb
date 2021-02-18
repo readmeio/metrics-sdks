@@ -2,6 +2,8 @@ module Readme
   class Payload
     def initialize(har, user_info, development:)
       @har = har
+      # swap api_key for id
+      user_info[:id] = user_info.delete :api_key unless user_info[:api_key].nil?
       @user_info = user_info
       @development = development
     end

@@ -36,7 +36,7 @@ return [
      * Note that this does not support dot-notation, so only top-level keys can
      * be blacklisted.
      */
-    'blacklist' => [],
+    'denylist' => [],
 
     /**
      * An array of values from your API requests and responses that you only
@@ -45,7 +45,7 @@ return [
      * Note that this does not support dot-notation, so only top-level keys can
      * be whitelisted.
      */
-    'whitelist' => [],
+    'allowlist' => [],
 
     /**
      * Optionally, this is the base URL for your ReadMe project.

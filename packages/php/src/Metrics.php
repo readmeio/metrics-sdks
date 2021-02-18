@@ -30,10 +30,10 @@ class Metrics
     private $development_mode = false;
 
     /** @var array */
-    private $blacklist = [];
+    private $denylist = [];
 
     /** @var array */
-    private $whitelist = [];
+    private $allowlist = [];
 
     /** @var string|null */
     private $base_log_url = null;
@@ -72,12 +72,16 @@ class Metrics
             ? (bool)$options['development_mode']
             : false;
 
-        if (isset($options['blacklist']) && is_array($options['blacklist'])) {
-            $this->blacklist = $options['blacklist'];
+        if (isset($options['denylist']) && is_array($options['denylist'])) {
+            $this->denylist = $options['denylist'];
+        } elseif (isset($options['blacklist']) && is_array($options['blacklist'])) {
+            $this->denylist = $options['blacklist'];
         }
 
-        if (isset($options['whitelist']) && is_array($options['whitelist'])) {
-            $this->whitelist = $options['whitelist'];
+        if (isset($options['allowlist']) && is_array($options['allowlist'])) {
+            $this->allowlist = $options['allowlist'];
+        } elseif (isset($options['whitelist']) && is_array($options['whitelist'])) {
+            $this->allowlist = $options['whitelist'];
         }
 
         if (!empty($options['base_log_url'])) {
@@ -192,10 +196,20 @@ class Metrics
         $request_start = (!defined('LARAVEL_START')) ? LARAVEL_START : $_SERVER['REQUEST_TIME_FLOAT'];
         $group = $this->group_handler::constructGroup($request);
 
-        if (!array_key_exists('id', $group)) {
-            throw new \TypeError('Metrics grouping function did not return an array with an id present.');
-        } elseif (empty($group['id'])) {
+        $api_key_exists = array_key_exists('api_key', $group);
+        $id_key_exists = array_key_exists('id', $group);
+        if (!$api_key_exists and !$id_key_exists) {
+            throw new \TypeError('Metrics grouping function did not return an array with an api_key present.');
+        } elseif ($id_key_exists and empty($group['id'])) {
             throw new \TypeError('Metrics grouping function must not return an empty id.');
+        } elseif ($api_key_exists and empty($group['api_key'])) {
+            throw new \TypeError('Metrics grouping function must not return an empty api_key.');
+        }
+
+        if ($api_key_exists) {
+            // Swap externally documented api_key field into backwards compatible & internally used id field
+            $group['id'] = $group['api_key'];
+            unset($group['api_key']);
         }
 
         return [
@@ -238,10 +252,10 @@ class Metrics
          * @var array $params
          */
         $params = array_replace_recursive($_POST, $_FILES);
-        if (!empty($this->blacklist)) {
-            $params = $this->excludeDataFromBlacklist($params);
-        } elseif (!empty($this->whitelist)) {
-            $params = $this->excludeDataNotInWhitelist($params);
+        if (!empty($this->denylist)) {
+            $params = $this->excludeDataFromDenylist($params);
+        } elseif (!empty($this->allowlist)) {
+            $params = $this->excludeDataNotInAllowlist($params);
         }
 
         return [
@@ -266,10 +280,10 @@ class Metrics
         if ($response instanceof JsonResponse) {
             $body = $response->getData(true);
 
-            if (!empty($this->blacklist)) {
-                $body = $this->excludeDataFromBlacklist($body);
-            } elseif (!empty($this->whitelist)) {
-                $body = $this->excludeDataNotInWhitelist($body);
+            if (!empty($this->denylist)) {
+                $body = $this->excludeDataFromDenylist($body);
+            } elseif (!empty($this->allowlist)) {
+                $body = $this->excludeDataNotInAllowlist($body);
             }
         } else {
             $body = $response->getContent();
@@ -439,41 +453,41 @@ class Metrics
     }
 
     /**
-     * Given an array, exclude data at the highest associative level of it based upon the configured whitelist.
+     * Given an array, exclude data at the highest associative level of it based upon the configured allowlist.
      *
      * @param array $data
      * @return array
      */
-    private function excludeDataFromBlacklist($data = []): array
+    private function excludeDataFromDenylist($data = []): array
     {
-        // If `$data` is an array with associative keys, let's run the blacklist against that, otherwise run the
-        // blacklist against the keys inside the top-level array.
+        // If `$data` is an array with associative keys, let's run the denylist against that, otherwise run the
+        // denylist against the keys inside the top-level array.
         if ($this->isArrayAssoc($data)) {
-            Arr::forget($data, $this->blacklist);
+            Arr::forget($data, $this->denylist);
             return $data;
         }
 
         foreach ($data as $k => $v) {
-            Arr::forget($data[$k], $this->blacklist);
+            Arr::forget($data[$k], $this->denylist);
         }
 
         return $data;
     }
 
     /**
-     * Given an array, return only data at the highest level of it that matches the configured whitelist.
+     * Given an array, return only data at the highest level of it that matches the configured allowlist.
      *
      * @param array $data
      * @return array
      */
-    private function excludeDataNotInWhitelist($data = []): array
+    private function excludeDataNotInAllowlist($data = []): array
     {
         $ret = [];
 
-        // If `$data` is an array with associative keys, let's run the whitelist against that, otherwise run the
-        // whitelist against the keys inside the top-level array.
+        // If `$data` is an array with associative keys, let's run the allowlist against that, otherwise run the
+        // allowlist against the keys inside the top-level array.
         if ($this->isArrayAssoc($data)) {
-            foreach ($this->whitelist as $key) {
+            foreach ($this->allowlist as $key) {
                 if (isset($data[$key])) {
                     $ret[$key] = $data[$key];
                 }
@@ -483,7 +497,7 @@ class Metrics
         }
 
         foreach ($data as $idx => $v) {
-            foreach ($this->whitelist as $key) {
+            foreach ($this->allowlist as $key) {
                 if (isset($v[$key])) {
                     $ret[$idx][$key] = $data[$idx][$key];
                 }

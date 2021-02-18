@@ -12,7 +12,9 @@ use Illuminate\Http\Request;
 use ReadMe\Metrics;
 use ReadMe\MetricsException;
 use ReadMe\Tests\Fixtures\TestHandler;
+use ReadMe\Tests\Fixtures\TestHandlerReturnsDeprecatedIDField;
 use ReadMe\Tests\Fixtures\TestHandlerReturnsEmptyId;
+use ReadMe\Tests\Fixtures\TestHandlerReturnsEmptyAPIKey;
 use ReadMe\Tests\Fixtures\TestHandlerReturnsNoData;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Response;
@@ -68,7 +70,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     private $api_calls_to_readme = [];
 
     /** @var string */
-    private $api_key = 'mockReadMeApiKey';
+    private $readme_api_key = 'mockReadMeApiKey';
 
     /** @var string */
     private $base_log_url = 'https://docs.example.com';
@@ -88,7 +90,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->metrics = new Metrics($this->api_key, $this->group_handler);
+        $this->metrics = new Metrics($this->readme_api_key, $this->group_handler);
     }
 
     protected function tearDown(): void
@@ -118,7 +120,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             new \GuzzleHttp\Psr7\Response(200, [], json_encode(['baseUrl' => $this->base_log_url]))
         );
 
-        $this->metrics = new Metrics($this->api_key, $this->group_handler, [
+        $this->metrics = new Metrics($this->readme_api_key, $this->group_handler, [
             'development_mode' => $development_mode,
             'client' => new Client(['handler' => $handlers->metrics]),
             'client_readme' => new Client(['handler' => $handlers->readme])
@@ -215,7 +217,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             new \GuzzleHttp\Psr7\Response(200, [], json_encode(['baseUrl' => $this->base_log_url]))
         );
 
-        $this->metrics = new Metrics($this->api_key, $this->group_handler, [
+        $this->metrics = new Metrics($this->readme_api_key, $this->group_handler, [
             'development_mode' => $development_mode,
             'client' => new Client(['handler' => $handlers->metrics]),
             'client_readme' => new Client(['handler' => $handlers->readme])
@@ -252,7 +254,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             new \GuzzleHttp\Psr7\Response(200, [], json_encode(['baseUrl' => $this->base_log_url]))
         );
 
-        $this->metrics = new Metrics($this->api_key, $this->group_handler, [
+        $this->metrics = new Metrics($this->readme_api_key, $this->group_handler, [
             'development_mode' => $development_mode,
             'client' => new Client(['handler' => $handlers->metrics]),
             'client_readme' => new Client(['handler' => $handlers->readme])
@@ -282,7 +284,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame('fake-uuid', $payload['_id']);
 
-        $this->assertSame([
+        $this->assertEqualsCanonicalizing([
             'id' => '123457890',
             'label' => 'username',
             'email' => 'email@example.com'
@@ -396,15 +398,59 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group constructPayload
      */
+    public function testConstructPayloadWithAPIKey(): void
+    {
+        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS, self::MOCK_POST_PARAMS);
+        $response = $this->getMockJsonResponse();
+        $metrics = new Metrics($this->readme_api_key, $this->group_handler);
+        $payload = $metrics->constructPayload('fake-uuid', $request, $response);
+
+        $this->assertArrayHasKey('id', $payload['group']);
+    }
+
+    /**
+     * @group constructPayload
+     */
+    public function testConstructPayloadWithDeprecatedIDField(): void
+    {
+        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS, self::MOCK_POST_PARAMS);
+        $response = $this->getMockJsonResponse();
+        $metrics = new Metrics($this->readme_api_key, TestHandlerReturnsDeprecatedIDField::class);
+        $payload = $metrics->constructPayload('fake-uuid', $request, $response);
+
+        $this->assertArrayHasKey('id', $payload['group']);
+    }
+
+    /**
+     * @group constructPayload
+     */
     public function testConstructPayloadShouldThrowErrorIfGroupFunctionDoesNotReturnExpectedPayload(): void
     {
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessageMatches('/did not return an array with an id present/');
+        $this->expectExceptionMessageMatches('/did not return an array with an api_key present/');
 
         $request = \Mockery::mock(Request::class);
         $response = \Mockery::mock(JsonResponse::class);
 
-        (new Metrics($this->api_key, TestHandlerReturnsNoData::class))->constructPayload(
+        (new Metrics($this->readme_api_key, TestHandlerReturnsNoData::class))->constructPayload(
+            'fake-uuid',
+            $request,
+            $response
+        );
+    }
+
+    /**
+     * @group constructPayload
+     */
+    public function testConstructPayloadShouldThrowErrorIfGroupFunctionReturnsAnEmptyAPIKey(): void
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessageMatches('/must not return an empty api_key/');
+
+        $request = \Mockery::mock(Request::class);
+        $response = \Mockery::mock(JsonResponse::class);
+
+        (new Metrics($this->readme_api_key, TestHandlerReturnsEmptyAPIKey::class))->constructPayload(
             'fake-uuid',
             $request,
             $response
@@ -422,7 +468,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $request = \Mockery::mock(Request::class);
         $response = \Mockery::mock(JsonResponse::class);
 
-        (new Metrics($this->api_key, TestHandlerReturnsEmptyId::class))->constructPayload(
+        (new Metrics($this->readme_api_key, TestHandlerReturnsEmptyId::class))->constructPayload(
             'fake-uuid',
             $request,
             $response
@@ -432,9 +478,64 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group processRequest
      */
-    public function testProcessRequestShouldFilterOutItemsInBlacklist(): void
+    public function testProcessRequestShouldFilterOutItemsInDenyList(): void
     {
-        $metrics = new Metrics($this->api_key, $this->group_handler, [
+        $metrics = new Metrics($this->readme_api_key, $this->group_handler, [
+            'denylist' => ['val', 'password']
+        ]);
+
+        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS, self::MOCK_POST_PARAMS);
+        $response = $this->getMockJsonResponse();
+        $payload = $metrics->constructPayload('fake-uuid', $request, $response);
+
+        $request_data = $payload['request']['log']['entries'][0]['request'];
+
+        // Denylist should not affect $_GET params.
+        $this->assertSame([
+            ['name' => 'val', 'value' => '1'],
+            ['name' => 'arr', 'value' => '[null,"3"]']
+        ], $request_data['queryString']);
+
+        $params = $request_data['postData']['params'];
+        $this->assertSame([
+            ['name' => 'apiKey', 'value' => 'abcdef'],
+            ['name' => 'another', 'value' => 'Hello world']
+        ], $params);
+    }
+
+    /**
+     * @group processRequest
+     */
+    public function testProcessRequestShouldFilterOnlyItemsInAllowlist(): void
+    {
+        $metrics = new Metrics($this->readme_api_key, $this->group_handler, [
+            'allowlist' => ['val', 'password']
+        ]);
+
+        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS, self::MOCK_POST_PARAMS);
+        $response = $this->getMockJsonResponse();
+        $payload = $metrics->constructPayload('fake-uuid', $request, $response);
+
+        $request_data = $payload['request']['log']['entries'][0]['request'];
+
+        // Allowlist should not affect $_GET params.
+        $this->assertSame([
+            ['name' => 'val', 'value' => '1'],
+            ['name' => 'arr', 'value' => '[null,"3"]']
+        ], $request_data['queryString']);
+
+        $params = $request_data['postData']['params'];
+        $this->assertSame([
+            ['name' => 'password', 'value' => '123456']
+        ], $params);
+    }
+
+    /**
+     * @group processRequest
+     */
+    public function testProcessRequestShouldFilterOutItemsInDeprecatedBlacklist(): void
+    {
+        $metrics = new Metrics($this->readme_api_key, $this->group_handler, [
             'blacklist' => ['val', 'password']
         ]);
 
@@ -460,9 +561,9 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group processRequest
      */
-    public function testProcessRequestShouldFilterOnlyItemsInWhitelist(): void
+    public function testProcessRequestShouldFilterOnlyItemsInDeprecatedWhitelist(): void
     {
-        $metrics = new Metrics($this->api_key, $this->group_handler, [
+        $metrics = new Metrics($this->readme_api_key, $this->group_handler, [
             'whitelist' => ['val', 'password']
         ]);
 
@@ -489,7 +590,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
      */
     public function testProcessResponseShouldFilterOutItemsInBlacklist(): void
     {
-        $metrics = new Metrics($this->api_key, $this->group_handler, [
+        $metrics = new Metrics($this->readme_api_key, $this->group_handler, [
             'blacklist' => ['value']
         ]);
 
@@ -510,7 +611,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
      */
     public function testProcessResponseShouldFilterOnlyItemsInWhitelist(): void
     {
-        $metrics = new Metrics($this->api_key, $this->group_handler, [
+        $metrics = new Metrics($this->readme_api_key, $this->group_handler, [
             'whitelist' => ['value']
         ]);
 
@@ -538,7 +639,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             new \GuzzleHttp\Psr7\Response(200, [], json_encode(['baseUrl' => $this->base_log_url]))
         );
 
-        $this->metrics = new Metrics($this->api_key, $this->group_handler, [
+        $this->metrics = new Metrics($this->readme_api_key, $this->group_handler, [
             'development_mode' => $development_mode,
             'base_log_url' => $this->base_log_url,
             'client' => new Client(['handler' => $handlers->metrics]),
@@ -568,7 +669,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             new \GuzzleHttp\Psr7\Response(200, [], json_encode(['baseUrl' => $this->base_log_url]))
         );
 
-        $this->metrics = new Metrics($this->api_key, $this->group_handler, [
+        $this->metrics = new Metrics($this->readme_api_key, $this->group_handler, [
             'development_mode' => $development_mode,
             'client' => new Client(['handler' => $handlers->metrics]),
             'client_readme' => new Client(['handler' => $handlers->readme])
@@ -603,7 +704,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             new \GuzzleHttp\Psr7\Response(200, [], json_encode(['baseUrl' => $this->base_log_url]))
         );
 
-        $this->metrics = new Metrics($this->api_key, $this->group_handler, [
+        $this->metrics = new Metrics($this->readme_api_key, $this->group_handler, [
             'development_mode' => $development_mode,
             'client' => new Client(['handler' => $handlers->metrics]),
             'client_readme' => new Client(['handler' => $handlers->readme])
@@ -645,7 +746,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             ]))
         );
 
-        $this->metrics = new Metrics($this->api_key, $this->group_handler, [
+        $this->metrics = new Metrics($this->readme_api_key, $this->group_handler, [
             'development_mode' => false,
             'client' => new Client(['handler' => $handlers->metrics]),
             'client_readme' => new Client(['handler' => $handlers->readme])
@@ -685,7 +786,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             ]))
         );
 
-        $this->metrics = new Metrics($this->api_key, $this->group_handler, [
+        $this->metrics = new Metrics($this->readme_api_key, $this->group_handler, [
             'development_mode' => true,
             'client' => new Client(['handler' => $handlers->metrics]),
             'client_readme' => new Client(['handler' => $handlers->readme])
@@ -710,7 +811,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             new \GuzzleHttp\Psr7\Response(500)
         );
 
-        $this->metrics = new Metrics($this->api_key, $this->group_handler, [
+        $this->metrics = new Metrics($this->readme_api_key, $this->group_handler, [
             'development_mode' => true,
             'client' => new Client(['handler' => $handlers->metrics]),
             'client_readme' => new Client(['handler' => $handlers->readme])

@@ -5,6 +5,10 @@ require "webmock/rspec"
 RSpec.describe Readme::Metrics do
   include Rack::Test::Methods
 
+  before :each do
+    WebMock.reset_executed_requests!
+  end
+
   it "has a version number" do
     expect(Readme::Metrics::VERSION).not_to be nil
   end
@@ -20,7 +24,6 @@ RSpec.describe Readme::Metrics do
       get "/api/foo"
       completion_time = Time.now - start_time
 
-      expect(HTTParty).to have_received(:post).once
       expect(completion_time).to be < readme_request_completion_time
     end
 
@@ -376,26 +379,59 @@ RSpec.describe Readme::Metrics do
     end
   end
 
-  def json_app_with_middleware(overrides = {})
-    app_with_middleware(JsonApp.new, overrides)
+  describe "group validation" do
+    before do
+      stub_request(:post, Readme::Metrics::ENDPOINT)
+      allow(Thread).to receive(:new).and_yield
+    end
+
+    it "supports the api_key field in lieu of the deprecated id field" do
+      def app
+        json_app_with_middleware({}, {id: :empty, api_key: "8675309"})
+      end
+
+      post "/api/foo"
+
+      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) }
+    end
+
+    it "throws when provided an unsupported field" do
+      def app
+        json_app_with_middleware({}, {nananana: "booboo"})
+      end
+
+      post "/api/foo"
+
+      expect {
+        WebMock.to have_requested(:post, Readme::Metrics::ENDPOINT)
+          .with { |request| validate_json("readmeMetrics", request.body) }
+      }.to raise_error
+    end
   end
 
-  def text_app_with_middleware(overrides = {})
-    app_with_middleware(TextApp.new, overrides)
+  def json_app_with_middleware(option_overrides = {}, group_overrides = {})
+    app_with_middleware(JsonApp.new, option_overrides, group_overrides)
   end
 
-  def empty_app_with_middleware(overrides = {})
-    app_with_middleware(EmptyApp.new, overrides)
+  def text_app_with_middleware(option_overrides = {}, group_overrides = {})
+    app_with_middleware(TextApp.new, option_overrides, group_overrides)
   end
 
-  def app_with_middleware(app, overrides = {})
+  def empty_app_with_middleware(option_overrides = {}, group_overrides = {})
+    app_with_middleware(EmptyApp.new, option_overrides, group_overrides)
+  end
+
+  def app_with_middleware(app, option_overrides = {}, group_overrides = {})
     defaults = {api_key: "API KEY", buffer_length: 1}
-    with_metrics = Readme::Metrics.new(app, defaults.merge(overrides)) { |env|
-      {
+    with_metrics = Readme::Metrics.new(app, defaults.merge(option_overrides)) { |env|
+      group = {
         id: env["CURRENT_USER"].id,
         label: env["CURRENT_USER"].name,
         email: env["CURRENT_USER"].email
-      }
+      }.merge(group_overrides)
+      group.delete :id unless group[:api_key].nil?
+      group
     }
 
     SetCurrentUser.new(SetHttpVersion.new(with_metrics))

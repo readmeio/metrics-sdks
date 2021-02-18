@@ -26,7 +26,148 @@ function createApp(options) {
 
 describe('processRequest()', () => {
   describe('options', () => {
-    describe('blacklist/whitelist in body', () => {
+    describe('denylist/allowlist', () => {
+      it('should strip denylisted properties', () => {
+        const app = createApp({ denylist: ['password', 'apiKey'] });
+
+        return request(app)
+          .post('/')
+          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .expect(({ body }) => {
+            expect(body.postData.text).toBe('{"another":"Hello world"}');
+          });
+      });
+
+      it('should strip denylisted nested properties', () => {
+        const app = createApp({ denylist: ['a.b.c'] });
+
+        return request(app)
+          .post('/')
+          .send({ a: { b: { c: 1 } } })
+          .expect(({ body }) => {
+            expect(body.postData.text).toBe('{"a":{"b":{}}}');
+          });
+      });
+
+      it('should only send allowlisted properties', () => {
+        const app = createApp({ allowlist: ['password', 'apiKey'] });
+
+        return request(app)
+          .post('/')
+          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .expect(({ body }) => {
+            expect(body.postData.text).toBe('{"password":"123456","apiKey":"abcdef"}');
+          });
+      });
+
+      it('should only send allowlisted nested properties', () => {
+        const app = createApp({ allowlist: ['a.b.c'] });
+
+        return request(app)
+          .post('/')
+          .send({ a: { b: { c: 1 } }, d: 2 })
+          .expect(({ body }) => {
+            expect(body.postData.text).toBe('{"a":{"b":{"c":1}}}');
+          });
+      });
+
+      it('should ignore allowlist if denylist is present', () => {
+        const app = createApp({ denylist: ['password', 'apiKey'], allowlist: ['password', 'apiKey'] });
+
+        return request(app)
+          .post('/')
+          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .expect(({ body }) => {
+            expect(body.postData.text).toBe('{"another":"Hello world"}');
+          });
+      });
+    });
+
+    describe('denylist/allowlist in headers', () => {
+      it('should strip denylisted properties', () => {
+        const app = createApp({ denylist: ['host', 'accept-encoding', 'user-agent', 'connection'] });
+
+        return request(app)
+          .post('/')
+          .set('a', '1')
+          .expect(({ body }) => {
+            expect(body.headers).toStrictEqual([
+              { name: 'a', value: '1' },
+              { name: 'content-length', value: '0' },
+            ]);
+          });
+      });
+
+      it('should only send allowlisted properties', () => {
+        const app = createApp({ allowlist: ['a'] });
+
+        return request(app)
+          .post('/')
+          .set('a', '1')
+          .expect(({ body }) => {
+            expect(body.headers).toStrictEqual([{ name: 'a', value: '1' }]);
+          });
+      });
+    });
+
+    describe('denylist/allowlist in body and headers', () => {
+      it('should strip denylisted properties in body and headers', () => {
+        const app = createApp({
+          denylist: ['host', 'accept-encoding', 'user-agent', 'connection', 'content-length', 'password', 'apiKey'],
+        });
+
+        return request(app)
+          .post('/')
+          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .set('a', '1')
+          .expect(({ body }) => {
+            expect(body.headers).toStrictEqual([
+              { name: 'content-type', value: 'application/json' },
+              { name: 'a', value: '1' },
+            ]);
+            expect(body.postData.text).toBe('{"another":"Hello world"}');
+          });
+      });
+
+      it('should only send allowlisted nested properties in body and headers', () => {
+        const app = createApp({
+          allowlist: ['a', 'another', 'content-type'],
+        });
+
+        return request(app)
+          .post('/')
+          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .set('a', '1')
+          .expect(({ body }) => {
+            expect(body.headers).toStrictEqual([
+              { name: 'a', value: '1' },
+              { name: 'content-type', value: 'application/json' },
+            ]);
+            expect(body.postData.text).toBe('{"another":"Hello world"}');
+          });
+      });
+
+      it('should ignore allowlist if there are denylisted properties in headers and body', () => {
+        const app = createApp({
+          denylist: ['host', 'accept-encoding', 'user-agent', 'connection', 'content-length', 'password', 'apiKey'],
+          allowlist: ['host', 'accept-encoding', 'user-agent', 'connection', 'content-length', 'password', 'apiKey'],
+        });
+
+        return request(app)
+          .post('/')
+          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .set('a', '1')
+          .expect(({ body }) => {
+            expect(body.headers).toStrictEqual([
+              { name: 'content-type', value: 'application/json' },
+              { name: 'a', value: '1' },
+            ]);
+            expect(body.postData.text).toBe('{"another":"Hello world"}');
+          });
+      });
+    });
+
+    describe('deprecated blacklist/whitelist', () => {
       it('should strip blacklisted properties', () => {
         const app = createApp({ blacklist: ['password', 'apiKey'] });
 

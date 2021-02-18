@@ -25,7 +25,7 @@ module Readme
         middleware.
 
         Expected a hash with the shape:
-          { id: "unique_id", label: "Your user label", email: "Your user email" }
+          { api_key: "Your user api key", label: "Your user label", email: "Your user email" }
 
         Received value:
           #{result}
