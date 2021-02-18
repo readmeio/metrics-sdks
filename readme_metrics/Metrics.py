@@ -2,7 +2,7 @@ import queue
 import threading
 import requests
 import json
-import pkg_resources
+import importlib
 
 from werkzeug import Request
 
@@ -30,8 +30,8 @@ class Metrics:
 
         self.config = config
         self.payload_builder = PayloadBuilder(
-            config.BLACKLIST,
-            config.WHITELIST,
+            config.DENYLIST,
+            config.ALLOWLIST,
             config.IS_DEVELOPMENT_MODE,
             config.GROUPING_FUNCTION,
         )
@@ -61,7 +61,7 @@ class Metrics:
 
         payload = json.dumps(result_list)
 
-        version = pkg_resources.require("readme_metrics")[0].version
+        version = importlib.import_module(__package__).__version__
 
         readme_result = requests.post(
             self.METRICS_API + "/request",

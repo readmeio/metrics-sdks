@@ -1,7 +1,7 @@
 import json
 import sys
 import time
-import pkg_resources
+import importlib
 from typing import List
 from urllib import parse
 
@@ -18,8 +18,8 @@ class PayloadBuilder:
     portions of the payload sent to the ReadMe API.
 
     Attributes:
-        blacklist (List[str]): Cached blacklist for current PayloadBuilder instance
-        whitelist (List[str]): Cached whitelist for current PayloadBuilder instance
+        denylist (List[str]): Cached denylist for current PayloadBuilder instance
+        allowlist (List[str]): Cached allowlist for current PayloadBuilder instance
         development_mode (bool): Cached development mode parameter for current
             PayloadBuilder instance
         grouping_function ([type]): Cached grouping function for current PayloadBuilder
@@ -28,22 +28,22 @@ class PayloadBuilder:
 
     def __init__(
         self,
-        blacklist: List[str],
-        whitelist: List[str],
+        denylist: List[str],
+        allowlist: List[str],
         development_mode: bool,
         grouping_function,
     ):
         """Creates a PayloadBuilder instance with the supplied configuration
 
         Args:
-            blacklist (List[str]): Header/JSON body blacklist
-            whitelist (List[str]): Header/JSON body whitelist
+            denylist (List[str]): Header/JSON body denylist
+            allowlist (List[str]): Header/JSON body allowlist
             development_mode (bool): Development mode flag passed to ReadMe
             grouping_function ([type]): Grouping function to generate an identity
                 payload
         """
-        self.blacklist = blacklist
-        self.whitelist = whitelist
+        self.denylist = denylist
+        self.allowlist = allowlist
         self.development_mode = "true" if development_mode else "false"
         self.grouping_function = grouping_function
 
@@ -57,15 +57,20 @@ class PayloadBuilder:
         Returns:
             dict: Payload object (ready to be serialized and sent to ReadMe)
         """
+        group = self.grouping_function(request)
+        if "api_key" in group:
+            group["id"] = group["api_key"]
+            del group["api_key"]
+
         payload = {
-            "group": self.grouping_function(request),
+            "group": group,
             "clientIPAddress": request.remote_addr,
             "development": self.development_mode,
             "request": {
                 "log": {
                     "creator": {
                         "name": __name__,
-                        "version": pkg_resources.require("readme_metrics")[0].version,
+                        "version": importlib.import_module(__package__).__version__,
                         "comment": sys.version,
                     },
                     "entries": [
@@ -95,12 +100,14 @@ class PayloadBuilder:
         post_data = {}
         headers = None
 
-        if self.blacklist:
-            headers = util_exclude_keys(request.headers, self.blacklist)
-        elif self.whitelist:
-            headers = util_filter_keys(request.headers, self.whitelist)
+        # Convert EnivronHeaders to a dictionary
+        headers_dict = dict(request.headers.items())
+        if self.denylist:
+            headers = util_exclude_keys(headers_dict, self.denylist)
+        elif self.allowlist:
+            headers = util_filter_keys(headers_dict, self.allowlist)
         else:
-            headers = request.headers
+            headers = headers_dict
 
         if request.content_length is not None and request.content_length > 0:
 
@@ -109,10 +116,10 @@ class PayloadBuilder:
             try:
                 json_object = json.loads(body)
 
-                if self.blacklist:
-                    body = util_exclude_keys(json_object, self.blacklist)
-                elif self.whitelist:
-                    body = util_filter_keys(json_object, self.whitelist)
+                if self.denylist:
+                    body = util_exclude_keys(json_object, self.denylist)
+                elif self.allowlist:
+                    body = util_filter_keys(json_object, self.allowlist)
 
                 post_data["mimeType"] = "application/json"
                 post_data["text"] = body
@@ -152,10 +159,10 @@ class PayloadBuilder:
         Returns:
             dict: Wrapped response payload
         """
-        if self.blacklist:
-            headers = util_exclude_keys(response.headers, self.blacklist)
-        elif self.whitelist:
-            headers = util_filter_keys(response.headers, self.whitelist)
+        if self.denylist:
+            headers = util_exclude_keys(response.headers, self.denylist)
+        elif self.allowlist:
+            headers = util_filter_keys(response.headers, self.allowlist)
         else:
             headers = response.headers
 
@@ -164,10 +171,10 @@ class PayloadBuilder:
         try:
             json_object = json.loads(body)
 
-            if self.blacklist:
-                body = util_exclude_keys(json_object, self.blacklist)
-            elif self.whitelist:
-                body = util_filter_keys(json_object, self.whitelist)
+            if self.denylist:
+                body = util_exclude_keys(json_object, self.denylist)
+            elif self.allowlist:
+                body = util_filter_keys(json_object, self.allowlist)
         except ValueError:
             pass
 
@@ -175,8 +182,9 @@ class PayloadBuilder:
         for k, v in headers.items():
             hdr_items.append({"name": k, "value": v})
 
-        status_code = int(response.status.split(" ")[0])
-        status_text = response.status.replace(str(status_code) + " ", "")
+        status_string = str(response.status)
+        status_code = int(status_string.split(" ")[0])
+        status_text = status_string.replace(str(status_code) + " ", "")
 
         return {
             "status": status_code,
