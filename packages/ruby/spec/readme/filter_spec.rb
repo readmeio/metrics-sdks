@@ -1,6 +1,8 @@
 require "readme/filter"
 
-RSpec.describe Filter do
+RSpec.describe Readme::Filter do
+  Filter = Readme::Filter
+
   describe ".for" do
     it "returns RejectParams when only reject argument is given" do
       result = Filter.for(reject: ["reject"])

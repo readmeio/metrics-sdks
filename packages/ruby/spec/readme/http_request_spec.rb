@@ -1,6 +1,8 @@
-require "http_request"
+require "readme/http_request"
 
-RSpec.describe HttpRequest do
+RSpec.describe Readme::HttpRequest do
+  HttpRequest = Readme::HttpRequest
+
   describe "#url" do
     it "builds a URL from parts" do
       env = {

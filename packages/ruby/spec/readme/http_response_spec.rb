@@ -1,6 +1,8 @@
-require "http_response"
+require "readme/http_response"
 
-RSpec.describe HttpResponse do
+RSpec.describe Readme::HttpResponse do
+  HttpResponse = Readme::HttpResponse
+
   describe "#body" do
     it "returns an empty string when the body is nil" do
       response = HttpResponse.from_parts(200, {}, nil)
