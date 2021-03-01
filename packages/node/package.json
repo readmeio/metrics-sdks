@@ -29,7 +29,7 @@
     "uuid": "^8.2.0"
   },
   "devDependencies": {
-    "@readme/eslint-config": "^4.1.0",
+    "@readme/eslint-config": "^5.0.0",
     "body-parser": "^1.19.0",
     "conventional-changelog-cli": "^2.0.31",
     "eslint": "^7.0.0",
