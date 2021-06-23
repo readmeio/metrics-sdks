@@ -73,9 +73,9 @@ describe('processResponse()', () => {
       it('should strip blacklisted properties in headers', () => {
         expect.hasAssertions();
         return testResponse(res => {
-          expect(
-            processResponse(res, { blacklist: ['content-length', 'etag', 'content-type'] }).headers
-          ).toStrictEqual([{ name: 'x-powered-by', value: 'Express' }]);
+          expect(processResponse(res, { blacklist: ['content-length', 'etag', 'content-type'] }).headers).toStrictEqual(
+            [{ name: 'x-powered-by', value: 'Express' }]
+          );
         });
       });
 
