@@ -1,3 +1,27 @@
+## <small>4.0.3 (2021-06-23)</small>
+
+* chore: rebuilding the root lockfile ([dcb3fb9](https://github.com/readmeio/metrics-sdks/commit/dcb3fb9))
+* chore: update node package dev dependencies (#253) ([b9ab08b](https://github.com/readmeio/metrics-sdks/commit/b9ab08b)), closes [#253](https://github.com/readmeio/metrics-sdks/issues/253)
+* chore: upgrade to npm 7 and a fix a few security vulnerabilities (#249) ([501e84d](https://github.com/readmeio/metrics-sdks/commit/501e84d)), closes [#249](https://github.com/readmeio/metrics-sdks/issues/249)
+* chore(deps-dev): bump @readme/eslint-config from 4.1.0 to 4.1.1 (#184) ([703ea2b](https://github.com/readmeio/metrics-sdks/commit/703ea2b)), closes [#184](https://github.com/readmeio/metrics-sdks/issues/184)
+* chore(deps-dev): bump eslint from 7.16.0 to 7.19.0 (#189) ([1af7b2f](https://github.com/readmeio/metrics-sdks/commit/1af7b2f)), closes [#189](https://github.com/readmeio/metrics-sdks/issues/189)
+* chore(deps-dev): bump nock from 13.0.5 to 13.0.7 (#192) ([478da52](https://github.com/readmeio/metrics-sdks/commit/478da52)), closes [#192](https://github.com/readmeio/metrics-sdks/issues/192)
+* chore(deps-dev): bump supertest from 6.0.1 to 6.1.3 (#190) ([92682f3](https://github.com/readmeio/metrics-sdks/commit/92682f3)), closes [#190](https://github.com/readmeio/metrics-sdks/issues/190)
+* chore(deps): bump actions/cache from 2.1.4 to 2.1.6 (#238) ([58a383a](https://github.com/readmeio/metrics-sdks/commit/58a383a)), closes [#238](https://github.com/readmeio/metrics-sdks/issues/238)
+* chore(deps): bump actions/cache from v2 to v2.1.4 (#196) ([c1aa3d0](https://github.com/readmeio/metrics-sdks/commit/c1aa3d0)), closes [#196](https://github.com/readmeio/metrics-sdks/issues/196)
+* chore(deps): bump actions/setup-node from 2.1.4 to 2.1.5 (#236) ([f0c04b7](https://github.com/readmeio/metrics-sdks/commit/f0c04b7)), closes [#236](https://github.com/readmeio/metrics-sdks/issues/236)
+* chore(deps): bump actions/setup-python from 2.2.1 to 2.2.2 (#235) ([526cc0f](https://github.com/readmeio/metrics-sdks/commit/526cc0f)), closes [#235](https://github.com/readmeio/metrics-sdks/issues/235)
+* chore(deps): bump actions/setup-ruby from v1.1.2 to v1.1.3 (#197) ([e814022](https://github.com/readmeio/metrics-sdks/commit/e814022)), closes [#197](https://github.com/readmeio/metrics-sdks/issues/197)
+* chore(deps): bump pytest from 6.2.1 to 6.2.2 in /packages/python (#183) ([7a61963](https://github.com/readmeio/metrics-sdks/commit/7a61963)), closes [#183](https://github.com/readmeio/metrics-sdks/issues/183)
+* chore(deps): bump requests from 2.24.0 to 2.25.1 in /packages/python (#163) ([506e84f](https://github.com/readmeio/metrics-sdks/commit/506e84f)), closes [#163](https://github.com/readmeio/metrics-sdks/issues/163)
+* ci: add code scanning workflow (#251) ([0e07b03](https://github.com/readmeio/metrics-sdks/commit/0e07b03)), closes [#251](https://github.com/readmeio/metrics-sdks/issues/251)
+* ci: cleaning up the dependabot reviewers lists ([3b68afa](https://github.com/readmeio/metrics-sdks/commit/3b68afa))
+* ci: disable dependabot on ruby and python deps (#252) ([c3c0cd7](https://github.com/readmeio/metrics-sdks/commit/c3c0cd7)), closes [#252](https://github.com/readmeio/metrics-sdks/issues/252)
+* feat: master -> main ([521006c](https://github.com/readmeio/metrics-sdks/commit/521006c))
+* Rename certain SDK fields (#195) ([c877ead](https://github.com/readmeio/metrics-sdks/commit/c877ead)), closes [#195](https://github.com/readmeio/metrics-sdks/issues/195)
+
+
+
 ## <small>4.0.2 (2021-01-12)</small>
 
 * feat: implementing request timeouts in the node sdk (#182) ([c6fab88](https://github.com/readmeio/metrics-sdks/commit/c6fab88)), closes [#182](https://github.com/readmeio/metrics-sdks/issues/182)
