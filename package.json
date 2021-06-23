@@ -18,9 +18,9 @@
     "node": "^12 || ^14 || ^16"
   },
   "devDependencies": {
-    "@commitlint/cli": "^11.0.0",
-    "@commitlint/config-conventional": "^11.0.0",
-    "conventional-changelog-cli": "^2.0.34",
+    "@commitlint/cli": "^12.1.4",
+    "@commitlint/config-conventional": "^12.1.4",
+    "conventional-changelog-cli": "^2.1.1",
     "husky": "^4.2.5",
     "lerna": "^3.22.1"
   },
