@@ -14,7 +14,7 @@ setup(
     description="ReadMe API Metrics WSGI SDK",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/readmeio/metrics-sdks/tree/master/packages/python",
+    url="https://github.com/readmeio/metrics-sdks/tree/main/packages/python",
     packages=["readme_metrics"],
     install_requires=["werkzeug", "requests"],
 )
