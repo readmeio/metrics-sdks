@@ -106,4 +106,4 @@ run YourApp.new
 
 ## License
 
-[View our license here](https://github.com/readmeio/metrics-sdks/tree/master/packages/ruby/LICENSE)
+[View our license here](https://github.com/readmeio/metrics-sdks/tree/main/packages/ruby/LICENSE)

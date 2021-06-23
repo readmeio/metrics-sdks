@@ -1,6 +1,6 @@
 # Maintainers Guide
 ## Prepping a new release
-In order to prep a new release we need to split the current `master` up to the individual mirrors for each SDK package.
+In order to prep a new release we need to split the current `main` up to the individual mirrors for each SDK package.
 
 Why do this? Well for some of our packages the management systems in which they're delivered require a tag-based release and we can't tag individual directories so we need to split that package out to its own repository. [splitsh](https://github.com/splitsh/lite) handles this for us automatically and you can mirror the current codebase out to each package by running the following:
 

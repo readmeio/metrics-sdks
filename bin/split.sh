@@ -2,7 +2,7 @@
 set -e
 set -x
 
-CURRENT_BRANCH="master"
+CURRENT_BRANCH="main"
 
 function split() {
     # https://github.com/splitsh/lite
