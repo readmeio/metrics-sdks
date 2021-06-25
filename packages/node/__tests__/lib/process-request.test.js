@@ -32,9 +32,11 @@ describe('processRequest()', () => {
 
         return request(app)
           .post('/')
-          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
           .expect(({ body }) => {
-            expect(body.postData.text).toBe('{"another":"Hello world"}');
+            expect(body.postData.text).toBe(
+              '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}'
+            );
           });
       });
 
@@ -43,9 +45,9 @@ describe('processRequest()', () => {
 
         return request(app)
           .post('/')
-          .send({ a: { b: { c: 1 } } })
+          .send({ a: { b: { c: {} } } })
           .expect(({ body }) => {
-            expect(body.postData.text).toBe('{"a":{"b":{}}}');
+            expect(body.postData.text).toBe('{"a":{"b":{"c":"[REDACTED]"}}}');
           });
       });
 
@@ -54,9 +56,9 @@ describe('processRequest()', () => {
 
         return request(app)
           .post('/')
-          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
           .expect(({ body }) => {
-            expect(body.postData.text).toBe('{"password":"123456","apiKey":"abcdef"}');
+            expect(body.postData.text).toBe('{"password":"123456","apiKey":"abc","another":"[REDACTED 11]"}');
           });
       });
 
@@ -67,7 +69,7 @@ describe('processRequest()', () => {
           .post('/')
           .send({ a: { b: { c: 1 } }, d: 2 })
           .expect(({ body }) => {
-            expect(body.postData.text).toBe('{"a":{"b":{"c":1}}}');
+            expect(body.postData.text).toBe('{"a":{"b":{"c":1}},"d":"[REDACTED]"}');
           });
       });
 
@@ -76,9 +78,11 @@ describe('processRequest()', () => {
 
         return request(app)
           .post('/')
-          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
           .expect(({ body }) => {
-            expect(body.postData.text).toBe('{"another":"Hello world"}');
+            expect(body.postData.text).toBe(
+              '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}'
+            );
           });
       });
     });
@@ -91,10 +95,15 @@ describe('processRequest()', () => {
           .post('/')
           .set('a', '1')
           .expect(({ body }) => {
-            expect(body.headers).toStrictEqual([
-              { name: 'a', value: '1' },
-              { name: 'content-length', value: '0' },
-            ]);
+            expect(body.headers).toStrictEqual(
+              expect.arrayContaining([
+                { name: 'host', value: '[REDACTED 15]' },
+                { name: 'accept-encoding', value: '[REDACTED 13]' },
+                { name: 'a', value: '1' },
+                { name: 'connection', value: '[REDACTED 5]' },
+                { name: 'content-length', value: '0' },
+              ])
+            );
           });
       });
 
@@ -105,7 +114,15 @@ describe('processRequest()', () => {
           .post('/')
           .set('a', '1')
           .expect(({ body }) => {
-            expect(body.headers).toStrictEqual([{ name: 'a', value: '1' }]);
+            expect(body.headers).toStrictEqual(
+              expect.arrayContaining([
+                { name: 'host', value: '[REDACTED 15]' },
+                { name: 'accept-encoding', value: '[REDACTED 13]' },
+                { name: 'a', value: '1' },
+                { name: 'connection', value: '[REDACTED 5]' },
+                { name: 'content-length', value: '[REDACTED 1]' },
+              ])
+            );
           });
       });
     });
@@ -118,14 +135,22 @@ describe('processRequest()', () => {
 
         return request(app)
           .post('/')
-          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
           .set('a', '1')
           .expect(({ body }) => {
-            expect(body.headers).toStrictEqual([
-              { name: 'content-type', value: 'application/json' },
-              { name: 'a', value: '1' },
-            ]);
-            expect(body.postData.text).toBe('{"another":"Hello world"}');
+            expect(body.headers).toStrictEqual(
+              expect.arrayContaining([
+                { name: 'host', value: '[REDACTED 15]' },
+                { name: 'accept-encoding', value: '[REDACTED 13]' },
+                { name: 'content-type', value: 'application/json' },
+                { name: 'a', value: '1' },
+                { name: 'content-length', value: '[REDACTED 2]' },
+                { name: 'connection', value: '[REDACTED 5]' },
+              ])
+            );
+            expect(body.postData.text).toBe(
+              '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}'
+            );
           });
       });
 
@@ -136,14 +161,22 @@ describe('processRequest()', () => {
 
         return request(app)
           .post('/')
-          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
           .set('a', '1')
           .expect(({ body }) => {
-            expect(body.headers).toStrictEqual([
-              { name: 'a', value: '1' },
-              { name: 'content-type', value: 'application/json' },
-            ]);
-            expect(body.postData.text).toBe('{"another":"Hello world"}');
+            expect(body.headers).toStrictEqual(
+              expect.arrayContaining([
+                { name: 'host', value: '[REDACTED 15]' },
+                { name: 'accept-encoding', value: '[REDACTED 13]' },
+                { name: 'content-type', value: 'application/json' },
+                { name: 'a', value: '1' },
+                { name: 'content-length', value: '[REDACTED 2]' },
+                { name: 'connection', value: '[REDACTED 5]' },
+              ])
+            );
+            expect(body.postData.text).toBe(
+              '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}'
+            );
           });
       });
 
@@ -155,38 +188,42 @@ describe('processRequest()', () => {
 
         return request(app)
           .post('/')
-          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
           .set('a', '1')
           .expect(({ body }) => {
-            expect(body.headers).toStrictEqual([
-              { name: 'content-type', value: 'application/json' },
-              { name: 'a', value: '1' },
-            ]);
-            expect(body.postData.text).toBe('{"another":"Hello world"}');
+            expect(body.headers).toStrictEqual(
+              expect.arrayContaining([
+                { name: 'host', value: '[REDACTED 15]' },
+                { name: 'accept-encoding', value: '[REDACTED 13]' },
+                { name: 'content-type', value: 'application/json' },
+                { name: 'a', value: '1' },
+                { name: 'content-length', value: '[REDACTED 2]' },
+                { name: 'connection', value: '[REDACTED 5]' },
+              ])
+            );
+            expect(body.postData.text).toBe(
+              '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}'
+            );
           });
       });
     });
 
+    /*
+     * These tests are for the legacy blacklist/whitelist properties that mirrors allowlist/denylist behavior.
+     * Rather than reimplementing each test again here, it should be appropriate to just test the base case as
+     * The behavior here is assumed to use the same code paths as those used by the new properties.
+     */
     describe('deprecated blacklist/whitelist', () => {
       it('should strip blacklisted properties', () => {
         const app = createApp({ blacklist: ['password', 'apiKey'] });
 
         return request(app)
           .post('/')
-          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
           .expect(({ body }) => {
-            expect(body.postData.text).toBe('{"another":"Hello world"}');
-          });
-      });
-
-      it('should strip blacklisted nested properties', () => {
-        const app = createApp({ blacklist: ['a.b.c'] });
-
-        return request(app)
-          .post('/')
-          .send({ a: { b: { c: 1 } } })
-          .expect(({ body }) => {
-            expect(body.postData.text).toBe('{"a":{"b":{}}}');
+            expect(body.postData.text).toBe(
+              '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}'
+            );
           });
       });
 
@@ -195,115 +232,9 @@ describe('processRequest()', () => {
 
         return request(app)
           .post('/')
-          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
+          .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
           .expect(({ body }) => {
-            expect(body.postData.text).toBe('{"password":"123456","apiKey":"abcdef"}');
-          });
-      });
-
-      it('should only send whitelisted nested properties', () => {
-        const app = createApp({ whitelist: ['a.b.c'] });
-
-        return request(app)
-          .post('/')
-          .send({ a: { b: { c: 1 } }, d: 2 })
-          .expect(({ body }) => {
-            expect(body.postData.text).toBe('{"a":{"b":{"c":1}}}');
-          });
-      });
-
-      it('should ignore whitelist if blacklist is present', () => {
-        const app = createApp({ blacklist: ['password', 'apiKey'], whitelist: ['password', 'apiKey'] });
-
-        return request(app)
-          .post('/')
-          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
-          .expect(({ body }) => {
-            expect(body.postData.text).toBe('{"another":"Hello world"}');
-          });
-      });
-    });
-
-    describe('blacklist/whitelist in headers', () => {
-      it('should strip blacklisted properties', () => {
-        const app = createApp({ blacklist: ['host', 'accept-encoding', 'user-agent', 'connection'] });
-
-        return request(app)
-          .post('/')
-          .set('a', '1')
-          .expect(({ body }) => {
-            expect(body.headers).toStrictEqual([
-              { name: 'a', value: '1' },
-              { name: 'content-length', value: '0' },
-            ]);
-          });
-      });
-
-      it('should only send whitelisted properties', () => {
-        const app = createApp({ whitelist: ['a'] });
-
-        return request(app)
-          .post('/')
-          .set('a', '1')
-          .expect(({ body }) => {
-            expect(body.headers).toStrictEqual([{ name: 'a', value: '1' }]);
-          });
-      });
-    });
-
-    describe('blacklist/whitelist in body and headers', () => {
-      it('should strip blacklisted properties in body and headers', () => {
-        const app = createApp({
-          blacklist: ['host', 'accept-encoding', 'user-agent', 'connection', 'content-length', 'password', 'apiKey'],
-        });
-
-        return request(app)
-          .post('/')
-          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
-          .set('a', '1')
-          .expect(({ body }) => {
-            expect(body.headers).toStrictEqual([
-              { name: 'content-type', value: 'application/json' },
-              { name: 'a', value: '1' },
-            ]);
-            expect(body.postData.text).toBe('{"another":"Hello world"}');
-          });
-      });
-
-      it('should only send whitelisted nested properties in body and headers', () => {
-        const app = createApp({
-          whitelist: ['a', 'another', 'content-type'],
-        });
-
-        return request(app)
-          .post('/')
-          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
-          .set('a', '1')
-          .expect(({ body }) => {
-            expect(body.headers).toStrictEqual([
-              { name: 'a', value: '1' },
-              { name: 'content-type', value: 'application/json' },
-            ]);
-            expect(body.postData.text).toBe('{"another":"Hello world"}');
-          });
-      });
-
-      it('should ignore whitelist if there are blacklisted properties in headers and body', () => {
-        const app = createApp({
-          blacklist: ['host', 'accept-encoding', 'user-agent', 'connection', 'content-length', 'password', 'apiKey'],
-          whitelist: ['host', 'accept-encoding', 'user-agent', 'connection', 'content-length', 'password', 'apiKey'],
-        });
-
-        return request(app)
-          .post('/')
-          .send({ password: '123456', apiKey: 'abcdef', another: 'Hello world' })
-          .set('a', '1')
-          .expect(({ body }) => {
-            expect(body.headers).toStrictEqual([
-              { name: 'content-type', value: 'application/json' },
-              { name: 'a', value: '1' },
-            ]);
-            expect(body.postData.text).toBe('{"another":"Hello world"}');
+            expect(body.postData.text).toBe('{"password":"123456","apiKey":"abc","another":"[REDACTED 11]"}');
           });
       });
     });
