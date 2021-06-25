@@ -64,7 +64,10 @@ describe('constructPayload()', () => {
         expect(isValidUUIDV4(body._id)).toBe(true);
         expect(typeof body.request.log.entries[0].request).toBe('object');
         expect(typeof body.request.log.entries[0].response).toBe('object');
-        expect(body.request.log.entries[0].request.postData).toStrictEqual({});
+        expect(body.request.log.entries[0].request.postData).toStrictEqual({
+          mimeType: 'application/json',
+          text: '{"password":"[REDACTED 6]"}',
+        });
       });
   });
 
