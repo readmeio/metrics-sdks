@@ -15,7 +15,7 @@ RSpec.describe Readme::Metrics do
 
   context "in a multi-threaded environment" do
     it "doesn't wait for the HTTP request to Readme to finish" do
-      readme_request_completion_time = 1 # seconds
+      readme_request_completion_time = 2 # seconds
       allow(HTTParty).to receive(:post) do
         sleep readme_request_completion_time
       end
