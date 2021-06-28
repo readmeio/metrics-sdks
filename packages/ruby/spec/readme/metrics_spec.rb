@@ -236,7 +236,7 @@ RSpec.describe Readme::Metrics do
       expect(last_response.status).to eq 200
     end
 
-    it "is not submitted to Readme with  reject_params configured" do
+    it "is not submitted to Readme with reject_params configured" do
       def app
         text_app_with_middleware(buffer_length: 1, reject_params: ["reject"])
       end
@@ -247,7 +247,7 @@ RSpec.describe Readme::Metrics do
       expect(last_response.status).to eq 200
     end
 
-    it "is submitted to Readme with  reject_params configured for empty bodies" do
+    it "is submitted to Readme with reject_params configured for empty bodies" do
       def app
         empty_app_with_middleware(buffer_length: 1, reject_params: ["reject"])
       end
@@ -258,7 +258,7 @@ RSpec.describe Readme::Metrics do
       expect(last_response.status).to eq 204
     end
 
-    it "is submitted to Readme with  allow_only configured for empty bodies" do
+    it "is submitted to Readme with allow_only configured for empty bodies" do
       def app
         empty_app_with_middleware(buffer_length: 1, allow_only: ["allowed"])
       end
