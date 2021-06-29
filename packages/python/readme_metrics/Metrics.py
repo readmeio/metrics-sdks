@@ -1,3 +1,5 @@
+import atexit
+import math
 import queue
 import threading
 import requests
@@ -38,6 +40,8 @@ class Metrics:
         )
         self.queue = queue.Queue()
 
+        atexit.register(self.exit_handler)
+
     def process(self, request: Request, response: ResponseInfoWrapper) -> None:
         """Enqueues a request/response combination to be submitted the API.
 
@@ -53,3 +57,14 @@ class Metrics:
                 thread.start()
             else:
                 publish_batch(*args)
+
+    def exit_handler(self) -> None:
+        if not self.queue.empty():
+            args = (self.config, self.queue)
+            for _ in range(math.ceil(self.queue.qsize() / self.config.BUFFER_LENGTH)):
+                if self.config.IS_BACKGROUND_MODE:
+                    thread = threading.Thread(target=publish_batch, daemon=True, args=args)
+                    thread.start()
+                else:
+                    publish_batch(*args)
+        self.queue.join()
