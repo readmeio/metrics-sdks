@@ -28,6 +28,7 @@ class MetricsApiConfig:
             If this option is configured, ONLY the allowlisted properties will be sent.
         ALLOWED_HTTP_HOSTS (List[str]): A list of allowed http hosts for sending
             data to the ReadMe API.
+        METRICS_API (str): Base URL of the ReadMe metrics API.
     """
 
     README_API_KEY: str = None
@@ -38,6 +39,7 @@ class MetricsApiConfig:
     DENYLIST: List[str] = []
     ALLOWLIST: List[str] = []
     ALLOWED_HTTP_HOSTS: List[str] = []
+    METRICS_API: str = "https://metrics.readme.io"
 
     def __init__(
         self,

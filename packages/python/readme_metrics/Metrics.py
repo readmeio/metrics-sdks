@@ -17,7 +17,6 @@ class Metrics:
     """
 
     PACKAGE_NAME: str = "readme/metrics"
-    METRICS_API: str = "https://metrics.readme.io"
 
     def __init__(self, config: MetricsApiConfig):
         """
@@ -64,7 +63,7 @@ class Metrics:
         version = importlib.import_module(__package__).__version__
 
         readme_result = requests.post(
-            self.METRICS_API + "/request",
+            self.config.METRICS_API + "/request",
             auth=(self.config.README_API_KEY, ""),
             data=payload,
             headers={

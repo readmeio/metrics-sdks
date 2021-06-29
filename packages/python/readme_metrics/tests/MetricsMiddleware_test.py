@@ -49,10 +49,6 @@ def mockMiddlewareConfig():
     )
 
 
-# Verify that metrics has fields for metrics API and package name
-assert Metrics.METRICS_API != None
-assert Metrics.PACKAGE_NAME != None
-
 # Mock callback for handling middleware response
 class MetricsCoreMock:
     def process(self, req, res):
