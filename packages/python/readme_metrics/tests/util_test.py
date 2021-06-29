@@ -1,4 +1,4 @@
-import pytest
+import pytest  # pylint: disable=import-error
 from readme_metrics import util
 
 

@@ -1,4 +1,4 @@
-import pytest
+import pytest  # pylint: disable=import-error
 import requests
 import json
 
