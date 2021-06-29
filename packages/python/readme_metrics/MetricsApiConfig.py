@@ -5,32 +5,29 @@ class MetricsApiConfig:
     """ReadMe Metrics API configuration object
 
     Attributes:
-        README_API_KEY (str): (required) Your ReadMe API key
-        GROUPING_FUNCTION (lambda): (required) Grouping function to construct an
+        README_API_KEY (str) Your ReadMe API key
+        GROUPING_FUNCTION (lambda): Grouping function to construct an
             identity object. It receives the current request as a parameter, and must
             return a dictionary containing at least an "id" field, and optionally
             "label" and "email" fields.
 
             The main purpose of the identity object is to identify the API's caller.
-        BUFFER_LENGTH (int, optional): Number of requests to buffer before sending data
+        BUFFER_LENGTH (int): Number of requests to buffer before sending data
             to ReadMe. Defaults to 10.
-        IS_DEVELOPMENT_MODE (bool, optional): Determines whether you are running in
+        IS_DEVELOPMENT_MODE (bool): Determines whether you are running in
             development mode. Defaults to False.
-        IS_BACKGROUND_MODE (bool, optional):  Determines whether to issue the call to
+        IS_BACKGROUND_MODE (bool):  Determines whether to issue the call to
             the ReadMe API in a background thread. Defaults to True.
-        DENYLIST (List[str], optional): An array of headers and JSON body properties to
+        DENYLIST (List[str]): An array of headers and JSON body properties to
             skip sending to ReadMe.
 
             If you configure a denylist, it will override any allowlist configuration.
-        ALLOWLIST (List[str], optional): An array of headers and JSON body properties to
+        ALLOWLIST (List[str]): An array of headers and JSON body properties to
             send to ReadMe.
 
             If this option is configured, ONLY the allowlisted properties will be sent.
-        BLACKLIST (List[str], optional): Deprecated, prefer using an denylist.
-        WHITELIST (List[str], optional): Deprecated, prefer using an allowlist.
-        ALLOWED_HTTP_HOSTS (List[str] (optional)): A list of allowed http hosts for sending
+        ALLOWED_HTTP_HOSTS (List[str]): A list of allowed http hosts for sending
             data to the ReadMe API.
-
     """
 
     README_API_KEY: str = None
