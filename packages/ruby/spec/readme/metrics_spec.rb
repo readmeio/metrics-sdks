@@ -15,7 +15,7 @@ RSpec.describe Readme::Metrics do
 
   context "in a multi-threaded environment" do
     it "doesn't wait for the HTTP request to Readme to finish" do
-      readme_request_completion_time = 2 # seconds
+      readme_request_completion_time = 1 # seconds
       allow(HTTParty).to receive(:post) do
         sleep readme_request_completion_time
       end
@@ -51,52 +51,59 @@ RSpec.describe Readme::Metrics do
       header "Content-Type", "application/json"
       post "/api/foo", {key: "value"}.to_json
 
-      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-        .with { |request| validate_json("readmeMetrics", request.body) }
+      expect(a_request(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) })
+        .to have_been_made.once
     end
 
     it "submits to the Readme API for POST requests with a url encoded body" do
       post "/api/foo", {key: "value"}
 
-      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-        .with { |request| validate_json("readmeMetrics", request.body) }
+      expect(a_request(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) })
+        .to have_been_made.once
     end
 
     it "submits to the Readme API for POST requests with no body" do
       post "/api/foo"
 
-      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-        .with { |request| validate_json("readmeMetrics", request.body) }
+      expect(a_request(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) })
+        .to have_been_made.once
     end
 
     it "submits to the Readme API for GET requests" do
       get "/api/foo"
 
-      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-        .with { |request| validate_json("readmeMetrics", request.body) }
+      expect(a_request(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) })
+        .to have_been_made.once
     end
 
     it "submits to the Readme API for PUT requests with a JSON body" do
       header "Content-Type", "application/json"
       put "/api/foo", {key: "value"}.to_json
 
-      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-        .with { |request| validate_json("readmeMetrics", request.body) }
+      expect(a_request(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) })
+        .to have_been_made.once
     end
 
     it "submits to the Readme API for PATCH requests with a JSON body" do
       header "Content-Type", "application/json"
       patch "/api/foo", {key: "value"}.to_json
 
-      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-        .with { |request| validate_json("readmeMetrics", request.body) }
+      expect(a_request(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) })
+        .to have_been_made.once
     end
 
     it "submits to the Readme API for DELETE requests" do
       delete "/api/foo"
 
-      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-        .with { |request| validate_json("readmeMetrics", request.body) }
+      expect(a_request(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) })
+        .to have_been_made.once
     end
 
     it "returns a response when the middleware raises an error" do
