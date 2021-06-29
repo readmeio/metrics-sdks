@@ -1,5 +1,5 @@
 import importlib
-import logging
+import json
 import math
 from queue import Empty, Queue
 import time
@@ -11,7 +11,7 @@ def publish_batch(config, queue):
     result_list = []
     try:
         try:
-            while not queue.empty() and len(result_list) < config.batch_size:
+            while not queue.empty() and len(result_list) < config.BUFFER_LENGTH:
                 payload = queue.get_nowait()
                 result_list.append(payload)
         except Empty:
@@ -22,26 +22,34 @@ def publish_batch(config, queue):
 
         version = importlib.import_module(__package__).__version__
         url = config.METRICS_API + "/request"
+        config.LOGGER.debug(f"url = {url}")
+        config.LOGGER.debug(f'auth = {config.README_API_KEY}, ""')
+        config.LOGGER.debug(f"Content-Type: application/json")
+        config.LOGGER.debug(f"User-Agent: readme-metrics-python@{version}")
+        import pprint
+
+        pprint.pprint(result_list)
+
         readme_result = requests.post(
             url,
             auth=(config.README_API_KEY, ""),
-            data=result_list,
+            data=json.dumps(result_list),
             headers={
                 "Content-Type": "application/json",
                 "User-Agent": f"readme-metrics-python@{version}",
             },
-            timeout=1,
+            timeout=config.METRICS_API_TIMEOUT,
         )
-        config.logger.info(
+        config.LOGGER.info(
             f"POST to {url} with {len(result_list)} items returned {readme_result.status_code}"
         )
         if not readme_result.ok:
-            config.logger.exception(readme_result.text)
+            config.LOGGER.exception(readme_result.text)
             raise Exception(f"POST to {url} returned {readme_result.status_code}")
     except Exception as e:
         # Errors in the Metrics SDK should never cause the application to
         # throw an error. Log it but don't re-raise.
-        config.logger.exception(e)
+        config.LOGGER.exception(e)
     finally:
         for _ in result_list:
             queue.task_done()
