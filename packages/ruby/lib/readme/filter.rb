@@ -25,11 +25,8 @@ class Filter
 
     def filter(hash)
       allowed_fields = @allowed_fields.map(&:downcase)
-      # Select all fields that are allowed
-      allowed_params = hash.select { |key, _value| allowed_fields.include?(key.downcase) }
-      # If a field is not in the allowed fields reject it
-      rejected_params = hash.reject { |key, _value| allowed_fields.include?(key.downcase) }
-      # Merge the result together
+      allowed_params, rejected_params = hash.partition { |key, _value| allowed_fields.include?(key.downcase) }.map(&:to_h)
+
       allowed_params.merge(Filter.redact(rejected_params))
     end
 
@@ -45,10 +42,7 @@ class Filter
 
     def filter(hash)
       rejected_fields = @rejected_fields.map(&:downcase)
-      # Reject all items in the rejected fields
-      allowed_params = hash.reject { |key, _value| rejected_fields.include?(key.downcase) }
-      # Get all the rejected fields
-      rejected_params = hash.select { |key, _value| rejected_fields.include?(key.downcase) }
+      rejected_params, allowed_params = hash.partition { |key, _value| rejected_fields.include?(key.downcase) }.map(&:to_h)
 
       allowed_params.merge(Filter.redact(rejected_params))
     end
