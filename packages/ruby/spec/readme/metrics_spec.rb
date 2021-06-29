@@ -53,7 +53,7 @@ RSpec.describe Readme::Metrics do
 
       expect(a_request(:post, Readme::Metrics::ENDPOINT)
         .with { |request| validate_json("readmeMetrics", request.body) })
-        .to have_been_made.once
+        .to have_been_made.at_least_once
     end
 
     it "submits to the Readme API for POST requests with a url encoded body" do
@@ -61,7 +61,7 @@ RSpec.describe Readme::Metrics do
 
       expect(a_request(:post, Readme::Metrics::ENDPOINT)
         .with { |request| validate_json("readmeMetrics", request.body) })
-        .to have_been_made.once
+        .to have_been_made.at_least_once
     end
 
     it "submits to the Readme API for POST requests with no body" do
@@ -69,7 +69,7 @@ RSpec.describe Readme::Metrics do
 
       expect(a_request(:post, Readme::Metrics::ENDPOINT)
         .with { |request| validate_json("readmeMetrics", request.body) })
-        .to have_been_made.once
+        .to have_been_made.at_least_once
     end
 
     it "submits to the Readme API for GET requests" do
@@ -77,7 +77,7 @@ RSpec.describe Readme::Metrics do
 
       expect(a_request(:post, Readme::Metrics::ENDPOINT)
         .with { |request| validate_json("readmeMetrics", request.body) })
-        .to have_been_made.once
+        .to have_been_made.at_least_once
     end
 
     it "submits to the Readme API for PUT requests with a JSON body" do
@@ -86,7 +86,7 @@ RSpec.describe Readme::Metrics do
 
       expect(a_request(:post, Readme::Metrics::ENDPOINT)
         .with { |request| validate_json("readmeMetrics", request.body) })
-        .to have_been_made.once
+        .to have_been_made.at_least_once
     end
 
     it "submits to the Readme API for PATCH requests with a JSON body" do
@@ -95,7 +95,7 @@ RSpec.describe Readme::Metrics do
 
       expect(a_request(:post, Readme::Metrics::ENDPOINT)
         .with { |request| validate_json("readmeMetrics", request.body) })
-        .to have_been_made.once
+        .to have_been_made.at_least_once
     end
 
     it "submits to the Readme API for DELETE requests" do
@@ -103,7 +103,7 @@ RSpec.describe Readme::Metrics do
 
       expect(a_request(:post, Readme::Metrics::ENDPOINT)
         .with { |request| validate_json("readmeMetrics", request.body) })
-        .to have_been_made.once
+        .to have_been_made.at_least_once
     end
 
     it "returns a response when the middleware raises an error" do
