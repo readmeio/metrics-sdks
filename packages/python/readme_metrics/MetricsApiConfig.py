@@ -1,5 +1,7 @@
 from typing import List, Any, Callable
 
+from readme_metrics.util import util_build_logger
+
 
 class MetricsApiConfig:
     """ReadMe Metrics API configuration object
@@ -29,6 +31,12 @@ class MetricsApiConfig:
         ALLOWED_HTTP_HOSTS (List[str]): A list of allowed http hosts for sending
             data to the ReadMe API.
         METRICS_API (str): Base URL of the ReadMe metrics API.
+        LOGGER (logging.Logger): Logger used by all classes and methods in the
+            readme_metrics packge. Defaults to a basic console logger with log level
+            CRITICAL.
+
+            You can adjust logging settings by manipulating LOGGER, or you can replace
+            LOGGER entirely with your application's Logger.
     """
 
     README_API_KEY: str = None
@@ -93,3 +101,4 @@ class MetricsApiConfig:
         self.DENYLIST = denylist or blacklist or []
         self.ALLOWLIST = allowlist or whitelist or []
         self.ALLOWED_HTTP_HOSTS = allowed_http_hosts
+        self.LOGGER = util_build_logger()
