@@ -6,14 +6,16 @@ import importlib
 
 from werkzeug import Request
 
-from readme_metrics import MetricsApiConfig, ResponseInfoWrapper
+from readme_metrics import MetricsApiConfig
+from readme_metrics.publisher import publish_batch
 from readme_metrics.PayloadBuilder import PayloadBuilder
+from readme_metrics.ResponseInfoWrapper import ResponseInfoWrapper
 
 
 class Metrics:
     """
-    This is the internal central controller classinvoked by the WSGI middleware. It
-    handles the creation, queueing, and submission of the requests.
+    This is the internal central controller class invoked by the ReadMe middleware. It
+    queues requests for submission. The submission is processed by readme_metrics.publisher.publish_batch().
     """
 
     PACKAGE_NAME: str = "readme/metrics"
@@ -44,30 +46,10 @@ class Metrics:
             response (ResponseInfoWrapper): Response object
         """
         self.queue.put(self.payload_builder(request, response))
-
         if self.queue.qsize() >= self.config.BUFFER_LENGTH:
+            args = (self.config, self.queue)
             if self.config.IS_BACKGROUND_MODE:
-                threading.Thread(target=self._processAll, daemon=True).start()
+                thread = threading.Thread(target=publish_batch, daemon=True, args=args)
+                thread.start()
             else:
-                self._processAll()
-
-    def _processAll(self) -> None:
-        result_list = []
-        while not self.queue.empty():
-            obj = self.queue.get_nowait()
-            if obj:
-                result_list.append(obj)
-
-        payload = json.dumps(result_list)
-
-        version = importlib.import_module(__package__).__version__
-
-        readme_result = requests.post(
-            self.config.METRICS_API + "/request",
-            auth=(self.config.README_API_KEY, ""),
-            data=payload,
-            headers={
-                "Content-Type": "application/json",
-                "User-Agent": "readme-metrics-python@" + version,
-            },
-        )
+                publish_batch(*args)
