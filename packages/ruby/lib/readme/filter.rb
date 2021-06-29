@@ -14,7 +14,7 @@ class Filter
   def self.redact(rejected_params)
     rejected_params.each_with_object({}) do |(k, v), hash|
       # If it's a string then return the length of the redacted field
-      hash[k.to_str] = "[REDACTED#{v.instance_of?(String) ? " #{v.length}" : ""}]"
+      hash[k.to_str] = "[REDACTED#{v.is_a?(String) ? " #{v.length}" : ""}]"
     end
   end
 
