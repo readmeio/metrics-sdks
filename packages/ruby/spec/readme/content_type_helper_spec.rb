@@ -1,9 +1,9 @@
-require "content_type_helper"
+require "readme/content_type_helper"
 
-RSpec.describe ContentTypeHelper do
+RSpec.describe Readme::ContentTypeHelper do
   describe "#json?" do
     it "is true for all various JSON types" do
-      ContentTypeHelper::JSON_MIME_TYPES.each do |mime|
+      Readme::ContentTypeHelper::JSON_MIME_TYPES.each do |mime|
         request = FakeRequest.new(mime)
         expect(request).to be_json
       end
@@ -22,7 +22,7 @@ RSpec.describe ContentTypeHelper do
   end
 
   class FakeRequest
-    include ContentTypeHelper
+    include Readme::ContentTypeHelper
 
     attr_reader :content_type
 
