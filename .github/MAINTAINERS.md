@@ -18,7 +18,7 @@ For publishing a new version of the Node SDK, you can handle this with Lerna by 
 To publish a new version of the PHP package, after you mirror the codebase with splitsh, check out the [PHP mirror](https://github.com/readmeio/metrics-sdks-php) and create a new tag there. Once the tag is pushed back into Git, Packagist will automatically pick it up.
 
 #### Ruby
-@todo
+To publish a new version of the Ruby [package](https://rubygems.org/gems/readme-metrics/) bump the package version in `version.rb`, and then run `gem build readme-metrics` and `gem publish <BUILT_GEM>`.
 
 #### Python
 1. `cd packages/python`
