@@ -51,52 +51,59 @@ RSpec.describe Readme::Metrics do
       header "Content-Type", "application/json"
       post "/api/foo", {key: "value"}.to_json
 
-      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-        .with { |request| validate_json("readmeMetrics", request.body) }
+      expect(a_request(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) })
+        .to have_been_made.once
     end
 
     it "submits to the Readme API for POST requests with a url encoded body" do
       post "/api/foo", {key: "value"}
 
-      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-        .with { |request| validate_json("readmeMetrics", request.body) }
+      expect(a_request(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) })
+        .to have_been_made.once
     end
 
     it "submits to the Readme API for POST requests with no body" do
       post "/api/foo"
 
-      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-        .with { |request| validate_json("readmeMetrics", request.body) }
+      expect(a_request(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) })
+        .to have_been_made.once
     end
 
     it "submits to the Readme API for GET requests" do
       get "/api/foo"
 
-      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-        .with { |request| validate_json("readmeMetrics", request.body) }
+      expect(a_request(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) })
+        .to have_been_made.once
     end
 
     it "submits to the Readme API for PUT requests with a JSON body" do
       header "Content-Type", "application/json"
       put "/api/foo", {key: "value"}.to_json
 
-      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-        .with { |request| validate_json("readmeMetrics", request.body) }
+      expect(a_request(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) })
+        .to have_been_made.once
     end
 
     it "submits to the Readme API for PATCH requests with a JSON body" do
       header "Content-Type", "application/json"
       patch "/api/foo", {key: "value"}.to_json
 
-      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-        .with { |request| validate_json("readmeMetrics", request.body) }
+      expect(a_request(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) })
+        .to have_been_made.once
     end
 
     it "submits to the Readme API for DELETE requests" do
       delete "/api/foo"
 
-      expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-        .with { |request| validate_json("readmeMetrics", request.body) }
+      expect(a_request(:post, Readme::Metrics::ENDPOINT)
+        .with { |request| validate_json("readmeMetrics", request.body) })
+        .to have_been_made.once
     end
 
     it "returns a response when the middleware raises an error" do
@@ -236,7 +243,7 @@ RSpec.describe Readme::Metrics do
       expect(last_response.status).to eq 200
     end
 
-    it "is not submitted to Readme with  reject_params configured" do
+    it "is not submitted to Readme with reject_params configured" do
       def app
         text_app_with_middleware(buffer_length: 1, reject_params: ["reject"])
       end
@@ -247,7 +254,7 @@ RSpec.describe Readme::Metrics do
       expect(last_response.status).to eq 200
     end
 
-    it "is submitted to Readme with  reject_params configured for empty bodies" do
+    it "is submitted to Readme with reject_params configured for empty bodies" do
       def app
         empty_app_with_middleware(buffer_length: 1, reject_params: ["reject"])
       end
@@ -258,7 +265,7 @@ RSpec.describe Readme::Metrics do
       expect(last_response.status).to eq 204
     end
 
-    it "is submitted to Readme with  allow_only configured for empty bodies" do
+    it "is submitted to Readme with allow_only configured for empty bodies" do
       def app
         empty_app_with_middleware(buffer_length: 1, allow_only: ["allowed"])
       end

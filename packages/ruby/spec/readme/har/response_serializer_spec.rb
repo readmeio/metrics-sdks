@@ -33,7 +33,8 @@ RSpec.describe Readme::Har::ResponseSerializer do
       expect(json[:httpVersion]).to eq request.http_version
       expect(json[:headers]).to match_array(
         [
-          {name: "X-Custom", value: "custom"}
+          {name: "X-Custom", value: "custom"},
+          {name: "reject", value: "[REDACTED 6]"}
         ]
       )
       expect(json[:headersSize]).to eq(-1)
@@ -41,7 +42,8 @@ RSpec.describe Readme::Har::ResponseSerializer do
       expect(json[:redirectURL]).to eq ""
       expect(json[:cookies]).to match_array(
         [
-          {name: "cookie1", value: "value1"}
+          {name: "cookie1", value: "value1"},
+          {name: "reject", value: "[REDACTED 6]"}
         ]
       )
       expect(json.dig(:content, :text)).to eq "OK"
@@ -64,7 +66,7 @@ RSpec.describe Readme::Har::ResponseSerializer do
       )
       json = serializer.as_json
 
-      expect(json.dig(:content, :text)).to eq({keep: "keep"}.to_json)
+      expect(json.dig(:content, :text)).to eq({keep: "keep", reject: "[REDACTED 6]"}.to_json)
       expect(json.dig(:content, :size)).to eq response.content_length
       expect(json.dig(:content, :mimeType)).to eq "application/json"
     end
