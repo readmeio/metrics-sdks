@@ -1,3 +1,14 @@
+## 4.1.0 (2021-06-29)
+
+* chore(ruby): bump to v1.1.0 (#264) ([831b056](https://github.com/readmeio/metrics-sdks/commit/831b056)), closes [#264](https://github.com/readmeio/metrics-sdks/issues/264)
+* chore(ruby): update lock file ([30cfbb5](https://github.com/readmeio/metrics-sdks/commit/30cfbb5))
+* Namespace with Readme module (#261) ([debd564](https://github.com/readmeio/metrics-sdks/commit/debd564)), closes [#261](https://github.com/readmeio/metrics-sdks/issues/261)
+* test(ruby): fix flakey tests (#262) ([62ef3e8](https://github.com/readmeio/metrics-sdks/commit/62ef3e8)), closes [#262](https://github.com/readmeio/metrics-sdks/issues/262)
+* feat(node): send a redacted string rather than omitting values for deny/allowlist (#259) ([1702d6c](https://github.com/readmeio/metrics-sdks/commit/1702d6c)), closes [#259](https://github.com/readmeio/metrics-sdks/issues/259)
+* feat(ruby): redact sensitive fields, rather filter them out entirely (#260) ([39b7613](https://github.com/readmeio/metrics-sdks/commit/39b7613)), closes [#260](https://github.com/readmeio/metrics-sdks/issues/260)
+
+
+
 ## <small>4.0.3 (2021-06-23)</small>
 
 * chore: rebuilding the root lockfile ([dcb3fb9](https://github.com/readmeio/metrics-sdks/commit/dcb3fb9))
