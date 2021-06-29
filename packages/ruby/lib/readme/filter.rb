@@ -11,13 +11,23 @@ class Filter
     end
   end
 
+  def self.redact(rejected_params)
+    rejected_params.each_with_object({}) do |(k, v), hash|
+      # If it's a string then return the length of the redacted field
+      hash[k.to_str] = "[REDACTED#{v.is_a?(String) ? " #{v.length}" : ""}]"
+    end
+  end
+
   class AllowOnly
-    def initialize(filter_values)
-      @filter_values = filter_values.map(&:downcase)
+    def initialize(filter_fields)
+      @allowed_fields = filter_fields
     end
 
     def filter(hash)
-      hash.select { |key, _value| @filter_values.include?(key.downcase) }
+      allowed_fields = @allowed_fields.map(&:downcase)
+      allowed_params, rejected_params = hash.partition { |key, _value| allowed_fields.include?(key.downcase) }.map(&:to_h)
+
+      allowed_params.merge(Filter.redact(rejected_params))
     end
 
     def pass_through?
@@ -26,12 +36,15 @@ class Filter
   end
 
   class RejectParams
-    def initialize(filter_values)
-      @filter_values = filter_values.map(&:downcase)
+    def initialize(filter_fields)
+      @rejected_fields = filter_fields
     end
 
     def filter(hash)
-      hash.reject { |key, _value| @filter_values.include?(key.downcase) }
+      rejected_fields = @rejected_fields.map(&:downcase)
+      rejected_params, allowed_params = hash.partition { |key, _value| rejected_fields.include?(key.downcase) }.map(&:to_h)
+
+      allowed_params.merge(Filter.redact(rejected_params))
     end
 
     def pass_through?

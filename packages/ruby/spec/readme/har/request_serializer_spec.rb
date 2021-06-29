@@ -62,11 +62,11 @@ RSpec.describe Readme::Har::RequestSerializer do
       json = request.as_json
 
       request_body = JSON.parse(json.dig(:postData, :text))
-      expect(request_body.keys).to_not include "key1"
+      expect(request_body.keys).to include "key1"
       expect(request_body.keys).to include "key2"
 
-      request_headers = json[:headers].map { |pair| pair[:name] }
-      expect(request_headers).to_not include "Filtered-Header"
+      request_headers = json[:headers].to_h { |pair| [pair[:name], pair[:value]] }
+      expect(request_headers["Filtered-Header"]).to eq "[REDACTED 8]"
     end
 
     it "builds proper body when there is no response body" do
@@ -89,8 +89,11 @@ RSpec.describe Readme::Har::RequestSerializer do
       expect(json[:postData]).not_to have_key(:text)
       expect(json.dig(:postData, :mimeType)).to eq http_request.content_type
       expect(json.dig(:postData, :params)).to match_array(
-        [{name: "item", value: "1"},
-          {name: "other", value: "2"}]
+        [
+          {name: "item", value: "1"},
+          {name: "other", value: "2"},
+          {name: "reject", value: "[REDACTED 1]"}
+        ]
       )
     end
 

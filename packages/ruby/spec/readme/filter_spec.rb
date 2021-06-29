@@ -27,11 +27,11 @@ end
 
 RSpec.describe Filter::RejectParams do
   describe "#filter" do
-    it "returns the given hash without the given filter values" do
-      hash = {"reject" => "rejected", "REJECT" => "rejected", "keep" => "kept"}
-      result = Filter::RejectParams.new(["reject"]).filter(hash)
+    it "redacts the given hash given filter values" do
+      hash = {"keep" => "kept", "reject" => "aaa", "number" => 1, "hash" => {ok: "yes"}}
+      result = Filter::RejectParams.new(["reject", "number", "hash"]).filter(hash)
 
-      expect(result.keys).to match_array(["keep"])
+      expect(result).to match({"reject" => "[REDACTED 3]", "keep" => "kept", "hash" => "[REDACTED]", "number" => "[REDACTED]"})
     end
   end
 
@@ -50,7 +50,7 @@ RSpec.describe Filter::AllowOnly do
       hash = {"reject" => "rejected", "keep" => "kept", "KEEP" => "kept"}
       result = Filter::AllowOnly.new(["keep"]).filter(hash)
 
-      expect(result.keys).to match_array(["keep", "KEEP"])
+      expect(result).to match({"reject" => "[REDACTED 8]", "keep" => "kept", "KEEP" => "kept"})
     end
   end
 
