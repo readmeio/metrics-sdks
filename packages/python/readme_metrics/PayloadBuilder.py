@@ -1,4 +1,6 @@
+from collections.abc import Mapping
 import json
+from json import JSONDecodeError
 import sys
 import time
 import importlib
@@ -8,8 +10,6 @@ from urllib import parse
 import requests
 from readme_metrics import ResponseInfoWrapper
 from werkzeug import Request
-
-from readme_metrics.util import util_exclude_keys, util_filter_keys
 
 
 class PayloadBuilder:
@@ -97,56 +97,20 @@ class PayloadBuilder:
         Returns:
             dict: Wrapped request payload
         """
-        post_data = {}
-        headers = None
+        headers = self._redact_dict(request.headers)
+        params = parse.parse_qsl(request.query_string.decode("utf-8"))
 
-        # Convert EnivronHeaders to a dictionary
-        headers_dict = dict(request.headers.items())
-        if self.denylist:
-            headers = util_exclude_keys(headers_dict, self.denylist)
-        elif self.allowlist:
-            headers = util_filter_keys(headers_dict, self.allowlist)
+        if request.content_length:
+            post_data = self._process_body(request.rm_body)
         else:
-            headers = headers_dict
-
-        if request.content_length is not None and request.content_length > 0:
-
-            body = request.rm_body.decode("utf-8") or ""
-
-            try:
-                json_object = json.loads(body)
-
-                if self.denylist:
-                    body = util_exclude_keys(json_object, self.denylist)
-                elif self.allowlist:
-                    body = util_filter_keys(json_object, self.allowlist)
-
-                post_data["mimeType"] = "application/json"
-                post_data["text"] = body
-            except ValueError as e:
-                post_data["params"] = [body]
-
-                if request.content_type:
-                    post_data["mimeType"] = request.content_type
-                else:
-                    post_data["mimeType"] = "text/html"
-
-        hdr_items = []
-        for k, v in headers.items():
-            hdr_items.append({"name": k, "value": v})
-
-        qs_items = []
-        qs_dict = dict(parse.parse_qsl(request.query_string.decode("utf-8")))
-
-        for k, v in qs_dict.items():
-            qs_items.append({"name": k, "value": v})
+            post_data = {}
 
         return {
             "method": request.method,
             "url": request.base_url,
             "httpVersion": request.environ["SERVER_PROTOCOL"],
-            "headers": hdr_items,
-            "queryString": qs_items,
+            "headers": [{"name": k, "value": v} for (k, v) in headers.items()],
+            "queryString": [{"name": k, "value": v} for (k, v) in params],
             **post_data,
         }
 
@@ -159,28 +123,10 @@ class PayloadBuilder:
         Returns:
             dict: Wrapped response payload
         """
-        if self.denylist:
-            headers = util_exclude_keys(response.headers, self.denylist)
-        elif self.allowlist:
-            headers = util_filter_keys(response.headers, self.allowlist)
-        else:
-            headers = response.headers
+        headers = self._redact_dict(response.headers)
+        body = self._process_body(response.body).get("text")
 
-        body = response.body
-
-        try:
-            json_object = json.loads(body)
-
-            if self.denylist:
-                body = util_exclude_keys(json_object, self.denylist)
-            elif self.allowlist:
-                body = util_filter_keys(json_object, self.allowlist)
-        except ValueError:
-            pass
-
-        hdr_items = []
-        for k, v in headers.items():
-            hdr_items.append({"name": k, "value": v})
+        headers = [{"name": k, "value": v} for (k, v) in headers.items()]
 
         status_string = str(response.status)
         status_code = int(status_string.split(" ")[0])
@@ -189,10 +135,71 @@ class PayloadBuilder:
         return {
             "status": status_code,
             "statusText": status_text or "",
-            "headers": hdr_items,  # headers.items(),
+            "headers": headers,  # headers.items(),
             "content": {
                 "text": body,
                 "size": response.content_length,
                 "mimeType": response.content_type,
             },
         }
+
+    # always returns a dict with some of these fields: text, mimeType, params}
+    def _process_body(self, body):
+        if isinstance(body, bytes):
+            # Non-unicode bytes cannot be directly serialized as a JSON
+            # payload to send to the ReadMe API, so we need to conver this to a
+            # unicode string first. But we don't know what encoding it might be
+            # using, if any (it could also just be raw bytes, like an image).
+            # We're going to assume that if it's possible to decode at all, then
+            # it's most likely UTF-8. If we can't decode it, just send an error
+            # with the JSON payload.
+            try:
+                body = body.decode("utf-8")
+            except UnicodeDecodeError:
+                return {"text": "[ERROR: NOT VALID UTF-8]"}
+
+        if not isinstance(body, str):
+            # We don't know how to process this body. If it's safe to encode as
+            # JSON, return it unchanged; otherwise return an error.
+            try:
+                json.dumps(body)
+                return {"text": body}
+            except TypeError:
+                return {"text": "[ERROR: NOT SERIALIZABLE]"}
+
+        try:
+            body_data = json.loads(body)
+        except JSONDecodeError:
+            params = parse.parse_qsl(body)
+            if params:
+                return {
+                    "text": body,
+                    "mimeType": "multipart/form-data",
+                    "params": [{"name": k, "value": v} for (k, v) in params],
+                }  # TODO should be name/value
+            else:
+                return {"text": body}
+
+        if (self.denylist or self.allowlist) and isinstance(body_data, dict):
+            redacted_data = self._redact_dict(body_data)
+            body = json.dumps(redacted_data)
+
+        return {"text": body, "mimeType": "application/json"}
+
+    def _redact_dict(self, mapping: Mapping):
+        def _redact_value(v):
+            return f"[REDACTED{len(v) if isinstance(v, str) else ''}]"
+
+        # Short-circuit this function if there's no allowlist or denylist
+        if not (self.allowlist or self.denylist):
+            return mapping
+
+        result = dict()
+        for (key, value) in mapping.items():
+            if self.denylist and key in self.denylist:
+                result[key] = _redact_value(value)
+            elif self.allowlist and key not in self.allowlist:
+                result[key] = _redact_value(value)
+            else:
+                result[key] = value
+        return result
