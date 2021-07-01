@@ -86,13 +86,9 @@ class MetricsMiddleware:
                 res_ctype = ""
                 res_clength = 0
 
-                htype = next(
-                    (h for h in response_headers if h[0] == "Content-Type"), None
-                )
+                htype = next((h for h in response_headers if h[0] == "Content-Type"), None)
 
-                hlength = next(
-                    (h for h in response_headers if h[0] == "Content-Length"), None
-                )
+                hlength = next((h for h in response_headers if h[0] == "Content-Length"), None)
 
                 if htype and hlength:
                     res_ctype = htype[1]
@@ -108,12 +104,7 @@ class MetricsMiddleware:
                 )
 
                 # Send off data to be queued (and processed) by ReadMe if allowed
-                if self.config.ALLOWED_HTTP_HOSTS:
-                    if environ["HTTP_HOST"] in self.config.ALLOWED_HTTP_HOSTS:
-                        self.metrics_core.process(req, res)
-                else:
-                    # If the allowed_http_hosts has not been set (None by default), send off the data to be queued
-                    self.metrics_core.process(req, res)
+                self.metrics_core.process(req, res)
 
                 yield data
 

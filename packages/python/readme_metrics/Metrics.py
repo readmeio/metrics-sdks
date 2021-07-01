@@ -49,6 +49,12 @@ class Metrics:
             request (Request): Request object
             response (ResponseInfoWrapper): Response object
         """
+        if not self.host_allowed(request.environ["HTTP_HOST"]):
+            self.config.LOGGER.debug(
+                f"Not enqueueing request, host {request.environ['HTTP_HOST']} not in ALLOWED_HTTP_HOSTS"
+            )
+            return
+
         self.queue.put(self.payload_builder(request, response))
         if self.queue.qsize() >= self.config.BUFFER_LENGTH:
             args = (self.config, self.queue)
@@ -68,3 +74,10 @@ class Metrics:
                 else:
                     publish_batch(*args)
         self.queue.join()
+
+    def host_allowed(self, host):
+        if self.config.ALLOWED_HTTP_HOSTS:
+            return host in self.config.ALLOWED_HTTP_HOSTS
+        else:
+            # If the allowed_http_hosts has not been set (None by default), send off the data to be queued
+            return True
