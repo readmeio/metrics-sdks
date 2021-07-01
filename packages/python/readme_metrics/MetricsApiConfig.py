@@ -63,6 +63,7 @@ class MetricsApiConfig:
         blacklist: List[str] = None,
         whitelist: List[str] = None,
         allowed_http_hosts: List[str] = None,
+        timeout: int = 3,
     ):
         """Initializes an instance of the MetricsApiConfig object
 
@@ -101,6 +102,8 @@ class MetricsApiConfig:
             allowed_http_hosts (List[str], optional): A list of HTTP hosts which should be
                 logged to ReadMe. If this is present, requests will only be sent to ReadMe
                 whose Host header matches one of the allowed hosts.
+            timeout (int): Timeout (in seconds) for calls back to the ReadMe Metrics API.
+                Default 3 seconds.
         """
         self.README_API_KEY = api_key
         self.GROUPING_FUNCTION = grouping_function
@@ -110,4 +113,5 @@ class MetricsApiConfig:
         self.DENYLIST = denylist or blacklist or []
         self.ALLOWLIST = allowlist or whitelist or []
         self.ALLOWED_HTTP_HOSTS = allowed_http_hosts
+        self.METRICS_API_TIMEOUT = timeout
         self.LOGGER = util_build_logger()
