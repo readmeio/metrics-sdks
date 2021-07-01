@@ -9,13 +9,22 @@ Track your API metrics within ReadMe.
 
 ## Installation
 
+For the basic WSGI middleware implementation:
 ```
 pip install readme-metrics
 ```
 
+If you're using Flask:
+```
+pip install readme-metrics[flask]
+```
+
+
 ## Usage
 
-Just include the `MetricsMiddleware` in any WSGI app!
+<!-- TODO update docs for Flask -->
+
+Just include the `MetricsMiddleware` into your API!
 
 ```python
 from readme_metrics import MetricsApiConfig, MetricsMiddleware
