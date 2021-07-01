@@ -80,20 +80,27 @@ class MetricsApiConfig:
                 development mode. Defaults to False.
             background_worker_mode (bool, optional): Determines whether to issue the
                 call to the ReadMe API in a background thread. Defaults to True.
-            denylist (List[str], optional): An array of headers and JSON body
-                properties to skip sending to ReadMe. Defaults to None.
+            denylist (List[str], optional): An array of keys from your API requests and
+                responses headers and bodies that are blocked from being sent to ReadMe.
+                Both the request and response will be checked for these keys, in their
+                HTTP headers, form fields, URL parameters, and JSON request/response
+                bodies. JSON is only checked at the top level, so a nested field will
+                still be sent even if its key matches one of the keys in `denylist`.
+                Defaults to None.
 
                 If you configure a denylist, it will override any allowlist
                 configuration.
             allowlist (List[str], optional): An array of headers and JSON body
-                properties to send to ReadMe. Defaults to None.
+                properties to send to ReadMe. Similar semantics to `denylist`; defaults
+                to None.
 
                 If this option is configured, ONLY the whitelisted properties will be
                 sent.
             blacklist (List[str], optional): Deprecated, prefer denylist.
             whitelist (List[str], optional): Deprecated, prefer allowlist.
-            allowed_http_hosts (List[str], optional): A list of allowed http hosts for sending data
-                to the ReadMe API.
+            allowed_http_hosts (List[str], optional): A list of HTTP hosts which should be
+                logged to ReadMe. If this is present, requests will only be sent to ReadMe
+                whose Host header matches one of the allowed hosts.
         """
         self.README_API_KEY = api_key
         self.GROUPING_FUNCTION = grouping_function
