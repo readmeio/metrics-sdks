@@ -69,7 +69,9 @@ class Metrics:
             args = (self.config, self.queue)
             for _ in range(math.ceil(self.queue.qsize() / self.config.BUFFER_LENGTH)):
                 if self.config.IS_BACKGROUND_MODE:
-                    thread = threading.Thread(target=publish_batch, daemon=True, args=args)
+                    thread = threading.Thread(
+                        target=publish_batch, daemon=True, args=args
+                    )
                     thread.start()
                 else:
                     publish_batch(*args)
