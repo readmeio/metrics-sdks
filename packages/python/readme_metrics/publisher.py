@@ -22,13 +22,6 @@ def publish_batch(config, queue):
 
         version = importlib.import_module(__package__).__version__
         url = config.METRICS_API + "/request"
-        config.LOGGER.debug(f"url = {url}")
-        config.LOGGER.debug(f'auth = {config.README_API_KEY}, ""')
-        config.LOGGER.debug(f"Content-Type: application/json")
-        config.LOGGER.debug(f"User-Agent: readme-metrics-python@{version}")
-        import pprint
-
-        pprint.pprint(result_list)
 
         readme_result = requests.post(
             url,
