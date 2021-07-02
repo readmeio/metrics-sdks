@@ -176,7 +176,7 @@ class PayloadBuilder:
                     "text": body,
                     "mimeType": "multipart/form-data",
                     "params": [{"name": k, "value": v} for (k, v) in params],
-                }  # TODO should be name/value
+                }
             else:
                 return {"text": body}
 
