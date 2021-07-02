@@ -37,7 +37,7 @@ mapping = {
 # When using the denylist, we should redact all top-level fields with names like denied_*.
 expected_denylist_result = {
     "allowed_string": "allowed_value",
-    "denied_string": "[REDACTED12]",
+    "denied_string": "[REDACTED 12]",
     "unspecified_string": "unspecified_value",
     "allowed_number": 123,
     "denied_number": "[REDACTED]",
@@ -53,8 +53,8 @@ expected_denylist_result = {
 # When using the denylist, we should redact all denied_* and unspecified_* top-level fields.
 expected_allowlist_result = {
     "allowed_string": "allowed_value",
-    "denied_string": "[REDACTED12]",
-    "unspecified_string": "[REDACTED17]",
+    "denied_string": "[REDACTED 12]",
+    "unspecified_string": "[REDACTED 17]",
     "allowed_number": 123,
     "denied_number": "[REDACTED]",
     "unspecified_number": "[REDACTED]",

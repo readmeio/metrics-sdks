@@ -188,7 +188,10 @@ class PayloadBuilder:
 
     def _redact_dict(self, mapping: Mapping):
         def _redact_value(v):
-            return f"[REDACTED{len(v) if isinstance(v, str) else ''}]"
+            if isinstance(v, str):
+                return f"[REDACTED {len(v)}]"
+            else:
+                return "[REDACTED]"
 
         # Short-circuit this function if there's no allowlist or denylist
         if not (self.allowlist or self.denylist):
