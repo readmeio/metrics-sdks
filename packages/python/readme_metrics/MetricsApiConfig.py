@@ -1,3 +1,4 @@
+import importlib
 from typing import List, Any, Callable
 
 from readme_metrics.util import util_build_logger
@@ -69,12 +70,16 @@ class MetricsApiConfig:
 
         Args:
             api_key (str): Your ReadMe API key
-            grouping_function ([type]]): Grouping function to construct an identity
+            grouping_function ([type] or str]): Grouping function to construct an identity
                 object. It receives the current request as a parameter, and must return
                 a dictionary containing at least an "id" field, and optionally "label"
                 and "email" fields.
 
                 The main purpose of the identity object is to identify the API's caller.
+
+                You can optionally pass the path of the function to the MetricsApiConfig
+                constructor, in which case it will automatically be resolved and imported
+                when this object is initialized.
             buffer_length (int, optional): Number of requests to buffer before sending
                 data to ReadMe. Defaults to 10.
             development_mode (bool, optional): Determines whether you are running in
@@ -106,7 +111,12 @@ class MetricsApiConfig:
                 Default 3 seconds.
         """
         self.README_API_KEY = api_key
-        self.GROUPING_FUNCTION = grouping_function
+        if isinstance(grouping_function, str):
+            module_name, function_name = grouping_function.rsplit(".", 1)
+            module = importlib.import_module(module_name)
+            self.GROUPING_FUNCTION = getattr(module, function_name)
+        else:
+            self.GROUPING_FUNCTION = grouping_function
         self.BUFFER_LENGTH = buffer_length
         self.IS_DEVELOPMENT_MODE = development_mode
         self.IS_BACKGROUND_MODE = background_worker_mode

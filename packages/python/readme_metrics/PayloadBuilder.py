@@ -9,7 +9,6 @@ from urllib import parse
 
 import requests
 from readme_metrics import ResponseInfoWrapper
-from werkzeug import Request
 
 
 class PayloadBuilder:
@@ -47,11 +46,13 @@ class PayloadBuilder:
         self.development_mode = "true" if development_mode else "false"
         self.grouping_function = grouping_function
 
-    def __call__(self, request: Request, response: ResponseInfoWrapper) -> dict:
+    def __call__(self, request, response: ResponseInfoWrapper) -> dict:
         """Builds a HAR payload encompassing the request & response data
 
         Args:
-            request (Request): Request information to use
+            request: Request information to use, either a `werkzeug.Request`
+                or a `django.core.handlers.wsgi.WSGIRequest`.
+                TODO: Implement for `django.core.handlers.asgi.ASGIRequest` too?
             response (ResponseInfoWrapper): Response information to use
 
         Returns:
@@ -64,7 +65,7 @@ class PayloadBuilder:
 
         payload = {
             "group": group,
-            "clientIPAddress": request.remote_addr,
+            "clientIPAddress": request.environ.get("REMOTE_ADDR"),
             "development": self.development_mode,
             "request": {
                 "log": {
@@ -75,7 +76,7 @@ class PayloadBuilder:
                     },
                     "entries": [
                         {
-                            "pageref": request.base_url,
+                            "pageref": self._build_base_url(request),
                             "startedDateTime": request.rm_start_dt,
                             "time": int(time.time() * 1000) - request.rm_start_ts,
                             "request": self._build_request_payload(request),
@@ -88,26 +89,28 @@ class PayloadBuilder:
 
         return payload
 
-    def _build_request_payload(self, request: Request) -> dict:
+    def _build_request_payload(self, request) -> dict:
         """Wraps the request portion of the payload
 
         Args:
-            request (Request): Request object containing the response information
+            request (Request): Request object containing the request information, either
+                a `werkzeug.Request` or a `django.core.handlers.wsgi.WSGIRequest`.
+                TODO: Implement for `django.core.handlers.asgi.ASGIRequest` too?
 
         Returns:
             dict: Wrapped request payload
         """
         headers = self._redact_dict(request.headers)
-        params = parse.parse_qsl(request.query_string.decode("utf-8"))
+        params = parse.parse_qsl(self._get_query_string(request))
 
-        if request.content_length:
+        if getattr(request, "content_length", None):
             post_data = self._process_body(request.rm_body)
         else:
             post_data = {}
 
         return {
             "method": request.method,
-            "url": request.base_url,
+            "url": self._build_base_url(request),
             "httpVersion": request.environ["SERVER_PROTOCOL"],
             "headers": [{"name": k, "value": v} for (k, v) in headers.items()],
             "queryString": [{"name": k, "value": v} for (k, v) in params],
@@ -143,7 +146,70 @@ class PayloadBuilder:
             },
         }
 
-    # always returns a dict with some of these fields: text, mimeType, params}
+    # TODO document, returns a str (not bytes)
+    def _get_query_string(self, request):
+        """Helper function to get the query string for a request, translating fields from
+        either a Werkzeug Request object or a Django WSGIRequest object.
+
+        Args:
+            request (Request): Request object containing the request information, either
+                a `werkzeug.Request` or a `django.core.handlers.wsgi.WSGIRequest`.
+                TODO: Implement for `django.core.handlers.asgi.ASGIRequest` too?
+
+        Returns:
+            str: Query string, for example "field1=value1&field2=value2"
+        """
+        if hasattr(request, "query_string"):
+            # works for Werkzeug request objects only
+            result = request.query_string
+        elif "QUERY_STRING" in request.environ:
+            # works for Django, and possibly other request objects too
+            result = request.environ["QUERY_STRING"]
+        else:
+            raise Exception("Don't know how to retrieve query string from this type of request")
+
+        if isinstance(result, bytes):
+            result = result.decode("utf-8")
+
+        return result
+
+    def _build_base_url(self, request):
+        """Helper function to get the base URL for a request (full URL excluding the
+        query string), translating fields from either a Werkzeug Request object or a
+        Django WSGIRequest object.
+
+        Args:
+            request (Request): Request object containing the request information, either
+                a `werkzeug.Request` or a `django.core.handlers.wsgi.WSGIRequest`.
+                TODO: Implement for `django.core.handlers.asgi.ASGIRequest` too?
+
+        Returns:
+            str: Query string, for example "https://api.example.local:8080/v1/userinfo"
+        """
+        if hasattr(request, "base_url"):
+            # Werkzeug request objects already have exactly what we need
+            return request.base_url
+
+        scheme, host, path = None, None, None
+
+        if "wsgi.url_scheme" in request.environ:
+            scheme = request.environ["wsgi.url_scheme"]
+
+        if hasattr(request, "_get_raw_host"):
+            # Django request objects already have a properly formatted host field
+            host = request._get_raw_host()
+        elif "HTTP_HOST" in request.environ:
+            host = request.environ["HTTP_HOST"]
+
+        if "PATH_INFO" in request.environ:
+            path = request.environ["PATH_INFO"]
+
+        if scheme and path and host:
+            return f"{scheme}://{host}{path}"
+        else:
+            raise Exception("Don't know how to build URL from this type of request")
+
+    # always returns a dict with some of these fields: text, mimeType, params
     def _process_body(self, body):
         if isinstance(body, bytes):
             # Non-unicode bytes cannot be directly serialized as a JSON
