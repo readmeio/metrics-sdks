@@ -52,7 +52,6 @@ class PayloadBuilder:
         Args:
             request: Request information to use, either a `werkzeug.Request`
                 or a `django.core.handlers.wsgi.WSGIRequest`.
-                TODO: Implement for `django.core.handlers.asgi.ASGIRequest` too?
             response (ResponseInfoWrapper): Response information to use
 
         Returns:
@@ -95,7 +94,6 @@ class PayloadBuilder:
         Args:
             request (Request): Request object containing the request information, either
                 a `werkzeug.Request` or a `django.core.handlers.wsgi.WSGIRequest`.
-                TODO: Implement for `django.core.handlers.asgi.ASGIRequest` too?
 
         Returns:
             dict: Wrapped request payload
@@ -146,7 +144,6 @@ class PayloadBuilder:
             },
         }
 
-    # TODO document, returns a str (not bytes)
     def _get_query_string(self, request):
         """Helper function to get the query string for a request, translating fields from
         either a Werkzeug Request object or a Django WSGIRequest object.
@@ -154,7 +151,6 @@ class PayloadBuilder:
         Args:
             request (Request): Request object containing the request information, either
                 a `werkzeug.Request` or a `django.core.handlers.wsgi.WSGIRequest`.
-                TODO: Implement for `django.core.handlers.asgi.ASGIRequest` too?
 
         Returns:
             str: Query string, for example "field1=value1&field2=value2"
@@ -181,7 +177,6 @@ class PayloadBuilder:
         Args:
             request (Request): Request object containing the request information, either
                 a `werkzeug.Request` or a `django.core.handlers.wsgi.WSGIRequest`.
-                TODO: Implement for `django.core.handlers.asgi.ASGIRequest` too?
 
         Returns:
             str: Query string, for example "https://api.example.local:8080/v1/userinfo"
@@ -222,7 +217,7 @@ class PayloadBuilder:
             try:
                 body = body.decode("utf-8")
             except UnicodeDecodeError:
-                return {"text": "[ERROR: NOT VALID UTF-8]"}
+                return {"text": "[NOT VALID UTF-8]"}
 
         if not isinstance(body, str):
             # We don't know how to process this body. If it's safe to encode as
