@@ -20,7 +20,9 @@ class ReadMeMetrics:
             self.init_app(app)
 
     def init_app(self, app: Flask):
-        self.config.LOGGER.info(f"Configuring {app.name} hooks to call ReadMeMetrics extension functions")
+        self.config.LOGGER.info(
+            f"Configuring {app.name} hooks to call ReadMeMetrics extension functions"
+        )
         app.before_request(self.before_request)
         app.after_request(self.after_request)
 

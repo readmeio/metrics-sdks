@@ -162,7 +162,9 @@ class PayloadBuilder:
             # works for Django, and possibly other request objects too
             result = request.environ["QUERY_STRING"]
         else:
-            raise Exception("Don't know how to retrieve query string from this type of request")
+            raise Exception(
+                "Don't know how to retrieve query string from this type of request"
+            )
 
         if isinstance(result, bytes):
             result = result.decode("utf-8")

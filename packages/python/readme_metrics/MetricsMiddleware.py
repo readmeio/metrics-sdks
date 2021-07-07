@@ -87,9 +87,13 @@ class MetricsMiddleware:
                 res_ctype = ""
                 res_clength = 0
 
-                htype = next((h for h in response_headers if h[0] == "Content-Type"), None)
+                htype = next(
+                    (h for h in response_headers if h[0] == "Content-Type"), None
+                )
 
-                hlength = next((h for h in response_headers if h[0] == "Content-Length"), None)
+                hlength = next(
+                    (h for h in response_headers if h[0] == "Content-Length"), None
+                )
 
                 if htype and hlength:
                     res_ctype = htype[1]
