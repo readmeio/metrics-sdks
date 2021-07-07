@@ -9,15 +9,15 @@ from readme_metrics import MetricsApiConfig
 
 
 class MetricsMiddleware:
-    def __init__(self, get_response):
+    def __init__(self, get_response, config=None):
         self.get_response = get_response
-        self.config = settings.README_METRICS_CONFIG
+        self.config = config or settings.README_METRICS_CONFIG
         assert isinstance(self.config, MetricsApiConfig)
         self.metrics_core = Metrics(self.config)
 
     def __call__(self, request):
         try:
-            request.rm_start_dt = str(datetime.now())
+            request.rm_start_dt = str(datetime.utcnow())
             request.rm_start_ts = int(time.time() * 1000)
             if request.headers["Content-Length"] or request.body:
                 request.rm_content_length = request.headers["Content-Length"] or "0"
