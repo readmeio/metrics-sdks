@@ -26,7 +26,7 @@ class ReadMeMetrics:
 
     def before_request(self):
         try:
-            request.rm_start_dt = str(datetime.now())
+            request.rm_start_dt = str(datetime.utcnow())
             request.rm_start_ts = int(time.time() * 1000)
             if "Content-Length" in request.headers or request.data:
                 request.rm_content_length = request.headers["Content-Length"] or "0"

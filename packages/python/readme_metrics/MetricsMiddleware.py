@@ -1,10 +1,11 @@
+import io
+import time
+import datetime
+
 from readme_metrics.Metrics import Metrics
 from readme_metrics.MetricsApiConfig import MetricsApiConfig
 from readme_metrics.ResponseInfoWrapper import ResponseInfoWrapper
 from werkzeug import Request
-import io
-import time
-import datetime
 
 
 class MetricsMiddleware:
@@ -86,13 +87,9 @@ class MetricsMiddleware:
                 res_ctype = ""
                 res_clength = 0
 
-                htype = next(
-                    (h for h in response_headers if h[0] == "Content-Type"), None
-                )
+                htype = next((h for h in response_headers if h[0] == "Content-Type"), None)
 
-                hlength = next(
-                    (h for h in response_headers if h[0] == "Content-Length"), None
-                )
+                hlength = next((h for h in response_headers if h[0] == "Content-Length"), None)
 
                 if htype and hlength:
                     res_ctype = htype[1]
