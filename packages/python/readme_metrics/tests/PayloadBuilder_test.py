@@ -1,4 +1,4 @@
-import pytest
+import pytest  # pylint: disable=import-error
 import requests
 import json
 
@@ -113,7 +113,7 @@ class TestPayloadBuilder:
         text = data["request"]["log"]["entries"][0]["request"]["text"]
 
         assert "ok" in text
-        assert not "password" in text
+        assert "password" not in text
 
     def testAllowlist(self):
         config = self.mockMiddlewareConfig(allowlist=["ok"])
@@ -131,7 +131,7 @@ class TestPayloadBuilder:
         text = data["request"]["log"]["entries"][0]["request"]["text"]
 
         assert "ok" in text
-        assert not "password" in text
+        assert "password" not in text
 
     def testDeprecatedBlackListed(self):
 
@@ -151,7 +151,7 @@ class TestPayloadBuilder:
         text = data["request"]["log"]["entries"][0]["request"]["text"]
 
         assert "ok" in text
-        assert not "password" in text
+        assert "password" not in text
 
     def testDeprecatedWhiteListed(self):
         config = self.mockMiddlewareConfig(whitelist=["ok"])
@@ -169,7 +169,7 @@ class TestPayloadBuilder:
         text = data["request"]["log"]["entries"][0]["request"]["text"]
 
         assert "ok" in text
-        assert not "password" in text
+        assert "password" not in text
 
     def testGroupingFunction(self):
         config = self.mockMiddlewareConfig(

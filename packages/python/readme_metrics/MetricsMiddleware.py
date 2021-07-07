@@ -108,12 +108,7 @@ class MetricsMiddleware:
                 )
 
                 # Send off data to be queued (and processed) by ReadMe if allowed
-                if self.config.ALLOWED_HTTP_HOSTS:
-                    if environ["HTTP_HOST"] in self.config.ALLOWED_HTTP_HOSTS:
-                        self.metrics_core.process(req, res)
-                else:
-                    # If the allowed_http_hosts has not been set (None by default), send off the data to be queued
-                    self.metrics_core.process(req, res)
+                self.metrics_core.process(req, res)
 
                 yield data
 

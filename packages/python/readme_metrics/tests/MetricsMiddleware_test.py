@@ -1,4 +1,4 @@
-import pytest
+import pytest  # pylint: disable=import-error
 import requests
 import json
 
@@ -48,10 +48,6 @@ def mockMiddlewareConfig():
         buffer_length=1,
     )
 
-
-# Verify that metrics has fields for metrics API and package name
-assert Metrics.METRICS_API != None
-assert Metrics.PACKAGE_NAME != None
 
 # Mock callback for handling middleware response
 class MetricsCoreMock:
