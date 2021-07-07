@@ -147,7 +147,7 @@ class PayloadBuilder:
     def _process_body(self, body):
         if isinstance(body, bytes):
             # Non-unicode bytes cannot be directly serialized as a JSON
-            # payload to send to the ReadMe API, so we need to conver this to a
+            # payload to send to the ReadMe API, so we need to convert this to a
             # unicode string first. But we don't know what encoding it might be
             # using, if any (it could also just be raw bytes, like an image).
             # We're going to assume that if it's possible to decode at all, then
