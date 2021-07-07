@@ -113,7 +113,10 @@ class TestPayloadBuilder:
         text = data["request"]["log"]["entries"][0]["request"]["text"]
 
         assert "ok" in text
-        assert "password" not in text
+        assert "123" in text
+        assert "password" in text
+        assert "456" not in text
+        assert "[REDACTED]" in text
 
     def testAllowlist(self):
         config = self.mockMiddlewareConfig(allowlist=["ok"])
@@ -131,7 +134,10 @@ class TestPayloadBuilder:
         text = data["request"]["log"]["entries"][0]["request"]["text"]
 
         assert "ok" in text
-        assert "password" not in text
+        assert "123" in text
+        assert "password" in text
+        assert "456" not in text
+        assert "[REDACTED]" in text
 
     def testDeprecatedBlackListed(self):
 
@@ -151,7 +157,10 @@ class TestPayloadBuilder:
         text = data["request"]["log"]["entries"][0]["request"]["text"]
 
         assert "ok" in text
-        assert "password" not in text
+        assert "123" in text
+        assert "password" in text
+        assert "456" not in text
+        assert "[REDACTED]" in text
 
     def testDeprecatedWhiteListed(self):
         config = self.mockMiddlewareConfig(whitelist=["ok"])
@@ -169,7 +178,10 @@ class TestPayloadBuilder:
         text = data["request"]["log"]["entries"][0]["request"]["text"]
 
         assert "ok" in text
-        assert "password" not in text
+        assert "123" in text
+        assert "password" in text
+        assert "456" not in text
+        assert "[REDACTED]" in text
 
     def testGroupingFunction(self):
         config = self.mockMiddlewareConfig(
