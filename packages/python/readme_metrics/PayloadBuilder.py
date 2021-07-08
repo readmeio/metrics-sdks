@@ -58,6 +58,9 @@ class PayloadBuilder:
             dict: Payload object (ready to be serialized and sent to ReadMe)
         """
         group = self.grouping_function(request)
+        if group is None:
+            return None
+
         if "api_key" in group:
             group["id"] = group["api_key"]
             del group["api_key"]

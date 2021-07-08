@@ -53,7 +53,16 @@ class Metrics:
             )
             return
 
-        self.queue.put(self.payload_builder(request, response))
+        payload = self.payload_builder(request, response)
+        if payload is None:
+            # PayloadBuilder returns None when the grouping function returns
+            # None (an indication that the request should not be logged.)
+            self.config.LOGGER.debug(
+                f"Not enqueueing request, grouping function returned None"
+            )
+            return
+
+        self.queue.put(payload)
         if self.queue.qsize() >= self.config.BUFFER_LENGTH:
             args = (self.config, self.queue)
             if self.config.IS_BACKGROUND_MODE:

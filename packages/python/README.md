@@ -24,11 +24,16 @@ First you'll need to write a "grouping function" to inform ReadMe of the user or
 ```python
 def grouping_function(request):
     # You can lookup your user here, pull it off the request object, etc.
-    return {
-        "api_key": "unique api_key of the user",
-        "label": "label for us to show for this user (ie email, project name, user name, etc)",
-        "email": "email address for user"
-    }
+    # Your grouping function should None if you don't want the request to be
+    # logged, and otherwise return a structure like the one below.
+    if user_is_authenticated:
+        return {
+            "api_key": "unique api_key of the user",
+            "label": "label for us to show for this user (ie email, project name, user name, etc)",
+            "email": "email address for user"
+        }
+    else:
+        return None
 ```
 
 Second, once you have written a grouping function, add a `README_METRICS_CONFIG` setting using the `MetricsApiConfig` helper object:
@@ -69,11 +74,16 @@ First you'll need to write a "grouping function" to inform ReadMe of the user or
 ```python
 def grouping_function(request):
     # You can lookup your user here, pull it off the request object, etc.
-    return {
-        "api_key": "unique api_key of the user",
-        "label": "label for us to show for this user (ie email, project name, user name, etc)",
-        "email": "email address for user"
-    }
+    # Your grouping function should None if you don't want the request to be
+    # logged, and otherwise return a structure like the one below.
+    if user_is_authenticated:
+        return {
+            "api_key": "unique api_key of the user",
+            "label": "label for us to show for this user (ie email, project name, user name, etc)",
+            "email": "email address for user"
+        }
+    else:
+        return None
 ```
 
 Second, once you have written a grouping function, set up the extension wherever you create your Flask app.
@@ -113,11 +123,17 @@ First you'll need to write a "grouping function" to inform ReadMe of the user or
 
 ```python
 def grouping_function(request):
-    return {
-        "api_key": "unique api_key of the user",
-        "label": "label for us to show for this user (ie email, project name, user name, etc)",
-        "email": "email address for user"
-    }
+    # You can lookup your user here, pull it off the request object, etc.
+    # Your grouping function should None if you don't want the request to be
+    # logged, and otherwise return a structure like the one below.
+    if user_is_authenticated:
+        return {
+            "api_key": "unique api_key of the user",
+            "label": "label for us to show for this user (ie email, project name, user name, etc)",
+            "email": "email address for user"
+        }
+    else:
+        return None
 ```
 
 Then, wherever you initialize your WSGI app, you can wrap it with our middleware wrapper:
