@@ -35,6 +35,7 @@ class Metrics:
             config.ALLOWLIST,
             config.IS_DEVELOPMENT_MODE,
             config.GROUPING_FUNCTION,
+            config.LOGGER,
         )
         self.queue = queue.Queue()
 
