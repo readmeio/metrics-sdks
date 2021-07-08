@@ -52,7 +52,7 @@ class MetricsMiddleware:
             return write
 
         try:
-            req.rm_start_dt = str(datetime.datetime.now())
+            req.rm_start_dt = str(datetime.datetime.utcnow())
             req.rm_start_ts = int(time.time() * 1000)
 
             if req.method == "POST":
