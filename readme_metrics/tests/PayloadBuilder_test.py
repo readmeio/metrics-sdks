@@ -207,6 +207,22 @@ class TestPayloadBuilder:
         assert group["email"] == "flavor@spam.musubi"
         assert group["label"] == "Spam Musubi"
 
+    def testGroupingFunctionNone(self):
+        # PayloadBuilder should return None if the grouping_function returns
+        # None (which means not to log the request).
+        config = self.mockMiddlewareConfig(grouping_function=lambda req: None)
+
+        responseObjectString = "{ 'responseObject': 'value' }"
+        environ = Environ.MockEnviron().getEnvironForRequest(b"", "POST")
+        app = MockApplication(responseObjectString)
+        metrics = MetricsCoreMock()
+        middleware = MetricsMiddleware(app, config)
+        middleware.metrics_core = metrics
+        next(middleware(environ, app.mockStartResponse))
+        payload_builder = self.createPayload(config)
+        payload = payload_builder(metrics.req, metrics.res)
+        assert payload is None
+
     def testDeprecatedIDField(self):
         config = self.mockMiddlewareConfig(
             grouping_function=lambda req: {
