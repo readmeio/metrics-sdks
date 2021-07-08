@@ -16,5 +16,6 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/readmeio/metrics-sdks/tree/main/packages/python",
     packages=["readme_metrics"],
-    install_requires=["werkzeug", "requests"],
+    install_requires=["requests"],
+    extras_require={"Flask": ["Flask"], "Django": ["Django"]},
 )

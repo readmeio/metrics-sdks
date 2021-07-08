@@ -6,8 +6,6 @@ import requests
 import json
 import importlib
 
-from werkzeug import Request
-
 from readme_metrics import MetricsApiConfig
 from readme_metrics.publisher import publish_batch
 from readme_metrics.PayloadBuilder import PayloadBuilder
@@ -42,11 +40,11 @@ class Metrics:
 
         atexit.register(self.exit_handler)
 
-    def process(self, request: Request, response: ResponseInfoWrapper) -> None:
+    def process(self, request, response: ResponseInfoWrapper) -> None:
         """Enqueues a request/response combination to be submitted the API.
 
         Args:
-            request (Request): Request object
+            request (Request): Request object from your WSGI server
             response (ResponseInfoWrapper): Response object
         """
         if not self.host_allowed(request.environ["HTTP_HOST"]):
