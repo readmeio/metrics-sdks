@@ -1,10 +1,11 @@
 from collections.abc import Mapping
 import json
 from json import JSONDecodeError
+from logging import Logger
 import sys
 import time
 import importlib
-from typing import List
+from typing import List, Optional
 from urllib import parse
 
 import requests
@@ -31,6 +32,7 @@ class PayloadBuilder:
         allowlist: List[str],
         development_mode: bool,
         grouping_function,
+        logger: Logger,
     ):
         """Creates a PayloadBuilder instance with the supplied configuration
 
@@ -40,11 +42,13 @@ class PayloadBuilder:
             development_mode (bool): Development mode flag passed to ReadMe
             grouping_function ([type]): Grouping function to generate an identity
                 payload
+            logger (Logger): Loggiing
         """
         self.denylist = denylist
         self.allowlist = allowlist
         self.development_mode = "true" if development_mode else "false"
         self.grouping_function = grouping_function
+        self.logger = logger
 
     def __call__(self, request, response: ResponseInfoWrapper) -> dict:
         """Builds a HAR payload encompassing the request & response data
@@ -58,12 +62,9 @@ class PayloadBuilder:
             dict: Payload object (ready to be serialized and sent to ReadMe)
         """
         group = self.grouping_function(request)
+        group = self._validate_group(group)
         if group is None:
             return None
-
-        if "api_key" in group:
-            group["id"] = group["api_key"]
-            del group["api_key"]
 
         payload = {
             "group": group,
@@ -90,6 +91,45 @@ class PayloadBuilder:
         }
 
         return payload
+
+    def _validate_group(self, group: Optional[dict]):
+        if group is None:
+            return None
+        if not isinstance(group, dict):
+            self.logger.error(
+                "Grouping function returned %s but should return a dict; not logging this request",
+                type(group).__name__,
+            )
+            return None
+
+        if "api_key" in group:
+            # The public API for the grouping function now asks users to return
+            # an "api_key", but our Metrics API expects an "id" field. Quietly
+            # update it to
+            group["id"] = group["api_key"]
+            del group["api_key"]
+        elif "id" not in group:
+            self.logger.error(
+                "Grouping function response missing 'api_key' field; not logging this request"
+            )
+            return None
+
+        for field in ["email", "label"]:
+            if field not in group:
+                self.logger.warning(
+                    "Grouping function response missing %s field; logging request anyway",
+                    field,
+                )
+        extra_fields = set(group.keys()).difference(["id", "email", "label"])
+        if extra_fields:
+            self.logger.warning(
+                "Grouping function included unexpected field(s) in response: %s; discarding those fields and logging request anyway",
+                extra_fields,
+            )
+            for field in extra_fields:
+                del group[field]
+
+        return group
 
     def _build_request_payload(self, request) -> dict:
         """Wraps the request portion of the payload

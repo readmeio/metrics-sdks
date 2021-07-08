@@ -1,6 +1,10 @@
+import logging
+
 import pytest  # pylint: disable=import-error
 from readme_metrics.PayloadBuilder import PayloadBuilder
 
+
+logger = logging.getLogger(__name__)
 
 allowlist = [
     "allowed_string",
@@ -73,13 +77,18 @@ def test_redaction_with_allowlist():
         allowlist=allowlist,
         development_mode=True,
         grouping_function=None,
+        logger=logger,
     )._redact_dict(mapping)
     assert allowlist_result == expected_allowlist_result
 
 
 def test_redaction_with_denylist():
     denylist_result = PayloadBuilder(
-        denylist=denylist, allowlist=None, development_mode=True, grouping_function=None
+        denylist=denylist,
+        allowlist=None,
+        development_mode=True,
+        grouping_function=None,
+        logger=logger,
     )._redact_dict(mapping)
     assert denylist_result == expected_denylist_result
 
@@ -87,6 +96,10 @@ def test_redaction_with_denylist():
 def test_redaction_with_both():
     # when both allowlist and denylist are present, denylist takes precedence
     denylist_result = PayloadBuilder(
-        denylist=denylist, allowlist=None, development_mode=True, grouping_function=None
+        denylist=denylist,
+        allowlist=None,
+        development_mode=True,
+        grouping_function=None,
+        logger=logger,
     )._redact_dict(mapping)
     assert denylist_result == expected_denylist_result

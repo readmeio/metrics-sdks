@@ -66,6 +66,7 @@ class TestPayloadBuilder:
             config.ALLOWLIST,
             config.IS_DEVELOPMENT_MODE,
             config.GROUPING_FUNCTION,
+            config.LOGGER,
         )
 
     def getMetricData(self):
@@ -246,6 +247,60 @@ class TestPayloadBuilder:
         assert group["id"] == "spam"
         assert group["email"] == "flavor@spam.musubi"
         assert group["label"] == "Spam Musubi"
+
+    def testGroupingFunctionValidationWhenMissingId(self):
+        config = self.mockMiddlewareConfig(
+            grouping_function=lambda req: {
+                "email": "flavor@spam.musubi",
+                "label": "Spam Musubi",
+            }
+        )
+
+        responseObjectString = "{ 'responseObject': 'value' }"
+        environ = Environ.MockEnviron().getEnvironForRequest(b"", "POST")
+        app = MockApplication(responseObjectString)
+        metrics = MetricsCoreMock()
+        middleware = MetricsMiddleware(app, config)
+        middleware.metrics_core = metrics
+        next(middleware(environ, app.mockStartResponse))
+        payload = self.createPayload(config)
+        data = payload(metrics.req, metrics.res)
+
+        # When the "id" and "api_key" fields are both missing,
+        # the payload should be None
+        assert data is None
+
+    def testGroupingFunctionValidationWhenExtraFields(self):
+        # Extra fields included in the grouping function response
+        # should be stripped from the payload
+        config = self.mockMiddlewareConfig(
+            grouping_function=lambda req: {
+                "id": "spam",
+                "email": "flavor@spam.musubi",
+                "label": "Spam Musubi",
+                "telephone": "(939) 555-0113",
+            }
+        )
+
+        responseObjectString = "{ 'responseObject': 'value' }"
+        environ = Environ.MockEnviron().getEnvironForRequest(b"", "POST")
+        app = MockApplication(responseObjectString)
+        metrics = MetricsCoreMock()
+        middleware = MetricsMiddleware(app, config)
+        middleware.metrics_core = metrics
+        next(middleware(environ, app.mockStartResponse))
+        payload = self.createPayload(config)
+        data = payload(metrics.req, metrics.res)
+        assert isinstance(data, dict)
+        assert "group" in data
+        group = data["group"]
+
+        expected_group = {
+            "id": "spam",
+            "email": "flavor@spam.musubi",
+            "label": "Spam Musubi",
+        }
+        assert group == expected_group
 
     @pytest.mark.skip(reason="@todo")
     def testProduction(self):
