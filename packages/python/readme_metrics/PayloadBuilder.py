@@ -105,7 +105,7 @@ class PayloadBuilder:
         if "api_key" in group:
             # The public API for the grouping function now asks users to return
             # an "api_key", but our Metrics API expects an "id" field. Quietly
-            # update it to
+            # update it to "id".
             group["id"] = group["api_key"]
             del group["api_key"]
         elif "id" not in group:
