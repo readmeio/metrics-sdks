@@ -124,8 +124,8 @@ First you'll need to write a "grouping function" to inform ReadMe of the user or
 ```python
 def grouping_function(request):
     # You can lookup your user here, pull it off the request object, etc.
-    # Your grouping function should None if you don't want the request to be
-    # logged, and otherwise return a structure like the one below.
+    # Your grouping function should return None if you don't want the request
+    # to be logged, and otherwise return a structure like the one below.
     if user_is_authenticated:
         return {
             "api_key": "unique api_key of the user",
