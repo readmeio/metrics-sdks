@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import os
 import time
 from unittest.mock import Mock, MagicMock, patch
 
@@ -14,9 +15,6 @@ mock_config = MetricsApiConfig(
     lambda req: {"id": "123", "label": "testuser", "email": "user@email.com"},
     buffer_length=1000,
 )
-
-
-import os
 
 
 class TestDjangoMiddleware:
