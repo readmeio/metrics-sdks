@@ -1,10 +1,11 @@
+import io
+import time
+import datetime
+
 from readme_metrics.Metrics import Metrics
 from readme_metrics.MetricsApiConfig import MetricsApiConfig
 from readme_metrics.ResponseInfoWrapper import ResponseInfoWrapper
 from werkzeug import Request
-import io
-import time
-import datetime
 
 
 class MetricsMiddleware:
