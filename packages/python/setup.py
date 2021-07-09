@@ -4,7 +4,7 @@ from setuptools import setup
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-version = importlib.import_module(__package__).__version__
+version = importlib.import_module("readme_metrics").__version__
 
 setup(
     name="readme-metrics",
