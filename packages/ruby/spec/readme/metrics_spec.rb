@@ -13,6 +13,20 @@ RSpec.describe Readme::Metrics do
     expect(Readme::Metrics::VERSION).not_to be nil
   end
 
+  context "provided a custom request queue" do
+    let(:request_queue) { [] }
+
+    def app
+      empty_app_with_middleware({request_queue: request_queue})
+    end
+
+    it "pushes to the custom queue" do
+      post "/api/foo", "[BODY]"
+
+      expect(request_queue.size).to eq 1
+    end
+  end
+
   context "in a multi-threaded environment" do
     it "doesn't wait for the HTTP request to Readme to finish" do
       readme_request_completion_time = 1 # seconds
