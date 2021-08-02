@@ -34,7 +34,7 @@ module Readme
       @get_user_info = get_user_info
 
       buffer_length = options[:buffer_length] || DEFAULT_BUFFER_LENGTH
-      @@request_queue = Readme::RequestQueue.new(options[:api_key], buffer_length)
+      @@request_queue = options[:request_queue] || Readme::RequestQueue.new(options[:api_key], buffer_length)
       @@logger = options[:logger] || Logger.new($stdout)
     end
 
