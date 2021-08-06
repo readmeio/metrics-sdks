@@ -96,7 +96,7 @@ module.exports.metrics = (apiKey, group, options = {}) => {
   if (!apiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a grouping function');
 
-  const bufferLength = options.bufferLength || config.bufferLength;
+  const bufferLength = Math.min(Math.max(options.bufferLength || config.bufferLength, 100), 1);
   const requestTimeout = config.timeout;
   const encodedApiKey = Buffer.from(`${apiKey}:`).toString('base64');
   let baseLogUrl = options.baseLogUrl || undefined;
