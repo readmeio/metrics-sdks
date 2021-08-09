@@ -5,9 +5,14 @@ const crypto = require('crypto');
 const config = require('./config');
 const flatCache = require('flat-cache');
 const findCacheDir = require('find-cache-dir');
+const clamp = require('lodash/clamp');
 const pkg = require('./package.json');
 
 const constructPayload = require('./lib/construct-payload');
+
+// Make sure we flush the queue if the process is exited
+let doSend = () => {};
+process.on('exit', doSend);
 
 // We're doing this to buffer up the response body
 // so we can send it off to the metrics server
@@ -96,7 +101,8 @@ module.exports.metrics = (apiKey, group, options = {}) => {
   if (!apiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a grouping function');
 
-  const bufferLength = options.bufferLength || config.bufferLength;
+  // Ensures the buffer length is between 1 and 30
+  const bufferLength = clamp(options.bufferLength || config.bufferLength, 1, 30);
   const requestTimeout = config.timeout;
   const encodedApiKey = Buffer.from(`${apiKey}:`).toString('base64');
   let baseLogUrl = options.baseLogUrl || undefined;
@@ -116,48 +122,51 @@ module.exports.metrics = (apiKey, group, options = {}) => {
 
     patchResponse(res);
 
-    function send() {
+    doSend = () => {
+      const json = queue.slice();
+      queue = [];
+
+      const signal = timeoutSignal(requestTimeout);
+
+      fetch(`${config.host}/v1/request`, {
+        method: 'post',
+        body: JSON.stringify(json),
+        headers: {
+          Authorization: `Basic ${encodedApiKey}`,
+          'Content-Type': 'application/json',
+          'User-Agent': `${pkg.name}/${pkg.version}`,
+        },
+        signal,
+      })
+        .then(() => {})
+        .catch(e => {
+          // Silently discard errors and timeouts.
+          if (options.development) throw e;
+        })
+        .finally(() => {
+          timeoutSignal.clear(signal);
+        });
+    };
+
+    function startSend() {
       // This should in future become more sophisticated,
       // with flush timeouts and more error checking but
       // this is fine for now
       const payload = constructPayload(req, res, group, options, { logId, startedDateTime });
       queue.push(payload);
-      if (queue.length >= bufferLength) {
-        const json = queue.slice();
-        queue = [];
-
-        const signal = timeoutSignal(requestTimeout);
-
-        fetch(`${config.host}/v1/request`, {
-          method: 'post',
-          body: JSON.stringify(json),
-          headers: {
-            Authorization: `Basic ${encodedApiKey}`,
-            'Content-Type': 'application/json',
-            'User-Agent': `${pkg.name}/${pkg.version}`,
-          },
-          signal,
-        })
-          .then(() => {})
-          .catch(() => {
-            // Silently discard errors and timeouts.
-          })
-          .finally(() => {
-            timeoutSignal.clear(signal);
-          });
-      }
+      if (queue.length >= bufferLength) doSend();
 
       cleanup(); // eslint-disable-line no-use-before-define
     }
 
     function cleanup() {
-      res.removeListener('finish', send);
+      res.removeListener('finish', startSend);
       res.removeListener('error', cleanup);
       res.removeListener('close', cleanup);
     }
 
     // Add response listeners
-    res.once('finish', send);
+    res.once('finish', startSend);
     res.once('error', cleanup);
     res.once('close', cleanup);
 
