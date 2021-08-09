@@ -1,3 +1,23 @@
+## 4.2.0 (2021-08-09)
+
+* feat: new redaction methodology for Python metrics client (#266) ([96163eb](https://github.com/readmeio/metrics-sdks/commit/96163eb)), closes [#266](https://github.com/readmeio/metrics-sdks/issues/266)
+* feat(node): cap the buffer length at 100 logs ([8a68d1e](https://github.com/readmeio/metrics-sdks/commit/8a68d1e))
+* feat(node): ensure buffer length is between 1 and 30 and flush queue on process exit ([272c2b7](https://github.com/readmeio/metrics-sdks/commit/272c2b7))
+* feat(python): documented way to skip logging a request (#271) ([33d9c62](https://github.com/readmeio/metrics-sdks/commit/33d9c62)), closes [#271](https://github.com/readmeio/metrics-sdks/issues/271)
+* feat(python): validate and clean up the result of the grouping function (#272) ([22b40cd](https://github.com/readmeio/metrics-sdks/commit/22b40cd)), closes [#272](https://github.com/readmeio/metrics-sdks/issues/272)
+* feat(ruby): accept custom request queue as option (#276) ([819fe14](https://github.com/readmeio/metrics-sdks/commit/819fe14)), closes [#276](https://github.com/readmeio/metrics-sdks/issues/276)
+* chore: bump ruby version ([3825030](https://github.com/readmeio/metrics-sdks/commit/3825030))
+* chore: docs for packaging Python + correct path to Python release version number (#274) ([d9ff651](https://github.com/readmeio/metrics-sdks/commit/d9ff651)), closes [#274](https://github.com/readmeio/metrics-sdks/issues/274)
+* chore(deps-dev): bump jest from 27.0.5 to 27.0.6 (#269) ([097fa6e](https://github.com/readmeio/metrics-sdks/commit/097fa6e)), closes [#269](https://github.com/readmeio/metrics-sdks/issues/269)
+* chore(deps-dev): bump prettier from 2.3.1 to 2.3.2 (#268) ([c03262f](https://github.com/readmeio/metrics-sdks/commit/c03262f)), closes [#268](https://github.com/readmeio/metrics-sdks/issues/268)
+* chore(deps): bump actions/setup-node from 2.1.5 to 2.2.0 (#267) ([3f6bfac](https://github.com/readmeio/metrics-sdks/commit/3f6bfac)), closes [#267](https://github.com/readmeio/metrics-sdks/issues/267)
+* Python Metrics client libraries for Django and Flask (#270) ([bb0d41d](https://github.com/readmeio/metrics-sdks/commit/bb0d41d)), closes [#270](https://github.com/readmeio/metrics-sdks/issues/270)
+* Python metrics client starteddatetime rm 1315 (#273) ([d5e0022](https://github.com/readmeio/metrics-sdks/commit/d5e0022)), closes [#273](https://github.com/readmeio/metrics-sdks/issues/273)
+* Python SDK version 1.1 (#263) ([14a6549](https://github.com/readmeio/metrics-sdks/commit/14a6549)), closes [#263](https://github.com/readmeio/metrics-sdks/issues/263)
+* docs(ruby): add docs to publish ruby gem (#265) ([2d3dd6e](https://github.com/readmeio/metrics-sdks/commit/2d3dd6e)), closes [#265](https://github.com/readmeio/metrics-sdks/issues/265)
+
+
+
 ## 4.1.0 (2021-06-29)
 
 * chore(ruby): bump to v1.1.0 (#264) ([831b056](https://github.com/readmeio/metrics-sdks/commit/831b056)), closes [#264](https://github.com/readmeio/metrics-sdks/issues/264)
