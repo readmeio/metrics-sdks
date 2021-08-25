@@ -5,7 +5,7 @@ updates:
     schedule:
       interval: monthly
     labels:
-      - scope:dependency
+      - dependencies
     commit-message:
       prefix: chore(deps)
       prefix-development: chore(deps-dev)
@@ -16,7 +16,7 @@ updates:
       interval: monthly
     open-pull-requests-limit: 10
     labels:
-      - scope:dependency
+      - dependencies
       - area:node
     commit-message:
       prefix: chore(deps)
@@ -28,7 +28,7 @@ updates:
 #       interval: monthly
 #     open-pull-requests-limit: 10
 #     labels:
-#       - scope:dependency
+#       - dependencies
 #       - area:ruby
 #     commit-message:
 #       prefix: chore(deps)
@@ -40,7 +40,7 @@ updates:
       interval: monthly
     open-pull-requests-limit: 10
     labels:
-      - scope:dependency
+      - dependencies
       - area:php
     commit-message:
       prefix: chore(deps)
@@ -52,7 +52,7 @@ updates:
 #       interval: monthly
 #     open-pull-requests-limit: 10
 #     labels:
-#       - scope:dependency
+#       - dependencies
 #       - area:python
 #     commit-message:
 #       prefix: chore(deps)
