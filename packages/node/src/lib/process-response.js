@@ -1,7 +1,7 @@
 const removeProperties = require('lodash/omit');
 const removeOtherProperties = require('lodash/pick');
 
-const objectToArray = require('./object-to-array');
+const { objectToArray } = require('./object-to-array');
 
 module.exports = (res, options = {}) => {
   // Here we have to reconstruct the body

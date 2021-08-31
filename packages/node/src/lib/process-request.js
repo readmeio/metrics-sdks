@@ -5,7 +5,7 @@ const pick = require('lodash/pick');
 const merge = require('lodash/merge');
 const contentType = require('content-type');
 
-const objectToArray = require('./object-to-array');
+const { objectToArray } = require('./object-to-array');
 
 /**
  * @param {Any} value the value to be redacted

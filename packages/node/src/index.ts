@@ -6,7 +6,7 @@ const config = require('./config');
 const flatCache = require('flat-cache');
 const findCacheDir = require('find-cache-dir');
 const clamp = require('lodash/clamp');
-const pkg = require('./package.json');
+const pkg = require('../package.json');
 
 const constructPayload = require('./lib/construct-payload');
 
@@ -97,7 +97,13 @@ async function getProjectBaseUrl(encodedApiKey, requestTimeout) {
   return cache.getKey('baseUrl');
 }
 
-module.exports.metrics = (apiKey, group, options = {}) => {
+interface Options {
+  bufferLength?: number;
+  baseLogUrl?: string;
+  development?: boolean;
+}
+
+export function metrics(apiKey: string, group: string, options: Options = {}) {
   if (!apiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a grouping function');
 
@@ -172,4 +178,4 @@ module.exports.metrics = (apiKey, group, options = {}) => {
 
     return next();
   };
-};
+}

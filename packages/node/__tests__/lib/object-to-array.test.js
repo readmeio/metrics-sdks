@@ -1,4 +1,4 @@
-const objectToArray = require('../../lib/object-to-array');
+const { objectToArray } = require('../../src/lib/object-to-array');
 
 describe('#object-to-array', () => {
   it('should transform a nested object of query parameters into an array', () => {

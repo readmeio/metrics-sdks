@@ -7,9 +7,9 @@ const flatCache = require('flat-cache');
 const findCacheDir = require('find-cache-dir');
 const { isValidUUIDV4 } = require('is-valid-uuid-v4');
 
-const config = require('../config');
+const config = require('../src/config');
 const pkg = require('../package.json');
-const middleware = require('..');
+const middleware = require('../src');
 
 const apiKey = 'mockReadMeApiKey';
 const group = '5afa21b97011c63320226ef3';

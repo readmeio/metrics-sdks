@@ -2,7 +2,7 @@ const express = require('express');
 const request = require('supertest');
 const bodyParser = require('body-parser');
 
-const processRequest = require('../../lib/process-request');
+const processRequest = require('../../src/lib/process-request');
 
 function createApp(options) {
   const app = express();

@@ -2,7 +2,7 @@ const express = require('express');
 const request = require('supertest');
 const bodyParser = require('body-parser');
 
-const processResponse = require('../../lib/process-response');
+const processResponse = require('../../src/lib/process-response');
 
 function testResponse(assertion, response) {
   const app = express();

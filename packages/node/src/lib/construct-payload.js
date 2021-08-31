@@ -1,7 +1,7 @@
 const url = require('url');
 const processRequest = require('./process-request');
 const processResponse = require('./process-response');
-const { name, version } = require('../package.json');
+const { name, version } = require('../../package.json');
 
 module.exports = (req, res, groupingFn, options = {}, { logId, startedDateTime }) => {
   const group = groupingFn(req, res);

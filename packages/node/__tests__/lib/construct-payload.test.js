@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 const { isValidUUIDV4 } = require('is-valid-uuid-v4');
 const packageJson = require('../../package.json');
 
-const constructPayload = require('../../lib/construct-payload');
+const constructPayload = require('../../src/lib/construct-payload');
 
 function createApp(options, existingPayload = { logId: uuidv4(), startedDateTime: new Date() }, group = () => {}) {
   const app = express();
