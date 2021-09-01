@@ -12,6 +12,7 @@ const objectToArray = require('./object-to-array');
  * @returns A redacted string potentially containing the length of the original value, if it was a string
  */
 function redactValue(value) {
+  // eslint-disable-next-line sonarjs/no-nested-template-literals
   return `[REDACTED${typeof value === 'string' ? ` ${value.length}` : ''}]`;
 }
 
