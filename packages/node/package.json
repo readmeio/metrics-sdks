@@ -49,7 +49,7 @@
   "scripts": {
     "build": "tsc",
     "lint": "eslint .",
-    "prepublish": "npm run build",
+    "prepack": "npm run build",
     "pretest": "npm run build && npm run lint",
     "prettier": "prettier --list-different --write \"./**/**.{js,ts}\"",
     "test": "jest --coverage"
