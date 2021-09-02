@@ -31,7 +31,6 @@
   "devDependencies": {
     "@readme/eslint-config": "^6.1.0",
     "body-parser": "^1.19.0",
-    "conventional-changelog-cli": "^2.1.1",
     "eslint": "^7.29.0",
     "express": "^4.17.1",
     "is-valid-uuid-v4": "^1.2.0",
@@ -45,7 +44,6 @@
     "lint": "eslint .",
     "pretest": "npm run lint",
     "prettier": "prettier --list-different --write \"./**/**.js\"",
-    "release": "conventional-changelog -i CHANGELOG.md -s",
     "test": "jest --coverage"
   },
   "jest": {
