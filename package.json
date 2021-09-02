@@ -2,13 +2,12 @@
   "name": "metrics-sdks-monorepo",
   "private": true,
   "scripts": {
-    "bootstrap": "lerna bootstrap",
-    "clean": "lerna clean",
-    "lint": "lerna run lint --stream",
-    "postinstall": "lerna bootstrap --hoist",
-    "publish": "lerna publish",
-    "test": "lerna run test --stream",
-    "version": "conventional-changelog --pkg lerna.json -i CHANGELOG.md -s && git add CHANGELOG.md"
+    "clean": "npx lerna clean",
+    "lint": "npm run lint --workspaces",
+    "prepare": "husky install",
+    "publish": "npx lerna publish",
+    "test": "npm test --workspaces",
+    "version": "npx conventional-changelog-cli --pkg lerna.json -i CHANGELOG.md -s && git add CHANGELOG.md"
   },
   "repository": {
     "type": "git",
@@ -17,17 +16,13 @@
   "engines": {
     "node": "^12 || ^14 || ^16"
   },
+  "workspaces": [
+    "./packages/node"
+  ],
   "devDependencies": {
     "@commitlint/cli": "^13.1.0",
     "@commitlint/config-conventional": "^13.1.0",
-    "conventional-changelog-cli": "^2.1.1",
-    "husky": "^4.2.5",
-    "lerna": "^4.0.0"
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
+    "husky": "^7.0.2"
   },
   "commitlint": {
     "extends": [
