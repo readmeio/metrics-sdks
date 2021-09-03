@@ -1,9 +1,29 @@
-const url = require('url');
-const processRequest = require('./process-request');
-const processResponse = require('./process-response');
-const { name, version } = require('../../package.json');
+import url from 'url';
+import processRequest from './process-request';
+import processResponse from './process-response';
+import { name, version } from '../../package.json';
+import { Options } from './express-middleware';
 
-module.exports = (req, res, groupingFn, options = {}, { logId, startedDateTime }) => {
+export interface GroupingFunction {
+  (req, res): {
+    // @todo: document this
+    apiKey: string;
+    // @deprecated use apiKey instead
+    id: string;
+    // @todo: document this
+    label: string;
+    // @todo: document this
+    email: string;
+  };
+}
+
+export function constructPayload(
+  req,
+  res,
+  groupingFn: GroupingFunction,
+  options: Options = {},
+  { logId, startedDateTime }
+) {
   const group = groupingFn(req, res);
 
   // if apiKey is specified use it as if it were passed in as the id
@@ -38,4 +58,4 @@ module.exports = (req, res, groupingFn, options = {}, { logId, startedDateTime }
       },
     },
   };
-};
+}
