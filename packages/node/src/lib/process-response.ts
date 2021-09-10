@@ -1,9 +1,19 @@
-const removeProperties = require('lodash/omit');
-const removeOtherProperties = require('lodash/pick');
+import { RequestOptions } from './process-request';
 
-const { objectToArray } = require('./object-to-array');
+import removeProperties from 'lodash/omit';
+import removeOtherProperties from 'lodash/pick';
 
-module.exports = (res, options = {}) => {
+import { objectToArray } from './object-to-array';
+
+// Ignoring the following issue because we're just pulling in the type. We might not want to error at all on no-unresolved when using typescript
+// eslint-disable-next-line import/no-unresolved
+import { Entry } from 'har-format';
+
+export default function processResponse(
+  res,
+  options: RequestOptions
+  // We don't need to include all of the har response fields, because the metrics server only cares about a subset
+): Omit<Entry['response'], 'httpVersion' | 'cookies' | 'redirectURL' | 'headersSize' | 'bodySize'> {
   // Here we have to reconstruct the body
   // from the string that we've buffered up
   // We have to do this so we can strip out
@@ -47,4 +57,4 @@ module.exports = (res, options = {}) => {
       mimeType: res.get('content-type'),
     },
   };
-};
+}

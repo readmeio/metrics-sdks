@@ -1,11 +1,10 @@
-import fetch from 'node-fetch';
-import timeoutSignal from 'timeout-signal';
 import { v4 as uuidv4 } from 'uuid';
 import config from '../config';
 import clamp from 'lodash/clamp';
-import pkg from '../../package.json';
+
 import { constructPayload, GroupingFunction } from './construct-payload';
 import { getProjectBaseUrl } from './get-project-base-url';
+import { log as logMetric, LogBody } from './metrics-log';
 
 // Make sure we flush the queue if the process is exited
 let doSend = () => {};
@@ -49,7 +48,7 @@ export function expressMiddleware(apiKey: string, group: GroupingFunction, optio
   const requestTimeout = config.timeout;
   const encodedApiKey = Buffer.from(`${apiKey}:`).toString('base64');
   let baseLogUrl = options.baseLogUrl || undefined;
-  let queue = [];
+  let queue: Array<LogBody> = [];
 
   return async (req, res, next) => {
     if (baseLogUrl === undefined) {
@@ -66,28 +65,21 @@ export function expressMiddleware(apiKey: string, group: GroupingFunction, optio
     patchResponse(res);
 
     doSend = () => {
+      // Copy the queue so we can send all the requests in one batch
       const json = queue.slice();
+      // Clear out the queue so we don't resend any data in the future
       queue = [];
 
-      const signal = timeoutSignal(requestTimeout);
-
-      fetch(`${config.host}/v1/request`, {
-        method: 'post',
-        body: JSON.stringify(json),
-        headers: {
-          Authorization: `Basic ${encodedApiKey}`,
-          'Content-Type': 'application/json',
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-        signal,
-      })
-        .then(() => {})
+      // Make the log call
+      logMetric(encodedApiKey, json)
+        .then(() => {
+          if (options.development) {
+            // What should we do here
+          }
+        })
         .catch(e => {
           // Silently discard errors and timeouts.
           if (options.development) throw e;
-        })
-        .finally(() => {
-          timeoutSignal.clear(signal);
         });
     };
 

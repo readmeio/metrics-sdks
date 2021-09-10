@@ -1,29 +1,32 @@
 import url from 'url';
-import processRequest from './process-request';
+import processRequest, { RequestOptions } from './process-request';
 import processResponse from './process-response';
 import { name, version } from '../../package.json';
-import { Options } from './express-middleware';
+import { LogBody } from './metrics-log';
 
+export interface GroupingObject {
+  // @todo: document this
+  apiKey: string;
+  /**
+   * @deprecated use apiKey instead
+   */
+  id: string;
+  // @todo: document this
+  label: string;
+  // @todo: document this
+  email: string;
+}
 export interface GroupingFunction {
-  (req, res): {
-    // @todo: document this
-    apiKey: string;
-    // @deprecated use apiKey instead
-    id: string;
-    // @todo: document this
-    label: string;
-    // @todo: document this
-    email: string;
-  };
+  (req, res): GroupingObject;
 }
 
 export function constructPayload(
   req,
   res,
   groupingFn: GroupingFunction,
-  options: Options = {},
+  options: RequestOptions,
   { logId, startedDateTime }
-) {
+): LogBody {
   const group = groupingFn(req, res);
 
   // if apiKey is specified use it as if it were passed in as the id

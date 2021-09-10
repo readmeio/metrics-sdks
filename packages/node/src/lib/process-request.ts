@@ -1,11 +1,14 @@
-const url = require('url');
-const get = require('lodash/get');
-const set = require('lodash/set');
-const pick = require('lodash/pick');
-const merge = require('lodash/merge');
-const contentType = require('content-type');
+import * as url from 'url';
+import get from 'lodash/get';
+import set from 'lodash/set';
+import pick from 'lodash/pick';
+import merge from 'lodash/merge';
+import * as contentType from 'content-type';
+// We're just importing types, so we don't need this unresolved.
+// eslint-disable-next-line import/no-unresolved
+import { Entry } from 'har-format';
 
-const { objectToArray } = require('./object-to-array');
+import { objectToArray } from './object-to-array';
 
 /**
  * @param {Any} value the value to be redacted
@@ -59,7 +62,34 @@ function redactOtherProperties(obj, nonRedactedPaths) {
   return merge(redactedFields, allowedFields);
 }
 
-module.exports = (req, options = {}) => {
+export interface RequestOptions {
+  /**
+   *
+   */
+  denylist?: [];
+  /**
+   * @deprecated use denylist instead
+   */
+  blacklist?: [];
+  /**
+   *
+   */
+  allowlist?: [];
+  /**
+   * @deprecated use allowList instead
+   */
+  whitelist?: [];
+  /**
+   *
+   */
+  development?: boolean;
+}
+
+export default function processRequest(
+  req,
+  options?: RequestOptions
+  // We don't need to include all of the har request fields, because the metrics server only cares about a subset
+): Omit<Entry['request'], 'cookies' | 'headersSize' | 'bodySize'> {
   const denylist = options.denylist || options.blacklist;
   const allowlist = options.allowlist || options.whitelist;
 
@@ -73,19 +103,24 @@ module.exports = (req, options = {}) => {
     req.headers = redactOtherProperties(req.headers, allowlist);
   }
 
-  const postData = {};
+  let postData: Entry['request']['postData'] = null;
   if (req.body && Object.keys(req.body).length > 0) {
-    // parse mimetype from content-type header, default to JSON
-    postData.mimeType = 'application/json';
+    let mimeType: string = null;
     try {
-      postData.mimeType = contentType.parse(req).type;
+      mimeType = contentType.parse(req).type;
     } catch (e) {} // eslint-disable-line no-empty
 
     // Per HAR, we send JSON as postData.text, not params.
-    if (postData.mimeType === 'application/json') {
-      postData.text = JSON.stringify(req.body);
+    if (mimeType === 'application/json') {
+      postData = {
+        mimeType,
+        text: JSON.stringify(req.body),
+      };
     } else {
-      postData.params = objectToArray(req.body || {});
+      postData = {
+        mimeType,
+        params: objectToArray(req.body || {}),
+      };
     }
   }
 
@@ -102,4 +137,4 @@ module.exports = (req, options = {}) => {
     queryString: objectToArray(req.query),
     postData,
   };
-};
+}
