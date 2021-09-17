@@ -1,6 +1,6 @@
 const readme = require('@readme/cloudflare-worker');
-const matchRouteWhitelist = require('./lib/cloudflare-routing.js');
-const { CONSTANTS } = require('./constants.js');
+const matchRouteWhitelist = require('./lib/cloudflare-routing');
+const { CONSTANTS } = require('./constants');
 
 addEventListener('fetch', event => {
   event.passThroughOnException();

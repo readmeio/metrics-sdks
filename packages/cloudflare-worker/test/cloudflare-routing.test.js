@@ -1,6 +1,4 @@
-/* eslint-env mocha */
-const assert = require('assert');
-const matchRouteWhitelist = require('../lib/cloudflare-routing.js');
+const matchRouteWhitelist = require('../lib/cloudflare-routing');
 const globals = require('./service-worker-globals');
 
 describe('cloudflare-routing()', () => {
@@ -13,7 +11,7 @@ describe('cloudflare-routing()', () => {
       routes: ['https://www.example.com/getTestDocs'],
     };
 
-    assert.equal(matchRouteWhitelist('https://example.com/'), false);
+    expect(matchRouteWhitelist('https://example.com/')).toBe(false);
   });
 
   it('should return false if url incorrectly matches wildcard path route', () => {
@@ -21,7 +19,7 @@ describe('cloudflare-routing()', () => {
       routes: ['https://test.example.com/docs/*'],
     };
 
-    assert.equal(matchRouteWhitelist('https://test.example.com/api/myDoc'), false);
+    expect(matchRouteWhitelist('https://test.example.com/api/myDoc')).toBe(false);
   });
 
   it('should return true if url is a complete match of reference route', () => {
@@ -29,7 +27,7 @@ describe('cloudflare-routing()', () => {
       routes: ['https://test.example.com/'],
     };
 
-    assert.equal(matchRouteWhitelist('https://test.example.com/'), true);
+    expect(matchRouteWhitelist('https://test.example.com/')).toBe(true);
   });
 
   it('should return true if url matches a domain reference wildcard', () => {
@@ -37,7 +35,7 @@ describe('cloudflare-routing()', () => {
       routes: ['https://*.example.com/'],
     };
 
-    assert.equal(matchRouteWhitelist('https://test.example.com/'), true);
+    expect(matchRouteWhitelist('https://test.example.com/')).toBe(true);
   });
 
   it('should return true if url matches a path reference wildcard', () => {
@@ -45,7 +43,7 @@ describe('cloudflare-routing()', () => {
       routes: ['https://test.example.com/*'],
     };
 
-    assert.equal(matchRouteWhitelist('https://test.example.com/getTestDocs'), true);
+    expect(matchRouteWhitelist('https://test.example.com/getTestDocs')).toBe(true);
   });
 
   it('should return true if url matches a path and domain reference wildcard', () => {
@@ -53,7 +51,7 @@ describe('cloudflare-routing()', () => {
       routes: ['https://*.example.com/docs/*'],
     };
 
-    assert.equal(matchRouteWhitelist('https://test.example.com/docs/myDoc'), true);
+    expect(matchRouteWhitelist('https://test.example.com/docs/myDoc')).toBe(true);
   });
 
   it('should return true if wildcard appends required string for multiple cases', () => {
@@ -61,7 +59,7 @@ describe('cloudflare-routing()', () => {
       routes: ['https://www.example.com/docs*'],
     };
 
-    assert.equal(matchRouteWhitelist('https://www.example.com/docs2'), true);
-    assert.equal(matchRouteWhitelist('https://www.example.com/docs'), true);
+    expect(matchRouteWhitelist('https://www.example.com/docs2')).toBe(true);
+    expect(matchRouteWhitelist('https://www.example.com/docs')).toBe(true);
   });
 });

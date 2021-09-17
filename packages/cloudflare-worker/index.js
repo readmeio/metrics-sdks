@@ -1,6 +1,4 @@
-/* eslint-env worker */
-/* global HOST, VERSION */
-const { CONSTANTS } = require('./constants.js');
+const { CONSTANTS } = require('./constants');
 
 async function getRequestBody(request) {
   if (request.method.match(/GET|HEAD/)) {
@@ -41,19 +39,16 @@ async function getResponseBody(response) {
 // environment, which is only during unit testing
 
 let version = 'node';
-/* istanbul ignore next */
 try {
   version = VERSION;
 } catch (e) {} // eslint-disable-line no-empty
 let host = 'http://localhost';
-/* istanbul ignore next */
 try {
   host = HOST;
 } catch (e) {} // eslint-disable-line no-empty
 
 function log(...args) {
-  /* eslint-disable no-console */
-  if (process.env.NODE_ENV !== 'testing') console.log(...args);
+  if (process.env.NODE_ENV !== 'test') console.log(...args);
 }
 
 module.exports.fetchAndCollect = async function fetchAndCollect(request) {
@@ -73,8 +68,9 @@ module.exports.fetchAndCollect = async function fetchAndCollect(request) {
     })
     .filter(Boolean);
 
-  if (missingHeaders.length)
+  if (missingHeaders.length) {
     throw new Error(`Missing headers on the response: ${missingHeaders.join(', ')}`);
+  }
 
   const { res, body: responseBody } = await getResponseBody(response);
 
@@ -142,8 +138,8 @@ module.exports.metrics = function readme(apiKey, group, req, har) {
     })
     .catch(
       /* istanbul ignore next */ err => {
-        if (process.env.NODE_ENV !== 'testing') console.error('Error saving log to readme', err);
+        if (process.env.NODE_ENV !== 'test') console.error('Error saving log to readme', err);
         throw err;
-      },
+      }
     );
 };

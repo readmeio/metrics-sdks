@@ -1,13 +1,5 @@
-/* eslint-env mocha */
-const { join } = require('path');
 const http = require('http');
-const assert = require('assert');
 const nock = require('nock');
-
-// Have to set this up here because this is normally done from within webpack
-// We could use compile() in this test and eval() the output
-// but then we lose all stack traces from the errors
-require('module-alias').addAlias('@readme/cloudflare-worker', join(__dirname, '..', 'index.js'));
 
 const globals = require('./service-worker-globals');
 
@@ -27,20 +19,23 @@ class FetchEvent {
 }
 
 describe('template', () => {
-  before(() => {
+  beforeAll(() => {
     nock.disableNetConnect();
     nock.enableNetConnect('127.0.0.1');
   });
-  after(() => nock.cleanAll());
+
+  afterAll(() => nock.cleanAll());
 
   beforeEach(() => {
     Object.assign(global, globals());
+    jest.resetModules();
   });
 
   afterEach(() => {
     delete global.HOST;
   });
 
+  // eslint-disable-next-line jest/no-done-callback
   it('should send x-readme-* headers through to metrics backend', done => {
     const id = 123456;
     const label = 'api-key-label';
@@ -53,9 +48,9 @@ describe('template', () => {
         });
         req.on('end', () => {
           body = JSON.parse(body);
-          assert.equal(body[0].group.id, id);
-          assert.equal(body[0].group.label, label);
-          assert.equal(body[0].group.email, email);
+          expect(body[0].group.id).toBe(String(id));
+          expect(body[0].group.label).toBe(label);
+          expect(body[0].group.email).toBe(email);
           res.end();
           server.close();
           return done();
@@ -69,13 +64,11 @@ describe('template', () => {
     };
 
     requireTemplate();
-    nock('http://www.example.com')
-      .post('/test')
-      .reply(200, '', {
-        'x-readme-id': id,
-        'x-readme-label': label,
-        'x-readme-email': email,
-      });
+    nock('http://www.example.com').post('/test').reply(200, '', {
+      'x-readme-id': id,
+      'x-readme-label': label,
+      'x-readme-email': email,
+    });
 
     const fetchEvent = new FetchEvent({
       request: new Request('http://www.example.com/test', {
@@ -94,13 +87,11 @@ describe('template', () => {
     };
 
     requireTemplate();
-    const mock = nock('http://www.example.com')
-      .post('/test')
-      .reply(200, '', {
-        'x-readme-id': '123456',
-        'x-readme-label': 'api-key-label',
-        'x-readme-email': 'test@readme.io',
-      });
+    const mock = nock('http://www.example.com').post('/test').optionally().reply(200, '', {
+      'x-readme-id': '123456',
+      'x-readme-label': 'api-key-label',
+      'x-readme-email': 'test@readme.io',
+    });
 
     const event = new FetchEvent({
       request: new Request('http://www.example.com/test', {
@@ -111,7 +102,7 @@ describe('template', () => {
 
     global.listeners.fetch[0](event);
 
-    assert.equal(Object.keys(event.request.headers).length, 0);
+    expect(Object.keys(event.request.headers)).toHaveLength(0);
     mock.done();
   });
 });
