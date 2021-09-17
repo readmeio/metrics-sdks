@@ -1,4 +1,4 @@
-import * as url from 'url';
+import url, { URL } from 'url';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import pick from 'lodash/pick';
@@ -8,7 +8,21 @@ import * as contentType from 'content-type';
 // eslint-disable-next-line import/no-unresolved
 import { Entry } from 'har-format';
 
-import { objectToArray } from './object-to-array';
+import { objectToArray, searchToArray } from './object-to-array';
+import { getProto, LogOptions } from './construct-payload';
+import { IncomingMessage } from 'http';
+
+export function fixHeader(header: string | number | Array<string>): string | undefined {
+  if (header === undefined) {
+    return undefined;
+  }
+
+  if (Array.isArray(header)) {
+    return header.join(',');
+  }
+
+  return String(header);
+}
 
 /**
  * @param {Any} value the value to be redacted
@@ -62,49 +76,28 @@ function redactOtherProperties(obj, nonRedactedPaths) {
   return merge(redactedFields, allowedFields);
 }
 
-export interface RequestOptions {
-  /**
-   *
-   */
-  denylist?: [];
-  /**
-   * @deprecated use denylist instead
-   */
-  blacklist?: [];
-  /**
-   *
-   */
-  allowlist?: [];
-  /**
-   * @deprecated use allowList instead
-   */
-  whitelist?: [];
-  /**
-   *
-   */
-  development?: boolean;
-}
-
 export default function processRequest(
-  req,
-  options?: RequestOptions
+  req: IncomingMessage,
+  requestBody?: Record<string, unknown>,
+  options?: LogOptions
   // We don't need to include all of the har request fields, because the metrics server only cares about a subset
-): Omit<Entry['request'], 'cookies' | 'headersSize' | 'bodySize'> {
+): Entry['request'] {
   const denylist = options.denylist || options.blacklist;
   const allowlist = options.allowlist || options.whitelist;
+  let reqBody = requestBody;
 
   if (denylist) {
-    req.body = redactProperties(req.body, denylist);
+    reqBody = redactProperties(reqBody, denylist);
     req.headers = redactProperties(req.headers, denylist);
   }
 
   if (allowlist && !denylist) {
-    req.body = redactOtherProperties(req.body, allowlist);
+    reqBody = redactOtherProperties(reqBody, allowlist);
     req.headers = redactOtherProperties(req.headers, allowlist);
   }
 
   let postData: Entry['request']['postData'] = null;
-  if (req.body && Object.keys(req.body).length > 0) {
+  if (reqBody && Object.keys(reqBody).length > 0) {
     let mimeType: string = null;
     try {
       mimeType = contentType.parse(req).type;
@@ -114,12 +107,12 @@ export default function processRequest(
     if (mimeType === 'application/json') {
       postData = {
         mimeType,
-        text: JSON.stringify(req.body),
+        text: JSON.stringify(reqBody),
       };
     } else {
       postData = {
         mimeType,
-        params: objectToArray(req.body || {}),
+        params: objectToArray(reqBody),
       };
     }
   }
@@ -127,14 +120,17 @@ export default function processRequest(
   return {
     method: req.method,
     url: url.format({
-      protocol: req.headers['x-forwarded-proto'] || req.protocol,
-      host: req.headers['x-forwarded-host'] || req.get('host'),
-      pathname: `${req.baseUrl}${req.path}`,
-      query: req.query,
+      protocol: fixHeader(req.headers['x-forwarded-proto']) || getProto(req),
+      host: fixHeader(req.headers['x-forwarded-host']) || req.headers.host,
+      pathname: req.url,
     }),
-    httpVersion: `${req.protocol.toUpperCase()}/${req.httpVersion}`,
+    httpVersion: `${getProto(req)}/${req.httpVersion}`,
     headers: objectToArray(req.headers),
-    queryString: objectToArray(req.query),
+    queryString: searchToArray(new URL(req.url, `${getProto(req)}://${req.headers.host}`).searchParams),
     postData,
+    // TODO: Get these correct
+    cookies: [],
+    headersSize: 0,
+    bodySize: 0,
   };
 }

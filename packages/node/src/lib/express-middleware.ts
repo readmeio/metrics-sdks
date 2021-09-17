@@ -1,14 +1,18 @@
-import { v4 as uuidv4 } from 'uuid';
 import config from '../config';
 import clamp from 'lodash/clamp';
-
-import { constructPayload, GroupingFunction } from './construct-payload';
+import * as url from 'url';
+import { v4 as uuidv4 } from 'uuid';
+import { constructPayload } from './construct-payload';
 import { getProjectBaseUrl } from './get-project-base-url';
-import { log as logMetric, LogBody } from './metrics-log';
+import { GroupingObject, metricsAPICall, OutgoingLogBody } from './metrics-log';
 
 // Make sure we flush the queue if the process is exited
 let doSend = () => {};
 process.on('exit', doSend);
+
+export interface GroupingFunction {
+  (req, res): GroupingObject;
+}
 
 // We're doing this to buffer up the response body
 // so we can send it off to the metrics server
@@ -48,7 +52,7 @@ export function expressMiddleware(apiKey: string, group: GroupingFunction, optio
   const requestTimeout = config.timeout;
   const encodedApiKey = Buffer.from(`${apiKey}:`).toString('base64');
   let baseLogUrl = options.baseLogUrl || undefined;
-  let queue: Array<LogBody> = [];
+  let queue: Array<OutgoingLogBody> = [];
 
   return async (req, res, next) => {
     if (baseLogUrl === undefined) {
@@ -71,7 +75,7 @@ export function expressMiddleware(apiKey: string, group: GroupingFunction, optio
       queue = [];
 
       // Make the log call
-      logMetric(encodedApiKey, json)
+      metricsAPICall(encodedApiKey, json)
         .then(() => {
           if (options.development) {
             // What should we do here
@@ -87,7 +91,35 @@ export function expressMiddleware(apiKey: string, group: GroupingFunction, optio
       // This should in future become more sophisticated,
       // with flush timeouts and more error checking but
       // this is fine for now
-      const payload = constructPayload(req, res, group, options, { logId, startedDateTime });
+
+      // Leftover from express. TODO: fix this
+      /* req.route
+              ? url.format({
+                  protocol: req.protocol,
+                  host: req.host,
+                  pathname: `${req.baseUrl}${req.route.path}`,
+                })
+              : '' */
+      const groupData = group(req, res);
+
+      const payload = constructPayload(
+        req,
+        res,
+        {
+          ...groupData,
+          logId,
+          startedDateTime,
+          responseEndDateTime: new Date(),
+          routePath: req.route
+            ? url.format({
+                protocol: req.protocol,
+                host: req.host,
+                pathname: `${req.baseUrl}${req.route.path}`,
+              })
+            : '',
+        },
+        options
+      );
       queue.push(payload);
       if (queue.length >= bufferLength) doSend();
 
