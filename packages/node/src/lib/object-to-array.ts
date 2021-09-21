@@ -17,7 +17,7 @@ export function objectToArray(object: Record<string, unknown>): Array<{ name: st
 export function searchToArray(search: URLSearchParams): Array<{ name: string; value: string }> {
   const final = [];
 
-  search.forEach((name, value) => {
+  search.forEach((value, name) => {
     final.push({ name, value });
   });
 
