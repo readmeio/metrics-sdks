@@ -1,18 +1,29 @@
-const express = require('express');
-const request = require('supertest');
-const nock = require('nock');
-const rimraf = require('rimraf');
-const crypto = require('crypto');
-const flatCache = require('flat-cache');
-const findCacheDir = require('find-cache-dir');
-const { isValidUUIDV4 } = require('is-valid-uuid-v4');
-
-const config = require('../src/config');
-const pkg = require('../package.json');
-const middleware = require('../src');
+import express from 'express';
+import request from 'supertest';
+import nock from 'nock';
+import rimraf from 'rimraf';
+import * as crypto from 'crypto';
+import flatCache from 'flat-cache';
+import findCacheDir from 'find-cache-dir';
+import { isValidUUIDV4 } from 'is-valid-uuid-v4';
+import config from '../src/config';
+import pkg from '../package.json';
+import { expressMiddleware } from '../src';
+import { ServerResponse } from 'http';
 
 const apiKey = 'mockReadMeApiKey';
-const group = '5afa21b97011c63320226ef3';
+const incomingGroup = {
+  apiKey: '5afa21b97011c63320226ef3',
+  label: 'test',
+  email: 'test@example.com'
+};
+
+const outgoingGroup = {
+  id: '5afa21b97011c63320226ef3',
+  label: 'test',
+  email: 'test@example.com'
+};
+
 const baseLogUrl = 'https://docs.example.com';
 const cacheDir = findCacheDir({ name: pkg.name });
 
@@ -43,6 +54,17 @@ function hydrateCache(lastUpdated) {
   cache.setKey('lastUpdated', lastUpdated);
   cache.setKey('baseUrl', baseLogUrl);
   cache.save();
+}
+
+declare global {
+  namespace jest {
+    interface Matchers<R> {
+      toHaveDocumentationHeader(res?: ServerResponse): {
+        pass: boolean,
+        message: string
+      }
+    }
+  }
 }
 
 expect.extend({
@@ -83,18 +105,18 @@ describe('#metrics', () => {
     // Clean up the cache dir between tests.
     rimraf.sync(cacheDir);
   });
-
+/*
   it('should error if missing apiKey', () => {
     expect(() => {
-      middleware.metrics();
+      expressMiddleware();
     }).toThrow('You must provide your ReadMe API key');
   });
 
   it('should error if missing grouping function', () => {
     expect(() => {
-      middleware.metrics('api-key');
+      expressMiddleware('api-key');
     }).toThrow('You must provide a grouping function');
-  });
+  });*/
 
   it('should send a request to the metrics server', () => {
     const apiMock = getReadMeApiMock(1);
@@ -105,7 +127,7 @@ describe('#metrics', () => {
       },
     })
       .post('/v1/request', ([body]) => {
-        expect(body.group).toBe(group);
+        expect(body.group).toStrictEqual(outgoingGroup);
         expect(typeof body.request.log.entries[0].startedDateTime).toBe('string');
         return true;
       })
@@ -113,7 +135,7 @@ describe('#metrics', () => {
       .reply(200);
 
     const app = express();
-    app.use(middleware.metrics(apiKey, () => group));
+    app.use(expressMiddleware(apiKey, () => incomingGroup));
     app.get('/test', (req, res) => res.sendStatus(200));
 
     return request(app)
@@ -135,8 +157,9 @@ describe('#metrics', () => {
       },
     })
       .post('/v1/request', ([body]) => {
-        expect(body.group.a).toBe('a');
-        expect(body.group.b).toBe('b');
+        expect(body.group.id).toBe('a');
+        expect(body.group.label).toBe('b');
+        expect(body.group.email).toBe('c');
         return true;
       })
       .basicAuth({ user: apiKey })
@@ -146,9 +169,10 @@ describe('#metrics', () => {
     app.use((req, res, next) => {
       req.a = 'a';
       res.b = 'b';
+      res.c = 'c';
       next();
     });
-    app.use(middleware.metrics(apiKey, (req, res) => ({ a: req.a, b: res.b })));
+    app.use(expressMiddleware(apiKey, (req, res) => ({ apiKey: req.a, label: res.b, email: res.c })));
     app.get('/test', (req, res) => res.sendStatus(200));
 
     return request(app)
@@ -182,7 +206,7 @@ describe('#metrics', () => {
         .reply(200);
 
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group, { bufferLength: 3 }));
+      app.use(expressMiddleware(apiKey, () => incomingGroup, { bufferLength: 3 }));
       app.get('/test', (req, res) => res.sendStatus(200));
 
       // We need to make sure that the logId isn't being preserved between buffered requests.
@@ -260,7 +284,7 @@ describe('#metrics', () => {
       );
 
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group, { bufferLength }));
+      app.use(expressMiddleware(apiKey, () => incomingGroup, { bufferLength }));
       app.get('/test', (req, res) => res.sendStatus(200));
 
       return Promise.all(
@@ -284,8 +308,9 @@ describe('#metrics', () => {
         .post('/v1/request')
         .basicAuth({ user: apiKey })
         .reply(200);
+
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group, { baseLogUrl }));
+      app.use(expressMiddleware(apiKey, () => incomingGroup, { baseLogUrl }));
       app.get('/test', (req, res) => res.sendStatus(200));
 
       await request(app)
@@ -309,7 +334,7 @@ describe('#metrics', () => {
         .reply(200);
 
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group));
+      app.use(expressMiddleware(apiKey, () => incomingGroup));
       app.get('/test', (req, res) => res.sendStatus(200));
 
       // Cache will be populated with this call as the cache doesn't exist yet.
@@ -321,7 +346,7 @@ describe('#metrics', () => {
       // Spin up a new app so we're forced to look for the baseUrl in the cache instead of what's saved in-memory
       // within the middleware.
       const app2 = express();
-      app2.use(middleware.metrics(apiKey, () => group));
+      app2.use(expressMiddleware(apiKey, () => incomingGroup));
       app2.get('/test', (req, res) => res.sendStatus(200));
 
       // Cache will be hit with this request and shouldn't make another call to the API for data it already has.
@@ -347,7 +372,7 @@ describe('#metrics', () => {
         .reply(200);
 
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group));
+      app.use(expressMiddleware(apiKey, () => incomingGroup));
       app.get('/test', (req, res) => res.sendStatus(200));
 
       await request(app)
@@ -375,7 +400,7 @@ describe('#metrics', () => {
         .reply(200);
 
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group));
+      app.use(expressMiddleware(apiKey, () => incomingGroup));
       app.get('/test', (req, res) => res.sendStatus(200));
 
       await request(app)
@@ -415,7 +440,7 @@ describe('#metrics', () => {
         .reply(200);
 
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group));
+      app.use(expressMiddleware(apiKey, () => incomingGroup));
       app.get('/test', (req, res) => res.sendStatus(200));
 
       await request(app)
@@ -461,7 +486,7 @@ describe('#metrics', () => {
     it('should buffer up res.write() calls', async () => {
       const mock = createMock();
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group));
+      app.use(expressMiddleware(apiKey, () => incomingGroup));
       app.get('/test', (req, res) => {
         res.write('{"a":1,');
         res.write('"b":2,');
@@ -477,7 +502,7 @@ describe('#metrics', () => {
     it('should buffer up res.end() calls', async () => {
       const mock = createMock();
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group));
+      app.use(expressMiddleware(apiKey, () => incomingGroup));
       app.get('/test', (req, res) => res.end(JSON.stringify(responseBody)));
 
       await request(app)
@@ -491,7 +516,7 @@ describe('#metrics', () => {
     it('should work for res.send() calls', async () => {
       const mock = createMock();
       const app = express();
-      app.use(middleware.metrics(apiKey, () => group));
+      app.use(expressMiddleware(apiKey, () => incomingGroup));
       app.get('/test', (req, res) => res.send(responseBody));
 
       await request(app)

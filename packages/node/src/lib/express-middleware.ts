@@ -75,7 +75,7 @@ export function expressMiddleware(apiKey: string, group: GroupingFunction, optio
       queue = [];
 
       // Make the log call
-      metricsAPICall(encodedApiKey, json)
+      metricsAPICall(apiKey, json)
         .then(() => {
           if (options.development) {
             // What should we do here
@@ -113,10 +113,12 @@ export function expressMiddleware(apiKey: string, group: GroupingFunction, optio
           routePath: req.route
             ? url.format({
                 protocol: req.protocol,
-                host: req.host,
+                host: req.hostname,
                 pathname: `${req.baseUrl}${req.route.path}`,
               })
             : '',
+          responseBody: res._body,
+          requestBody: req.body,
         },
         options
       );

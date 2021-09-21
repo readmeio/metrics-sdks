@@ -13,7 +13,7 @@ export interface GroupingObject {
   /**
    * @deprecated use apiKey instead
    */
-  id: string;
+  id?: string;
   // @todo: document this
   label: string;
   // @todo: document this
@@ -31,16 +31,15 @@ export interface OutgoingLogBody {
 
 export interface LogResponse {
   response?: Response;
-  logUrl: string | Array<string>;
+  ids: string | Array<string>;
 }
 
-function getLogUrls(body: OutgoingLogBody | Array<OutgoingLogBody>): string | Array<string> {
-  const baseUrl = 'TODO';
+function getLogIds(body: OutgoingLogBody | Array<OutgoingLogBody>): string | Array<string> {
   if (Array.isArray(body)) {
-    return body.map(value => `${baseUrl}/${value._id}`);
+    return body.map(value => value._id);
   }
 
-  return `${baseUrl}/${body._id}`;
+  return body._id;
 }
 
 // This is mostly defined in construct-payload.ts. We might want to do some consolidation between that and this.
@@ -48,7 +47,7 @@ function getLogUrls(body: OutgoingLogBody | Array<OutgoingLogBody>): string | Ar
 
 export function metricsAPICall(
   readmeAPIKey: string,
-  body: OutgoingLogBody | Array<OutgoingLogBody>,
+  body: Array<OutgoingLogBody>,
   fireAndForget = false
 ): Promise<LogResponse> {
   const signal = timeoutSignal(config.timeout);
@@ -72,14 +71,16 @@ export function metricsAPICall(
   if (fireAndForget) {
     makeRequest();
     return Promise.resolve({
-      logUrl: getLogUrls(body),
+      ids: getLogIds(body),
     });
   }
 
-  return makeRequest().then(response => ({
-    response,
-    logUrl: getLogUrls(body),
-  }));
+  return makeRequest().then(response => {
+    return {
+      response,
+      ids: getLogIds(body),
+    };
+  });
 }
 
 export function log(
@@ -89,5 +90,8 @@ export function log(
   payloadData: PayloadData,
   logOptions: LogOptions
 ) {
-  return metricsAPICall(readmeAPIKey, constructPayload(req, res, payloadData, logOptions), logOptions.fireAndForget);
+  if (!readmeAPIKey) throw new Error('You must provide your ReadMe API key');
+
+  const payload = constructPayload(req, res, payloadData, logOptions);
+  return metricsAPICall(readmeAPIKey, Array.isArray(payload) ? payload : [payload], logOptions.fireAndForget);
 }
