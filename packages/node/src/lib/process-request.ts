@@ -7,6 +7,7 @@ import * as contentType from 'content-type';
 // We're just importing types, so we don't need this unresolved.
 // eslint-disable-next-line import/no-unresolved
 import { Entry } from 'har-format';
+import * as qs from 'querystring';
 
 import { objectToArray, searchToArray } from './object-to-array';
 import { getProto, LogOptions } from './construct-payload';
@@ -72,7 +73,7 @@ function replaceEach(obj, cb) {
  */
 function redactOtherProperties(obj, nonRedactedPaths) {
   const allowedFields = pick(obj, nonRedactedPaths);
-  const redactedFields = replaceEach(obj, redactValue);
+  const redactedFields = obj ? replaceEach(obj, redactValue) : obj;
   return merge(redactedFields, allowedFields);
 }
 
@@ -82,9 +83,11 @@ export default function processRequest(
   options?: LogOptions
   // We don't need to include all of the har request fields, because the metrics server only cares about a subset
 ): Entry['request'] {
-  const denylist = options.denylist || options.blacklist;
-  const allowlist = options.allowlist || options.whitelist;
+  const denylist = options?.denylist || options?.blacklist;
+  const allowlist = options?.allowlist || options?.whitelist;
   let reqBody = requestBody;
+  // We extrtract this here just in case it's redacted
+  const contentTypeHeader = req.headers['content-type'];
 
   if (denylist) {
     reqBody = redactProperties(reqBody, denylist);
@@ -97,10 +100,11 @@ export default function processRequest(
   }
 
   let postData: Entry['request']['postData'] = null;
+
   if (reqBody && Object.keys(reqBody).length > 0) {
     let mimeType: string = null;
     try {
-      mimeType = contentType.parse(req).type;
+      mimeType = contentType.parse(contentTypeHeader).type;
     } catch (e) {} // eslint-disable-line no-empty
 
     // Per HAR, we send JSON as postData.text, not params.
@@ -117,16 +121,24 @@ export default function processRequest(
     }
   }
 
+  const protocol = fixHeader(req.headers['x-forwarded-proto'])?.toLowerCase() || getProto(req);
+  const host = fixHeader(req.headers['x-forwarded-host']) || req.headers.host;
+  // We use a fake host here because we rely on the host header which could be redacted.
+  // We only ever use this reqUrl with the fake hostname for the pathname and querystring.
+  const reqUrl = new URL(req.url, `${protocol}://readme.io`);
+
   return {
     method: req.method,
     url: url.format({
-      protocol: fixHeader(req.headers['x-forwarded-proto']) || getProto(req),
-      host: fixHeader(req.headers['x-forwarded-host']) || req.headers.host,
-      pathname: req.url,
+      protocol,
+      host,
+      pathname: reqUrl.pathname,
+      // Search includes the leading questionmark, format assumes there isn't one, so we trim that off.
+      query: qs.parse(reqUrl.search.substring(1)),
     }),
-    httpVersion: `${getProto(req)}/${req.httpVersion}`,
+    httpVersion: `${getProto(req).toUpperCase()}/${req.httpVersion}`,
     headers: objectToArray(req.headers),
-    queryString: searchToArray(new URL(req.url, `${getProto(req)}://${req.headers.host}`).searchParams),
+    queryString: searchToArray(reqUrl.searchParams),
     postData,
     // TODO: Get these correct
     cookies: [],

@@ -1,27 +1,42 @@
-const express = require('express');
-const request = require('supertest');
-const bodyParser = require('body-parser');
+import express from 'express';
+import request from 'supertest';
+import bodyParser from 'body-parser';
+import * as http from 'http';
+import processRequest from '../../src/lib/process-request';
+import { expressMiddleware, log } from '../../src/index';
+import { LogOptions } from 'src/lib/construct-payload';
+import * as qs from 'qs';
 
-const processRequest = require('../../src/lib/process-request');
+function createApp(reqOptions?: LogOptions) {
 
-function createApp(options) {
-  const app = express();
-  app.use(bodyParser.urlencoded({ extended: false }));
-  app.use(bodyParser.json());
+  const host = 'localhost';
+  const port = 8000;
 
-  const router = express.Router();
+  const requestListener = function (req: http.IncomingMessage, res: http.ServerResponse) {
+    let body = "";
+    let parsedBody: Record<string, unknown> | undefined;
 
-  router.post('/a', (req, res) => res.json(processRequest(req, options)));
+    req.on('readable', function() {
+      let chunk = req.read();
+      if (chunk) {
+        body += chunk;
+      }
+    });
 
-  app.use('/test-base-path', router);
+    req.on('end', function() {
+      res.setHeader('Content-Type', 'application/json');
 
-  app.get('/*', (req, res) => res.json(processRequest(req, options)));
+      if (req.headers['content-type'] === 'application/json') {
+        parsedBody = JSON.parse(body);
+      } else if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
+        parsedBody = qs.parse(body);
+      }
 
-  app.post('/*', (req, res) => {
-    res.json(processRequest(req, options));
-  });
+      res.end(JSON.stringify(processRequest(req, parsedBody, reqOptions)));
+    });
+  };
 
-  return app;
+  return http.createServer(requestListener);
 }
 
 describe('processRequest()', () => {
@@ -232,6 +247,7 @@ describe('processRequest()', () => {
 
         return request(app)
           .post('/')
+          .set('content-type', 'application/json')
           .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
           .expect(({ body }) => {
             expect(body.postData.text).toBe('{"password":"123456","apiKey":"abc","another":"[REDACTED 11]"}');
@@ -336,19 +352,22 @@ describe('processRequest()', () => {
     it('should be an empty object if request is a GET', () =>
       request(createApp())
         .get('/')
-        .expect(({ body }) => expect(body.postData).toStrictEqual({})));
+        .expect(({ body }) => expect(body.postData).toStrictEqual(null)));
 
-    it('should be an empty object if req.body is empty', () =>
+    it('should be null if req.body is empty', () =>
       request(createApp())
         .post('/')
-        .expect(({ body }) => expect(body.postData).toStrictEqual({})));
+        .expect(({ body }) => expect(body.postData).toStrictEqual(null)));
 
     it('#text should contain stringified body', () => {
       const body = { a: 1, b: 2 };
       return request(createApp())
         .post('/')
+        .set('Content-Type', 'application/json')
         .send(body)
-        .expect(res => expect(res.body.postData.text).toBe('{"a":1,"b":2}'));
+        .expect(res => {
+          expect(res.body.postData.text).toBe('{"a":1,"b":2}')
+        });
     });
   });
 });

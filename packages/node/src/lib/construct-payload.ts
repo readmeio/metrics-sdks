@@ -12,31 +12,36 @@ import { TLSSocket } from 'tls';
  * @param req
  * @returns
  */
-export function getProto(req: IncomingMessage): 'HTTPS' | 'HTTP' {
-  return (req.socket as TLSSocket).encrypted ? 'HTTPS' : 'HTTP';
+export function getProto(req: IncomingMessage): 'https' | 'http' {
+  return (req.socket as TLSSocket).encrypted ? 'https' : 'http';
 }
 
 export interface LogOptions {
   /**
    *
    */
-  denylist?: [];
+  denylist?: Array<string>;
+
   /**
    * @deprecated use denylist instead
    */
-  blacklist?: [];
+  blacklist?: Array<string>;
+
   /**
    *
    */
-  allowlist?: [];
+  allowlist?: Array<string>;
+
   /**
    * @deprecated use allowList instead
    */
-  whitelist?: [];
+  whitelist?: Array<string>;
+
   /**
    *
    */
   development?: boolean;
+
   /**
    *
    */
