@@ -20,8 +20,8 @@ export default function processResponse(
   // from the string that we've buffered up
   // We have to do this so we can strip out
   // any whitelist/blacklist properties
-  const denylist = options.denylist || options.blacklist;
-  const allowlist = options.allowlist || options.whitelist;
+  const denylist = options?.denylist || options?.blacklist;
+  const allowlist = options?.allowlist || options?.whitelist;
   let body;
   try {
     body = JSON.parse(responseBody);

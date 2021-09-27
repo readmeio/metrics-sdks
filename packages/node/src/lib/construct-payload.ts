@@ -89,13 +89,15 @@ export function constructPayload(
       email: payloadData.email,
     },
     clientIPAddress: req.socket.remoteAddress,
-    development: logOptions.development,
+    development: !!logOptions?.development,
     request: {
       log: {
         creator: { name, version, comment: `${fixPlatform(process.platform)}/${process.version}` },
         entries: [
           {
-            pageref: payloadData.routePath || new URL(req.url, `${getProto(req)}://${req.headers.host}`).pathname,
+            pageref: payloadData.routePath
+              ? new URL(payloadData.routePath, `${getProto(req)}://${req.headers.host}`).toString()
+              : new URL(req.url, `${getProto(req)}://${req.headers.host}`).toString(),
             startedDateTime: payloadData.startedDateTime.toISOString(),
             time: serverTime,
             request: processRequest(req, payloadData.requestBody, logOptions),

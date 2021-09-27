@@ -8,10 +8,6 @@ import { LogOptions } from 'src/lib/construct-payload';
 import * as qs from 'qs';
 
 function createApp(reqOptions?: LogOptions) {
-
-  const host = 'localhost';
-  const port = 8000;
-
   const requestListener = function (req: http.IncomingMessage, res: http.ServerResponse) {
     let body = "";
     let parsedBody: Record<string, unknown> | undefined;
