@@ -91,15 +91,6 @@ export function expressMiddleware(apiKey: string, group: GroupingFunction, optio
       // This should in future become more sophisticated,
       // with flush timeouts and more error checking but
       // this is fine for now
-
-      // Leftover from express. TODO: fix this
-      /* req.route
-              ? url.format({
-                  protocol: req.protocol,
-                  host: req.host,
-                  pathname: `${req.baseUrl}${req.route.path}`,
-                })
-              : '' */
       const groupData = group(req, res);
 
       const payload = constructPayload(

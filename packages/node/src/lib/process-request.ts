@@ -13,6 +13,12 @@ import { objectToArray, searchToArray } from './object-to-array';
 import { getProto, LogOptions } from './construct-payload';
 import { IncomingMessage } from 'http';
 
+/**
+ * Ensure we have a string or undefined response for any header.
+ *
+ * @param header
+ * @returns
+ */
 export function fixHeader(header: string | number | Array<string>): string | undefined {
   if (header === undefined) {
     return undefined;
@@ -26,6 +32,8 @@ export function fixHeader(header: string | number | Array<string>): string | und
 }
 
 /**
+ * Redacts a value by replacing it with a string like [REDACTED 6]
+ *
  * @param {Any} value the value to be redacted
  * @returns A redacted string potentially containing the length of the original value, if it was a string
  */
@@ -35,6 +43,8 @@ function redactValue(value) {
 }
 
 /**
+ * Redacts all the properties in an object
+ *
  * @param {Object} obj The data object that is operated upon
  * @param {String[]} redactedPaths a list of paths that point values which should be redacted
  * @returns An object with the redacted values
@@ -66,6 +76,7 @@ function replaceEach(obj, cb) {
 }
 
 /**
+ * Redacts everything but the provided fields
  *
  * @param {Object} obj The data object with fields to redact
  * @param {Array} nonRedactedPaths A list of all object paths that shouldn't be redacted
@@ -81,7 +92,6 @@ export default function processRequest(
   req: IncomingMessage,
   requestBody?: Record<string, unknown>,
   options?: LogOptions
-  // We don't need to include all of the har request fields, because the metrics server only cares about a subset
 ): Entry['request'] {
   const denylist = options?.denylist || options?.blacklist;
   const allowlist = options?.allowlist || options?.whitelist;

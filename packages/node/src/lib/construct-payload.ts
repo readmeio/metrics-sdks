@@ -8,6 +8,7 @@ import { URL } from 'url';
 import { TLSSocket } from 'tls';
 
 /**
+ * Extracts the protocol string from the incoming request
  *
  * @param req
  * @returns
@@ -18,7 +19,7 @@ export function getProto(req: IncomingMessage): 'https' | 'http' {
 
 export interface LogOptions {
   /**
-   *
+   * An array of values to redact from the incoming and outgoing headers, parameters and body
    */
   denylist?: Array<string>;
 
@@ -28,7 +29,10 @@ export interface LogOptions {
   blacklist?: Array<string>;
 
   /**
+   * An array of values to include in the incoming and outgoing headers, parameters and body.
+   *  Everything else will be redacted.
    *
+   * If set, the denylist will be ignored.
    */
   allowlist?: Array<string>;
 
@@ -38,12 +42,12 @@ export interface LogOptions {
   whitelist?: Array<string>;
 
   /**
-   *
+   * If true, the logs will be marked as development logs
    */
   development?: boolean;
 
   /**
-   *
+   * If true, this will return the log details without waiting for a response from the metrics servers
    */
   fireAndForget?: boolean;
 }
@@ -60,6 +64,12 @@ export interface PayloadData {
   responseBody?: string;
 }
 
+/**
+ * Translates Nodes platform strings into the allowed metrics platform strings
+ *
+ * @param platform
+ * @returns
+ */
 function fixPlatform(platform: string): 'mac' | 'windows' | 'linux' | 'unknown' {
   switch (platform) {
     case 'darwin':
