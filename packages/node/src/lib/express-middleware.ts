@@ -2,7 +2,7 @@ import config from '../config';
 import clamp from 'lodash/clamp';
 import * as url from 'url';
 import { v4 as uuidv4 } from 'uuid';
-import { constructPayload } from './construct-payload';
+import { constructPayload, LogOptions } from './construct-payload';
 import { getProjectBaseUrl } from './get-project-base-url';
 import { GroupingObject, metricsAPICall, OutgoingLogBody } from './metrics-log';
 
@@ -37,10 +37,9 @@ function patchResponse(res) {
   };
 }
 
-export interface Options {
+export interface Options extends LogOptions {
   bufferLength?: number;
   baseLogUrl?: string;
-  development?: boolean;
 }
 
 export function expressMiddleware(apiKey: string, group: GroupingFunction, options: Options = {}) {
@@ -75,16 +74,10 @@ export function expressMiddleware(apiKey: string, group: GroupingFunction, optio
       queue = [];
 
       // Make the log call
-      metricsAPICall(apiKey, json)
-        .then(() => {
-          if (options.development) {
-            // What should we do here
-          }
-        })
-        .catch(e => {
-          // Silently discard errors and timeouts.
-          if (options.development) throw e;
-        });
+      metricsAPICall(apiKey, json).catch(e => {
+        // Silently discard errors and timeouts.
+        if (options.development) throw e;
+      });
     };
 
     function startSend() {

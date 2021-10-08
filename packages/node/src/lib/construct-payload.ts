@@ -54,8 +54,8 @@ export interface LogOptions {
 
 export interface PayloadData {
   apiKey: string;
-  label: string;
-  email: string;
+  label?: string;
+  email?: string;
   startedDateTime: Date;
   responseEndDateTime: Date;
   logId?: string;
