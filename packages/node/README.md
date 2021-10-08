@@ -13,6 +13,7 @@ Track your API metrics within ReadMe.
 
 ### Contents
 
+- [Overview](#overview)
 - [Express.JS Integration](#expressjs-integration)
 - [Generic Node Integration](#generic-node-integration)
 
