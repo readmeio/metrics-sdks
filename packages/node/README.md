@@ -1,15 +1,14 @@
 
+[![](https://d3vv6lp55qjaqc.cloudfront.net/items/1M3C3j0I0s0j3T362344/Untitled-2.png)](https://readme.io)
+
 > 🚧 Any Issues?
 > Integrations can be tricky! [Contact support](https://docs.readme.com/guides/docs/contact-support) if you have any questions/issues.
 
-## Build Details
 
-Track your API metrics within ReadMe.
 
-[![npm](https://img.shields.io/npm/v/readmeio.svg)](https://npm.im/readmeio)
-[![Build](https://github.com/readmeio/metrics-sdks/workflows/nodejs/badge.svg)](https://github.com/readmeio/metrics-sdks)
+[![npm](https://img.shields.io/npm/v/readmeio.svg)](https://npm.im/readmeio) [![Build](https://github.com/readmeio/metrics-sdks/workflows/nodejs/badge.svg)](https://github.com/readmeio/metrics-sdks)
 
-[![](https://d3vv6lp55qjaqc.cloudfront.net/items/1M3C3j0I0s0j3T362344/Untitled-2.png)](https://readme.io)
+
 
 ## Contents
 
@@ -17,7 +16,7 @@ Track your API metrics within ReadMe.
 - [Express.JS Integration](#expressjs-integration)
 - [Generic Node Integration](#generic-node-integration)
 
-## Overview
+# Overview
 
 With ReadMe's Metrics API your team can get deep insights into your API's usage. If you're a developer, it's super easy to send your API logs to ReadMe, so your team can get deep insights into your API's usage. Here's an overview of how the integration works:
 
@@ -25,7 +24,7 @@ With ReadMe's Metrics API your team can get deep insights into your API's usage.
 - The Node SDK sends ReadMe the details of your API's incoming requests and outgoing responses, with the option for you to redact any private parameters or headers.
 - ReadMe uses these request and response details to create an API Metrics Dashboard which can be used to analyze specific API calls or monitor aggregate usage data.
 
-## Express.JS Integration
+# Express.JS Integration
 
 Note: If you're not using [Express.js](https://expressjs.com) check out our [Generic Node](#generic-node-integration) documentation.
 
@@ -99,7 +98,7 @@ app.use(readme.metrics(readmeAPIKey, req => ({
   email: req.<userEmailAddress>, // You might extract this from user data associated with the API key
 })));
 ```
-#### Additional Express Options
+### Additional Express Options
 Option           |  Description
 -----------------|---------------
 denyList         | An array of parameter names that will be redacted from the query parameters, request body, response body and headers
@@ -120,7 +119,7 @@ Example
 }
 ```
 
-#### Documentation URL
+### Documentation URL
 
 With the middleware loaded, all requests that funneled through it will receive a `x-documentation-url` header applied to the response. The value of this header will be the URL on ReadMe Metrics with which you can view the log for that request.
 
@@ -129,7 +128,7 @@ Note that in order to generate this URL, an API request is made to ReadMe once a
 If you wish to not rely on this cache, you can opt to supply a `baseLogUrl` option into the middleware, which should evaluate to the public-facing URL of your ReadMe project.
 
 
-### Generic Node Integration
+# Generic Node Integration
 Note: If you're using [Express.js](https://expressjs.com) check out our [Express.JS Integration](#expressjs-integration) documentation.
 
 1. Install `readmeio` via your package manager
@@ -206,7 +205,7 @@ Take one of your IDs and go to the following url to see what details were logged
 {your metrics url}/logs/{logId}
 ```
 
-#### Log Reference
+### Log Reference
 
 Parameter    | Required? | Description
 -------------|-----------|-----------
@@ -221,7 +220,7 @@ Example
 log(readmeAPIKey, req, res, payloadData, logOptions)
 ```
 
-#### Payload Data
+### Payload Data
 When logging your request with node's native request and response data we can't get all the information we need. This parameter to the `log` function includes all the information we can't easily retrieve for you.
 
 Option              | Required? | Description
@@ -253,7 +252,7 @@ Example
 }
 ```
 
-#### Additional Node Options
+### Additional Node Options
 Option           |  Description
 -----------------|---------------
 denyList         | An array of parameter names that will be redacted from the query parameters, request body, response body and headers
@@ -271,6 +270,6 @@ Example
 ```
 
 
-### Limitations
+## Limitations
 
 - Currently only supports JSON request bodies. Adding a `allowlist` or `denylist` for non-JSON bodies will not work (unless they're added to `req.body`) the same way that [`body-parser`](https://npm.im/body-parser) does it. The properties will be passed into [`postData`](http://www.softwareishard.com/blog/har-12-spec/#postData) as a `params` array.
