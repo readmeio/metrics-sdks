@@ -2,7 +2,7 @@
 > 🚧 Any Issues?
 > Integrations can be tricky! [Contact support](https://docs.readme.com/guides/docs/contact-support) if you have any questions/issues.
 
-### Build Details
+## Build Details
 
 Track your API metrics within ReadMe.
 
@@ -11,13 +11,13 @@ Track your API metrics within ReadMe.
 
 [![](https://d3vv6lp55qjaqc.cloudfront.net/items/1M3C3j0I0s0j3T362344/Untitled-2.png)](https://readme.io)
 
-### Contents
+## Contents
 
 - [Overview](#overview)
 - [Express.JS Integration](#expressjs-integration)
 - [Generic Node Integration](#generic-node-integration)
 
-### Overview
+## Overview
 
 With ReadMe's Metrics API your team can get deep insights into your API's usage. If you're a developer, it's super easy to send your API logs to ReadMe, so your team can get deep insights into your API's usage. Here's an overview of how the integration works:
 
@@ -25,7 +25,7 @@ With ReadMe's Metrics API your team can get deep insights into your API's usage.
 - The Node SDK sends ReadMe the details of your API's incoming requests and outgoing responses, with the option for you to redact any private parameters or headers.
 - ReadMe uses these request and response details to create an API Metrics Dashboard which can be used to analyze specific API calls or monitor aggregate usage data.
 
-### Express.JS Integration
+## Express.JS Integration
 
 Note: If you're not using [Express.js](https://expressjs.com) check out our [Generic Node](#generic-node-integration) documentation.
 
@@ -67,7 +67,7 @@ curl -i {my api url}
 
 You should see a response header `x-documentation-url`. This header contains a url which will show you all the details we logged about the request. For more details about this header check out the [Documentation URL](#documentation-url) docs.
 
-#### Express Middleware Reference
+### Express Middleware Reference
 The express middleware accepts the following parameters
 
 Note that this middleware is not likely to be sensitive to order. If you are new to Express, see [How to Write Middleware for Express.js Apps](https://stormpath.com/blog/how-to-write-middleware-for-express-apps)
@@ -82,7 +82,7 @@ Example:
 ```javascript
 readme.express(readmeAPIKey, groupFn, options);
 ```
-#### Grouping Function
+### Grouping Function
 The grouping function is a function your script should include that extracts identifying information out of the `Request` object. While only `apiKey` is required, we recommend providing all three values to get the most out of the metrics dashboard.
 
 Field  | Required? | Usage
