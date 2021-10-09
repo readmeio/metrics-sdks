@@ -261,7 +261,7 @@ class Metrics
         return [
             'method' => $request->method(),
             'url' => $request->fullUrl(),
-            'httpVersion' => $_SERVER['SERVER_PROTOCOL'],
+            'httpVersion' => $_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.1',
             'headers' => static::convertHeaderBagToArray($request->headers),
             'queryString' => static::convertObjectToArray($_GET),
             'postData' => [
