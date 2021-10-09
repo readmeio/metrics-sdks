@@ -307,7 +307,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             'startedDateTime was not in a format matching `2019-12-19T01:17:51+00:00`.'
         );
 
-        $this->assertIsFloat($payload_entry['time']);
+        $this->assertIsInt($payload_entry['time']);
         $this->assertIsNumeric($payload_entry['time']);
         $this->assertGreaterThan(0, $payload_entry['time']);
 
