@@ -1,3 +1,4 @@
+# readmeio
 
 [![](https://d3vv6lp55qjaqc.cloudfront.net/items/1M3C3j0I0s0j3T362344/Untitled-2.png)](https://readme.io)
 
@@ -90,7 +91,7 @@ apiKey | yes       | API Key used to make the request.
 label  | no        | This will be the user's display name in the API Metrics Dashboard, since it's much easier to remember a name than a unique identifier.
 email  | no        | Email of the user that is making the call
 
-Example
+Example:
 ```javascript
 app.use(readme.metrics(readmeAPIKey, req => ({
   apiKey: req.<apiKey>, // You might extract this from a header or parameter
@@ -108,7 +109,7 @@ fireAndForget    | When enabled, the server will wait for the response from the 
 bufferLength     | This value should be a number representing the amount of requests to group up before sending them over the network. Increasing this value will increase performance but delay the time until logs show up in the dashboard
 baseLogUrl       | This value is used when building the `x-documentation-url` header. If not provided we will make one API call a day to determine your url. If provided we will include that value and never look it up automatically.
 
-Example
+Example:
 ```javascript
 {
   denyList: ['password', 'secret'],
@@ -148,9 +149,9 @@ import * as readme from 'readmeio';
 const readme = require('readmeio');
 ```
 
-3. Add the log call to your node server. The generic node integration uses the standard node `IncomingMessage` and `ServerResponse` variables. These are acessible through the request handler provided to your node server.
+3. Add the log call to your Node server. The generic Node integration uses the standard Node `IncomingMessage` and `ServerResponse` variables. These are accessible through the request handler provided to your Node server.
 
-```JavaScript
+```javascript
 const http = require('http');
 const { log } = require('readmeio');
 
@@ -200,7 +201,7 @@ Your server should log out an object that looks like this:
 }
 ```
 
-Take one of your IDs and go to the following url to see what details were logged about that request
+Take one of your IDs and go to the following URL to see what details were logged about that request:
 ```
 {your metrics url}/logs/{logId}
 ```
@@ -210,32 +211,32 @@ Take one of your IDs and go to the following url to see what details were logged
 Parameter    | Required? | Description
 -------------|-----------|-----------
 readmeAPIKey | yes       | The API key for your readme project. This ensures your requests end up in your dashboard.
-req          | yes       | A node.js IncomingMessage object, usually found in your server's request handler.
-res          | yes       | A node.js ServerResponse object, usually found in your server's request handler.
+req          | yes       | A Node `IncomingMessage` object, usually found in your server's request handler.
+res          | yes       | A Node `ServerResponse` object, usually found in your server's request handler.
 payloadData  | yes       | A collection of information that will be logged alongside this request. See [Payload Data](#payload-data) for more details.
 logOptions   | no        | Additional options. You can read more under [Additional Node Options](#additional-node-options)
 
-Example
+Example:
 ```javascript
 log(readmeAPIKey, req, res, payloadData, logOptions)
 ```
 
 ### Payload Data
-When logging your request with node's native request and response data we can't get all the information we need. This parameter to the `log` function includes all the information we can't easily retrieve for you.
+When logging your request with Node's native request and response data we can't get all the information we need. This parameter to the `log` function includes all the information we can't easily retrieve for you.
 
 Option              | Required? | Description
 --------------------|-----------|------------------
 apiKey              | yes       | API Key used to make the request.
 label               | no        | This will be the user's display name in the API Metrics Dashboard, since it's much easier to remember a name than a unique identifier.
 email               | no        | Email of the user that is making the call
-startedDateTime     | yes       | A Javascript date object representing the time the server received the incoming request. This should be logged before retrieving and parsing the incoming request body.
-responseEndDateTime | yes       | A Javascript date object representing the time the server finished sending the outgoing response.
+startedDateTime     | yes       | A JavaScript `Date` object representing the time the server received the incoming request. This should be logged before retrieving and parsing the incoming request body.
+responseEndDateTime | yes       | A JavaScript `Date` object representing the time the server finished sending the outgoing response.
 logId               | no        | A UUIDv4 identifier. If not provided this will be automatically generated for you. You can use this ID in conjunction with your `base_url` to create the URL that points to this log. i.e. `{base_url}/logs/{logId}`.
 routePath           | no        | If provided this path will be used instead of the request path. This is useful for grouping common routes together as `/users/{user_id}` instead of each page being unique as `/users/1`, `/users/2`, etc.
-requestBody         | no        | The parsed incoming request body, as a Javascript object
-responseBody        | no        | The outgoing request body as a string
+requestBody         | no        | The parsed incoming request body as a JavaScript object.
+responseBody        | no        | The outgoing request body as a string.
 
-Example
+Example:
 ```javascript
 {
   apiKey: "abcdef1234",
@@ -255,12 +256,12 @@ Example
 ### Additional Node Options
 Option           |  Description
 -----------------|---------------
-denyList         | An array of parameter names that will be redacted from the query parameters, request body, response body and headers
-allowList        | If included, denyList will be ignored and all parameters but those in this list will be redacted
+denyList         | An array of parameter names that will be redacted from the query parameters, request body, response body and headers.
+allowList        | If included, denyList will be ignored and all parameters but those in this list will be redacted.
 development      | When enabled, the log will be marked as a development log. This is great for separating staging or test data from data coming from customers.
 fireAndForget    | When enabled, the server will wait for the response from the metrics call. This will be slower, but the response is useful in debugging problems.
 
-Example
+Example:
 ```javascript
 {
   denyList: ['password', 'secret'],
