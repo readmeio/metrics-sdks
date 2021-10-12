@@ -228,7 +228,7 @@ class Metrics
                         [
                             'pageref' => $request->url(),
                             'startedDateTime' => date('c', $request_start),
-                            'time' => (microtime(true) - $request_start) * 1000,
+                            'time' => (int) ((microtime(true) - $request_start) * 1000),
                             'request' => $this->processRequest($request),
                             'response' => $this->processResponse($response)
                         ]
