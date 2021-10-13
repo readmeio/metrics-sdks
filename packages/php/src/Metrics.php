@@ -193,7 +193,7 @@ class Metrics
      */
     public function constructPayload(string $log_id, Request $request, $response): array
     {
-        $request_start = (!defined('LARAVEL_START')) ? LARAVEL_START : $_SERVER['REQUEST_TIME_FLOAT'];
+        $request_start = defined('LARAVEL_START') ? LARAVEL_START : $_SERVER['REQUEST_TIME_FLOAT'];
         $group = $this->group_handler::constructGroup($request);
 
         $api_key_exists = array_key_exists('api_key', $group);
