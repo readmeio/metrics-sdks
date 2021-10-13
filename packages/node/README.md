@@ -106,9 +106,9 @@ Option           | Type             | Description
 denyList         | Array of strings | An array of parameter names that will be redacted from the query parameters, request body (when JSON or form-encoded), response body (when JSON) and headers
 allowList        | Array of strings | If included, denyList will be ignored and all parameters but those in this list will be redacted
 development      | bool             | When `true`, the log will be marked as a development log. This is great for separating staging or test data from data coming from customers.
-fireAndForget    | bool             | When `true`, the server will wait for the response from the metrics call. This will be slower, but the response is useful in debugging problems.
-bufferLength     | number           | This value should be a number representing the amount of requests to group up before sending them over the network. Increasing this value will increase performance but delay the time until logs show up in the dashboard
-baseLogUrl       | string           | This value is used when building the `x-documentation-url` header. If not provided we will make one API call a day to determine your url. If provided we will include that value and never look it up automatically.
+fireAndForget    | bool             | When `false`, the server will wait for the response from the metrics call. This will be slower, but the response is useful in debugging problems.
+bufferLength     | number           | This value should be a number representing the amount of requests to group up before sending them over the network. Increasing this value will increase performance but delay the time until logs show up in the dashboard. The default value is `1`
+baseLogUrl       | string           | This value is used when building the `x-documentation-url` header (see docs [below](#documentation-url)). It is your projects base url e.g. `https://example.readme.com`. If not provided we will make one API call a day to determine your url. If provided we will include that value and never look it up automatically.
 
 Example:
 ```javascript
@@ -117,7 +117,7 @@ Example:
   development: true,
   fireAndForget: true,
   bufferLength: 1,
-  baseLogUrl: "https://example.com"
+  baseLogUrl: "https://example.readme.com"
 }
 ```
 
@@ -260,7 +260,7 @@ Option           | Type             | Description
 denyList         | Array of strings | An array of parameter names that will be redacted from the query parameters, request body (when provided as an object, or as a JSON or form encoded string), response body (when JSON) and headers.
 allowList        | Array of strings | If included, denyList will be ignored and all parameters but those in this list will be redacted.
 development      | bool             | When `true`, the log will be marked as a development log. This is great for separating staging or test data from data coming from customers.
-fireAndForget    | bool             | When `true`, the server will wait for the response from the metrics call. This will be slower, but the response is useful in debugging problems.
+fireAndForget    | bool             | When `false`, the server will wait for the response from the metrics call. This will be slower, but the response is useful in debugging problems.
 
 Example:
 ```javascript
