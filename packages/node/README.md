@@ -85,11 +85,12 @@ readme.express(readmeAPIKey, groupFn, options);
 ### Grouping Function
 The grouping function is a function your script should include that extracts identifying information out of the `Request` object. While only `apiKey` is required, we recommend providing all three values to get the most out of the metrics dashboard.
 
-Field  | Required? | Usage
--------|-----------|-------
-apiKey | yes       | API Key used to make the request.
-label  | no        | This will be the user's display name in the API Metrics Dashboard, since it's much easier to remember a name than a unique identifier.
-email  | no        | Email of the user that is making the call
+Return data:
+Field  | Required? | Type   | Usage
+-------|-----------|--------|------
+apiKey | yes       | string | API Key used to make the request.
+label  | no        | string | This will be the user's display name in the API Metrics Dashboard, since it's much easier to remember a name than a unique identifier.
+email  | no        | string | Email of the user that is making the call
 
 Example:
 ```javascript
@@ -100,14 +101,14 @@ app.use(readme.metrics(readmeAPIKey, req => ({
 })));
 ```
 ### Additional Express Options
-Option           |  Description
------------------|---------------
-denyList         | An array of parameter names that will be redacted from the query parameters, request body, response body and headers
-allowList        | If included, denyList will be ignored and all parameters but those in this list will be redacted
-development      | When enabled, the log will be marked as a development log. This is great for separating staging or test data from data coming from customers.
-fireAndForget    | When enabled, the server will wait for the response from the metrics call. This will be slower, but the response is useful in debugging problems.
-bufferLength     | This value should be a number representing the amount of requests to group up before sending them over the network. Increasing this value will increase performance but delay the time until logs show up in the dashboard
-baseLogUrl       | This value is used when building the `x-documentation-url` header. If not provided we will make one API call a day to determine your url. If provided we will include that value and never look it up automatically.
+Option           | Type             | Description
+-----------------|------------------|---------
+denyList         | Array of strings | An array of parameter names that will be redacted from the query parameters, request body (when JSON or form-encoded), response body (when JSON) and headers
+allowList        | Array of strings | If included, denyList will be ignored and all parameters but those in this list will be redacted
+development      | bool             | When `true`, the log will be marked as a development log. This is great for separating staging or test data from data coming from customers.
+fireAndForget    | bool             | When `true`, the server will wait for the response from the metrics call. This will be slower, but the response is useful in debugging problems.
+bufferLength     | number           | This value should be a number representing the amount of requests to group up before sending them over the network. Increasing this value will increase performance but delay the time until logs show up in the dashboard
+baseLogUrl       | string           | This value is used when building the `x-documentation-url` header. If not provided we will make one API call a day to determine your url. If provided we will include that value and never look it up automatically.
 
 Example:
 ```javascript
@@ -208,13 +209,13 @@ Take one of your IDs and go to the following URL to see what details were logged
 
 ### Log Reference
 
-Parameter    | Required? | Description
--------------|-----------|-----------
-readmeAPIKey | yes       | The API key for your readme project. This ensures your requests end up in your dashboard.
-req          | yes       | A Node `IncomingMessage` object, usually found in your server's request handler.
-res          | yes       | A Node `ServerResponse` object, usually found in your server's request handler.
-payloadData  | yes       | A collection of information that will be logged alongside this request. See [Payload Data](#payload-data) for more details.
-logOptions   | no        | Additional options. You can read more under [Additional Node Options](#additional-node-options)
+Parameter    | Required? | Type            | Description
+-------------|-----------|-----------------|-----
+readmeAPIKey | yes       | string          | The API key for your readme project. This ensures your requests end up in your dashboard.
+req          | yes       | IncomingMessage | A Node `IncomingMessage` object, usually found in your server's request handler.
+res          | yes       | ServerResponse  | A Node `ServerResponse` object, usually found in your server's request handler.
+payloadData  | yes       | Object          | A collection of information that will be logged alongside this request. See [Payload Data](#payload-data) for more details.
+logOptions   | no        | Object          | Additional options. You can read more under [Additional Node Options](#additional-node-options)
 
 Example:
 ```javascript
@@ -224,17 +225,17 @@ log(readmeAPIKey, req, res, payloadData, logOptions)
 ### Payload Data
 When logging your request with Node's native request and response data we can't get all the information we need. This parameter to the `log` function includes all the information we can't easily retrieve for you.
 
-Option              | Required? | Description
---------------------|-----------|------------------
-apiKey              | yes       | API Key used to make the request.
-label               | no        | This will be the user's display name in the API Metrics Dashboard, since it's much easier to remember a name than a unique identifier.
-email               | no        | Email of the user that is making the call
-startedDateTime     | yes       | A JavaScript `Date` object representing the time the server received the incoming request. This should be logged before retrieving and parsing the incoming request body.
-responseEndDateTime | yes       | A JavaScript `Date` object representing the time the server finished sending the outgoing response.
-logId               | no        | A UUIDv4 identifier. If not provided this will be automatically generated for you. You can use this ID in conjunction with your `base_url` to create the URL that points to this log. i.e. `{base_url}/logs/{logId}`.
-routePath           | no        | If provided this path will be used instead of the request path. This is useful for grouping common routes together as `/users/{user_id}` instead of each page being unique as `/users/1`, `/users/2`, etc.
-requestBody         | no        | The parsed incoming request body as a JavaScript object.
-responseBody        | no        | The outgoing request body as a string.
+Option              | Required? | Type             | Description
+--------------------|-----------|------------------|----------
+apiKey              | yes       | string           | API Key used to make the request.
+label               | no        | string           | This will be the user's display name in the API Metrics Dashboard, since it's much easier to remember a name than a unique identifier.
+email               | no        | string           | Email of the user that is making the call
+startedDateTime     | yes       | Date             | A JavaScript `Date` object representing the time the server received the incoming request. This should be logged before retrieving and parsing the incoming request body.
+responseEndDateTime | yes       | Date             | A JavaScript `Date` object representing the time the server finished sending the outgoing response.
+logId               | no        | string           | A UUIDv4 identifier. If not provided this will be automatically generated for you. You can use this ID in conjunction with your `base_url` to create the URL that points to this log. i.e. `{base_url}/logs/{logId}`.
+routePath           | no        | string           | If provided this path will be used instead of the request path. This is useful for grouping common routes together as `/users/{user_id}` instead of each page being unique as `/users/1`, `/users/2`, etc.
+requestBody         | no        | Object or string | The incoming request body. You should provide this function a parsed object, but a string is acceptable if necessary.
+responseBody        | no        | string           | The outgoing request body as a string.
 
 Example:
 ```javascript
@@ -254,12 +255,12 @@ Example:
 ```
 
 ### Additional Node Options
-Option           |  Description
------------------|---------------
-denyList         | An array of parameter names that will be redacted from the query parameters, request body, response body and headers.
-allowList        | If included, denyList will be ignored and all parameters but those in this list will be redacted.
-development      | When enabled, the log will be marked as a development log. This is great for separating staging or test data from data coming from customers.
-fireAndForget    | When enabled, the server will wait for the response from the metrics call. This will be slower, but the response is useful in debugging problems.
+Option           | Type             | Description
+-----------------|------------------|--------
+denyList         | Array of strings | An array of parameter names that will be redacted from the query parameters, request body (when provided as an object, or as a JSON or form encoded string), response body (when JSON) and headers.
+allowList        | Array of strings | If included, denyList will be ignored and all parameters but those in this list will be redacted.
+development      | bool             | When `true`, the log will be marked as a development log. This is great for separating staging or test data from data coming from customers.
+fireAndForget    | bool             | When `true`, the server will wait for the response from the metrics call. This will be slower, but the response is useful in debugging problems.
 
 Example:
 ```javascript
@@ -273,4 +274,4 @@ Example:
 
 ## Limitations
 
-- Currently only supports JSON request bodies. Adding a `allowlist` or `denylist` for non-JSON bodies will not work (unless they're added to `req.body`) the same way that [`body-parser`](https://npm.im/body-parser) does it. The properties will be passed into [`postData`](http://www.softwareishard.com/blog/har-12-spec/#postData) as a `params` array.
+- The express plugin only supports allowlist and denylist for JSON and form-encoded request bodies. If you need allowlist or denylist support for other request bodies you can use the manual log function and parse the request body into an object before sending it to the `log` function.

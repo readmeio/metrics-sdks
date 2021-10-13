@@ -60,7 +60,7 @@ export interface PayloadData {
   responseEndDateTime: Date;
   logId?: string;
   routePath?: string;
-  requestBody?: Record<string, unknown>;
+  requestBody?: Record<string, unknown> | string;
   responseBody?: string;
 }
 

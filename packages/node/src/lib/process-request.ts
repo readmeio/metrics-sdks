@@ -49,7 +49,7 @@ function redactValue(value) {
  * @param {String[]} redactedPaths a list of paths that point values which should be redacted
  * @returns An object with the redacted values
  */
-function redactProperties(obj, redactedPaths = []) {
+function redactProperties<T extends Record<string, unknown>>(obj: T, redactedPaths = []): T {
   const nextObj = { ...obj };
   return redactedPaths.reduce((acc, path) => {
     const value = get(acc, path);
@@ -63,7 +63,7 @@ function redactProperties(obj, redactedPaths = []) {
  * @param {Function} cb A callback that is invoked for each value found, the return value being the next value that is set in the returned object
  * @returns An object with the replaced values
  */
-function replaceEach(obj, cb) {
+function replaceEach(obj, cb): Record<string, unknown> {
   return Object.keys(obj).reduce((acc, key) => {
     const value = obj[key];
     if (typeof value === 'object' && value !== null) {
@@ -82,53 +82,68 @@ function replaceEach(obj, cb) {
  * @param {Array} nonRedactedPaths A list of all object paths that shouldn't be redacted
  * @returns A merged objects that is entirely redacted except for the values of the nonRedactedPaths
  */
-function redactOtherProperties(obj, nonRedactedPaths) {
+function redactOtherProperties<T extends Record<string, unknown>>(obj: T, nonRedactedPaths): T {
   const allowedFields = pick(obj, nonRedactedPaths);
   const redactedFields = obj ? replaceEach(obj, redactValue) : obj;
   return merge(redactedFields, allowedFields);
 }
 
+function parseRequestBody(body: string, mimeType: string): Record<string, unknown> | string {
+  if (mimeType === 'application/x-www-form-urlencoded') {
+    return qs.parse(body);
+  }
+
+  if (mimeType === 'application/json') {
+    return JSON.parse(body);
+  }
+
+  return body;
+}
+
 export default function processRequest(
   req: IncomingMessage,
-  requestBody?: Record<string, unknown>,
+  requestBody?: Record<string, unknown> | string,
   options?: LogOptions
 ): Entry['request'] {
   const denylist = options?.denylist || options?.blacklist;
   const allowlist = options?.allowlist || options?.whitelist;
-  let reqBody = requestBody;
-  // We extrtract this here just in case it's redacted
-  const contentTypeHeader = req.headers['content-type'];
+
+  let mimeType: string = null;
+  try {
+    mimeType = contentType.parse(req.headers['content-type']).type;
+  } catch (e) {} // eslint-disable-line no-empty
+
+  let reqBody = typeof requestBody === 'string' ? parseRequestBody(requestBody, mimeType) : requestBody;
+  let postData: Entry['request']['postData'] = null;
 
   if (denylist) {
-    reqBody = redactProperties(reqBody, denylist);
+    reqBody = typeof reqBody === 'object' ? redactProperties(reqBody, denylist) : reqBody;
     req.headers = redactProperties(req.headers, denylist);
   }
 
   if (allowlist && !denylist) {
-    reqBody = redactOtherProperties(reqBody, allowlist);
+    reqBody = typeof reqBody === 'object' ? redactOtherProperties(reqBody, allowlist) : reqBody;
     req.headers = redactOtherProperties(req.headers, allowlist);
   }
 
-  let postData: Entry['request']['postData'] = null;
-
-  if (reqBody && Object.keys(reqBody).length > 0) {
-    let mimeType: string = null;
-    try {
-      mimeType = contentType.parse(contentTypeHeader).type;
-    } catch (e) {} // eslint-disable-line no-empty
-
-    // Per HAR, we send JSON as postData.text, not params.
-    if (mimeType === 'application/json') {
-      postData = {
-        mimeType,
-        text: JSON.stringify(reqBody),
-      };
-    } else {
-      postData = {
-        mimeType,
-        params: objectToArray(reqBody),
-      };
-    }
+  if (mimeType === 'application/x-www-form-urlencoded') {
+    postData = {
+      mimeType,
+      // There might be a better way to type this, but this works for now.
+      // If the mimeType is application/x-www-form-urlencoded, then the body is always going to be an object here.
+      params: objectToArray(reqBody as Record<string, unknown>),
+      text: null,
+    };
+  } else if (mimeType === 'application/json') {
+    postData = {
+      mimeType,
+      text: JSON.stringify(reqBody),
+    };
+  } else if (mimeType) {
+    postData = {
+      mimeType,
+      text: reqBody ? reqBody.toString() : null,
+    };
   }
 
   const protocol = fixHeader(req.headers['x-forwarded-proto'])?.toLowerCase() || getProto(req);
