@@ -8,15 +8,21 @@ import { ServerResponse, IncomingMessage } from 'http';
 import { Har } from 'har-format';
 
 export interface GroupingObject {
-  // @todo: document this
+  /**
+   * API Key used to make the request. Note that this is different from the `readmeAPIKey` described above and should be a value from your API that is unique to each of your users.
+   */
   apiKey: string;
   /**
    * @deprecated use apiKey instead
    */
   id?: string;
-  // @todo: document this
+  /**
+   * This will be the user's display name in the API Metrics Dashboard, since it's much easier to remember a name than an API key.
+   */
   label: string;
-  // @todo: document this
+  /**
+   * Email of the user that is making the call
+   */
   email: string;
 }
 
@@ -41,9 +47,6 @@ function getLogIds(body: OutgoingLogBody | Array<OutgoingLogBody>): string | Arr
 
   return body._id;
 }
-
-// This is mostly defined in construct-payload.ts. We might want to do some consolidation between that and this.
-// Also, how do we reconsile this and the batch requests? todo.....
 
 export function metricsAPICall(
   readmeAPIKey: string,
@@ -83,6 +86,17 @@ export function metricsAPICall(
   });
 }
 
+/**
+ * Log a request to the API Metrics Dashboard with the standard Node.js server data.
+ *
+ * @param readmeAPIKey The API key for your ReadMe project. This ensures your requests end up in your dashboard. You can read more about the API key in [our docs](https://docs.readme.com/reference/authentication).
+ * @param req A Node.js `IncomingMessage` object, usually found in your server's request handler.
+ * @param res A Node.js `ServerResponse` object, usually found in your server's request handler.
+ * @param payloadData A collection of information that will be logged alongside this request. See [Payload Data](#payload-data) for more details.
+ * @param logOptions Additional options. Check the documentation for more details.
+ *
+ * @returns A promise that resolves to an object containing your log ids and the server response
+ */
 export function log(
   readmeAPIKey: string,
   req: IncomingMessage,

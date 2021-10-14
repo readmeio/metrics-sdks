@@ -10,6 +10,15 @@ import { LogOptions } from './construct-payload';
 import { ServerResponse } from 'http';
 import { fixHeader } from './process-request';
 
+/**
+ * Transforms the provided ServerResponse and additional information into the appropriate HAR structure
+ *
+ * @param res The node ServerResponse object
+ * @param responseBody A string representation of the response body
+ * @param options A collection of additional options. See the documentation for more details.
+ *
+ * @returns The HAR formatted response details
+ */
 export default function processResponse(
   res: ServerResponse,
   responseBody?: string,
@@ -53,7 +62,7 @@ export default function processResponse(
       size: Number(fixHeader(res.getHeader('content-length') || 0)),
       mimeType: fixHeader(res.getHeader('content-type')),
     },
-    // TODO: Get these correct
+    // TODO: Once readme starts accepting these, send the correct values
     httpVersion: '',
     cookies: [],
     redirectURL: '',

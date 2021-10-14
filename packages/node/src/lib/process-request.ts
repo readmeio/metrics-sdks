@@ -34,10 +34,10 @@ export function fixHeader(header: string | number | Array<string>): string | und
 /**
  * Redacts a value by replacing it with a string like [REDACTED 6]
  *
- * @param {Any} value the value to be redacted
+ * @param value the value to be redacted
  * @returns A redacted string potentially containing the length of the original value, if it was a string
  */
-function redactValue(value) {
+function redactValue(value: string) {
   // eslint-disable-next-line sonarjs/no-nested-template-literals
   return `[REDACTED${typeof value === 'string' ? ` ${value.length}` : ''}]`;
 }
@@ -45,8 +45,8 @@ function redactValue(value) {
 /**
  * Redacts all the properties in an object
  *
- * @param {Object} obj The data object that is operated upon
- * @param {String[]} redactedPaths a list of paths that point values which should be redacted
+ * @param obj The data object that is operated upon
+ * @param redactedPaths a list of paths that point values which should be redacted
  * @returns An object with the redacted values
  */
 function redactProperties<T extends Record<string, unknown>>(obj: T, redactedPaths = []): T {
@@ -59,8 +59,8 @@ function redactProperties<T extends Record<string, unknown>>(obj: T, redactedPat
 }
 
 /**
- * @param {Object} obj The data object that is operated upon
- * @param {Function} cb A callback that is invoked for each value found, the return value being the next value that is set in the returned object
+ * @param obj The data object that is operated upon
+ * @param cb A callback that is invoked for each value found, the return value being the next value that is set in the returned object
  * @returns An object with the replaced values
  */
 function replaceEach(obj, cb): Record<string, unknown> {
@@ -78,8 +78,8 @@ function replaceEach(obj, cb): Record<string, unknown> {
 /**
  * Redacts everything but the provided fields
  *
- * @param {Object} obj The data object with fields to redact
- * @param {Array} nonRedactedPaths A list of all object paths that shouldn't be redacted
+ * @param obj The data object with fields to redact
+ * @param nonRedactedPaths A list of all object paths that shouldn't be redacted
  * @returns A merged objects that is entirely redacted except for the values of the nonRedactedPaths
  */
 function redactOtherProperties<T extends Record<string, unknown>>(obj: T, nonRedactedPaths): T {
@@ -111,6 +111,15 @@ function parseRequestBody(body: string, mimeType: string): Record<string, unknow
   return body;
 }
 
+/**
+ * This transforms the IncommingMessage and additional provided information into the relevant HAR structure
+ *
+ * @param req The IncommingMessage from the node server.
+ * @param requestBody A parsed request body object, or an unparsed request body string.
+ * @param options A collection of processing options.
+ *
+ * @returns The proper request structure following the HAR format
+ */
 export default function processRequest(
   req: IncomingMessage,
   requestBody?: Record<string, unknown> | string,
@@ -176,7 +185,7 @@ export default function processRequest(
     headers: objectToArray(req.headers),
     queryString: searchToArray(reqUrl.searchParams),
     postData,
-    // TODO: Get these correct
+    // TODO: When readme starts accepting these, send the correct values
     cookies: [],
     headersSize: 0,
     bodySize: 0,

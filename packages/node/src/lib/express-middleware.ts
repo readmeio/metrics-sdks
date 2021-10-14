@@ -42,14 +42,22 @@ export interface Options extends LogOptions {
   baseLogUrl?: string;
 }
 
-export function expressMiddleware(apiKey: string, group: GroupingFunction, options: Options = {}) {
-  if (!apiKey) throw new Error('You must provide your ReadMe API key');
+/**
+ * This middleware will set up Express to automatically log all API requests to ReadMe Metrics.
+ *
+ * @param apiKey The API key for your ReadMe project. This ensures your requests end up in your dashboard. You can read more about the API key in [our docs](https://docs.readme.com/reference/authentication).
+ * @param group A function that helps translate incoming request data to our metrics grouping data. You can read more under [Grouping Function](#grouping-function).
+ * @param options Additional options. See the documentation for more details.
+ * @returns Your Express middleware
+ */
+export function expressMiddleware(readmeApiKey: string, group: GroupingFunction, options: Options = {}) {
+  if (!readmeApiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a grouping function');
 
   // Ensures the buffer length is between 1 and 30
   const bufferLength = clamp(options.bufferLength || config.bufferLength, 1, 30);
   const requestTimeout = config.timeout;
-  const encodedApiKey = Buffer.from(`${apiKey}:`).toString('base64');
+  const encodedApiKey = Buffer.from(`${readmeApiKey}:`).toString('base64');
   let baseLogUrl = options.baseLogUrl || undefined;
   let queue: Array<OutgoingLogBody> = [];
 
@@ -74,7 +82,7 @@ export function expressMiddleware(apiKey: string, group: GroupingFunction, optio
       queue = [];
 
       // Make the log call
-      metricsAPICall(apiKey, json).catch(e => {
+      metricsAPICall(readmeApiKey, json).catch(e => {
         // Silently discard errors and timeouts.
         if (options.development) throw e;
       });

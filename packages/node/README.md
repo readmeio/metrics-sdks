@@ -229,7 +229,7 @@ Option              | Required? | Type             | Description
 --------------------|-----------|------------------|----------
 `apiKey`              | yes       | string           | API Key used to make the request. Note that this is different from the `readmeAPIKey` described above and should be a value from your API that is unique to each of your users.
 `label`               | no        | string           | This will be the user's display name in the API Metrics Dashboard, since it's much easier to remember a name than an API key.
-`email`               | no        | string           | Email of the user that is making the call
+`email`               | no        | string           | Email of the user that is making the call.
 `startedDateTime`     | yes       | Date             | A JavaScript `Date` object representing the time the server received the incoming request. This should be logged before retrieving and parsing the incoming request body.
 `responseEndDateTime` | yes       | Date             | A JavaScript `Date` object representing the time the server finished sending the outgoing response.
 `logId`               | no        | string           | A UUIDv4 identifier. If not provided this will be automatically generated for you. You can use this ID in conjunction with your `base_url` to create the URL that points to this log. i.e. `{base_url}/logs/{logId}`.

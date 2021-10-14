@@ -53,14 +53,41 @@ export interface LogOptions {
 }
 
 export interface PayloadData {
+  /**
+   * API Key used to make the request. Note that this is different from the `readmeAPIKey` described above and should be a value from your API that is unique to each of your users.
+   */
   apiKey: string;
+  /**
+   * This will be the user's display name in the API Metrics Dashboard, since it's much easier to remember a name than an API key.
+   */
   label?: string;
+  /**
+   * Email of the user that is making the call
+   */
   email?: string;
+  /**
+   * A JavaScript `Date` object representing the time the server received the incoming request. This should be logged before retrieving and parsing the incoming request body.
+   */
   startedDateTime: Date;
+  /**
+   * A JavaScript `Date` object representing the time the server finished sending the outgoing response.
+   */
   responseEndDateTime: Date;
+  /**
+   * A UUIDv4 identifier. If not provided this will be automatically generated for you. You can use this ID in conjunction with your `base_url` to create the URL that points to this log. i.e. `{base_url}/logs/{logId}`.
+   */
   logId?: string;
+  /**
+   * If provided this path will be used instead of the request path. This is useful for grouping common routes together as `/users/{user_id}` instead of each page being unique as `/users/1`, `/users/2`, etc.
+   */
   routePath?: string;
+  /**
+   * Object or string | The incoming request body. You should provide this function a parsed object, but a string is acceptable if necessary.
+   */
   requestBody?: Record<string, unknown> | string;
+  /**
+   * The outgoing request body as a string.
+   */
   responseBody?: string;
 }
 
