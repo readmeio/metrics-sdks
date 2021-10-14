@@ -29,7 +29,7 @@ With ReadMe's Metrics API your team can get deep insights into your API's usage.
 
 Note: If you're not using [Express.js](https://expressjs.com), check out our [Generic Node.js](#generic-node-integration) documentation.
 
-1. Locate the file in your organization's API codebase that contains your Express server. Often this file is named `Express.js` or `app.js`. You can also search on the code snippet `express()`.
+1. Locate the file in your organization's API codebase that contains your Express server. Often this file is named `express.js` or `app.js`. You can also search on the code snippet `express()`.
 
 2. From the directory of this codebase, run the following command in your command line to install the [`readmeio` package from `npm`](https://www.npmjs.com/package/readmeio):
 ```
@@ -59,7 +59,7 @@ app.use(readme.express(readmeAPIKey, req => ({
 
 For more details about the parameters you can provide to the `express` function, refer to the [Express.js](#express-middleware-reference) documentation.
 
-5. Test a request
+5. Test a request:
 
 ```
 curl -i {my api url}
