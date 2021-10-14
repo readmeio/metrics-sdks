@@ -40,6 +40,62 @@ it('should create expected json response when preparsed', () => {
     });
 });
 
+it('should work with application/x-json', () => {
+  const app = createApp({ denylist: ['password']}, true);
+
+  return request(app)
+    .post('/')
+    .set('Content-Type', 'application/x-json')
+    .send(JSON.stringify({ password: '123456', apiKey: 'abc', another: 'Hello world' }))
+    .expect(({ body }) => {
+      expect(body.postData.text).toBe(
+        '{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}'
+      );
+    });
+});
+
+it('should work with text/json', () => {
+  const app = createApp({ denylist: ['password']}, true);
+
+  return request(app)
+    .post('/')
+    .set('Content-Type', 'text/json')
+    .send(JSON.stringify({ password: '123456', apiKey: 'abc', another: 'Hello world' }))
+    .expect(({ body }) => {
+      expect(body.postData.text).toBe(
+        '{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}'
+      );
+    });
+});
+
+it('should work with text/x-json', () => {
+  const app = createApp({ denylist: ['password']}, true);
+
+  return request(app)
+    .post('/')
+    .set('Content-Type', 'text/x-json')
+    .send(JSON.stringify({ password: '123456', apiKey: 'abc', another: 'Hello world' }))
+    .expect(({ body }) => {
+      expect(body.postData.text).toBe(
+        '{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}'
+      );
+    });
+});
+
+it('should work with *+json', () => {
+  const app = createApp({ denylist: ['password']}, true);
+
+  return request(app)
+    .post('/')
+    .set('Content-Type', 'application/custom+json')
+    .send(JSON.stringify({ password: '123456', apiKey: 'abc', another: 'Hello world' }))
+    .expect(({ body }) => {
+      expect(body.postData.text).toBe(
+        '{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}'
+      );
+    });
+});
+
 describe('options', () => {
   describe('denylist/allowlist', () => {
     it('should strip denylisted json properties', () => {

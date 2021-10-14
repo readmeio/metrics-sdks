@@ -14,7 +14,7 @@
 ## Contents
 
 - [Overview](#overview)
-- [Express.JS Integration](#expressjs-integration)
+- [Express.js Integration](#expressjs-integration)
 - [Generic Node.js Integration](#generic-nodejs-integration)
 
 # Overview
@@ -25,11 +25,11 @@ With ReadMe's Metrics API your team can get deep insights into your API's usage.
 - The Node.js SDK sends ReadMe the details of your API's incoming requests and outgoing responses, with the option for you to redact any private parameters or headers.
 - ReadMe uses these request and response details to create an API Metrics Dashboard which can be used to analyze specific API calls or monitor aggregate usage data.
 
-# Express.JS Integration
+# Express.js Integration
 
-Note: If you're not using [Express.JS](https://expressjs.com), check out our [Generic Node.js](#generic-node-integration) documentation.
+Note: If you're not using [Express.js](https://expressjs.com), check out our [Generic Node.js](#generic-node-integration) documentation.
 
-1. Locate the file in your organization's API codebase that contains your Express server. Often this file is named `express.js` or `app.js`. You can also search on the code snippet `express()`.
+1. Locate the file in your organization's API codebase that contains your Express server. Often this file is named `Express.js` or `app.js`. You can also search on the code snippet `express()`.
 
 2. From the directory of this codebase, run the following command in your command line to install the [`readmeio` package from `npm`](https://www.npmjs.com/package/readmeio):
 ```
@@ -57,7 +57,7 @@ app.use(readme.express(readmeAPIKey, req => ({
 })));
 ```
 
-For more details about the parameters you can provide to the `express` function, refer to the [Express.JS](#express-middleware-reference) documentation.
+For more details about the parameters you can provide to the `express` function, refer to the [Express.js](#express-middleware-reference) documentation.
 
 5. Test a request
 
@@ -65,16 +65,16 @@ For more details about the parameters you can provide to the `express` function,
 curl -i {my api url}
 ```
 
-You should see a response header `x-documentation-url`. This header contains a url which will show you all the details we logged about the request. For more details about this header check out the [Documentation URL](#documentation-url) docs.
+You should see a response header `x-documentation-url`. This header contains a URL to a detailed log of the API request/response. For info on configuring this header, check out the [Documentation URL](#documentation-url) docs.
 
 ### Express Middleware Reference
-The express middleware accepts the following parameters
+The Express middleware accepts the following parameters:
 
-Note that this middleware is not likely to be sensitive to order. If you are new to Express, see [How to Write Middleware for Express.js Apps](https://stormpath.com/blog/how-to-write-middleware-for-express-apps)
+> Note that this middleware is not likely to be sensitive to order. If you are new to Express, see [How to Write Middleware for Express.js Apps](https://stormpath.com/blog/how-to-write-middleware-for-express-apps).
 
 Parameter       | Required? | Description
 ----------------|-----------|-------
-`readmeAPIKey`    | yes       | The API key for your readme project. This ensures your requests end up in your dashboard.
+`readmeAPIKey`    | yes       | The API key for your ReadMe project. This ensures your requests end up in your dashboard. You can read more about the API key in [our docs](https://docs.readme.com/reference/authentication).
 `groupFn`         | yes       | A function that helps translate incoming request data to our metrics grouping data. You can read more under [Grouping Function](#grouping-function).
 `options`         | no        | Additional options. You can read more under [Additional Express Options](#additional-express-options)
 
@@ -83,18 +83,18 @@ Example:
 readme.express(readmeAPIKey, groupFn, options);
 ```
 ### Grouping Function
-The grouping function is a function your script should include that extracts identifying information out of the `Request` object. While only `apiKey` is required, we recommend providing all three values to get the most out of the metrics dashboard.
+The grouping function is a function your script should include that extracts identifying information out of the [`req`](https://expressjs.com/en/4x/api.html#req) object. While only `apiKey` is required, we recommend providing all three values to get the most out of the metrics dashboard.
 
 Return data:
 Field  | Required? | Type   | Usage
 -------|-----------|--------|------
 `apiKey` | yes       | string | API Key used to make the request. Note that this is different from the `readmeAPIKey` described above and should be a value from your API that is unique to each of your users.
 `label`  | no        | string | This will be the user's display name in the API Metrics Dashboard, since it's much easier to remember a name than an API key.
-`email`  | no        | string | Email of the user that is making the call
+`email`  | no        | string | Email of the user that is making the call.
 
 Example:
 ```javascript
-app.use(readme.metrics(readmeAPIKey, req => ({
+app.use(readme.express(readmeAPIKey, req => ({
   apiKey: req.<apiKey>, // You might extract this from a header or parameter
   label: req.<userNameToShowInDashboard>, // You might extract this from user data associated with the API key
   email: req.<userEmailAddress>, // You might extract this from user data associated with the API key
@@ -103,12 +103,12 @@ app.use(readme.metrics(readmeAPIKey, req => ({
 ### Additional Express Options
 Option           | Type             | Description
 -----------------|------------------|---------
-`denyList`         | Array of strings | An array of parameter names that will be redacted from the query parameters, request body (when JSON or form-encoded), response body (when JSON) and headers. For nested request parameters use dot notation (e.g. `a.b.c` to redact the field `c` within `{ a: { b: { c: 'foo' }}}`)
-`allowList`        | Array of strings | If included, denyList will be ignored and all parameters but those in this list will be redacted
-`development`      | bool             | When `true`, the log will be marked as a development log. This is great for separating staging or test data from data coming from customers.
-`fireAndForget`    | bool             | When `false`, the server will wait for the response from the metrics call. This will be slower, but the response is useful in debugging problems.
-`bufferLength`     | number           | This value should be a number representing the amount of requests to group up before sending them over the network. Increasing this value will increase performance but delay the time until logs show up in the dashboard. The default value is `1`
-`baseLogUrl`       | string           | This value is used when building the `x-documentation-url` header (see docs [below](#documentation-url)). It is your projects base url e.g. `https://example.readme.com`. If not provided we will make one API call a day to determine your url. If provided we will include that value and never look it up automatically.
+`denyList`         | Array of strings | An array of parameter names that will be redacted from the query parameters, request body (when JSON or form-encoded), response body (when JSON) and headers. For nested request parameters use dot notation (e.g. `a.b.c` to redact the field `c` within `{ a: { b: { c: 'foo' }}}`).
+`allowList`        | Array of strings | If included, `denyList` will be ignored and all parameters but those in this list will be redacted.
+`development`      | bool             | Defaults to `false`. When `true`, the log will be marked as a development log. This is great for separating staging or test data from data coming from customers.
+`fireAndForget`    | bool             | Defaults to `true`. When `false`, the server will wait for the response from the metrics call. This will be slower, but the response is useful in debugging problems.
+`bufferLength`     | number           | Defaults to `1`. This value should be a number representing the amount of requests to group up before sending them over the network. Increasing this value will increase performance but delay the time until logs show up in the dashboard. The default value is `1`.
+`baseLogUrl`       | string           | This value is used when building the `x-documentation-url` header (see docs [below](#documentation-url)). It is your ReadMe documentation's base URL (e.g. `https://example.readme.com`). If not provided, we will make one API call a day to determine your base URL (more info in [Documentation URL](#documentation-url). If provided, we will use that value and never look it up automatically.
 
 Example:
 ```javascript
@@ -131,14 +131,14 @@ If you wish to not rely on this cache, you can opt to supply a `baseLogUrl` opti
 
 
 # Generic Node.js Integration
-Note: If you're using [Express.JS](https://expressjs.com) check out our [Express.JS Integration](#expressjs-integration) documentation.
+Note: If you're using [Express.js](https://expressjs.com) check out our [Express.js Integration](#expressjs-integration) documentation.
 
-1. Install `readmeio` via your package manager
+1. Install `readmeio` via your package manager:
 ```
 npm install readmeio --save
 ```
 
-2. Import the readmeio library
+2. Import the `readmeio` library:
 
 **Typescript**
 ```typescript
@@ -187,9 +187,9 @@ const server = http.createServer((req, res) => {
 ```
 
 
-For more details about the parameters you can provide to the `log` function, refer to the [log](#log-reference) documentation.
+For more details about the parameters you can provide to the `log` function, refer to the [`log`](#log-reference) documentation.
 
-5. Test a request
+5. Test a request:
 
 ```
 curl -i {my api url}
@@ -204,14 +204,14 @@ Your server should log out an object that looks like this:
 
 Take one of your IDs and go to the following URL to see what details were logged about that request:
 ```
-{your metrics url}/logs/{logId}
+{your ReadMe documentation's base URL}/logs/{logId}
 ```
 
-### Log Reference
+### `log` Reference
 
 Parameter    | Required? | Type            | Description
 -------------|-----------|-----------------|-----
-`readmeAPIKey` | yes       | string          | The API key for your readme project. This ensures your requests end up in your dashboard.
+`readmeAPIKey` | yes       | string          | The API key for your ReadMe project. This ensures your requests end up in your dashboard. You can read more about the API key in [our docs](https://docs.readme.com/reference/authentication).
 `req`          | yes       | IncomingMessage | A Node.js `IncomingMessage` object, usually found in your server's request handler.
 `res`          | yes       | ServerResponse  | A Node.js `ServerResponse` object, usually found in your server's request handler.
 `payloadData`  | yes       | Object          | A collection of information that will be logged alongside this request. See [Payload Data](#payload-data) for more details.
@@ -274,4 +274,4 @@ Example:
 
 ## Limitations
 
-- The Express.JS plugin only supports `allowlist` and `denylist` for JSON and form-encoded request bodies. If you need `allowlist` or `denylist` support for other request bodies, you can parse the request body yourself, and provide it to the [`log` function](#log-reference).
+- The Express.js plugin only supports `allowlist` and `denylist` for JSON and form-encoded request bodies. If you need `allowlist` or `denylist` support for other request bodies, you can parse the request body yourself, and provide it to the [`log` function](#log-reference).

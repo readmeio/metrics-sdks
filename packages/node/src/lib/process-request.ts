@@ -88,12 +88,23 @@ function redactOtherProperties<T extends Record<string, unknown>>(obj: T, nonRed
   return merge(redactedFields, allowedFields);
 }
 
+function isApplicationJson(mimeType) {
+  if (!mimeType) {
+    return false;
+  }
+
+  return (
+    ['application/json', 'application/x-json', 'text/json', 'text/x-json'].includes(mimeType) ||
+    mimeType.indexOf('+json') !== -1
+  );
+}
+
 function parseRequestBody(body: string, mimeType: string): Record<string, unknown> | string {
   if (mimeType === 'application/x-www-form-urlencoded') {
     return qs.parse(body);
   }
 
-  if (mimeType === 'application/json') {
+  if (isApplicationJson(mimeType)) {
     return JSON.parse(body);
   }
 
@@ -134,7 +145,7 @@ export default function processRequest(
       params: objectToArray(reqBody as Record<string, unknown>),
       text: null,
     };
-  } else if (mimeType === 'application/json') {
+  } else if (isApplicationJson(mimeType)) {
     postData = {
       mimeType,
       text: JSON.stringify(reqBody),
