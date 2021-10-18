@@ -3,8 +3,6 @@ import removeOtherProperties from 'lodash/pick';
 
 import { objectToArray } from './object-to-array';
 
-// Ignoring the following issue because we're just pulling in the type. We might not want to error at all on no-unresolved when using typescript
-// eslint-disable-next-line import/no-unresolved
 import { Entry } from 'har-format';
 import { LogOptions } from './construct-payload';
 import { ServerResponse } from 'http';

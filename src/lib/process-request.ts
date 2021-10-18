@@ -4,8 +4,6 @@ import set from 'lodash/set';
 import pick from 'lodash/pick';
 import merge from 'lodash/merge';
 import * as contentType from 'content-type';
-// We're just importing types, so we don't need this unresolved.
-// eslint-disable-next-line import/no-unresolved
 import { Entry } from 'har-format';
 import * as qs from 'querystring';
 

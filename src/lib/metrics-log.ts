@@ -4,7 +4,6 @@ import pkg from '../../package.json';
 import config from '../config';
 import { constructPayload, PayloadData, LogOptions } from './construct-payload';
 import { ServerResponse, IncomingMessage } from 'http';
-// eslint-disable-next-line import/no-unresolved
 import { Har } from 'har-format';
 
 export interface GroupingObject {
