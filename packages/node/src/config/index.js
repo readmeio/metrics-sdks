@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const defaultJson = require('./default.json');
 
 function getConfig() {

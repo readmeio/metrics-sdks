@@ -7,7 +7,7 @@ import { getProjectBaseUrl } from './get-project-base-url';
 import { GroupingObject, metricsAPICall, OutgoingLogBody } from './metrics-log';
 
 // Make sure we flush the queue if the process is exited
-let doSend = () => {};
+let doSend = () => {}; // eslint-disable-line @typescript-eslint/no-empty-function
 process.on('exit', doSend);
 
 export interface GroupingFunction {
