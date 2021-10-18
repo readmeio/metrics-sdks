@@ -56,5 +56,6 @@
     "prettier": "prettier --list-different --write \"./**/**.{js,ts}\"",
     "test": "jest --coverage"
   },
-  "prettier": "@readme/eslint-config/prettier"
+  "prettier": "@readme/eslint-config/prettier",
+  "files": ["dist"]
 }
