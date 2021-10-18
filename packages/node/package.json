@@ -31,7 +31,7 @@
     "uuid": "^8.2.0"
   },
   "devDependencies": {
-    "@readme/eslint-config": "^6.1.0",
+    "@readme/eslint-config": "^7.2.2",
     "@types/har-format": "^1.2.7",
     "@types/jest": "^27.0.1",
     "@types/node": "^16.9.1",
