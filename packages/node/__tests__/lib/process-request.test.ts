@@ -2,6 +2,7 @@ import request from 'supertest';
 import * as http from 'http';
 import processRequest from '../../src/lib/process-request';
 import { LogOptions } from 'src/lib/construct-payload';
+import FormData from 'form-data';
 
 function createApp(reqOptions?: LogOptions, shouldPreParse: boolean = false) {
   const requestListener = function (req: http.IncomingMessage, res: http.ServerResponse) {
@@ -93,6 +94,26 @@ it('should work with *+json', () => {
       expect(body.postData.text).toBe(
         '{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}'
       );
+    });
+});
+
+it('should work with multipart/form-data', () => {
+  const app = createApp({ denylist: ['password']});
+
+  const form = new FormData();
+  form.append('password', '123456');
+  form.append('apiKey', 'abc');
+  form.append('another', 'Hello world');
+
+  const formHeaders = form.getHeaders();
+
+  return request(app)
+    .post('/')
+    .set(formHeaders)
+    .send(form.getBuffer().toString())
+    .expect(({ body }) => {
+      // If the request body for multipart form comes in as a string, we record it as is.
+      expect(body.postData.text).toBe(form.getBuffer().toString());
     });
 });
 

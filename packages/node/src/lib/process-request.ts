@@ -160,7 +160,8 @@ export default function processRequest(
   } else if (mimeType) {
     postData = {
       mimeType,
-      text: reqBody ? reqBody.toString() : null,
+      // Do our best to record *some sort of body* even if it's not 100% accurate.
+      text: typeof reqBody === 'string' ? reqBody : JSON.stringify(reqBody),
     };
   }
 
