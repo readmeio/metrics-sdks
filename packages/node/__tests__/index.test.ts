@@ -582,33 +582,5 @@ describe('#metrics', () => {
 
       mock.done();
     });
-
-    /*it('should buffer up res.end() calls', async () => {
-      const mock = createMock();
-      const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup));
-      app.get('/test', (req, res) => res.end(JSON.stringify(responseBody)));
-
-      await request(app)
-        .get('/test')
-        .expect(200)
-        .expect(res => expect(res).toHaveDocumentationHeader());
-
-      mock.done();
-    });
-
-    it('should work for res.send() calls', async () => {
-      const mock = createMock();
-      const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup));
-      app.get('/test', (req, res) => res.send(responseBody));
-
-      await request(app)
-        .get('/test')
-        .expect(200)
-        .expect(res => expect(res).toHaveDocumentationHeader());
-
-      mock.done();
-    });*/
   });
 });
