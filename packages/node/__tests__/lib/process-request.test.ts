@@ -4,7 +4,7 @@ import processRequest from '../../src/lib/process-request';
 import { LogOptions } from 'src/lib/construct-payload';
 import FormData from 'form-data';
 
-function createApp(reqOptions?: LogOptions, shouldPreParse: boolean = false) {
+function createApp(reqOptions?: LogOptions, shouldPreParse: boolean = false, bodyOverride?) {
   const requestListener = function (req: http.IncomingMessage, res: http.ServerResponse) {
     let body = "";
 
@@ -21,7 +21,7 @@ function createApp(reqOptions?: LogOptions, shouldPreParse: boolean = false) {
         body = JSON.parse(body);
       }
 
-      res.end(JSON.stringify(processRequest(req, body, reqOptions)));
+      res.end(JSON.stringify(processRequest(req, bodyOverride ? bodyOverride : body, reqOptions)));
     });
   };
 
@@ -114,6 +114,23 @@ it('should work with multipart/form-data', () => {
     .expect(({ body }) => {
       // If the request body for multipart form comes in as a string, we record it as is.
       expect(body.postData.text).toBe(form.getBuffer().toString());
+    });
+});
+
+it('should fail gracefully with circular json objects', () => {
+  const obj = { foo: null };
+  obj.foo = obj;
+
+  const app = createApp({ denylist: ['password']}, false, obj);
+
+  return request(app)
+    .post('/')
+    .set('content-type', 'text/plain')
+    .send('this isn\'t used')
+    .expect(({ body }) => {
+      console.log(body);
+      // If the request body for multipart form comes in as a string, we record it as is.
+      expect(body.postData.text).toBe('[ReadMe is unable to handle circular JSON. Please contact support if you have any questions.]');
     });
 });
 
