@@ -10,6 +10,11 @@ import config from '../src/config';
 import pkg from '../package.json';
 import { expressMiddleware } from '../src';
 import { ServerResponse } from 'http';
+import FormData from 'form-data';
+import multer from 'multer';
+
+const upload = multer();
+
 
 const apiKey = 'mockReadMeApiKey';
 const incomingGroup = {
@@ -166,7 +171,7 @@ describe('#metrics', () => {
       .reply(200);
 
     const app = express();
-    app.use((req, res, next) => {
+    app.use((req: any, res: any, next) => {
       req.a = 'a';
       res.b = 'b';
       res.c = 'c';
@@ -523,6 +528,57 @@ describe('#metrics', () => {
         .get('/test')
         .expect(200)
         .expect(res => expect(res).toHaveDocumentationHeader());
+
+      mock.done();
+    });
+  });
+
+  describe('`req.body`', () => {
+    let apiMock;
+
+    function createMock(checkLocation: 'text' | 'params', requestBody: unknown) {
+      return nock(config.host, {
+        reqheaders: {
+          'Content-Type': 'application/json',
+          'User-Agent': `${pkg.name}/${pkg.version}`,
+        },
+      })
+        .post('/v1/request', ([body]) => {
+          expect(body.request.log.entries[0].request.postData[checkLocation]).toBe(requestBody);
+          return true;
+        })
+        .reply(200);
+    }
+
+    beforeEach(() => {
+      apiMock = getReadMeApiMock(1);
+    });
+
+    afterEach(() => {
+      apiMock.done();
+    });
+
+    it('should accept multipart/form-data', async () => {
+
+      const form = new FormData();
+      form.append('password', '123456');
+      form.append('apiKey', 'abc');
+      form.append('another', 'Hello world');
+
+      // If the request body for a multipart/form-data request comes in as an object (as it does with the express middleware) we expect it to be recorded json encoded
+      const mock = createMock('text', JSON.stringify({password: '123456', apiKey: 'abc', another: 'Hello world'}));
+      const app = express();
+      app.use(upload.none());
+      app.use(expressMiddleware(apiKey, () => incomingGroup));
+      app.post('/test', (req, res) => {
+        res.status(200).end();
+      });
+
+      await request(app)
+        .post('/test')
+        .set(form.getHeaders())
+        .send(form.getBuffer().toString())
+        .expect(200);
 
       mock.done();
     });

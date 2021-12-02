@@ -158,9 +158,18 @@ export default function processRequest(
       text: JSON.stringify(reqBody),
     };
   } else if (mimeType) {
+    let stringBody = '';
+
+    try {
+      stringBody = typeof reqBody === 'string' ? reqBody : JSON.stringify(reqBody);
+    } catch (e) {
+      stringBody = '[ReadMe is unable to handle circular JSON. Please contact support if you have any questions.]';
+    }
+
     postData = {
       mimeType,
-      text: reqBody ? reqBody.toString() : null,
+      // Do our best to record *some sort of body* even if it's not 100% accurate.
+      text: stringBody,
     };
   }
 
