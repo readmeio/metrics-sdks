@@ -227,7 +227,7 @@ class Metrics
                     'entries' => [
                         [
                             'pageref' => $request->url(),
-                            'startedDateTime' => date('c', $request_start),
+                            'startedDateTime' => date('c', (int) $request_start),
                             'time' => (int) ((microtime(true) - $request_start) * 1000),
                             'request' => $this->processRequest($request),
                             'response' => $this->processResponse($response)
@@ -409,6 +409,7 @@ class Metrics
     {
         $output = [];
         foreach ($headers->all() as $name => $values) {
+            /** @psalm-suppress PossiblyNullIterator */
             foreach ($values as $value) {
                 // If the header is empty, don't worry about it.
                 if ($value === '') {
