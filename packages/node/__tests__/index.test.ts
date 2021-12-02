@@ -1,3 +1,4 @@
+import type { ServerResponse } from 'http';
 import express from 'express';
 import request from 'supertest';
 import nock from 'nock';
@@ -9,24 +10,22 @@ import { isValidUUIDV4 } from 'is-valid-uuid-v4';
 import config from '../src/config';
 import pkg from '../package.json';
 import { expressMiddleware } from '../src';
-import { ServerResponse } from 'http';
 import FormData from 'form-data';
 import multer from 'multer';
 
 const upload = multer();
 
-
 const apiKey = 'mockReadMeApiKey';
 const incomingGroup = {
   apiKey: '5afa21b97011c63320226ef3',
   label: 'test',
-  email: 'test@example.com'
+  email: 'test@example.com',
 };
 
 const outgoingGroup = {
   id: '5afa21b97011c63320226ef3',
   label: 'test',
-  email: 'test@example.com'
+  email: 'test@example.com',
 };
 
 const baseLogUrl = 'https://docs.example.com';
@@ -62,12 +61,10 @@ function hydrateCache(lastUpdated) {
 }
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jest {
     interface Matchers<R> {
-      toHaveDocumentationHeader(res?: ServerResponse): {
-        pass: boolean,
-        message: string
-      }
+      toHaveDocumentationHeader(res?: ServerResponse): R;
     }
   }
 }
@@ -110,8 +107,8 @@ describe('#metrics', () => {
     // Clean up the cache dir between tests.
     rimraf.sync(cacheDir);
   });
-/*
-  it('should error if missing apiKey', () => {
+
+  /* it('should error if missing apiKey', () => {
     expect(() => {
       expressMiddleware();
     }).toThrow('You must provide your ReadMe API key');
@@ -121,7 +118,7 @@ describe('#metrics', () => {
     expect(() => {
       expressMiddleware('api-key');
     }).toThrow('You must provide a grouping function');
-  });*/
+  }); */
 
   it('should send a request to the metrics server', () => {
     const apiMock = getReadMeApiMock(1);
@@ -559,14 +556,14 @@ describe('#metrics', () => {
     });
 
     it('should accept multipart/form-data', async () => {
-
       const form = new FormData();
       form.append('password', '123456');
       form.append('apiKey', 'abc');
       form.append('another', 'Hello world');
 
-      // If the request body for a multipart/form-data request comes in as an object (as it does with the express middleware) we expect it to be recorded json encoded
-      const mock = createMock('text', JSON.stringify({password: '123456', apiKey: 'abc', another: 'Hello world'}));
+      // If the request body for a multipart/form-data request comes in as an object (as it does with the express
+      // middleware) we expect it to be recorded json encoded
+      const mock = createMock('text', JSON.stringify({ password: '123456', apiKey: 'abc', another: 'Hello world' }));
       const app = express();
       app.use(upload.none());
       app.use(expressMiddleware(apiKey, () => incomingGroup));
@@ -574,11 +571,7 @@ describe('#metrics', () => {
         res.status(200).end();
       });
 
-      await request(app)
-        .post('/test')
-        .set(form.getHeaders())
-        .send(form.getBuffer().toString())
-        .expect(200);
+      await request(app).post('/test').set(form.getHeaders()).send(form.getBuffer().toString()).expect(200);
 
       mock.done();
     });

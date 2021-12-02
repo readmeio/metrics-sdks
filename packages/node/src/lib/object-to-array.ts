@@ -1,4 +1,4 @@
-import { URLSearchParams } from 'url';
+import type { URLSearchParams } from 'url';
 
 export function objectToArray(object: Record<string, unknown>): Array<{ name: string; value: string }> {
   return Object.entries(object).reduce((prev, [name, value]) => {

@@ -1,104 +1,95 @@
+import type { LogOptions } from 'src/lib/construct-payload';
 import request from 'supertest';
 import * as http from 'http';
 import processRequest from '../../src/lib/process-request';
-import { LogOptions } from 'src/lib/construct-payload';
 import FormData from 'form-data';
 
-function createApp(reqOptions?: LogOptions, shouldPreParse: boolean = false, bodyOverride?) {
+// eslint-disable-next-line default-param-last
+function createApp(reqOptions?: LogOptions, shouldPreParse = false, bodyOverride?) {
   const requestListener = function (req: http.IncomingMessage, res: http.ServerResponse) {
-    let body = "";
+    let body = '';
 
-    req.on('readable', function() {
-      let chunk = req.read();
+    req.on('readable', function () {
+      const chunk = req.read();
       if (chunk) {
         body += chunk;
       }
     });
 
-    req.on('end', function() {
+    req.on('end', function () {
       res.setHeader('Content-Type', 'application/json');
       if (shouldPreParse) {
         body = JSON.parse(body);
       }
 
-      res.end(JSON.stringify(processRequest(req, bodyOverride ? bodyOverride : body, reqOptions)));
+      res.end(JSON.stringify(processRequest(req, bodyOverride || body, reqOptions)));
     });
   };
 
   return http.createServer(requestListener);
 }
 
-it('should create expected json response when preparsed', () => {
+test('should create expected json response when preparsed', () => {
   const app = createApp({}, true);
 
   return request(app)
     .post('/')
     .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
     .expect(({ body }) => {
-      expect(body.postData.text).toBe(
-        '{"password":"123456","apiKey":"abc","another":"Hello world"}'
-      );
+      expect(body.postData.text).toBe('{"password":"123456","apiKey":"abc","another":"Hello world"}');
     });
 });
 
-it('should work with application/x-json', () => {
-  const app = createApp({ denylist: ['password']}, true);
+test('should work with application/x-json', () => {
+  const app = createApp({ denylist: ['password'] }, true);
 
   return request(app)
     .post('/')
     .set('Content-Type', 'application/x-json')
     .send(JSON.stringify({ password: '123456', apiKey: 'abc', another: 'Hello world' }))
     .expect(({ body }) => {
-      expect(body.postData.text).toBe(
-        '{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}'
-      );
+      expect(body.postData.text).toBe('{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}');
     });
 });
 
-it('should work with text/json', () => {
-  const app = createApp({ denylist: ['password']}, true);
+test('should work with text/json', () => {
+  const app = createApp({ denylist: ['password'] }, true);
 
   return request(app)
     .post('/')
     .set('Content-Type', 'text/json')
     .send(JSON.stringify({ password: '123456', apiKey: 'abc', another: 'Hello world' }))
     .expect(({ body }) => {
-      expect(body.postData.text).toBe(
-        '{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}'
-      );
+      expect(body.postData.text).toBe('{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}');
     });
 });
 
-it('should work with text/x-json', () => {
-  const app = createApp({ denylist: ['password']}, true);
+test('should work with text/x-json', () => {
+  const app = createApp({ denylist: ['password'] }, true);
 
   return request(app)
     .post('/')
     .set('Content-Type', 'text/x-json')
     .send(JSON.stringify({ password: '123456', apiKey: 'abc', another: 'Hello world' }))
     .expect(({ body }) => {
-      expect(body.postData.text).toBe(
-        '{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}'
-      );
+      expect(body.postData.text).toBe('{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}');
     });
 });
 
-it('should work with *+json', () => {
-  const app = createApp({ denylist: ['password']}, true);
+test('should work with *+json', () => {
+  const app = createApp({ denylist: ['password'] }, true);
 
   return request(app)
     .post('/')
     .set('Content-Type', 'application/custom+json')
     .send(JSON.stringify({ password: '123456', apiKey: 'abc', another: 'Hello world' }))
     .expect(({ body }) => {
-      expect(body.postData.text).toBe(
-        '{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}'
-      );
+      expect(body.postData.text).toBe('{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}');
     });
 });
 
-it('should work with multipart/form-data', () => {
-  const app = createApp({ denylist: ['password']});
+test('should work with multipart/form-data', () => {
+  const app = createApp({ denylist: ['password'] });
 
   const form = new FormData();
   form.append('password', '123456');
@@ -117,20 +108,21 @@ it('should work with multipart/form-data', () => {
     });
 });
 
-it('should fail gracefully with circular json objects', () => {
+test('should fail gracefully with circular json objects', () => {
   const obj = { foo: null };
   obj.foo = obj;
 
-  const app = createApp({ denylist: ['password']}, false, obj);
+  const app = createApp({ denylist: ['password'] }, false, obj);
 
   return request(app)
     .post('/')
     .set('content-type', 'text/plain')
-    .send('this isn\'t used')
+    .send("this isn't used")
     .expect(({ body }) => {
-      console.log(body);
       // If the request body for multipart form comes in as a string, we record it as is.
-      expect(body.postData.text).toBe('[ReadMe is unable to handle circular JSON. Please contact support if you have any questions.]');
+      expect(body.postData.text).toBe(
+        '[ReadMe is unable to handle circular JSON. Please contact support if you have any questions.]'
+      );
     });
 });
 
@@ -157,17 +149,19 @@ describe('options', () => {
         .send('password=123456&apiKey=abc&another=Hello world')
         .set('Content-Type', 'application/x-www-form-urlencoded')
         .expect(({ body }) => {
-          expect(body.postData.text).toBe(null);
-          expect(body.postData.params).toEqual([
+          expect(body.postData.text).toBeNull();
+          expect(body.postData.params).toStrictEqual([
             {
-              name: "password",
-              value: "[REDACTED 6]"
+              name: 'password',
+              value: '[REDACTED 6]',
             },
-            { name: "apiKey",
-              value: "[REDACTED 3]"
+            {
+              name: 'apiKey',
+              value: '[REDACTED 3]',
             },
-            { name: "another",
-              value: "Hello world"
+            {
+              name: 'another',
+              value: 'Hello world',
             },
           ]);
         });
@@ -202,47 +196,24 @@ describe('options', () => {
         .post('/')
         .send('password=123456&apiKey=abc&another=Hello world')
         .expect(({ body }) => {
-          expect(body.postData.text).toBe(null);
-          expect(body.postData.params).toEqual([
+          expect(body.postData.text).toBeNull();
+          expect(body.postData.params).toStrictEqual([
             {
-              name: "password",
-              value: "123456"
+              name: 'password',
+              value: '123456',
             },
-            { name: "apiKey",
-              value: "abc"
+            {
+              name: 'apiKey',
+              value: 'abc',
             },
-            { name: "another",
-              value: "[REDACTED 11]"
-            }
+            {
+              name: 'another',
+              value: '[REDACTED 11]',
+            },
           ]);
         });
     });
 
-    it('should strip denylisted form-encoded properties', () => {
-      const app = createApp({ denylist: ['password', 'apiKey'] });
-
-      return request(app)
-        .post('/')
-        .send('password=123456&apiKey=abc&another=Hello world')
-        .set('Content-Type', 'application/x-www-form-urlencoded')
-        .expect(({ body }) => {
-          expect(body.postData.text).toBe(null);
-          expect(body.postData.params).toEqual([
-            {
-              name: "password",
-              value: "[REDACTED 6]"
-            },
-            {
-              name: "apiKey",
-              value: "[REDACTED 3]"
-            },
-            {
-              name: "another",
-              value: "Hello world"
-            },
-          ]);
-        });
-    });
     it('should only send allowlisted nested properties', () => {
       const app = createApp({ allowlist: ['a.b.c'] });
 
@@ -326,9 +297,8 @@ describe('options', () => {
             { name: 'connection', value: '[REDACTED 5]' },
           ])
         );
-        expect(body.postData.text).toBe(
-          '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}'
-        );
+
+        expect(body.postData.text).toBe('{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}');
       });
   });
 
@@ -352,9 +322,8 @@ describe('options', () => {
             { name: 'connection', value: '[REDACTED 5]' },
           ])
         );
-        expect(body.postData.text).toBe(
-          '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}'
-        );
+
+        expect(body.postData.text).toBe('{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}');
       });
   });
 
@@ -379,84 +348,81 @@ describe('options', () => {
             { name: 'connection', value: '[REDACTED 5]' },
           ])
         );
-        expect(body.postData.text).toBe(
-          '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}'
-        );
+
+        expect(body.postData.text).toBe('{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}');
       });
-    });
+  });
+});
+
+/**
+ * These tests are for the legacy blacklist/whitelist properties that mirrors allowlist/denylist behavior.
+ * Rather than reimplementing each test again here, it should be appropriate to just test the base case as
+ * The behavior here is assumed to use the same code paths as those used by the new properties.
+ */
+describe('deprecated blacklist/whitelist', () => {
+  it('should strip blacklisted properties', () => {
+    const app = createApp({ blacklist: ['password', 'apiKey'] });
+
+    return request(app)
+      .post('/')
+      .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
+      .expect(({ body }) => {
+        expect(body.postData.text).toBe('{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}');
+      });
   });
 
-  /*
-    * These tests are for the legacy blacklist/whitelist properties that mirrors allowlist/denylist behavior.
-    * Rather than reimplementing each test again here, it should be appropriate to just test the base case as
-    * The behavior here is assumed to use the same code paths as those used by the new properties.
-    */
-  describe('deprecated blacklist/whitelist', () => {
-    it('should strip blacklisted properties', () => {
-      const app = createApp({ blacklist: ['password', 'apiKey'] });
+  it('should only send whitelisted properties', () => {
+    const app = createApp({ whitelist: ['password', 'apiKey'] });
 
-      return request(app)
-        .post('/')
-        .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
-        .expect(({ body }) => {
-          expect(body.postData.text).toBe(
-            '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}'
-          );
-        });
-    });
-
-    it('should only send whitelisted properties', () => {
-      const app = createApp({ whitelist: ['password', 'apiKey'] });
-
-      return request(app)
-        .post('/')
-        .set('content-type', 'application/json')
-        .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
-        .expect(({ body }) => {
-          expect(body.postData.text).toBe('{"password":"123456","apiKey":"abc","another":"[REDACTED 11]"}');
-        });
-    });
+    return request(app)
+      .post('/')
+      .set('content-type', 'application/json')
+      .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
+      .expect(({ body }) => {
+        expect(body.postData.text).toBe('{"password":"123456","apiKey":"abc","another":"[REDACTED 11]"}');
+      });
   });
+});
 
-it('#method', () =>
+test('#method', () =>
   request(createApp())
     .post('/')
     .expect(({ body }) => expect(body.method).toBe('POST')));
 
-it('#url', () =>
+test('#url', () =>
   request(createApp())
     .post('/path')
     .query({ a: 'b' })
     // This regex is for supertest's random port numbers
     .expect(({ body }) => expect(body.url).toMatch(/http:\/\/127.0.0.1:\d+\/path\?a=b/)));
 
-it('#url protocol x-forwarded-proto', () =>
+test('#url protocol x-forwarded-proto', () =>
   request(createApp())
     .post('/')
     .set('x-forwarded-proto', 'https')
     // This regex is for supertest's random port numbers
     .expect(({ body }) => expect(body.url).toMatch(/^https/)));
 
-it('#url-basepath', () =>
+test('#url-basepath', () =>
   request(createApp())
     .post('/test-base-path/a')
     .query({ a: 'b' })
     // This regex is for supertest's random port numbers
     .expect(({ body }) => expect(body.url).toMatch(/http:\/\/127.0.0.1:\d+\/test-base-path\/a\?a=b/)));
 
-it('#url with x-forwarded-host', () =>
+test('#url with x-forwarded-host', () =>
   request(createApp())
     .post('/path')
     .set({ 'x-forwarded-host': 'dash.readme.io' })
     // This regex is for supertest's random port numbers
     .expect(({ body }) => expect(body.url).toMatch('http://dash.readme.io/path')));
 
-it('#httpVersion', () =>
+test('#httpVersion', () =>
   request(createApp())
     .post('/')
     .expect(({ body }) => expect(body.httpVersion).toBe('HTTP/1.1')));
 
-it('#headers', () =>
+test('#headers', () =>
   request(createApp())
     .post('/')
     .set('a', '1')
@@ -470,7 +436,7 @@ it('#headers', () =>
       ]);
     }));
 
-it('#queryString', () =>
+test('#queryString', () =>
   request(createApp())
     .post('/')
     .query({ a: 'b', c: 'd' })
@@ -504,35 +470,35 @@ describe('#postData', () => {
   });
 });
 
-it('should be an empty object if request is a GET', () =>
+test('should be an empty object if request is a GET', () =>
   request(createApp())
     .get('/')
-    .expect(({ body }) => expect(body.postData).toStrictEqual(null)));
+    .expect(({ body }) => expect(body.postData).toBeNull()));
 
-it('should be null if req.body is empty', () =>
+test('should be null if req.body is empty', () =>
   request(createApp())
     .post('/')
-    .expect(({ body }) => expect(body.postData).toStrictEqual(null)));
+    .expect(({ body }) => expect(body.postData).toBeNull()));
 
-it('#text should contain stringified body', () => {
+test('#text should contain stringified body', () => {
   const body = { a: 1, b: 2 };
   return request(createApp())
     .post('/')
     .set('Content-Type', 'application/json')
     .send(body)
     .expect(res => {
-      expect(res.body.postData.text).toBe('{"a":1,"b":2}')
+      expect(res.body.postData.text).toBe('{"a":1,"b":2}');
     });
 });
 
-it('#text should contain stringified body with an unknown format', () => {
+test('#text should contain stringified body with an unknown format', () => {
   const body = 'hellloooo';
   return request(createApp())
     .post('/')
     .set('Content-Type', 'text/html')
     .send(body)
     .expect(res => {
-      expect(res.body.postData.mimeType).toBe('text/html')
-      expect(res.body.postData.text).toBe('hellloooo')
+      expect(res.body.postData.mimeType).toBe('text/html');
+      expect(res.body.postData.text).toBe('hellloooo');
     });
 });

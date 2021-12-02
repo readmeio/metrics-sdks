@@ -1,4 +1,4 @@
-import * as http from "http";
+import * as http from 'http';
 import * as qs from 'querystring';
 
 import request from 'supertest';
@@ -9,22 +9,27 @@ interface TestServerResponse extends http.ServerResponse {
   __bodyCache?: string;
 }
 
-function testResponse(assertion: (res: TestServerResponse) => void, response?: string, resContentType = 'application/json') {
+function testResponse(
+  assertion: (res: TestServerResponse) => void,
+  response?: string,
+  resContentType = 'application/json'
+) {
   const requestListener = function (req: http.IncomingMessage, res: TestServerResponse) {
-    let body = "";
+    let body = '';
     let parsedBody: Record<string, unknown> | undefined;
 
-    req.on('readable', function() {
-      let chunk = req.read();
+    req.on('readable', function () {
+      const chunk = req.read();
       if (chunk) {
         body += chunk;
       }
     });
 
-    req.on('end', function() {
+    req.on('end', function () {
       if (req.headers['content-type'] === 'application/json') {
         parsedBody = JSON.parse(body);
       } else if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         parsedBody = qs.parse(body);
       }
 
@@ -50,9 +55,9 @@ describe('processResponse()', () => {
       it('should strip blacklisted properties in body', () => {
         expect.hasAssertions();
         return testResponse(res => {
-          expect(processResponse(res, res.__bodyCache, { blacklist: ['password', 'apiKey'] }).content.text).toStrictEqual(
-            JSON.stringify({ another: 'Hello world' })
-          );
+          expect(
+            processResponse(res, res.__bodyCache, { blacklist: ['password', 'apiKey'] }).content.text
+          ).toStrictEqual(JSON.stringify({ another: 'Hello world' }));
         }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
       });
 
@@ -68,9 +73,9 @@ describe('processResponse()', () => {
       it('should only send whitelisted properties in body', () => {
         expect.hasAssertions();
         return testResponse(res => {
-          expect(processResponse(res, res.__bodyCache, { whitelist: ['password', 'apiKey'] }).content.text).toStrictEqual(
-            JSON.stringify({ password: '123456', apiKey: 'abcdef' })
-          );
+          expect(
+            processResponse(res, res.__bodyCache, { whitelist: ['password', 'apiKey'] }).content.text
+          ).toStrictEqual(JSON.stringify({ password: '123456', apiKey: 'abcdef' }));
         }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
       });
 
@@ -87,7 +92,10 @@ describe('processResponse()', () => {
         expect.hasAssertions();
         return testResponse(res => {
           expect(
-            processResponse(res, res.__bodyCache, { blacklist: ['password', 'apiKey'], whitelist: ['password', 'apiKey'] }).content.text
+            processResponse(res, res.__bodyCache, {
+              blacklist: ['password', 'apiKey'],
+              whitelist: ['password', 'apiKey'],
+            }).content.text
           ).toStrictEqual(JSON.stringify({ another: 'Hello world' }));
         }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
       });
@@ -97,9 +105,9 @@ describe('processResponse()', () => {
       it('should strip blacklisted properties in headers', () => {
         expect.hasAssertions();
         return testResponse(res => {
-          expect(processResponse(res, res.__bodyCache, { blacklist: ['etag', 'content-type'] }).headers).toStrictEqual(
-            [{ name: 'last-modified', value: 'Thu, 01 Jan 1970 00:00:00 GMT' }]
-          );
+          expect(processResponse(res, res.__bodyCache, { blacklist: ['etag', 'content-type'] }).headers).toStrictEqual([
+            { name: 'last-modified', value: 'Thu, 01 Jan 1970 00:00:00 GMT' },
+          ]);
         });
       });
 
@@ -152,11 +160,15 @@ describe('processResponse()', () => {
     it('should not be applied for plain text bodies', () => {
       expect.hasAssertions();
       const body = 'hello world: dasdsas';
-      return testResponse(res => {
-        expect(processResponse(res, res.__bodyCache, { blacklist: ['password', 'apiKey'] }).content.text).toStrictEqual(
-          JSON.stringify(body)
-        );
-      }, body, 'text/plain');
+      return testResponse(
+        res => {
+          expect(
+            processResponse(res, res.__bodyCache, { blacklist: ['password', 'apiKey'] }).content.text
+          ).toStrictEqual(JSON.stringify(body));
+        },
+        body,
+        'text/plain'
+      );
     });
   });
 
@@ -179,12 +191,12 @@ describe('processResponse()', () => {
         },
         {
           name: 'etag',
-          value: 'ajh4kjthklu3qa4h5tkjlha3214'
+          value: 'ajh4kjthklu3qa4h5tkjlha3214',
         },
         {
           name: 'last-modified',
-          value: 'Thu, 01 Jan 1970 00:00:00 GMT'
-        }
+          value: 'Thu, 01 Jan 1970 00:00:00 GMT',
+        },
       ]);
     });
   });
@@ -202,7 +214,7 @@ describe('processResponse()', () => {
 
     it('#mimeType', () =>
       testResponse(res => {
-        expect(processResponse(res, res.__bodyCache).content.mimeType).toStrictEqual('application/json');
+        expect(processResponse(res, res.__bodyCache).content.mimeType).toBe('application/json');
       }));
 
     it('#text', () => {
@@ -214,9 +226,13 @@ describe('processResponse()', () => {
 
     it('#text should work with plain text body', () => {
       const body = 'hello world: dasdsas';
-      return testResponse(res => {
-        expect(processResponse(res, res.__bodyCache).content.text).toStrictEqual(JSON.stringify(body));
-      }, body, 'text/plain');
+      return testResponse(
+        res => {
+          expect(processResponse(res, res.__bodyCache).content.text).toStrictEqual(JSON.stringify(body));
+        },
+        body,
+        'text/plain'
+      );
     });
   });
 });
