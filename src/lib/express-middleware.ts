@@ -1,10 +1,12 @@
+import type { LogOptions } from './construct-payload';
+import type { GroupingObject, OutgoingLogBody } from './metrics-log';
 import config from '../config';
 import clamp from 'lodash/clamp';
 import * as url from 'url';
 import { v4 as uuidv4 } from 'uuid';
-import { constructPayload, LogOptions } from './construct-payload';
+import { constructPayload } from './construct-payload';
 import { getProjectBaseUrl } from './get-project-base-url';
-import { GroupingObject, metricsAPICall, OutgoingLogBody } from './metrics-log';
+import { metricsAPICall } from './metrics-log';
 
 // Make sure we flush the queue if the process is exited
 let doSend = () => {}; // eslint-disable-line @typescript-eslint/no-empty-function

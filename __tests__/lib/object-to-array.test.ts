@@ -13,7 +13,7 @@ describe('#object-to-array', () => {
       },
       {
         name: 'arr2',
-        value: '3'
+        value: '3',
       },
       {
         name: 'arr3',
@@ -24,7 +24,6 @@ describe('#object-to-array', () => {
     ]);
   });
 });
-
 
 describe('#search-to-array', () => {
   it('should transform a nested object of query parameters into an array', () => {
@@ -37,7 +36,7 @@ describe('#search-to-array', () => {
       },
       {
         name: 'arr2',
-        value: '3'
+        value: '3',
       },
       {
         name: 'arr3[test]',

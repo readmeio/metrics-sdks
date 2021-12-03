@@ -1,11 +1,11 @@
+import type { Entry } from 'har-format';
+import type { LogOptions } from './construct-payload';
+import type { ServerResponse } from 'http';
 import removeProperties from 'lodash/omit';
 import removeOtherProperties from 'lodash/pick';
 
 import { objectToArray } from './object-to-array';
 
-import { Entry } from 'har-format';
-import { LogOptions } from './construct-payload';
-import { ServerResponse } from 'http';
 import { fixHeader } from './process-request';
 
 /**
