@@ -1,15 +1,16 @@
+import type { LogOptions } from './construct-payload';
+import type { Entry } from 'har-format';
+import type { IncomingMessage } from 'http';
 import url, { URL } from 'url';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import pick from 'lodash/pick';
 import merge from 'lodash/merge';
 import * as contentType from 'content-type';
-import { Entry } from 'har-format';
 import * as qs from 'querystring';
 
 import { objectToArray, searchToArray } from './object-to-array';
-import { getProto, LogOptions } from './construct-payload';
-import { IncomingMessage } from 'http';
+import { getProto } from './construct-payload';
 
 /**
  * Ensure we have a string or undefined response for any header.
@@ -36,7 +37,6 @@ export function fixHeader(header: string | number | Array<string>): string | und
  * @returns A redacted string potentially containing the length of the original value, if it was a string
  */
 function redactValue(value: string) {
-  // eslint-disable-next-line sonarjs/no-nested-template-literals
   return `[REDACTED${typeof value === 'string' ? ` ${value.length}` : ''}]`;
 }
 

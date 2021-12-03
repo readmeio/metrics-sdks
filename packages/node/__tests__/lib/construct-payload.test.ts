@@ -1,11 +1,11 @@
+import type { LogOptions, PayloadData } from '../../src/lib/construct-payload';
 import * as http from 'http';
 import request from 'supertest';
-import { v4 as uuidv4 } from 'uuid';
 import { isValidUUIDV4 } from 'is-valid-uuid-v4';
 import packageJson from '../../package.json';
 import * as qs from 'querystring';
 
-import { constructPayload, LogOptions, PayloadData } from '../../src/lib/construct-payload';
+import { constructPayload } from '../../src/lib/construct-payload';
 
 function fixPlatform(platform: string): 'mac' | 'windows' | 'linux' | 'unknown' {
   switch (platform) {
@@ -22,17 +22,17 @@ function fixPlatform(platform: string): 'mac' | 'windows' | 'linux' | 'unknown' 
 
 function createApp(options?: LogOptions, payloadData?: PayloadData) {
   const requestListener = function (req: http.IncomingMessage, res: http.ServerResponse) {
-    let body = "";
+    let body = '';
     let parsedBody: Record<string, unknown> | undefined;
 
-    req.on('readable', function() {
-      let chunk = req.read();
+    req.on('readable', function () {
+      const chunk = req.read();
       if (chunk) {
         body += chunk;
       }
     });
 
-    req.on('end', function() {
+    req.on('end', function () {
       res.setHeader('Content-Type', 'application/json');
 
       if (req.headers['content-type'] === 'application/json') {
@@ -41,10 +41,7 @@ function createApp(options?: LogOptions, payloadData?: PayloadData) {
         parsedBody = qs.parse(body);
       }
 
-      res.end(JSON.stringify(constructPayload(req, res, {
-        ...payloadData,
-        requestBody: parsedBody
-      }, options)));
+      res.end(JSON.stringify(constructPayload(req, res, { ...payloadData, requestBody: parsedBody }, options)));
     });
   };
 
@@ -70,14 +67,15 @@ describe('constructPayload()', () => {
   });
 
   it('should still support id even though it has been deprecated in favor of apiKey', () => {
-    const group = {
+    const groupAlt = {
       apiKey: 'user_api_key',
       label: 'label',
       email: 'email',
       startedDateTime: new Date(),
       responseEndDateTime: new Date(),
     };
-    return request(createApp(undefined, group))
+
+    return request(createApp(undefined, groupAlt))
       .post('/')
       .expect(({ body }) => {
         expect(body.group.id).toBe(group.apiKey);
@@ -136,18 +134,18 @@ describe('constructPayload()', () => {
     return request(createApp(undefined, group))
       .post('/')
       .expect(({ body }) => {
-        expect(new Date(body.request.log.entries[0].startedDateTime).toISOString()).toBe(group.startedDateTime.toISOString());
+        expect(new Date(body.request.log.entries[0].startedDateTime).toISOString()).toBe(
+          group.startedDateTime.toISOString()
+        );
       });
   });
 
   it('#time', () => {
-    const startedDateTime = new Date();
-
     return request(createApp(undefined, group))
       .post('/')
       .expect(({ body }) => {
         expect(typeof body.request.log.entries[0].time).toBe('number');
-        expect(body.request.log.entries[0].time).toStrictEqual(20000);
+        expect(body.request.log.entries[0].time).toBe(20000);
       });
   });
 });

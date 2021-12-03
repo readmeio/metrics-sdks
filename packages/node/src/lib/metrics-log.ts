@@ -1,10 +1,12 @@
-import fetch, { Response } from 'node-fetch';
+import type { Response } from 'node-fetch';
+import type { PayloadData, LogOptions } from './construct-payload';
+import type { ServerResponse, IncomingMessage } from 'http';
+import type { Har } from 'har-format';
+import fetch from 'node-fetch';
 import timeoutSignal from 'timeout-signal';
 import pkg from '../../package.json';
 import config from '../config';
-import { constructPayload, PayloadData, LogOptions } from './construct-payload';
-import { ServerResponse, IncomingMessage } from 'http';
-import { Har } from 'har-format';
+import { constructPayload } from './construct-payload';
 
 export interface GroupingObject {
   /**
