@@ -1,3 +1,35 @@
+## <small>5.0.1 (2021-12-03)</small>
+
+* chore(deps-dev): bump @commitlint/cli from 13.2.0 to 15.0.0 (#327) ([b2bc0d3](https://github.com/readmeio/metrics-sdks/commit/b2bc0d3)), closes [#327](https://github.com/readmeio/metrics-sdks/issues/327)
+* chore(deps-dev): bump @commitlint/config-conventional (#317) ([78068fd](https://github.com/readmeio/metrics-sdks/commit/78068fd)), closes [#317](https://github.com/readmeio/metrics-sdks/issues/317)
+* chore(deps-dev): bump @commitlint/config-conventional (#325) ([c3f7634](https://github.com/readmeio/metrics-sdks/commit/c3f7634)), closes [#325](https://github.com/readmeio/metrics-sdks/issues/325)
+* chore(deps-dev): bump @types/har-format from 1.2.7 to 1.2.8 (#315) ([cf569f4](https://github.com/readmeio/metrics-sdks/commit/cf569f4)), closes [#315](https://github.com/readmeio/metrics-sdks/issues/315)
+* chore(deps-dev): bump @types/jest from 27.0.1 to 27.0.2 (#314) ([6d0d647](https://github.com/readmeio/metrics-sdks/commit/6d0d647)), closes [#314](https://github.com/readmeio/metrics-sdks/issues/314)
+* chore(deps-dev): bump @types/jest from 27.0.2 to 27.0.3 (#331) ([538373b](https://github.com/readmeio/metrics-sdks/commit/538373b)), closes [#331](https://github.com/readmeio/metrics-sdks/issues/331)
+* chore(deps-dev): bump @types/node from 16.11.6 to 16.11.11 (#328) ([23d2795](https://github.com/readmeio/metrics-sdks/commit/23d2795)), closes [#328](https://github.com/readmeio/metrics-sdks/issues/328)
+* chore(deps-dev): bump @types/node from 16.9.1 to 16.11.6 (#313) ([916df92](https://github.com/readmeio/metrics-sdks/commit/916df92)), closes [#313](https://github.com/readmeio/metrics-sdks/issues/313)
+* chore(deps-dev): bump @typescript-eslint/parser from 4.30.0 to 5.3.0 (#311) ([d3c50f6](https://github.com/readmeio/metrics-sdks/commit/d3c50f6)), closes [#311](https://github.com/readmeio/metrics-sdks/issues/311)
+* chore(deps-dev): bump @typescript-eslint/parser from 5.3.0 to 5.5.0 (#333) ([9814c2f](https://github.com/readmeio/metrics-sdks/commit/9814c2f)), closes [#333](https://github.com/readmeio/metrics-sdks/issues/333)
+* chore(deps-dev): bump jest from 27.3.0 to 27.3.1 (#318) ([f4098a9](https://github.com/readmeio/metrics-sdks/commit/f4098a9)), closes [#318](https://github.com/readmeio/metrics-sdks/issues/318)
+* chore(deps-dev): bump jest from 27.3.1 to 27.4.3 (#329) ([d1544fd](https://github.com/readmeio/metrics-sdks/commit/d1544fd)), closes [#329](https://github.com/readmeio/metrics-sdks/issues/329)
+* chore(deps-dev): bump nock from 13.1.3 to 13.1.4 (#316) ([8eb3923](https://github.com/readmeio/metrics-sdks/commit/8eb3923)), closes [#316](https://github.com/readmeio/metrics-sdks/issues/316)
+* chore(deps-dev): bump nock from 13.1.4 to 13.2.1 (#332) ([4e2179e](https://github.com/readmeio/metrics-sdks/commit/4e2179e)), closes [#332](https://github.com/readmeio/metrics-sdks/issues/332)
+* chore(deps-dev): bump prettier from 2.4.1 to 2.5.0 (#326) ([7ed2225](https://github.com/readmeio/metrics-sdks/commit/7ed2225)), closes [#326](https://github.com/readmeio/metrics-sdks/issues/326)
+* chore(deps-dev): bump ts-jest from 27.0.5 to 27.0.7 (#310) ([06d7127](https://github.com/readmeio/metrics-sdks/commit/06d7127)), closes [#310](https://github.com/readmeio/metrics-sdks/issues/310)
+* chore(deps-dev): bump typescript from 4.4.2 to 4.4.4 (#319) ([a00b351](https://github.com/readmeio/metrics-sdks/commit/a00b351)), closes [#319](https://github.com/readmeio/metrics-sdks/issues/319)
+* chore(deps-dev): bump typescript from 4.4.4 to 4.5.2 (#330) ([df24d45](https://github.com/readmeio/metrics-sdks/commit/df24d45)), closes [#330](https://github.com/readmeio/metrics-sdks/issues/330)
+* chore(deps-dev): upgrading eslint and @readme/eslint-config (#335) ([fbf0542](https://github.com/readmeio/metrics-sdks/commit/fbf0542)), closes [#335](https://github.com/readmeio/metrics-sdks/issues/335)
+* chore(deps): bump actions/cache from 2.1.6 to 2.1.7 (#323) ([c7c46db](https://github.com/readmeio/metrics-sdks/commit/c7c46db)), closes [#323](https://github.com/readmeio/metrics-sdks/issues/323)
+* chore(deps): bump actions/setup-node from 2.4.1 to 2.5.0 (#324) ([958b09c](https://github.com/readmeio/metrics-sdks/commit/958b09c)), closes [#324](https://github.com/readmeio/metrics-sdks/issues/324)
+* chore(deps): bump actions/setup-python from 2.2.2 to 2.3.1 (#322) ([5bf5da2](https://github.com/readmeio/metrics-sdks/commit/5bf5da2)), closes [#322](https://github.com/readmeio/metrics-sdks/issues/322)
+* chore(deps): bump node-fetch from 2.6.5 to 2.6.6 (#312) ([521a75e](https://github.com/readmeio/metrics-sdks/commit/521a75e)), closes [#312](https://github.com/readmeio/metrics-sdks/issues/312)
+* feat: dropping support for PHP 7.3, extending support to PHP 8.1 (#334) ([9e4298d](https://github.com/readmeio/metrics-sdks/commit/9e4298d)), closes [#334](https://github.com/readmeio/metrics-sdks/issues/334)
+* fix: suppressing some PHP 8.1 deprecation notices ([c521648](https://github.com/readmeio/metrics-sdks/commit/c521648))
+* fix(node): ensure that unknown request bodies are handled without errors (#321) ([4ef1e0d](https://github.com/readmeio/metrics-sdks/commit/4ef1e0d)), closes [#321](https://github.com/readmeio/metrics-sdks/issues/321)
+* ci: pinning the version of python that's used in ci (#320) ([f9c92d9](https://github.com/readmeio/metrics-sdks/commit/f9c92d9)), closes [#320](https://github.com/readmeio/metrics-sdks/issues/320)
+
+
+
 ## 5.0.0 (2021-10-18)
 
 * chore: bump ruby version ([3825030](https://github.com/readmeio/metrics-sdks/commit/3825030))
