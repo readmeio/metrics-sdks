@@ -1,6 +1,6 @@
 import type { LogOptions } from './construct-payload';
 import type { Entry } from 'har-format';
-import type { IncomingMessage } from 'http';
+import type { Request } from 'express';
 import url, { URL } from 'url';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -119,7 +119,7 @@ function parseRequestBody(body: string, mimeType: string): Record<string, unknow
  * @returns The proper request structure following the HAR format
  */
 export default function processRequest(
-  req: IncomingMessage,
+  req: Request,
   requestBody?: Record<string, unknown> | string,
   options?: LogOptions
 ): Entry['request'] {
@@ -177,7 +177,7 @@ export default function processRequest(
   const host = fixHeader(req.headers['x-forwarded-host']) || req.headers.host;
   // We use a fake host here because we rely on the host header which could be redacted.
   // We only ever use this reqUrl with the fake hostname for the pathname and querystring.
-  const reqUrl = new URL(req.url, `${protocol}://readme.io`);
+  const reqUrl = new URL(req.originalUrl, `${protocol}://readme.io`);
 
   return {
     method: req.method,
