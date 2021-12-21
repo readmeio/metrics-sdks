@@ -108,18 +108,6 @@ describe('#metrics', () => {
     rimraf.sync(cacheDir);
   });
 
-  /* it('should error if missing apiKey', () => {
-    expect(() => {
-      expressMiddleware();
-    }).toThrow('You must provide your ReadMe API key');
-  });
-
-  it('should error if missing grouping function', () => {
-    expect(() => {
-      expressMiddleware('api-key');
-    }).toThrow('You must provide a grouping function');
-  }); */
-
   it('should send a request to the metrics server', () => {
     const apiMock = getReadMeApiMock(1);
     const mock = nock(config.host, {
@@ -150,6 +138,45 @@ describe('#metrics', () => {
       });
   });
 
+  it('express should log the full request url with nested express apps', () => {
+    const apiMock = getReadMeApiMock(1);
+    const mock = nock(config.host, {
+      reqheaders: {
+        'Content-Type': 'application/json',
+        'User-Agent': `${pkg.name}/${pkg.version}`,
+      },
+    })
+      .post('/v1/request', ([body]) => {
+        expect(body.group).toStrictEqual(outgoingGroup);
+        expect(body.request.log.entries[0].request.url).toContain('/test/nested');
+        return true;
+      })
+      .basicAuth({ user: apiKey })
+      .reply(200);
+
+    const app = express();
+    const appNest = express();
+
+    appNest.use(expressMiddleware(apiKey, () => incomingGroup));
+    appNest.get('/nested', (req, res) => {
+      // We're asserting `req.url` to be `/nested` here because the way that Express does contextual route loading
+      // `req.url` won't include the `/test`. The `/test` is only added later internally in Express with `req.originalUrl`.
+      expect(req.url).toBe('/nested');
+      res.sendStatus(200);
+    });
+
+    app.use('/test', appNest);
+
+    return request(app)
+      .get('/test/nested')
+      .expect(200)
+      .expect(res => expect(res).toHaveDocumentationHeader())
+      .then(() => {
+        apiMock.done();
+        mock.done();
+      });
+  });
+
   it('should have access to group(req,res) objects', () => {
     const apiMock = getReadMeApiMock(1);
     const mock = nock(config.host, {
@@ -168,6 +195,7 @@ describe('#metrics', () => {
       .reply(200);
 
     const app = express();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     app.use((req: any, res: any, next) => {
       req.a = 'a';
       res.b = 'b';
