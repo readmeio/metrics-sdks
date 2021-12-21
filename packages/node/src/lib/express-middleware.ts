@@ -97,7 +97,10 @@ export function expressMiddleware(readmeApiKey: string, group: GroupingFunction,
       const groupData = group(req, res);
 
       const payload = constructPayload(
-        req,
+        {
+          ...req,
+          url: req.originalUrl,
+        },
         res,
         {
           ...groupData,

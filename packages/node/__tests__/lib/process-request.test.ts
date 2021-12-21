@@ -4,7 +4,6 @@ import * as http from 'http';
 import processRequest from '../../src/lib/process-request';
 import FormData from 'form-data';
 
-// eslint-disable-next-line default-param-last
 function createApp(reqOptions?: LogOptions, shouldPreParse = false, bodyOverride?) {
   const requestListener = function (req: http.IncomingMessage, res: http.ServerResponse) {
     let body = '';
@@ -470,15 +469,15 @@ describe('#postData', () => {
   });
 });
 
-test('should be an empty object if request is a GET', () =>
+test('should be a undefined if request is a GET', () =>
   request(createApp())
     .get('/')
-    .expect(({ body }) => expect(body.postData).toBeNull()));
+    .expect(({ body }) => expect(body.postData).toBeUndefined()));
 
-test('should be null if req.body is empty', () =>
+test('should be missing if req.body is empty', () =>
   request(createApp())
     .post('/')
-    .expect(({ body }) => expect(body.postData).toBeNull()));
+    .expect(({ body }) => expect(body.postData).toBeUndefined()));
 
 test('#text should contain stringified body', () => {
   const body = { a: 1, b: 2 };
