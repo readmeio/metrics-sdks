@@ -469,7 +469,7 @@ describe('#postData', () => {
   });
 });
 
-test('should be a undefined if request is a GET', () =>
+test('should be undefined if request has no postData', () =>
   request(createApp())
     .get('/')
     .expect(({ body }) => expect(body.postData).toBeUndefined()));
