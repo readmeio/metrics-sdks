@@ -159,6 +159,8 @@ describe('#metrics', () => {
 
     appNest.use(expressMiddleware(apiKey, () => incomingGroup));
     appNest.get('/nested', (req, res) => {
+      // We're asserting `req.url` to be `/nested` here because the way that Express does contextual route loading
+      // `req.url` won't include the `/test`. The `/test` is only added later internally in Express with `req.originalUrl`.
       expect(req.url).toBe('/nested');
       res.sendStatus(200);
     });
