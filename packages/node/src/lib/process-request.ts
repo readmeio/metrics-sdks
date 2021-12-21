@@ -37,7 +37,8 @@ export function fixHeader(header: string | number | Array<string>): string | und
  * @returns A redacted string potentially containing the length of the original value, if it was a string
  */
 function redactValue(value: string) {
-  return `[REDACTED${typeof value === 'string' ? ` ${value.length}` : ''}]`;
+  const redactedVal = typeof value === 'string' ? ` ${value.length}` : '';
+  return `[REDACTED${redactedVal}]`;
 }
 
 /**
@@ -179,7 +180,7 @@ export default function processRequest(
   // We only ever use this reqUrl with the fake hostname for the pathname and querystring.
   const reqUrl = new URL(req.url, `${protocol}://readme.io`);
 
-  return {
+  const requestData = {
     method: req.method,
     url: url.format({
       protocol,
@@ -197,4 +198,11 @@ export default function processRequest(
     headersSize: 0,
     bodySize: 0,
   };
+
+  // At the moment the server doesn't accept null for request bodies. We're opening up support soon, but getting this fix out will be faster.
+  if (requestData.postData === null) {
+    delete requestData.postData;
+  }
+
+  return requestData;
 }
