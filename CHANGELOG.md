@@ -1,3 +1,9 @@
+## <small>5.0.2 (2021-12-21)</small>
+
+* fix: remove null postData, add support for nested express routes (#337) ([6433718](https://github.com/readmeio/metrics-sdks/commit/6433718)), closes [#337](https://github.com/readmeio/metrics-sdks/issues/337)
+
+
+
 ## <small>5.0.1 (2021-12-03)</small>
 
 * chore(deps-dev): bump @commitlint/cli from 13.2.0 to 15.0.0 (#327) ([b2bc0d3](https://github.com/readmeio/metrics-sdks/commit/b2bc0d3)), closes [#327](https://github.com/readmeio/metrics-sdks/issues/327)
