@@ -2,6 +2,8 @@ require "readme/har/response_serializer"
 require "readme/filter"
 
 RSpec.describe Readme::Har::ResponseSerializer do
+  Filter = Readme::Filter
+
   describe "#as_json" do
     it "creates a structure that is valid according the schema" do
       request = build_request

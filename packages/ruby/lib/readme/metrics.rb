@@ -8,10 +8,24 @@ require "readme/http_request"
 require "readme/http_response"
 require "httparty"
 require "logger"
+require "os"
 
 module Readme
   class Metrics
+    def self.platform
+      if OS.windows?
+        "windows"
+      elsif OS.mac?
+        "mac"
+      elsif OS.linux?
+        "linux"
+      else
+        "unknown"
+      end
+    end
+
     SDK_NAME = "Readme.io Ruby SDK"
+    PLATFORM = platform
     DEFAULT_BUFFER_LENGTH = 10
     ENDPOINT = "https://metrics.readme.io/v1/request"
     USER_INFO_KEYS = [:api_key, :label, :email]
