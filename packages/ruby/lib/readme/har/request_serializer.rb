@@ -1,3 +1,4 @@
+require "CGI"
 require "readme/har/collection"
 require "readme/filter"
 
@@ -58,15 +59,31 @@ module Readme
       def request_body
         if @filter.pass_through?
           pass_through_body
-        else
-          # Only JSON allowed for non-pass-through situations. It will raise
-          # if the body can't be parsed as JSON, aborting the request.
+        elsif is_form_urlencoded?
+          form_urlencoded_body
+        elsif is_json?
           json_body
+        else
+          @request.body
         end
+      end
+
+      def is_json?
+        ["application/json", "application/x-json", "text/json", "text/x-json"]
+          .include?(@request.content_type) || @request.content_type.include?("+json")
+      end
+
+      def is_form_urlencoded?
+        @request.content_type == "application/x-www-form-urlencoded"
       end
 
       def json_body
         parsed_body = JSON.parse(@request.body)
+        Har::Collection.new(@filter, parsed_body).to_h.to_json
+      end
+
+      def form_urlencoded_body
+        parsed_body = CGI.parse(@request.body).transform_values(&:first)
         Har::Collection.new(@filter, parsed_body).to_h.to_json
       end
 

@@ -133,6 +133,32 @@ RSpec.describe Readme::Har::RequestSerializer do
 
       expect(json[:url]).to eq "https://www.example.edu/api/foo/bar?id=1&name=joel"
     end
+
+    it "parses multiple json content types" do
+      http_request = build_http_request(
+        content_type: "application/x-json",
+        body: {key1: "value1", key2: "value2"}.to_json
+      )
+
+      request = Readme::Har::RequestSerializer.new(http_request, Readme::Filter::RejectParams.new([]))
+      json = request.as_json
+
+      expect(json.dig(:postData, :text)).to eq http_request.body
+    end
+
+    it "parses form-urlencoded content type" do
+      http_request = build_http_request(
+        content_type: "application/x-www-form-urlencoded",
+        body: "key1=value1&key2=value2",
+        query_params: {},
+        url: "https://example.com/"
+      )
+
+      request = Readme::Har::RequestSerializer.new(http_request, Readme::Filter::RejectParams.new([]))
+      json = request.as_json
+
+      expect(json.dig(:postData, :text)).to eq ({key1: "value1", key2: "value2"}).to_json
+    end
   end
 
   # if overriding `url` to have query parameters make sure to also override
