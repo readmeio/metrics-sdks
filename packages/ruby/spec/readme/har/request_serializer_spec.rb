@@ -123,7 +123,7 @@ RSpec.describe Readme::Har::RequestSerializer do
         content_type: "application/json",
         headers: {
           "X-Forwarded-Proto" => "https",
-          "X-Forwarded-Host" => "www.example.edu",
+          "X-Forwarded-Host" => "www.example.edu"
         },
         body: {key1: "key1", key2: "key2"}.to_json
       )
@@ -157,7 +157,7 @@ RSpec.describe Readme::Har::RequestSerializer do
       request = Readme::Har::RequestSerializer.new(http_request, Readme::Filter::RejectParams.new([]))
       json = request.as_json
 
-      expect(json.dig(:postData, :text)).to eq ({key1: "value1", key2: "value2"}).to_json
+      expect(json.dig(:postData, :text)).to eq {key1: "value1", key2: "value2"}.to_json
     end
   end
 

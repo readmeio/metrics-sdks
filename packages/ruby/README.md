@@ -124,7 +124,7 @@ run YourApp.new
 
 ### Contributing
 
-Ensure you are running the version of ruby specified in the `Gemfile.lock`; use `rvm` to easy manage ruby versions. Run `bundle` to install dependencies and `rake` or `rspec` to make sure tests pass.
+Ensure you are running the version of ruby specified in the `Gemfile.lock`; use `rvm` to easy manage ruby versions. Run `bundle` to install dependencies, `rake` or `rspec` to ensure tests pass, and `bundle exec standardrb` to lint the code.
 
 ## License
 
