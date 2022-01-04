@@ -1,15 +1,21 @@
+require "uuid"
+
 module Readme
   class Payload
-    def initialize(har, user_info, development:)
+    def initialize(har, info, development:)
       @har = har
       # swap api_key for id
-      user_info[:id] = user_info.delete :api_key unless user_info[:api_key].nil?
-      @user_info = user_info
+      info[:id] = info.delete :api_key unless info[:api_key].nil?
+      @log_id = info[:log_id]
+      info.delete :log_id
+      @user_info = info
       @development = development
+      @uuid = UUID.new
     end
 
     def to_json
       {
+        logId: UUID.validate(@log_id) ? @log_id : @uuid.generate,
         group: @user_info,
         clientIPAddress: "1.1.1.1",
         development: @development,
