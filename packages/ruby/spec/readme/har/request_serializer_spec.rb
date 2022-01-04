@@ -116,6 +116,23 @@ RSpec.describe Readme::Har::RequestSerializer do
         expect { serializer.as_json }.to raise_error(JSON::ParserError)
       end
     end
+
+    it "respects forwarded headers" do
+      http_request = build_http_request(
+        url: "http://example.com/api/foo/bar?id=1&name=joel",
+        content_type: "application/json",
+        headers: {
+          "X-Forwarded-Proto" => "https",
+          "X-Forwarded-Host" => "www.example.edu",
+        },
+        body: {key1: "key1", key2: "key2"}.to_json
+      )
+
+      request = Readme::Har::RequestSerializer.new(http_request)
+      json = request.as_json
+
+      expect(json[:url]).to eq "https://www.example.edu/api/foo/bar?id=1&name=joel"
+    end
   end
 
   # if overriding `url` to have query parameters make sure to also override

@@ -4,7 +4,7 @@ require "readme/filter"
 module Readme
   module Har
     class RequestSerializer
-      def initialize(request, filter = Filter::None.new)
+      def initialize(request, filter = Readme::Filter::None.new)
         @request = request
         @filter = filter
       end
@@ -13,7 +13,7 @@ module Readme
         {
           method: @request.request_method,
           queryString: Har::Collection.new(@filter, @request.query_params).to_a,
-          url: @request.url,
+          url: url,
           httpVersion: @request.http_version,
           headers: Har::Collection.new(@filter, @request.headers).to_a,
           cookies: Har::Collection.new(@filter, @request.cookies).to_a,
@@ -24,6 +24,16 @@ module Readme
       end
 
       private
+
+      def url
+        url = URI(@request.url)
+        headers = @request.headers
+        forward_proto = headers["X-Forwarded-Proto"]
+        forward_host = headers["X-Forwarded-Host"]
+        url.host = forward_host if forward_host.instance_of?(String)
+        url.scheme = forward_proto if forward_proto.instance_of?(String)
+        url.to_s
+      end
 
       def postData
         if @request.content_type.nil?
