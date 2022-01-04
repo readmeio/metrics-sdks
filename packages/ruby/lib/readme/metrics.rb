@@ -26,7 +26,7 @@ module Readme
 
     SDK_NAME = "Readme.io Ruby SDK"
     PLATFORM = platform
-    DEFAULT_BUFFER_LENGTH = 10
+    DEFAULT_BUFFER_LENGTH = 1
     ENDPOINT = "https://metrics.readme.io/v1/request"
     USER_INFO_KEYS = [:api_key, :label, :email]
     USER_INFO_KEYS_DEPRECATED = [:id, :label, :email]
