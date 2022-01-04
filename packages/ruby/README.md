@@ -25,26 +25,6 @@ from the environment, or you may hardcode them.
 If you're using Warden-based authentication like Devise, you may fetch the
 current_user for a given request from the environment.
 
-### Batching requests
-
-By default, the middleware will batch requests to the ReadMe API in groups of 10.
-For every 10 requests made to your application, the middleware will make a
-single request to ReadMe. If you wish to override this, provide a
-`buffer_length` option when configuring the middleware.
-
-### Sensitive Data
-
-If you have sensitive data you'd like to prevent from being sent to the Metrics
-API via headers, query params or payload bodies, you can specify a list of keys
-to filter via the `reject_params` option. Key-value pairs matching these keys
-will not be included in the request to the Metrics API.
-
-You are also able to specify a set of `allow_only` which should only be sent through.
-Any header or body values not matching these keys will be filtered out and not
-send to the API.
-
-You may only specify either `reject_params` or `allow_only` keys, not both.
-
 ### SDK Options
 
 Option           | Type             | Description

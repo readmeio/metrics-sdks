@@ -156,8 +156,9 @@ RSpec.describe Readme::Har::RequestSerializer do
 
       request = Readme::Har::RequestSerializer.new(http_request, Readme::Filter::RejectParams.new([]))
       json = request.as_json
+      expected = {key1: "value1", key2: "value2"}.to_json
 
-      expect(json.dig(:postData, :text)).to eq {key1: "value1", key2: "value2"}.to_json
+      expect(json.dig(:postData, :text)).to eq expected
     end
   end
 
