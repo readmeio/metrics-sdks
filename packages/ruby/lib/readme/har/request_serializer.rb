@@ -1,4 +1,4 @@
-require "CGI"
+require "cgi"
 require "readme/har/collection"
 require "readme/filter"
 
