@@ -122,6 +122,10 @@ run YourApp.new
 - [Rack](https://github.com/readmeio/metrics-sdk-racks-sample)
 - [Sinatra](https://github.com/readmeio/metrics-sdk-sinatra-example)
 
+### Contributing
+
+Ensure you are running the version of ruby specified in the `Gemfile.lock`; use `rvm` to easy manage ruby versions. Run `bundle` to install dependencies and `rake` or `rspec` to make sure tests pass.
+
 ## License
 
 [View our license here](https://github.com/readmeio/metrics-sdks/tree/main/packages/ruby/LICENSE)
