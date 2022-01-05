@@ -28,8 +28,6 @@ module Readme
     PLATFORM = platform
     DEFAULT_BUFFER_LENGTH = 1
     ENDPOINT = "https://metrics.readme.io/v1/request"
-    USER_INFO_KEYS = [:api_key, :label, :email]
-    USER_INFO_KEYS_DEPRECATED = [:id, :label, :email]
 
     def self.logger
       @@logger
@@ -148,11 +146,9 @@ module Readme
     end
 
     def user_info_valid?(user_info)
-      sorted_user_info_keys = user_info.keys.sort
       !user_info.nil? &&
         !user_info.values.any?(&:nil?) &&
-        (sorted_user_info_keys === USER_INFO_KEYS.sort ||
-          sorted_user_info_keys === USER_INFO_KEYS_DEPRECATED.sort)
+        user_info.has_key?(:api_key) || user_info.has_key?(:id)
     end
   end
 end
