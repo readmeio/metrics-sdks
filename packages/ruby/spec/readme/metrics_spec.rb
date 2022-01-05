@@ -1,9 +1,14 @@
 require "readme/metrics"
 require "rack/test"
 require "webmock/rspec"
+require "uuid"
 
 RSpec.describe Readme::Metrics do
   include Rack::Test::Methods
+
+  before do
+    @uuid = UUID.new
+  end
 
   before :each do
     WebMock.reset_executed_requests!
@@ -429,6 +434,16 @@ RSpec.describe Readme::Metrics do
           .with { |request| validate_json("readmeMetrics", request.body) }
       }.to raise_error
     end
+
+    it "can ignore sending logs" do
+      def app
+        json_app_with_middleware({}, {ignore: true})
+      end
+
+      post "/api/foo"
+
+      expect(WebMock).not_to have_requested(:post, Readme::Metrics::ENDPOINT)
+    end
   end
 
   def json_app_with_middleware(option_overrides = {}, group_overrides = {})
@@ -449,7 +464,9 @@ RSpec.describe Readme::Metrics do
       group = {
         id: env["CURRENT_USER"].id,
         label: env["CURRENT_USER"].name,
-        email: env["CURRENT_USER"].email
+        email: env["CURRENT_USER"].email,
+        log_id: @uuid.generate,
+        ignore: false
       }.merge(group_overrides)
       group.delete :id unless group[:api_key].nil?
       group
