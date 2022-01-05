@@ -43,6 +43,7 @@ Option              | Required? | Type             | Description
 `label`             | no        | string           | This will be the user's display name in the API Metrics Dashboard, since it's much easier to remember a name than an API key.
 `email`             | no        | string           | Email of the user that is making the call.
 `log_id`            | no        | string           | A UUIDv4 identifier. If not provided this will be automatically generated for you. Providing your own `log_id` is useful if you want to know the URL of the log in advance, i.e. `{your_base_url}/logs/{your_log_id}`.
+`ignore`            | no        | bool           | A flag that when set to `true` will suppress sending the log.
 
 ### Rails
 
