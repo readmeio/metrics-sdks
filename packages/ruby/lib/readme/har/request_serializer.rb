@@ -31,8 +31,8 @@ module Readme
         headers = @request.headers
         forward_proto = headers["X-Forwarded-Proto"]
         forward_host = headers["X-Forwarded-Host"]
-        url.host = forward_host if forward_host.instance_of?(String)
-        url.scheme = forward_proto if forward_proto.instance_of?(String)
+        url.host = forward_host if forward_host.is_a?(String)
+        url.scheme = forward_proto if forward_proto.is_a?(String)
         url.to_s
       end
 
