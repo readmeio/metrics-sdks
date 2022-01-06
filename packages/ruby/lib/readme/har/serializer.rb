@@ -32,7 +32,8 @@ module Readme
       def creator
         {
           name: Readme::Metrics::SDK_NAME,
-          version: Readme::Metrics::VERSION
+          version: Readme::Metrics::VERSION,
+          comment: "#{Readme::Metrics::PLATFORM}/#{RUBY_VERSION}"
         }
       end
 

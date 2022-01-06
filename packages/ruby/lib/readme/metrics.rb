@@ -8,14 +8,26 @@ require "readme/http_request"
 require "readme/http_response"
 require "httparty"
 require "logger"
+require "os"
 
 module Readme
   class Metrics
+    def self.platform
+      if OS.windows?
+        "windows"
+      elsif OS.mac?
+        "mac"
+      elsif OS.linux?
+        "linux"
+      else
+        "unknown"
+      end
+    end
+
     SDK_NAME = "Readme.io Ruby SDK"
-    DEFAULT_BUFFER_LENGTH = 10
+    PLATFORM = platform
+    DEFAULT_BUFFER_LENGTH = 1
     ENDPOINT = "https://metrics.readme.io/v1/request"
-    USER_INFO_KEYS = [:api_key, :label, :email]
-    USER_INFO_KEYS_DEPRECATED = [:id, :label, :email]
 
     def self.logger
       @@logger
@@ -74,7 +86,7 @@ module Readme
         Readme::Metrics.logger.warn "Request or response body MIME type isn't supported for filtering. Omitting request from ReadMe API logging"
       else
         payload = Payload.new(har, user_info, development: @development)
-        @@request_queue.push(payload.to_json)
+        @@request_queue.push(payload.to_json) unless payload.ignore
       end
     end
 
@@ -134,11 +146,9 @@ module Readme
     end
 
     def user_info_valid?(user_info)
-      sorted_user_info_keys = user_info.keys.sort
       !user_info.nil? &&
         !user_info.values.any?(&:nil?) &&
-        (sorted_user_info_keys === USER_INFO_KEYS.sort ||
-          sorted_user_info_keys === USER_INFO_KEYS_DEPRECATED.sort)
+        user_info.has_key?(:api_key) || user_info.has_key?(:id)
     end
   end
 end

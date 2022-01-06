@@ -116,6 +116,50 @@ RSpec.describe Readme::Har::RequestSerializer do
         expect { serializer.as_json }.to raise_error(JSON::ParserError)
       end
     end
+
+    it "respects forwarded headers" do
+      http_request = build_http_request(
+        url: "http://example.com/api/foo/bar?id=1&name=joel",
+        content_type: "application/json",
+        headers: {
+          "X-Forwarded-Proto" => "https",
+          "X-Forwarded-Host" => "www.example.edu"
+        },
+        body: {key1: "key1", key2: "key2"}.to_json
+      )
+
+      request = Readme::Har::RequestSerializer.new(http_request)
+      json = request.as_json
+
+      expect(json[:url]).to eq "https://www.example.edu/api/foo/bar?id=1&name=joel"
+    end
+
+    it "parses multiple json content types" do
+      http_request = build_http_request(
+        content_type: "application/x-json",
+        body: {key1: "value1", key2: "value2"}.to_json
+      )
+
+      request = Readme::Har::RequestSerializer.new(http_request, Readme::Filter::RejectParams.new([]))
+      json = request.as_json
+
+      expect(json.dig(:postData, :text)).to eq http_request.body
+    end
+
+    it "parses form-urlencoded content type" do
+      http_request = build_http_request(
+        content_type: "application/x-www-form-urlencoded",
+        body: "key1=value1&key2=value2",
+        query_params: {},
+        url: "https://example.com/"
+      )
+
+      request = Readme::Har::RequestSerializer.new(http_request, Readme::Filter::RejectParams.new([]))
+      json = request.as_json
+      expected = {key1: "value1", key2: "value2"}.to_json
+
+      expect(json.dig(:postData, :text)).to eq expected
+    end
   end
 
   # if overriding `url` to have query parameters make sure to also override

@@ -24,7 +24,7 @@ RSpec.describe Readme::Har::Serializer do
         double(:rack_response),
         start_time,
         end_time,
-        Filter::None.new
+        Readme::Filter::None.new
       )
       json = JSON.parse(har.to_json)
 
@@ -33,6 +33,7 @@ RSpec.describe Readme::Har::Serializer do
       expect(json.dig("log", "version")).to eq Readme::Har::Serializer::HAR_VERSION
       expect(json.dig("log", "creator", "name")).to eq Readme::Metrics::SDK_NAME
       expect(json.dig("log", "creator", "version")).to eq Readme::Metrics::VERSION
+      expect(json.dig("log", "creator", "comment")).to eq "#{Readme::Metrics::PLATFORM}/#{RUBY_VERSION}"
       expect(json.dig("log", "entries").length).to eq 1
       expect(json.dig("log", "entries", 0, "cache")).to be_empty
       expect(json.dig("log", "entries", 0, "timings", "send")).to eq 0
