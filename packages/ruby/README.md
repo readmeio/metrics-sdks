@@ -29,8 +29,7 @@ current_user for a given request from the environment.
 
 Option           | Type             | Description
 -----------------|------------------|---------
-`reject_params`         | Array of strings | If you have sensitive data you'd like to prevent from being sent to the Metrics API via headers, query params or payload bodies, you can specify a list of keys
-to filter via the `reject_params` option. NOTE: cannot be used in conjunction with `allow_only`. You may only specify either `reject_params` or `allow_only` keys, not both.
+`reject_params`         | Array of strings | If you have sensitive data you'd like to prevent from being sent to the Metrics API via headers, query params or payload bodies, you can specify a list of keys to filter via the `reject_params` option. NOTE: cannot be used in conjunction with `allow_only`. You may only specify either `reject_params` or `allow_only` keys, not both.
 `allow_only`        | Array of strings | The inverse of `reject_params`. If included all parameters but those in this list will be redacted. NOTE: cannot be used in conjunction with `reject_params`. You may only specify either `reject_params` or `allow_only` keys, not both.
 `development`      | bool             | Defaults to `false`. When `true`, the log will be marked as a development log. This is great for separating staging or test data from data coming from customers.
 `buffer_length`     | number           | Defaults to `1`. This value should be a number representing the amount of requests to group up before sending them over the network. Increasing this value may increase performance by batching, but will also delay the time until logs show up in the dashboard given the buffer size needs to be reached in order for the logs to be sent.
