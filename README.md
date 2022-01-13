@@ -45,13 +45,13 @@ dotnet add package ReadMe.Metrics
         context.Items["email"] = "email";
         await next();
     });
-    app.UseMiddleware<ReadmeMetricsLibrary.RequestResponseLogger>();
+    app.UseMiddleware<ReadmeMetricsLib.RequestResponseLogger>();
     ```
 - ## In .Net 5 / .Net 3.1
     Locate and open **Startup.cs** file in your Asp.Net Core Web API / Asp.Net Core Web Application (Usually in root directory). You will see several using namespace statements at the top. Add the following statement:
 
     ```c# 
-    using readmedotnetcore;
+    using ReadmeMetricsLib;
     using Microsoft.AspNetCore.Http;
     ```
 
