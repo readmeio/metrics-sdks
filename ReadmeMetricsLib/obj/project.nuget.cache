@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "dgSpecHash": "VVEW5fudpTAhmk9GfA6RnHFFPVyvFQQbRhQTWs4XRCLa9L+AnmhqLCuny1Ja05przLu+BfHqT7xvb7n0zVKM4g==",
+  "success": true,
+  "projectFilePath": "D:\\Upwork Projects\\Readme Contract\\ReadmeMetrics\\ReadmeMetricsLib\\ReadmeMetricsLib.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Aaryan\\.nuget\\packages\\microsoft.aspnetcore.http.abstractions\\2.2.0\\microsoft.aspnetcore.http.abstractions.2.2.0.nupkg.sha512",
+    "C:\\Users\\Aaryan\\.nuget\\packages\\microsoft.aspnetcore.http.features\\2.2.0\\microsoft.aspnetcore.http.features.2.2.0.nupkg.sha512",
+    "C:\\Users\\Aaryan\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\6.0.0\\microsoft.extensions.configuration.abstractions.6.0.0.nupkg.sha512",
+    "C:\\Users\\Aaryan\\.nuget\\packages\\microsoft.extensions.primitives\\6.0.0\\microsoft.extensions.primitives.6.0.0.nupkg.sha512",
+    "C:\\Users\\Aaryan\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
+    "C:\\Users\\Aaryan\\.nuget\\packages\\restsharp\\106.13.0\\restsharp.106.13.0.nupkg.sha512",
+    "C:\\Users\\Aaryan\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
+    "C:\\Users\\Aaryan\\.nuget\\packages\\system.text.encodings.web\\4.5.0\\system.text.encodings.web.4.5.0.nupkg.sha512"
+  ],
+  "logs": []
+}
