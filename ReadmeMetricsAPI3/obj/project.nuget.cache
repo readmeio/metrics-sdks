@@ -1,9 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "bk3DJHRwR8Tg//lIcjfnqpeToQ9wU2iXmFDNRZuKt0ZEpWPKHI3tvXU7oWCQFlzSL7WDAMW5X1DEueH9pbXscg==",
+  "dgSpecHash": "h/jEIak8z//kGonpvz/1U2zgPceOUhcJNJ8Qv7T+SENpVr+oeZ8zjT97zu1jq8GHCyvbgUHrd3R9FxaEUFoyXA==",
   "success": true,
   "projectFilePath": "D:\\Upwork Projects\\Readme Contract\\ReadmeMetrics\\ReadmeMetricsAPI3\\ReadmeMetricsAPI3.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Aaryan\\.nuget\\packages\\microsoft.aspnetcore.http.abstractions\\2.2.0\\microsoft.aspnetcore.http.abstractions.2.2.0.nupkg.sha512",
+    "C:\\Users\\Aaryan\\.nuget\\packages\\microsoft.aspnetcore.http.features\\2.2.0\\microsoft.aspnetcore.http.features.2.2.0.nupkg.sha512",
     "C:\\Users\\Aaryan\\.nuget\\packages\\microsoft.extensions.apidescription.server\\3.0.0\\microsoft.extensions.apidescription.server.3.0.0.nupkg.sha512",
     "C:\\Users\\Aaryan\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\6.0.0\\microsoft.extensions.configuration.abstractions.6.0.0.nupkg.sha512",
     "C:\\Users\\Aaryan\\.nuget\\packages\\microsoft.extensions.primitives\\6.0.0\\microsoft.extensions.primitives.6.0.0.nupkg.sha512",
@@ -15,6 +17,7 @@
     "C:\\Users\\Aaryan\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\5.6.3\\swashbuckle.aspnetcore.swaggergen.5.6.3.nupkg.sha512",
     "C:\\Users\\Aaryan\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\5.6.3\\swashbuckle.aspnetcore.swaggerui.5.6.3.nupkg.sha512",
     "C:\\Users\\Aaryan\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
+    "C:\\Users\\Aaryan\\.nuget\\packages\\system.text.encodings.web\\4.5.0\\system.text.encodings.web.4.5.0.nupkg.sha512",
     "C:\\Users\\Aaryan\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.22\\microsoft.netcore.app.host.win-x64.3.1.22.nupkg.sha512"
   ],
   "logs": []
