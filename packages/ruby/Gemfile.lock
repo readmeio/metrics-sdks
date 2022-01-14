@@ -3,6 +3,7 @@ PATH
   specs:
     readme-metrics (2.0.0)
       httparty (~> 0.18)
+      uuid (~> 2.3.8)
 
 GEM
   remote: https://rubygems.org/
