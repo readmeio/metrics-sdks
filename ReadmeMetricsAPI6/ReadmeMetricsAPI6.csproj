@@ -14,9 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="ReadmeMetricsLib">
-      <HintPath>..\ReadmeMetricsLib\bin\Debug\netcoreapp3.1\ReadmeMetricsLib.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\Readme\Readme.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using ReadmeMetricsLib;
 
 namespace ReadmeMetricsAPI3
 {
@@ -34,18 +32,17 @@ namespace ReadmeMetricsAPI3
         {
             app.Use(async (context, next) =>
             {
-                HttpRequest req = context.Request;
                 //You can extract apikey from request header by key like authentication, x-api-key as
                 // req.Headers["key"];
                 //Or extract apikey from request body form or x-www-form-urlencoded by key as
                 // req.Form["key"];
 
-                context.Items["apiKey"] = "ajdfjdlkudr09434";
+                context.Items["apiKey"] = context.Request.Headers["key"];
                 context.Items["label"] = "username / company name";
                 context.Items["email"] = "email";
                 await next();
             });
-            app.UseMiddleware<RequestResponseLogger>();
+            app.UseMiddleware<Readme.Metrics>();
 
 
             if (env.IsDevelopment())

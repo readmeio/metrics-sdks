@@ -29,33 +29,9 @@ dotnet add package ReadMe.Metrics
 ## 2. Integration
 
 - ## In .Net 6
-    Open **Program.cs** file and add below code under **var app = builder.Build();** line
-
-    ```c#
-    app.Use(async (context, next) =>
-    {
-        HttpRequest req = context.Request;
-        //You can extract apikey from request header by key like authentication, x-api-key as
-        // req.Headers["key"];
-        //Or extract apikey from request body form or x-www-form-urlencoded by key as
-        // req.Form["key"];
-
-        context.Items["apiKey"] = req.Headers["key"];
-        context.Items["label"] = "username / company name";
-        context.Items["email"] = "email";
-        await next();
-    });
-    app.UseMiddleware<ReadmeMetricsLib.RequestResponseLogger>();
-    ```
+    Open **Program.cs** file in your Asp.Net Core Web API / Asp.Net Core Web Application and add below code under **var app = builder.Build();** line
 - ## In .Net 5 / .Net 3.1
-    Locate and open **Startup.cs** file in your Asp.Net Core Web API / Asp.Net Core Web Application (Usually in root directory). You will see several using namespace statements at the top. Add the following statement:
-
-    ```c# 
-    using ReadmeMetricsLib;
-    using Microsoft.AspNetCore.Http;
-    ```
-
-    Find Configure method and add below code at start:
+    Locate and open **Startup.cs** file in your Asp.Net Core Web API / Asp.Net Core Web Application (Usually in root directory). Find Configure method and add below code at start:
 
     ```c#
     //Below middleware create items for group values
@@ -63,22 +39,20 @@ dotnet add package ReadMe.Metrics
 
     app.Use(async (context, next) =>
     {
-        HttpRequest req = context.Request;
-
         //You can extract apikey from request header by key like authentication, x-api-key as
-        // req.Headers["key"];
+        // context.Request.Headers["key"];
 
         //Or extract apikey from request body form or x-www-form-urlencoded by key as
-        // req.Form["key"];
+        // context.Request.Form["key"];
 
-        context.Items["apiKey"] = req.Headers["key"];
+        context.Items["apiKey"] = context.Request.Headers["key"];
         context.Items["label"] = "username / company name";
         context.Items["email"] = "email";
 
         await next();
     });
     //Below middleware will invoke metrics library
-    app.UseMiddleware<RequestResponseLogger>();
+    app.UseMiddleware<Readme.Metrics>();
     ```
 
 ## 3. Global Configuration

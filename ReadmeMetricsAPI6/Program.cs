@@ -14,18 +14,17 @@ var app = builder.Build();
 
 app.Use(async (context, next) =>
 {
-    HttpRequest req = context.Request;
     //You can extract apikey from request header by key like authentication, x-api-key as
-    // req.Headers["key"];
+    // context.Request.Headers["key"];
     //Or extract apikey from request body form or x-www-form-urlencoded by key as
-    // req.Form["key"];
+    // context.Request.Form["key"];
 
-    context.Items["apiKey"] = req.Headers["key"];
+    context.Items["apiKey"] = context.Request.Headers["key"];
     context.Items["label"] = "username / company name";
     context.Items["email"] = "email";
     await next();
 });
-app.UseMiddleware<ReadmeMetricsLib.RequestResponseLogger>();
+app.UseMiddleware<Readme.Metrics>();
 
 
 
