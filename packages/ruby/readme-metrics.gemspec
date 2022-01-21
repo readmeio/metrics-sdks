@@ -27,4 +27,5 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency "httparty", "~> 0.18"
   spec.add_runtime_dependency "uuid", "~> 2.3.8"
+  spec.add_runtime_dependency "os", "~> 1.1.4"
 end

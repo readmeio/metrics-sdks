@@ -1,8 +1,9 @@
 PATH
   remote: .
   specs:
-    readme-metrics (2.0.0)
+    readme-metrics (2.0.1)
       httparty (~> 0.18)
+      os (~> 1.1.4)
       uuid (~> 2.3.8)
 
 GEM
