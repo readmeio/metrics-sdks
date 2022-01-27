@@ -108,7 +108,7 @@ Option           | Type             | Description
 `development`      | bool             | Defaults to `false`. When `true`, the log will be marked as a development log. This is great for separating staging or test data from data coming from customers.
 `fireAndForget`    | bool             | Defaults to `true`. When `false`, the server will wait for the response from the metrics call. This will be slower, but the response is useful in debugging problems.
 `bufferLength`     | number           | Defaults to `1`. This value should be a number representing the amount of requests to group up before sending them over the network. Increasing this value will increase performance but delay the time until logs show up in the dashboard. The default value is `1`.
-`baseLogUrl`       | string           | This value is used when building the `x-documentation-url` header (see docs [below](#documentation-url)). It is your ReadMe documentation's base URL (e.g. `https://example.readme.com`). If not provided, we will make one API call a day to determine your base URL (more info in [Documentation URL](#documentation-url). If provided, we will use that value and never look it up automatically.
+`baseLogUrl`       | string           | This value is used when building the `x-documentation-url` header (see docs [below](#documentation-url)). It is your ReadMe documentation's base URL (e.g. `https://example.readme.io`). If not provided, we will make one API call a day to determine your base URL (more info in [Documentation URL](#documentation-url).  If provided, we will use that value and never look it up automatically. **Note:** <subdomain>.readme.com will not work. Make sure to use <subdomain>.readme.io, or your custom hostname.
 
 Example:
 ```javascript
@@ -117,7 +117,7 @@ Example:
   development: true,
   fireAndForget: true,
   bufferLength: 1,
-  baseLogUrl: "https://example.readme.com"
+  baseLogUrl: "https://example.readme.io"
 }
 ```
 
