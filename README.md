@@ -20,7 +20,7 @@ With ReadMe's Metrics API your team can get deep insights into your API's usage.
 dotnet add package Readme.Metrics
 ```
 
-2. Find the file that creates your `app`. This is often in a `Startup.cs` or `Program.cs` file depending on your version of .NET, and is located in your root directory. Find the `Configure` method, and add the following line before the routing is enabled. For full details on each option, read more about the [Group Object](#group-object).
+2. Find the file that creates your `app`. This is often in a `Startup.cs` or `Program.cs` file depending on your version of .NET, and is located in your root directory. Find the where your `app` is created, and add the following line before the routing is enabled. For full details on each option, read more about the [Group Object](#group-object).
 
 
 ```cs
@@ -53,12 +53,15 @@ app.UseMiddleware<Readme.Metrics>();
         "allowList": [ "<Any parameters you want allowed in your log. See docs>" ],
         "denyList": [ "<Any parameters you want removed from your log. See docs>"],
         "development": true, // Where to bucket your data, development or production
-        "baseLogUrl": "https://example.readme.com" // Your ReadMe website's base url
+        "baseLogUrl": "https://example.readme.io" // Your ReadMe website's base url. For now, make sure to use the readme.io domain or your custom subdomain.
     }
 }
 ```
 
-For a full example take a look at our example project: https://github.com/readmeio/metrics-sdks-dotnet/blob/6794e99c86e608f90a8e6c6d1357bd73b4d1de75/RequestResponseLoggingMiddlewareAPI/Startup.cs#L23
+For a full example take a look at our example projects:
+- [.NET Core 3.1](https://github.com/readmeio/metrics-sdks-dotnet/blob/04987ee32bcdcd0339736bc645475d05df5237ee/ReadmeMetricsAPI3/Startup.cs#L33-L45)
+- [.NET Core 5](https://github.com/readmeio/metrics-sdks-dotnet/blob/04987ee32bcdcd0339736bc645475d05df5237ee/ReadmeMetricsAPI5/Startup.cs#L33-L45)
+- [.NET Core 6](https://github.com/readmeio/metrics-sdks-dotnet/blob/04987ee32bcdcd0339736bc645475d05df5237ee/ReadmeMetricsAPI6/Program.cs#L15-L27)
 
 ## ASP.NET Core Middleware Reference
 ### Group Object
@@ -102,7 +105,7 @@ This is an optional object used to restrict traffic being sent to readme server 
 `denyList`         | Array of strings | An array of parameter names that will be redacted from the query parameters, request body (when JSON or form-encoded), response body (when JSON) and headers. For nested request parameters use dot notation (e.g. `a.b.c` to redact the field `c` within `{ a: { b: { c: 'foo' }}}`).
 `allowList`        | Array of strings | If included, `denyList` will be ignored and all parameters but those in this list will be redacted.
 `development`      | bool             | Defaults to `false`. When `true`, the log will be marked as a development log. This is great for separating staging or test data from data coming from customers.
-`baseLogUrl`       | string           | This value is used when building the `x-documentation-url` header (see docs [below](#documentation-url)). It is your ReadMe documentation's base URL (e.g. `https://example.readme.com`). If not provided, we will make one API call a day to determine your base URL (more info in [Documentation URL](#documentation-url). If provided, we will use that value and never look it up automatically.
+`baseLogUrl`       | string           | This value is used when building the `x-documentation-url` header (see docs [below](#documentation-url)). It is your ReadMe documentation's base URL (e.g. `https://example.readme.io`). If not provided, we will make one API call a day to determine your base URL (more info in [Documentation URL](#documentation-url). **Note:** <subdomain>.readme.com will not work. Make sure to use <subdomain>.readme.io, or your custom hostname.
 
 Example:
 ```json
@@ -111,7 +114,7 @@ Example:
     "options": {
         "denyList": ["password", "secret"],
         "development": true,
-        "baseLogUrl": "https://example.readme.com"
+        "baseLogUrl": "https://example.readme.io"
     }
 }
 ```

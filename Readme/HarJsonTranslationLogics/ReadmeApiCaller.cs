@@ -25,7 +25,6 @@ namespace Readme.HarJsonTranslationLogics
                 var request = new RestRequest(Method.POST);
                 request.AddHeader("Content-Type", "application/json");
                 string apiKey = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(_apiKey + ":"));
-                //Basic V3RCbllRYWg4Vzh0TWdmOEVoV1NsQlVTSFN0V3kzTHc6
                 request.AddHeader("Authorization", apiKey);
                 request.AddParameter("application/json", _harJsonObject, ParameterType.RequestBody);
                 IRestResponse response = await client.ExecuteAsync(request);
@@ -34,7 +33,7 @@ namespace Readme.HarJsonTranslationLogics
             catch (Exception)
             {
                 return null;
-            } 
+            }
         }
     }
 }
