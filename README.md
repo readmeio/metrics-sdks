@@ -26,11 +26,9 @@ dotnet add package Readme.Metrics
 ```cs
 app.Use(async (context, next) =>
 {
-    HttpRequest req = context.Request;
-
-    context.Items["apiKey"] = <Extract API users API key from the request>
-    context.Items["label"] = <Extract API users display name from the request>
-    context.Items["email"] = <Extract API users email address from the request>
+    context.Items["apiKey"] = <Extract API users API key from the context.Request>
+    context.Items["label"] = <Extract API users display name from the context.Request>
+    context.Items["email"] = <Extract API users email address from the context.Request>
 
     await next();
 });
