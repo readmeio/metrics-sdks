@@ -286,6 +286,7 @@ class Metrics
                 $body = $this->excludeDataNotInAllowlist($body);
             }
         } else {
+            /** @psalm-suppress ReservedWord */
             $body = $response->getContent();
         }
 
