@@ -40,8 +40,8 @@ jobs:
       - name: Check code standards
         run: composer run-script lint
 
-      - name: Execute static analysis
-        run: composer run-script psalm
+      # - name: Execute static analysis
+      #   run: composer run-script psalm
 
       - name: Run tests
         run: composer run-script phpunit
@@ -82,8 +82,8 @@ jobs:
       - name: Check code standards
         run: composer run-script lint
 
-      - name: Execute static analysis
-        run: composer run-script psalm
+    #  - name: Execute static analysis
+    #    run: composer run-script psalm
 
       - name: Run tests
         run: composer run-script phpunit
