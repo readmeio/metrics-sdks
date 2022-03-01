@@ -3,7 +3,7 @@ name: php
 on: [push]
 
 jobs:
-test74:
+  test74:
     runs-on: ubuntu-latest
     defaults:
       run:
