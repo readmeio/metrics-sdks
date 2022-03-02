@@ -7,6 +7,7 @@ module.exports = {
     },
   },
   globalSetup: '<rootDir>/__tests__/jest.setup.js',
+  modulePathIgnorePatterns: ['<rootDir>/dist'],
   preset: 'ts-jest',
   testEnvironment: 'node',
   testMatch: ['**/__tests__/**/(*.)+(spec|test).[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
