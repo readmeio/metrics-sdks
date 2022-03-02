@@ -18,7 +18,7 @@ import { getProto } from './construct-payload';
  * @param header
  * @returns
  */
-export function fixHeader(header: string | number | Array<string>): string | undefined {
+export function fixHeader(header: string | number | string[]): string | undefined {
   if (header === undefined) {
     return undefined;
   }

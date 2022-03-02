@@ -38,10 +38,10 @@ export interface OutgoingLogBody {
 
 export interface LogResponse {
   response?: Response;
-  ids: string | Array<string>;
+  ids: string | string[];
 }
 
-function getLogIds(body: OutgoingLogBody | Array<OutgoingLogBody>): string | Array<string> {
+function getLogIds(body: OutgoingLogBody | OutgoingLogBody[]): string | string[] {
   if (Array.isArray(body)) {
     return body.map(value => value._id);
   }
@@ -51,7 +51,7 @@ function getLogIds(body: OutgoingLogBody | Array<OutgoingLogBody>): string | Arr
 
 export function metricsAPICall(
   readmeAPIKey: string,
-  body: Array<OutgoingLogBody>,
+  body: OutgoingLogBody[],
   fireAndForget = false
 ): Promise<LogResponse> {
   const signal = timeoutSignal(config.timeout);

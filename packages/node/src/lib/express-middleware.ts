@@ -61,7 +61,7 @@ export function expressMiddleware(readmeApiKey: string, group: GroupingFunction,
   const requestTimeout = config.timeout;
   const encodedApiKey = Buffer.from(`${readmeApiKey}:`).toString('base64');
   let baseLogUrl = options.baseLogUrl || undefined;
-  let queue: Array<OutgoingLogBody> = [];
+  let queue: OutgoingLogBody[] = [];
 
   return async (req, res, next) => {
     if (baseLogUrl === undefined) {
