@@ -31,9 +31,9 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
 
-      # Installing a specific version of Laravel will force us to compatible versions of `illuminate/http` and
-      # `illuminate/support`. If we didn't do this step then we'd always only ever test on the latest versions of those
-      # two packages.
+      # Installing a specific version of Laravel will force us to use compatible versions of
+      # `illuminate/http` and `illuminate/support`. If we didn't do this step then we'd always only
+      # ever test on the latest versions of those two packages.
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
@@ -76,9 +76,9 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
 
-      # Installing a specific version of Laravel will force us to compatible versions of `illuminate/http` and
-      # `illuminate/support`. If we didn't do this step then we'd always only ever test on the latest versions of those
-      # two packages.
+      # Installing a specific version of Laravel will force us to use compatible versions of
+      # `illuminate/http` and `illuminate/support`. If we didn't do this step then we'd always only
+      # ever test on the latest versions of those two packages.
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
