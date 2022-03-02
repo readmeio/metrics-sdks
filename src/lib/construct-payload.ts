@@ -21,12 +21,12 @@ export interface LogOptions {
   /**
    * An array of values to redact from the incoming and outgoing headers, parameters and body
    */
-  denylist?: Array<string>;
+  denylist?: string[];
 
   /**
    * @deprecated use denylist instead
    */
-  blacklist?: Array<string>;
+  blacklist?: string[];
 
   /**
    * An array of values to include in the incoming and outgoing headers, parameters and body.
@@ -34,12 +34,12 @@ export interface LogOptions {
    *
    * If set, the denylist will be ignored.
    */
-  allowlist?: Array<string>;
+  allowlist?: string[];
 
   /**
    * @deprecated use allowList instead
    */
-  whitelist?: Array<string>;
+  whitelist?: string[];
 
   /**
    * If true, the logs will be marked as development logs
