@@ -15,9 +15,9 @@
   ],
   "require": {
     "php": "^7.4 | ^8.0",
-    "illuminate/http": "^6.8 | ^7.0 | ^8.0",
-    "illuminate/support": "^6.8 | ^7.0 | ^8.0",
-    "ocramius/package-versions": "^1.4",
+    "illuminate/http": "^6.8 | ^7.0 | ^8.0 | ^9.0",
+    "illuminate/support": "^6.8 | ^7.0 | ^8.0 | ^9.0",
+    "ocramius/package-versions": "^1.4 | ^2.5",
     "ramsey/uuid": "^3.7 | ^4.0",
     "composer/composer": "^2.0",
     "guzzlehttp/guzzle": "^7.0"
