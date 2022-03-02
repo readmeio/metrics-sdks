@@ -14,9 +14,8 @@ jobs:
       matrix:
         php: [8.0, 8.1]
         laravel: [6.*, 7.*, 8.*, 9.*]
-        dependency-version: [prefer-lowest, prefer-stable]
 
-    name: build (${{ matrix.php }} w/ Laravel ${{ matrix.laravel }} @${{ matrix.dependency-version }})
+    name: build (${{ matrix.php }} w/ Laravel ${{ matrix.laravel }}
 
     steps:
       - uses: actions/checkout@v2.3.4
@@ -25,17 +24,20 @@ jobs:
         uses: actions/cache@v2.1.7
         with:
           path: ~/.composer/cache/files
-          key: dependencies-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-${{ matrix.dependency-version }}composer-${{ hashFiles('composer.json') }}
+          key: dependencies-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
 
+      # Installing a specific version of Laravel will force us to compatible versions of `illuminate/http` and
+      # `illuminate/support`. If we didn't do this step then we'd always only ever test on the latest versions of those
+      # two packages.
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
-          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
+          composer update --prefer-stable --prefer-dist --no-interaction --no-suggest
 
       - name: Check code standards
         run: composer run-script lint
@@ -57,9 +59,8 @@ jobs:
       matrix:
         php: [7.4]
         laravel: [6.*, 7.*, 8.*]
-        dependency-version: [prefer-lowest, prefer-stable]
 
-    name: build (${{ matrix.php }} w/ Laravel ${{ matrix.laravel }} @${{ matrix.dependency-version }})
+    name: build (${{ matrix.php }} w/ Laravel ${{ matrix.laravel }}
 
     steps:
       - uses: actions/checkout@v2.3.4
@@ -68,17 +69,20 @@ jobs:
         uses: actions/cache@v2.1.7
         with:
           path: ~/.composer/cache/files
-          key: dependencies-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-${{ matrix.dependency-version }}composer-${{ hashFiles('composer.json') }}
+          key: dependencies-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
 
+      # Installing a specific version of Laravel will force us to compatible versions of `illuminate/http` and
+      # `illuminate/support`. If we didn't do this step then we'd always only ever test on the latest versions of those
+      # two packages.
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
-          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
+          composer update --prefer-stable --prefer-dist --no-interaction --no-suggest
 
       - name: Check code standards
         run: composer run-script lint
