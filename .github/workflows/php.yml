@@ -46,7 +46,7 @@ jobs:
       - name: Run tests
         run: composer run-script phpunit
 
-  test-php@7.4:
+  test-php74:
     runs-on: ubuntu-latest
     defaults:
       run:
