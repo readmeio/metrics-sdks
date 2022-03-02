@@ -1,3 +1,19 @@
+## 5.1.0 (2022-03-02)
+
+* chore: bump ruby sdk version (#352) ([f1601a0](https://github.com/readmeio/metrics-sdks/commit/f1601a0)), closes [#352](https://github.com/readmeio/metrics-sdks/issues/352)
+* chore: update gem to 2.0.1 and add os runtime dep (#355) ([69d60d9](https://github.com/readmeio/metrics-sdks/commit/69d60d9)), closes [#355](https://github.com/readmeio/metrics-sdks/issues/355)
+* chore(deps): bump actions/checkout from 2 to 3 (#366) ([f60e5bf](https://github.com/readmeio/metrics-sdks/commit/f60e5bf)), closes [#366](https://github.com/readmeio/metrics-sdks/issues/366)
+* chore(deps): bump actions/setup-node from 2.5.0 to 3 (#368) ([4722c79](https://github.com/readmeio/metrics-sdks/commit/4722c79)), closes [#368](https://github.com/readmeio/metrics-sdks/issues/368)
+* chore(deps): bump actions/setup-python from 2.3.1 to 3 (#367) ([0ab7101](https://github.com/readmeio/metrics-sdks/commit/0ab7101)), closes [#367](https://github.com/readmeio/metrics-sdks/issues/367)
+* chore(deps): bump django from 3.2.5 to 3.2.12 in /packages/python (#364) ([95ef499](https://github.com/readmeio/metrics-sdks/commit/95ef499)), closes [#364](https://github.com/readmeio/metrics-sdks/issues/364)
+* chore(deps): upgrading node pkg dependencies (#377) ([c9c3e1f](https://github.com/readmeio/metrics-sdks/commit/c9c3e1f)), closes [#377](https://github.com/readmeio/metrics-sdks/issues/377)
+* fix(php): update http, support and package-versions to ensure this can run with laravel 9 (#374) ([8ac5b08](https://github.com/readmeio/metrics-sdks/commit/8ac5b08)), closes [#374](https://github.com/readmeio/metrics-sdks/issues/374)
+* fix(readme): clarify that the base log url has to be readme.io, not readme.com (#357) ([2fa8edb](https://github.com/readmeio/metrics-sdks/commit/2fa8edb)), closes [#357](https://github.com/readmeio/metrics-sdks/issues/357)
+* Specify the uuid gem dependency (#353) ([44171f4](https://github.com/readmeio/metrics-sdks/commit/44171f4)), closes [#353](https://github.com/readmeio/metrics-sdks/issues/353)
+* feat: Ruby SDK Improvements (#350) ([50267ff](https://github.com/readmeio/metrics-sdks/commit/50267ff)), closes [#350](https://github.com/readmeio/metrics-sdks/issues/350) [#351](https://github.com/readmeio/metrics-sdks/issues/351)
+
+
+
 ## <small>5.0.2 (2021-12-21)</small>
 
 * fix: remove null postData, add support for nested express routes (#337) ([6433718](https://github.com/readmeio/metrics-sdks/commit/6433718)), closes [#337](https://github.com/readmeio/metrics-sdks/issues/337)
