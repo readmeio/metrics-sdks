@@ -122,3 +122,13 @@ With the middleware loaded, all requests that funneled through it will receive a
 
 Make sure to supply a `baseLogUrl` option into your readme settings, which should evaluate to the public-facing URL of your ReadMe project.
 
+## Troubleshooting
+1. If you have the `development` flag set in your configuration, you can only view these logs on your dashboard (https://dash.readme.com/project/{your_project}/v1.0/overview with your subdomain instead of `{your_project}`) by clicking the gear icon in the top right and toggling on "Development Data".
+2. If you're still having issues, write into support with the following information:
+    - The version of .NET you are using.
+    - The value of the `x-documentation-url` header that is returned from calls to your API, or the GUID generated for your log.
+    
+    Additionally, it would be useful to include:
+    - Any other config values you are using.
+    - The Method, URL, Query Parameters, Request Body and Headers of the API call you are trying to log.
+    - The response of the API call to the metrics server, i.e. the value of `response` on this line: https://github.com/readmeio/metrics-sdks-dotnet/blob/d849f12d33277870f846c974bf0eeed27788f3d8/Readme/HarJsonTranslationLogics/ReadmeApiCaller.cs#L30.
