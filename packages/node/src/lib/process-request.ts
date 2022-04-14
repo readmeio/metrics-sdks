@@ -178,12 +178,15 @@ export default function processRequest(
   const host = fixHeader(req.headers['x-forwarded-host']) || req.headers.host;
   // We use a fake host here because we rely on the host header which could be redacted.
   // We only ever use this reqUrl with the fake hostname for the pathname and querystring.
-  const reqUrl = new URL(req.url, `${protocol}://readme.io`);
+  const reqUrl = new URL(req.url, `https://readme.io`);
 
   const requestData = {
     method: req.method,
     url: url.format({
-      protocol,
+      // Handle cases where some reverse proxies put two protocols into x-forwarded-proto
+      // This line does the following: "https,http" -> "https"
+      // https://github.com/readmeio/metrics-sdks/issues/378
+      protocol: protocol.split(',')[0],
       host,
       pathname: reqUrl.pathname,
       // Search includes the leading questionmark, format assumes there isn't one, so we trim that off.
