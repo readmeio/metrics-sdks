@@ -179,3 +179,24 @@ MetricsApiConfig(
 | buffer_length          | **default: 10** Sets the number of API calls that should be recieved before the requests are sent to ReadMe. |
 | allowed_http_hosts     | A list of HTTP hosts which should be logged to ReadMe. If this is present, a request will only be sent to ReadMe if its Host header matches one of the allowed hosts. |
 | timeout                | Timeout (in seconds) for calls back to the ReadMe Metrics API. Default 3 seconds. |
+
+## Development
+
+### Install dependencies:
+
+```sh
+# https://pypi.org/project/pipx/
+brew install pipx
+
+# https://virtualenv.pypa.io/en/latest/installation.html#via-pipx
+pipx install virtualenv
+# Create a virtual environment for dependencies to be installed into
+virtualenv venv
+
+# Go inside of the virtual environment
+# https://www.freecodecamp.org/news/how-to-manage-python-dependencies-using-virtual-environments/
+source ./venv/bin/activate
+
+# Then finally install dependencies
+pip install -r requirements.txt
+```
