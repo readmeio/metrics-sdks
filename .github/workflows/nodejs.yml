@@ -11,7 +11,10 @@ jobs:
 
     strategy:
       matrix:
-       node-version: [12.x, 14.x, 16.x]
+        # node 16.14.2 ships with a buggy version of npm 🤷‍♂️
+        # https://github.com/nodejs/node/issues/42397
+        # TODO revert this back to 16.x when node pushes a new version
+        node-version: [12.x, 14.x, 16.14.0]
 
     steps:
       - uses: actions/checkout@v3
