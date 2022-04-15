@@ -1,4 +1,4 @@
-black==20.8b1
+black==22.3.0
 Django==3.2.12
 Flask==2.0.1
 pytest-mock==3.6.1
