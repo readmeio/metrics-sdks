@@ -402,6 +402,13 @@ test('#url protocol x-forwarded-proto', () =>
     // This regex is for supertest's random port numbers
     .expect(({ body }) => expect(body.url).toMatch(/^https/)));
 
+test('#url protocol x-forwarded-proto multiple', () =>
+  request(createApp())
+    .post('/')
+    .set('x-forwarded-proto', 'https,http')
+    // This regex is for supertest's random port numbers
+    .expect(({ body }) => expect(body.url).toMatch(/^https:\/\/127.0.0.1/)));
+
 test('#url-basepath', () =>
   request(createApp())
     .post('/test-base-path/a')
