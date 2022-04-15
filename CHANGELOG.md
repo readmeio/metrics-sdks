@@ -1,3 +1,13 @@
+## <small>5.1.1 (2022-04-15)</small>
+
+* fix: python CI (upgrade black to 22.3.0) and node CI (pin node.js to 16.14.0) (#393) ([f34d340](https://github.com/readmeio/metrics-sdks/commit/f34d340)), closes [#393](https://github.com/readmeio/metrics-sdks/issues/393) [/github.com/psf/black/issues/2964#issuecomment-1080974737](https://github.com//github.com/psf/black/issues/2964/issues/issuecomment-1080974737)
+* fix: x-forwarded-proto header parsing (#392) ([4f6b49b](https://github.com/readmeio/metrics-sdks/commit/4f6b49b)), closes [#392](https://github.com/readmeio/metrics-sdks/issues/392)
+* chore: move dotnet repo into packages/dotnet (#391) ([d6ee495](https://github.com/readmeio/metrics-sdks/commit/d6ee495)), closes [#391](https://github.com/readmeio/metrics-sdks/issues/391) [#2](https://github.com/readmeio/metrics-sdks/issues/2)
+* chore(deps-dev): bump ts-jest from 27.1.3 to 27.1.4 (#382) ([496ffac](https://github.com/readmeio/metrics-sdks/commit/496ffac)), closes [#382](https://github.com/readmeio/metrics-sdks/issues/382)
+* chore(deps-dev): bump typescript from 4.6.2 to 4.6.3 (#381) ([e9c6e41](https://github.com/readmeio/metrics-sdks/commit/e9c6e41)), closes [#381](https://github.com/readmeio/metrics-sdks/issues/381)
+
+
+
 ## 5.1.0 (2022-03-02)
 
 * chore: bump ruby sdk version (#352) ([f1601a0](https://github.com/readmeio/metrics-sdks/commit/f1601a0)), closes [#352](https://github.com/readmeio/metrics-sdks/issues/352)
