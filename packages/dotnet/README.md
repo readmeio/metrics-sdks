@@ -132,3 +132,4 @@ Make sure to supply a `baseLogUrl` option into your readme settings, which shoul
     - Any other config values you are using.
     - The Method, URL, Query Parameters, Request Body and Headers of the API call you are trying to log.
     - The response of the API call to the metrics server, i.e. the value of `response` on this line: https://github.com/readmeio/metrics-sdks-dotnet/blob/d849f12d33277870f846c974bf0eeed27788f3d8/Readme/HarJsonTranslationLogics/ReadmeApiCaller.cs#L30.
+
