@@ -5,9 +5,7 @@ set -x
 CURRENT_BRANCH="main"
 
 function split() {
-    # https://github.com/splitsh/lite
-    SHA1=`./bin/splitsh-lite --prefix=$1`
-    git push $2 "$SHA1:refs/heads/$CURRENT_BRANCH" -f
+    git subtree push --prefix $1 $2 main
 }
 
 function remote() {
