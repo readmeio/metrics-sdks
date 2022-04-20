@@ -11,13 +11,9 @@ jobs:
 
     strategy:
       matrix:
-        # node 16.14.2 ships with a buggy version of npm 🤷‍♂️
-        # https://github.com/nodejs/node/issues/42397
-        # TODO revert this back to 16.x when node pushes a new version
         node-version:
-          - 12
           - 14
-          - 16.14.0
+          - 16
           - 18
 
     steps:
@@ -25,6 +21,12 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+
+      # Node 14 still ships with npm@6 so for compatibility reasons we're upping
+      # this to match everything else.
+      - name: Install npm@8
+        if: matrix.node-version == '14'
+        run: npm install -g npm@8
 
       - run: npm ci
       - run: npm test
