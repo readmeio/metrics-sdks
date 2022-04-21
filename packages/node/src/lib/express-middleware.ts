@@ -129,7 +129,7 @@ export function expressMiddleware(readmeApiKey: string, group: GroupingFunction,
       queue.push(payload);
       if (queue.length >= bufferLength) doSend();
 
-      cleanup(); // eslint-disable-line no-use-before-define
+      cleanup(); // eslint-disable-line @typescript-eslint/no-use-before-define
     }
 
     function cleanup() {
