@@ -1,3 +1,21 @@
+## <small>5.1.2 (2022-04-21)</small>
+
+* feat: adding support for node 18, dropping node 12 (#406) ([2d109b1](https://github.com/readmeio/metrics-sdks/commit/2d109b1)), closes [#406](https://github.com/readmeio/metrics-sdks/issues/406) [/github.com/npm/cli/issues/1905#issuecomment-725686340](https://github.com//github.com/npm/cli/issues/1905/issues/issuecomment-725686340)
+* fix: update codeql analysis to run on PRs to main ([284a420](https://github.com/readmeio/metrics-sdks/commit/284a420))
+* chore(deps-dev): bump @commitlint/cli from 15.0.0 to 16.2.3 (#389) ([623cb7c](https://github.com/readmeio/metrics-sdks/commit/623cb7c)), closes [#389](https://github.com/readmeio/metrics-sdks/issues/389)
+* chore(deps-dev): bump @commitlint/config-conventional (#388) ([8c6d498](https://github.com/readmeio/metrics-sdks/commit/8c6d498)), closes [#388](https://github.com/readmeio/metrics-sdks/issues/388)
+* chore(deps-dev): bump @types/node from 16.11.11 to 17.0.24 (#396) ([761337f](https://github.com/readmeio/metrics-sdks/commit/761337f)), closes [#396](https://github.com/readmeio/metrics-sdks/issues/396)
+* chore(deps-dev): bump eslint from 8.10.0 to 8.13.0 (#397) ([75834b3](https://github.com/readmeio/metrics-sdks/commit/75834b3)), closes [#397](https://github.com/readmeio/metrics-sdks/issues/397)
+* chore(deps-dev): bump express from 4.17.1 to 4.17.3 (#385) ([918cfc9](https://github.com/readmeio/metrics-sdks/commit/918cfc9)), closes [#385](https://github.com/readmeio/metrics-sdks/issues/385)
+* chore(deps-dev): bump is-valid-uuid-v4 from 1.2.1 to 1.2.2 (#386) ([7b0b6ae](https://github.com/readmeio/metrics-sdks/commit/7b0b6ae)), closes [#386](https://github.com/readmeio/metrics-sdks/issues/386)
+* chore(deps-dev): bump prettier from 2.5.1 to 2.6.2 (#394) ([60cda78](https://github.com/readmeio/metrics-sdks/commit/60cda78)), closes [#394](https://github.com/readmeio/metrics-sdks/issues/394)
+* chore(deps-dev): bump supertest from 6.1.6 to 6.2.2 (#384) ([0994abf](https://github.com/readmeio/metrics-sdks/commit/0994abf)), closes [#384](https://github.com/readmeio/metrics-sdks/issues/384)
+* chore(deps): bump actions/cache from 2.1.7 to 3.0.2 (#395) ([da9b6a7](https://github.com/readmeio/metrics-sdks/commit/da9b6a7)), closes [#395](https://github.com/readmeio/metrics-sdks/issues/395)
+* chore(deps): bump minimist from 1.2.5 to 1.2.6 (#398) ([0c1b805](https://github.com/readmeio/metrics-sdks/commit/0c1b805)), closes [#398](https://github.com/readmeio/metrics-sdks/issues/398)
+* chore(deps): bump minimist from 1.2.5 to 1.2.6 in /packages/node (#379) ([7ad6906](https://github.com/readmeio/metrics-sdks/commit/7ad6906)), closes [#379](https://github.com/readmeio/metrics-sdks/issues/379)
+
+
+
 ## <small>5.1.1 (2022-04-15)</small>
 
 * fix: python CI (upgrade black to 22.3.0) and node CI (pin node.js to 16.14.0) (#393) ([f34d340](https://github.com/readmeio/metrics-sdks/commit/f34d340)), closes [#393](https://github.com/readmeio/metrics-sdks/issues/393) [/github.com/psf/black/issues/2964#issuecomment-1080974737](https://github.com//github.com/psf/black/issues/2964/issues/issuecomment-1080974737)
