@@ -6,7 +6,6 @@
         public static readonly string version = "1.0.2";
         public static readonly int wait = 0;
         public static readonly string receive = null;
-        public static readonly string readmeApiEndpoints = "https://metrics.readme.io/request";
-        
+        public static readonly string readmeApiEndpoints = "https://metrics.readme.io/v1/request";
     }
 }
