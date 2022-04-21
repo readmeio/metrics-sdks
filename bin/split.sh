@@ -7,6 +7,13 @@ function remote() {
 }
 
 function split() {
+    # Set up the correct SSH key for each repo
+    # Without this it will just use the first
+    # key it finds which will likely not be correct
+    if [ -n "$GITHUB_ACTIONS" ]
+    then
+        export GIT_SSH_COMMAND="ssh -i /home/runner/.ssh/$2 -o IdentitiesOnly=yes"
+    fi
     git subtree push --prefix $1 $2 main
 }
 
@@ -18,20 +25,20 @@ function addSshKey() {
     # ssh key will already have push access to the mirrors
     if [ -n "$GITHUB_ACTIONS" ]
     then
-        mkdir -p /home/runner
-        ssh-keyscan github.com >> /home/runner/known_hosts
-        printenv $1 > /home/runner/$1
-        chmod 600 /home/runner/$1
+        mkdir -p /home/runner/.ssh
+        ssh-keyscan github.com >> /home/runner/.ssh/known_hosts
+        printenv $2 > /home/runner/.ssh/$1
+        chmod 600 /home/runner/.ssh/$1
         ssh-agent -a $SSH_AUTH_SOCK > /dev/null || true
-        ssh-add /home/runner/$1
+        ssh-add /home/runner/.ssh/$1
     fi
 }
 
-addSshKey METRICS_SDK_NODE_PRIVATE_KEY
-addSshKey METRICS_SDK_PHP_PRIVATE_KEY
-addSshKey METRICS_SDK_PYTHON_PRIVATE_KEY
-addSshKey METRICS_SDK_RUBY_PRIVATE_KEY
-addSshKey METRICS_SDK_DOTNET_PRIVATE_KEY
+addSshKey sdks-node METRICS_SDK_NODE_PRIVATE_KEY
+addSshKey sdks-php METRICS_SDK_PHP_PRIVATE_KEY
+addSshKey sdks-python METRICS_SDK_PYTHON_PRIVATE_KEY
+addSshKey sdks-ruby METRICS_SDK_RUBY_PRIVATE_KEY
+addSshKey sdks-dotnet METRICS_SDK_DOTNET_PRIVATE_KEY
 
 remote sdks-node git@github.com:readmeio/metrics-sdks-node.git
 remote sdks-php git@github.com:readmeio/metrics-sdks-php.git
