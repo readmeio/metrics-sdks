@@ -2,13 +2,29 @@
 ## Prepping a new release
 In order to prep a new release we need to split the current `main` up to the individual mirrors for each SDK package.
 
-Why do this? Well for some of our packages the management systems in which they're delivered require a tag-based release and we can't tag individual directories so we need to split that package out to its own repository. [splitsh](https://github.com/splitsh/lite) handles this for us automatically and you can mirror the current codebase out to each package by running the following:
+Why do this? Well for some of our packages the management systems in which they're delivered require a tag-based release and we can't tag individual directories so we need to split that package out to its own repository. We use git subtrees to manage these mirrors. To push the subtrees from your local machine, you can run the following:
 
 ```
 ./bin/split.sh
 ```
 
-> 🚧 &nbsp; Please note that if you create a new package to also create a mirrored repository for it and to add this into `bin/split.sh`.
+This automatically happens via github action on pushes to main. We use [Deploy Keys](https://docs.github.com/en/developers/overview/managing-deploy-keys#deploy-keys) to handle this for us. 
+
+### Adding a new mirror
+To add a new package (and a new mirrored repository), you have to generate a new SSH key, upload the public key to the mirrored repo and add the private key to the parent repo's secrets. 
+
+1. Generating a new SSH key:
+
+```sh
+ssh-keygen -t ed25519 -C "$(git config user.email)" -f /tmp/new-ssh-key -N ""
+```
+
+This will output a new key, associated with your email address to /tmp/new-ssh-key. The new key will have no passphrase because it will be used in a github action environment with no way to provide the passphrase.
+
+2. Upload this to our 1password account
+3. Add the public key portion to the "Deploy Keys" section in the mirror e.g. https://github.com/readmeio/metrics-sdks-node/settings/keys/new. Make sure you check "Allow write access" so it can push new code.
+4. Add the private key portion to the "Actions secrets" section of the monorepo: https://github.com/readmeio/metrics-sdks/settings/secrets/actions/new
+5. Update `./bin/split.sh` and `./.github/workflows/split-monorepo.yml` to include the new mirror and SSH key.
 
 ### Issuing a new release
 #### Node
