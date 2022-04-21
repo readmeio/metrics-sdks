@@ -37,7 +37,7 @@ namespace ReadmeMetricsAPI5
                 //Or extract apikey from request body form or x-www-form-urlencoded by key as
                 // req.Form["key"];
 
-                context.Items["apiKey"] = context.Request.Headers["key"];
+                context.Items["apiKey"] = "apiKey";
                 context.Items["label"] = "username / company name";
                 context.Items["email"] = "email";
                 await next();
