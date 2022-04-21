@@ -50,7 +50,7 @@ const readme = require('readmeio');
 
 4. Configure the following middleware function:
 ```javascript
-app.use(readme.express(readmeAPIKey, req => ({
+app.use(readme.metrics(readmeAPIKey, req => ({
   apiKey: req.<apiKey>, // You might extract this from a header or parameter
   label: req.<userNameToShowInDashboard>, // You might extract this from user data associated with the API key
   email: req.<userEmailAddress>, // You might extract this from user data associated with the API key
@@ -80,7 +80,7 @@ Parameter       | Required? | Description
 
 Example:
 ```javascript
-readme.express(readmeAPIKey, groupFn, options);
+readme.metrics(readmeAPIKey, groupFn, options);
 ```
 ### Grouping Function
 The grouping function is a function your script should include that extracts identifying information out of the [`req`](https://expressjs.com/en/4x/api.html#req) object. While only `apiKey` is required, we recommend providing all three values to get the most out of the metrics dashboard.
@@ -94,7 +94,7 @@ Field  | Required? | Type   | Usage
 
 Example:
 ```javascript
-app.use(readme.express(readmeAPIKey, req => ({
+app.use(readme.metrics(readmeAPIKey, req => ({
   apiKey: req.<apiKey>, // You might extract this from a header or parameter
   label: req.<userNameToShowInDashboard>, // You might extract this from user data associated with the API key
   email: req.<userEmailAddress>, // You might extract this from user data associated with the API key
