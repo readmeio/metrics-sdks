@@ -31,5 +31,5 @@ jobs:
         if: matrix.node-version == '14'
         run: npm install -g npm@8
 
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - run: npm test
