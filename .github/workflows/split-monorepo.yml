@@ -11,6 +11,9 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+
     - name: Split repository into git mirrors
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
