@@ -1,7 +1,9 @@
 name: "Split monorepo into git mirrors"
 
 on:
-  push
+  push:
+    branches:
+      - main
 
 jobs:
   split-monorepo:
