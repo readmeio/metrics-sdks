@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <PackageId>ReadMe.Metrics</PackageId>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <Authors>ReadMe</Authors>
     <Company>ReadMe</Company>
     <Product>ReadMe.Metrics DotnetCore</Product>
