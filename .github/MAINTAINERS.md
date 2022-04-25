@@ -52,3 +52,20 @@ To publish a new version:
 6. `python3 -m twine upload dist/*`
     * If you get errors about `twine` not being installed, install it with `pip3 install twine`.
     * On the first run you'll be asked to log into PyPi, so if you don't have access to `readme-metrics` there ask someone to hook you up with access.
+
+#### Dotnet
+
+If you're not a maintainer of [`ReadMe.Metrics`](https://www.nuget.org/packages/ReadMe.Metrics/) on [NuGet](https://www.nuget.org/), [register for a Microsoft account by going through this flow](https://www.nuget.org/users/account/LogOn), enable two-factor auth on your [account settings](https://account.live.com/proofs/manage/additional), and ask someone to add you as a maintainer.
+
+To publish a new version:
+1. `cd packages/dotnet/Readme`
+2. Update `<Version>` in `Readme.csproj`
+<!-- https://docs.microsoft.com/en-us/nuget/create-packages/creating-a-package-dotnet-cli#run-the-pack-command -->
+4. `dotnet pack`
+<!-- https://docs.microsoft.com/en-us/nuget/nuget-org/publish-a-package#command-line -->
+5. Create an API key by following the instructions [here](https://docs.microsoft.com/en-us/nuget/nuget-org/publish-a-package#create-api-keys)
+6. Publish!
+
+```sh
+dotnet nuget push ./bin/Debug/ReadMe.Metrics.1.1.0.nupkg --api-key oy2fpuni2mpoicqrknqqhtq66e3jxiqurdnpgmacpo7tsi --source https://api.nuget.org/v3/index.json
+```
