@@ -50,9 +50,15 @@ describe('Metrics SDK Integration Tests', () => {
         process.env
       ),
     });
-    httpServer.stderr.on('data', data => console.error(`stderr: ${data}`));
-    httpServer.on('error', err => console.error('error', err));
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
+      httpServer.stderr.on('data', data => {
+        console.error(`stderr: ${data}`);
+        return reject(data);
+      });
+      httpServer.on('error', err => {
+        console.error('error', err);
+        return reject(err);
+      });
       httpServer.stdout.on('data', data => {
         if (data.toString().match(/app listening/)) return resolve();
         console.log(`stdout: ${data}`);
