@@ -17,6 +17,17 @@ updates:
     open-pull-requests-limit: 10
     labels:
       - dependencies
+    commit-message:
+      prefix: chore(deps)
+      prefix-development: chore(deps-dev)
+
+  - package-ecosystem: npm
+    directory: "/packages/node"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
       - area:node
     commit-message:
       prefix: chore(deps)
