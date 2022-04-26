@@ -53,11 +53,11 @@ describe('Metrics SDK Integration Tests', () => {
     return new Promise((resolve, reject) => {
       httpServer.stderr.on('data', data => {
         console.error(`stderr: ${data}`);
-        return reject(data);
+        return reject(data.toString());
       });
       httpServer.on('error', err => {
         console.error('error', err);
-        return reject(err);
+        return reject(err.toString());
       });
       httpServer.stdout.on('data', data => {
         if (data.toString().match(/app listening/)) return resolve();
