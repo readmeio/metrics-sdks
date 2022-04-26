@@ -6,7 +6,8 @@
     "lint": "npm run lint --workspaces",
     "prepare": "husky install",
     "publish": "npx lerna publish",
-    "test": "npm test --workspaces",
+    "test": "npm test --workspaces && npm run test:integration",
+    "test:integration": "NODE_OPTIONS=--experimental-vm-modules npx jest",
     "version": "npx conventional-changelog-cli --pkg lerna.json -i CHANGELOG.md -s && git add CHANGELOG.md"
   },
   "repository": {
@@ -22,11 +23,22 @@
   "devDependencies": {
     "@commitlint/cli": "^16.2.3",
     "@commitlint/config-conventional": "^16.2.1",
-    "husky": "^7.0.2"
+    "husky": "^7.0.2",
+    "jest": "^27.5.1"
   },
   "commitlint": {
     "extends": [
       "@commitlint/config-conventional"
     ]
-  }
+  },
+  "jest": {
+    "transform": {},
+    "testMatch": [
+      "<rootDir>/__tests__/**/*.[jt]s?(x)",
+      "<rootDir>/?(*.)+(spec|test).[jt]s?(x)"
+    ]
+  },
+  "type": "module",
+  "// ": "TODO FIX THIS WHEN I HAVE BETTER INTERNET",
+  "prettier": "./packages/node/node_modules/@readme/eslint-config/prettier"
 }
