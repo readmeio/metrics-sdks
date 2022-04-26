@@ -4,6 +4,12 @@ import { spawn } from 'child_process';
 import { promisify } from 'util';
 import { once } from 'events';
 
+if (!process.env.EXAMPLE_SERVER) {
+  // eslint-disable-next-line no-console
+  console.error('Missing `EXAMPLE_SERVER` environment variable');
+  process.exit(1);
+}
+
 // https://gist.github.com/krnlde/797e5e0a6f12cc9bd563123756fc101f
 http.get[promisify.custom] = function getAsync(options) {
   return new Promise((resolve, reject) => {
@@ -33,7 +39,7 @@ describe('Metrics SDK Integration Tests', () => {
     await once(metricsServer, 'listening');
     const { address, port } = metricsServer.address();
 
-    httpServer = spawn('node', ['./packages/node/examples/express/index.js'], {
+    httpServer = spawn(process.env.EXAMPLE_SERVER, {
       cwd: cwd(),
       env: Object.assign(
         {
