@@ -12,9 +12,12 @@ const port = process.env.PORT || 4000;
 
 app.use(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  readmeio.expressMiddleware(process.env.README_API_KEY, req => ({
-    apiKey: Math.random().toString(36).substring(2),
+  readmeio.metrics(process.env.README_API_KEY, req => ({
+    // User's API Key
+    apiKey: 'owlbert-api-key',
+    // Username to show in the dashboard
     label: 'Owlbert',
+    // User's email address
     email: 'owlbert@example.com',
   }))
 );
