@@ -36,16 +36,15 @@ jobs:
 
   integration:
     runs-on: ubuntu-latest
+    # This job depends on the one above so the module
+    # is built and in a good state 👍
+    needs: [build]
     defaults:
       run:
         working-directory: packages/node/examples/express
 
     steps:
     - uses: actions/checkout@v3
-
-    - name: Build the node sdk so the main entrypoint exists
-      run: npm run build
-      working-directory: packages/node
 
     - run: npm ci
     - run: docker-compose run integration_node_express
