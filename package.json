@@ -6,7 +6,7 @@
     "lint": "npm run lint --workspaces",
     "prepare": "husky install",
     "publish": "npx lerna publish",
-    "test": "npm test --workspaces && npm run test:integration",
+    "test": "npm test --workspaces",
     "test:integration": "NODE_OPTIONS=--experimental-vm-modules npx jest",
     "version": "npx conventional-changelog-cli --pkg lerna.json -i CHANGELOG.md -s && git add CHANGELOG.md"
   },
