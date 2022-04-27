@@ -1,5 +1,5 @@
 {
   "extends": [
-    "./packages/node/node_modules/@readme/eslint-config"
+    "@readme/eslint-config"
   ]
 }
