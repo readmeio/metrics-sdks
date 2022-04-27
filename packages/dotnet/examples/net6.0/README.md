@@ -7,9 +7,8 @@ brew install dotnet
 ```
 
 ## Run
-<!-- TODO make it so that it takes README_API_KEY -->
 ```sh
-readme__apiKey=<Your ReadMe API Key here> dotnet run
+README_API_KEY=<Your ReadMe API Key here> dotnet run
 ```
 
 ## Test

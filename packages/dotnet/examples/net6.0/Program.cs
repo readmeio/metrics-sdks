@@ -4,6 +4,13 @@ if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("README_API_KEY"))) 
 }
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.ConfigureAppConfiguration((hostingContext, config) => {
+  config.AddInMemoryCollection(new Dictionary<string, string> {
+    {"readme:apiKey", Environment.GetEnvironmentVariable("README_API_KEY")},
+  });
+});
+
 var app = builder.Build();
 
 var port = Environment.GetEnvironmentVariable("PORT");
