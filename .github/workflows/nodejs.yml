@@ -43,6 +43,10 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Build the node sdk so the main entrypoint exists
+      run: npm run build
+      working-directory: packages/node
+
     - run: npm ci
     - run: docker-compose run integration_node_express
 
