@@ -23,5 +23,10 @@ module.exports = {
     // We use `lodash` because it allows for more flexibility that we can't get with standard object accessors.
     'you-dont-need-lodash-underscore/get': 'off',
     'you-dont-need-lodash-underscore/omit': 'off',
+    // This was getting really weird in the examples/ folder
+    // where I know `readmeio` isn't going to be resolvable yet.
+    // In some versions of node that is true, but in others it's false
+    // which was causing this rule to trigger 🤯
+    'eslint-comments/no-unused-disable': 'off',
   },
 };
