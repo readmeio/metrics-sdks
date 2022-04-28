@@ -1,11 +1,13 @@
-if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("README_API_KEY"))) {
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("README_API_KEY")))
+{
   Console.Error.WriteLine("Missing `README_API_KEY` environment variable");
   System.Environment.Exit(1);
 }
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.ConfigureAppConfiguration((hostingContext, config) => {
+builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
+{
   config.AddInMemoryCollection(new Dictionary<string, string> {
     {"readme:apiKey", Environment.GetEnvironmentVariable("README_API_KEY")},
   });
@@ -16,7 +18,8 @@ var app = builder.Build();
 var port = Environment.GetEnvironmentVariable("PORT");
 if (string.IsNullOrEmpty(port)) port = "4000";
 
-app.Use(async (context, next) => {
+app.Use(async (context, next) =>
+{
   context.Items["apiKey"] = "owlbert-api-key";
   context.Items["label"] = "Owlbert";
   context.Items["email"] = "owlbert@example.com";
@@ -26,7 +29,8 @@ app.Use(async (context, next) => {
 
 app.UseMiddleware<Readme.Metrics>();
 
-app.MapGet("/", async context => {
+app.MapGet("/", async context =>
+{
   await context.Response.WriteAsJsonAsync(new { message = "hello world" });
 });
 
