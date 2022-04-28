@@ -41,7 +41,7 @@ namespace Readme
 
             string harJsonObj = await harJsonBuilder.BuildHar();
             ReadmeApiCaller readmeApiCaller = new ReadmeApiCaller(harJsonObj, configValues.apiKey);
-            string readmeResponse = await readmeApiCaller.SendHarObjToReadmeApi();
+            readmeApiCaller.SendHarObjToReadmeApi();
           }
           else
           {
