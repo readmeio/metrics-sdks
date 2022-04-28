@@ -104,7 +104,7 @@ describe('Metrics SDK Integration Tests', () => {
     delete har.request.log.entries[0].timings;
 
     // Strip the port from Host header and URL
-    har.request.log.entries[0].request.headers.find(h => h.name === 'host').value = 'localhost';
+    har.request.log.entries[0].request.headers.find(h => h.name.match(/host/i)).value = 'localhost';
     har.request.log.entries[0].request.url = 'http://localhost';
 
     expect(har.request.log.entries[0]).toMatchSnapshot();
