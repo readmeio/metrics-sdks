@@ -1,8 +1,9 @@
 import http from 'http';
 import { cwd } from 'process';
-import { spawn } from 'child_process';
+import { exec } from 'child_process';
 import { promisify } from 'util';
 import { once } from 'events';
+import getPort from 'get-port';
 
 if (!process.env.EXAMPLE_SERVER) {
   // eslint-disable-next-line no-console
@@ -26,23 +27,21 @@ http.get[promisify.custom] = function getAsync(options) {
 
 const get = promisify(http.get);
 
-const randomApiKey = Math.random().toString(36).substring(2);
-
-// TODO generate a random port number so we
-// can parallelize these tests
-const PORT = 4000;
+const randomApiKey = 'a-random-readme-api-key';
 
 describe('Metrics SDK Integration Tests', () => {
   let metricsServer;
   let httpServer;
+  let PORT;
 
   beforeAll(async () => {
-    metricsServer = http.createServer().listen(0, '0.0.0.0');
+    metricsServer = http.createServer().listen(0, 'localhost');
 
     await once(metricsServer, 'listening');
     const { address, port } = metricsServer.address();
+    PORT = await getPort();
 
-    httpServer = spawn(process.env.EXAMPLE_SERVER, {
+    httpServer = exec(process.env.EXAMPLE_SERVER, {
       cwd: cwd(),
       env: {
         PORT,
@@ -64,7 +63,7 @@ describe('Metrics SDK Integration Tests', () => {
       });
       // eslint-disable-next-line consistent-return
       httpServer.stdout.on('data', data => {
-        if (data.toString().match(/app listening/)) return resolve();
+        if (data.toString().match(/listening/)) return resolve();
         // eslint-disable-next-line no-console
         console.log(`stdout: ${data}`);
       });
@@ -81,6 +80,7 @@ describe('Metrics SDK Integration Tests', () => {
 
     const [req] = await once(metricsServer, 'request');
     expect(req.url).toBe('/v1/request');
+    expect(req.headers.authorization).toBe('Basic YS1yYW5kb20tcmVhZG1lLWFwaS1rZXk6');
 
     let body = '';
     // eslint-disable-next-line no-restricted-syntax
@@ -102,6 +102,10 @@ describe('Metrics SDK Integration Tests', () => {
     delete har.request.log.entries[0].startedDateTime;
     delete har.request.log.entries[0].time;
     delete har.request.log.entries[0].timings;
+
+    // Strip the port from Host header and URL
+    har.request.log.entries[0].request.headers.find(h => h.name === 'host').value = 'localhost';
+    har.request.log.entries[0].request.url = 'http://localhost';
 
     expect(har.request.log.entries[0]).toMatchSnapshot();
   });

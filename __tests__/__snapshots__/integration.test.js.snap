@@ -18,7 +18,7 @@ Object {
     "headers": Array [
       Object {
         "name": "host",
-        "value": "localhost:4000",
+        "value": "localhost",
       },
       Object {
         "name": "connection",
@@ -29,7 +29,7 @@ Object {
     "httpVersion": "HTTP/1.1",
     "method": "GET",
     "queryString": Array [],
-    "url": "http://localhost:4000/",
+    "url": "http://localhost",
   },
   "response": Object {
     "bodySize": 0,
