@@ -43,13 +43,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Build node sdk
-      run: |
-        npm ci --ignore-scripts
-        npm run build
-      working-directory: packages/node
-
-    - run: npm ci
     - run: docker-compose run integration_node_express
 
     - name: Cleanup
