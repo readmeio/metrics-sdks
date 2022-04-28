@@ -1,4 +1,5 @@
-if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("README_API_KEY")))
+var readmeApiKey = Environment.GetEnvironmentVariable("README_API_KEY");
+if (readmeApiKey == null)
 {
   Console.Error.WriteLine("Missing `README_API_KEY` environment variable");
   System.Environment.Exit(1);
@@ -9,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
 {
   config.AddInMemoryCollection(new Dictionary<string, string> {
-    {"readme:apiKey", Environment.GetEnvironmentVariable("README_API_KEY")},
+    {"readme:apiKey", readmeApiKey},
   });
 });
 
