@@ -6,4 +6,4 @@ services:
       dockerfile: ./__tests__/integrations/node.Dockerfile
     command: npm run test:integration
     environment:
-      - EXAMPLE_SERVER=./packages/node/examples/express/index.js
+      - EXAMPLE_SERVER=node ./packages/node/examples/express/index.js

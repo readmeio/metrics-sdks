@@ -1,6 +1,6 @@
 import http from 'http';
 import { cwd } from 'process';
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 import { promisify } from 'util';
 import { once } from 'events';
 import getPort from 'get-port';
@@ -41,7 +41,21 @@ describe('Metrics SDK Integration Tests', () => {
     const { address, port } = metricsServer.address();
     PORT = await getPort();
 
-    httpServer = exec(process.env.EXAMPLE_SERVER, {
+    // In order to use child_process.spawn, we have to provide a
+    // command along with an array of arguments. So this is a very
+    // rudimental way of splitting the two values provided to us
+    // from the environment variable.
+    //
+    // I tried refactoring this to use child_process.exec, which just
+    // takes in a single string to run, but that creates it's own
+    // shell so we can't do `cp.kill()` on it later on (because that
+    // just kills the shell, not the actual command we're running).
+    //
+    // Annoyingly this works under macOS, so it must be a platform
+    // difference when running under docker/linux.
+    const [command, ...args] = process.env.EXAMPLE_SERVER.split(' ');
+
+    httpServer = spawn(command, args, {
       cwd: cwd(),
       env: {
         PORT,
@@ -71,8 +85,13 @@ describe('Metrics SDK Integration Tests', () => {
   });
 
   afterAll(() => {
-    metricsServer.close();
     httpServer.kill();
+    return new Promise((resolve, reject) => {
+      metricsServer.close(err => {
+        if (err) return reject(err);
+        return resolve();
+      });
+    });
   });
 
   it('should make a request to a metrics backend with a har file', async () => {
