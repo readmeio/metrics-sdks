@@ -4,6 +4,7 @@ import { spawn } from 'child_process';
 import { promisify } from 'util';
 import { once } from 'events';
 import getPort from 'get-port';
+import caseless from 'caseless';
 
 if (!process.env.EXAMPLE_SERVER) {
   // eslint-disable-next-line no-console
@@ -28,6 +29,23 @@ http.get[promisify.custom] = function getAsync(options) {
 const get = promisify(http.get);
 
 const randomApiKey = 'a-random-readme-api-key';
+
+// Converts an array of headers like this:
+// [
+//   { name: 'host', value: 'localhost:49914' },
+//   { name: 'connection', value: 'close' },
+// ];
+//
+// To an object that can be passed in to caseless:
+// {
+//    host: 'localhost:49914',
+//    connection: 'close'
+// }
+function arrayToObject(array) {
+  return array.reduce((prev, next) => {
+    return Object.assign(prev, { [next.name]: next.value });
+  }, {});
+}
 
 describe('Metrics SDK Integration Tests', () => {
   let metricsServer;
@@ -94,6 +112,8 @@ describe('Metrics SDK Integration Tests', () => {
     });
   });
 
+  // TODO this needs fleshing out more with more assertions and complex
+  // test cases, along with more servers in different languages too!
   it('should make a request to a metrics backend with a har file', async () => {
     await get(`http://localhost:${PORT}`);
 
@@ -116,16 +136,23 @@ describe('Metrics SDK Integration Tests', () => {
     expect(har.group).toMatchSnapshot();
     expect(har.clientIPAddress).toBe('127.0.0.1');
 
-    // Removing non-deterministic items from the snapshot so we can compare
-    // https://jestjs.io/docs/snapshot-testing#2-tests-should-be-deterministic
-    delete har.request.log.entries[0].startedDateTime;
-    delete har.request.log.entries[0].time;
-    delete har.request.log.entries[0].timings;
+    const { request, response } = har.request.log.entries[0];
 
-    // Strip the port from Host header and URL
-    har.request.log.entries[0].request.headers.find(h => h.name.match(/host/i)).value = 'localhost';
-    har.request.log.entries[0].request.url = 'http://localhost';
+    expect(request.url).toBe(`http://localhost:${PORT}/`);
+    expect(request.method).toBe('GET');
+    expect(request.httpVersion).toBe('HTTP/1.1');
 
-    expect(har.request.log.entries[0]).toMatchSnapshot();
+    const requestHeaders = caseless(arrayToObject(request.headers));
+    expect(requestHeaders.get('connection')).toBe('close');
+    expect(requestHeaders.get('host')).toBe(`localhost:${PORT}`);
+
+    expect(response.status).toBe(200);
+    expect(response.statusText).toBe('OK');
+    expect(response.content.text).toBe(JSON.stringify({ message: 'hello world' }));
+    expect(response.content.size).toBe(25);
+    expect(response.content.mimeType).toBe('application/json; charset=utf-8');
+
+    const responseHeaders = caseless(arrayToObject(response.headers));
+    expect(responseHeaders.get('content-type')).toBe('application/json; charset=utf-8');
   });
 });
