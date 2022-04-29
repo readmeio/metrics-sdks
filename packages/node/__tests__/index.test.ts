@@ -12,6 +12,7 @@ import pkg from '../package.json';
 import { expressMiddleware } from '../src';
 import FormData from 'form-data';
 import multer from 'multer';
+import { sha256 } from '../src/lib/construct-payload';
 
 const upload = multer();
 
@@ -23,7 +24,7 @@ const incomingGroup = {
 };
 
 const outgoingGroup = {
-  id: '5afa21b97011c63320226ef3',
+  id: '4d723a8f140b9d2de9ee565578483a6a1a2a429aeaa8627cd180ff36459f1f4c',
   label: 'test',
   email: 'test@example.com',
 };
@@ -186,7 +187,7 @@ describe('#metrics', () => {
       },
     })
       .post('/v1/request', ([body]) => {
-        expect(body.group.id).toBe('a');
+        expect(body.group.id).toBe(sha256('a'));
         expect(body.group.label).toBe('b');
         expect(body.group.email).toBe('c');
         return true;

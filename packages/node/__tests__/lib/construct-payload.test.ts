@@ -5,7 +5,7 @@ import { isValidUUIDV4 } from 'is-valid-uuid-v4';
 import packageJson from '../../package.json';
 import * as qs from 'querystring';
 
-import { constructPayload } from '../../src/lib/construct-payload';
+import { constructPayload, sha256 } from '../../src/lib/construct-payload';
 
 function fixPlatform(platform: string): 'mac' | 'windows' | 'linux' | 'unknown' {
   switch (platform) {
@@ -61,7 +61,7 @@ describe('constructPayload()', () => {
     return request(createApp(undefined, group))
       .post('/')
       .expect(({ body }) => {
-        expect(body.group.id).toBe(group.apiKey);
+        expect(body.group.id).toBe(sha256(group.apiKey));
         expect(body.group.apiKey).toBeUndefined();
       });
   });
@@ -78,7 +78,7 @@ describe('constructPayload()', () => {
     return request(createApp(undefined, groupAlt))
       .post('/')
       .expect(({ body }) => {
-        expect(body.group.id).toBe(group.apiKey);
+        expect(body.group.id).toBe(sha256(group.apiKey));
         expect(body.group.apiKey).toBeUndefined();
       });
   });

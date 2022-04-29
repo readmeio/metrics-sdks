@@ -6,6 +6,8 @@ import processResponse from './process-response';
 import { name, version } from '../../package.json';
 import { v4 as uuidv4 } from 'uuid';
 import { URL } from 'url';
+import { createHash } from 'crypto';
+
 
 /**
  * Extracts the protocol string from the incoming request
@@ -110,6 +112,12 @@ function fixPlatform(platform: string): 'mac' | 'windows' | 'linux' | 'unknown' 
   }
 }
 
+export function sha256(apiKey) {
+  const hash = createHash('sha256');
+  hash.update(apiKey);
+  return hash.digest('hex');
+}
+
 export function constructPayload(
   req: IncomingMessage,
   res: ServerResponse,
@@ -121,7 +129,7 @@ export function constructPayload(
   return {
     _id: payloadData.logId || uuidv4(),
     group: {
-      id: payloadData.apiKey,
+      id: sha256(payloadData.apiKey),
       label: payloadData.label,
       email: payloadData.email,
     },
