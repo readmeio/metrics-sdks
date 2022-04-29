@@ -1,0 +1,5 @@
+coverage/
+dist/
+node_modules/
+# We just want to lint the very top level
+packages/

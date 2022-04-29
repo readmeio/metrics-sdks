@@ -58,7 +58,7 @@ export function metricsAPICall(
   const encodedKey = Buffer.from(`${readmeAPIKey}:`).toString('base64');
 
   const makeRequest = () => {
-    return fetch(`${config.host}/v1/request`, {
+    return fetch(new URL('/v1/request', config.host), {
       method: 'post',
       body: JSON.stringify(body),
       headers: {
