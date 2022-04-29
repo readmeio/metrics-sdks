@@ -7,3 +7,11 @@ services:
     command: npm run test:integration
     environment:
       - EXAMPLE_SERVER=node ./packages/node/examples/express/index.js
+
+  integration_dotnet_v6.0:
+    build:
+      context: .
+      dockerfile: ./__tests__/integrations/dotnet.Dockerfile
+    command: npm run test:integration
+    environment:
+      - EXAMPLE_SERVER=dotnet examples/net6.0/out/net6.0.dll
