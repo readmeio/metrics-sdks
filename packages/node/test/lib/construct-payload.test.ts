@@ -10,7 +10,7 @@ import { isValidUUIDV4 } from 'is-valid-uuid-v4';
 import request from 'supertest';
 
 import pkg from '../../package.json';
-import { constructPayload } from '../../src/lib/construct-payload';
+import { constructPayload, sha256 } from '../../src/lib/construct-payload';
 
 function createApp(options?: LogOptions, payloadData?: PayloadData) {
   const requestListener = function (req: IncomingMessage, res: ServerResponse) {
@@ -53,7 +53,7 @@ describe('constructPayload()', function () {
     return request(createApp(undefined, group))
       .post('/')
       .expect(({ body }) => {
-        expect(body.group.id).to.equal(group.apiKey);
+        expect(body.group.id).to.equal(sha256(group.apiKey));
         expect(body.group.apiKey).to.be.undefined;
       });
   });
@@ -70,7 +70,7 @@ describe('constructPayload()', function () {
     return request(createApp(undefined, groupAlt))
       .post('/')
       .expect(({ body }) => {
-        expect(body.group.id).to.equal(group.apiKey);
+        expect(body.group.id).to.equal(sha256(group.apiKey)));
         expect(body.group.apiKey).to.be.undefined;
       });
   });

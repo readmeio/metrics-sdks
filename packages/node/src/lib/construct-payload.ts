@@ -4,6 +4,8 @@ import type { TLSSocket } from 'tls';
 
 import os from 'os';
 import { URL } from 'url';
+import { createHash } from 'crypto';
+
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -96,6 +98,12 @@ export interface PayloadData {
   responseBody?: string;
 }
 
+export function sha256(apiKey) {
+  const hash = createHash('sha256');
+  hash.update(apiKey);
+  return hash.digest('hex');
+}
+
 export function constructPayload(
   req: IncomingMessage,
   res: ServerResponse,
@@ -107,7 +115,7 @@ export function constructPayload(
   return {
     _id: payloadData.logId || uuidv4(),
     group: {
-      id: payloadData.apiKey,
+      id: sha256(payloadData.apiKey),
       label: payloadData.label,
       email: payloadData.email,
     },
