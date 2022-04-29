@@ -24,7 +24,9 @@
     "@commitlint/cli": "^16.2.3",
     "@commitlint/config-conventional": "^16.2.1",
     "@readme/eslint-config": "^8.7.3",
+    "caseless": "^0.12.0",
     "eslint": "^8.14.0",
+    "get-port": "^6.1.2",
     "husky": "^7.0.2",
     "jest": "^27.5.1",
     "prettier": "^2.6.2"
