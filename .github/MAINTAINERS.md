@@ -61,7 +61,15 @@ If you're not a maintainer of [`ReadMe.Metrics`](https://www.nuget.org/packages/
 To publish a new version:
 1. `cd packages/dotnet/Readme`
 2. Update `<Version>` in `Readme.csproj`
+<!-- Please forgive me for this -->
+```sh
+NEW_VERSION="x.x.x"; sed -i '' "s/\(<Version.*>\)[^<>]*\(<\/Version.*\)/\1$NEW_VERSION\2/" *.csproj; unset NEW_VERSION
+```
 3. Update `version` in `ConstValues.cs`
+<!-- And for this 🙏 -->
+```sh
+NEW_VERSION="x.x.x"; sed -i '' "s/\(version = \)\"\([^\"]*\)\"/\1\"$NEW_VERSION\"/" ConstValues.cs; unset NEW_VERSION
+```
 <!-- https://docs.microsoft.com/en-us/nuget/create-packages/creating-a-package-dotnet-cli#run-the-pack-command -->
 4. `dotnet pack`
 <!-- https://docs.microsoft.com/en-us/nuget/nuget-org/publish-a-package#command-line -->
