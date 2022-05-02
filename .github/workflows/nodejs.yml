@@ -11,12 +11,9 @@ jobs:
 
     strategy:
       matrix:
-        # node 16.14.2 ships with a buggy version of npm 🤷‍♂️
-        # https://github.com/nodejs/node/issues/42397
-        # TODO revert this back to 16.x when node pushes a new version
         node-version:
           - 14
-          - 16.14.0
+          - 16
           - 18
 
     steps:
