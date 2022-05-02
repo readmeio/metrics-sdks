@@ -3,10 +3,11 @@
   "private": true,
   "scripts": {
     "clean": "npx lerna clean",
-    "lint": "npm run lint --workspaces",
+    "lint": "eslint . && npm run lint --workspaces",
     "prepare": "husky install",
     "publish": "npx lerna publish",
     "test": "npm test --workspaces",
+    "test:integration": "NODE_OPTIONS=--experimental-vm-modules npx jest",
     "version": "npx conventional-changelog-cli --pkg lerna.json -i CHANGELOG.md -s && git add CHANGELOG.md"
   },
   "repository": {
@@ -22,11 +23,26 @@
   "devDependencies": {
     "@commitlint/cli": "^16.2.3",
     "@commitlint/config-conventional": "^16.2.1",
-    "husky": "^7.0.2"
+    "@readme/eslint-config": "^8.7.3",
+    "caseless": "^0.12.0",
+    "eslint": "^8.14.0",
+    "get-port": "^6.1.2",
+    "husky": "^7.0.2",
+    "jest": "^27.5.1",
+    "prettier": "^2.6.2"
   },
   "commitlint": {
     "extends": [
       "@commitlint/config-conventional"
     ]
-  }
+  },
+  "jest": {
+    "transform": {},
+    "testMatch": [
+      "<rootDir>/__tests__/**/*.[jt]s?(x)",
+      "<rootDir>/?(*.)+(spec|test).[jt]s?(x)"
+    ]
+  },
+  "type": "module",
+  "prettier": "@readme/eslint-config/prettier"
 }

@@ -10,4 +10,7 @@ function getConfig() {
   return defaultJson;
 }
 
-module.exports = getConfig();
+module.exports = {
+  ...getConfig(),
+  ...(process.env.METRICS_SERVER ? { host: process.env.METRICS_SERVER } : {}),
+};
