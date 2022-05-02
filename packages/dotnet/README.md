@@ -1,9 +1,20 @@
-# ReadMe .NET
+# ReadMe.Metrics
+
+[![](https://d3vv6lp55qjaqc.cloudfront.net/items/1M3C3j0I0s0j3T362344/Untitled-2.png)](https://readme.io)
+
+[![npm](https://img.shields.io/nuget/v/ReadMe.Metrics.svg)](https://www.nuget.org/packages/ReadMe.Metrics/) [![Build](https://github.com/readmeio/metrics-sdks/workflows/dotnet/badge.svg)](https://github.com/readmeio/metrics-sdks)
 
 ## Contents
-- [Overview](#overview)
-- [ASP.NET Core Integration](#aspnet-core-integration)
-- [ASP.NET Core Middleware Reference](#aspnet-core-middleware-reference)
+- [ReadMe.Metrics](#readmemetrics)
+  - [Contents](#contents)
+  - [Overview](#overview)
+  - [ASP.NET Core Integration](#aspnet-core-integration)
+  - [ASP.NET Core Middleware Reference](#aspnet-core-middleware-reference)
+    - [Group Object](#group-object)
+    - [ReadMe Object in appsettings.json](#readme-object-in-appsettingsjson)
+      - [Options Object](#options-object)
+    - [Documentation URL](#documentation-url)
+  - [Troubleshooting](#troubleshooting)
 
 ## Overview
 With ReadMe's Metrics API your team can get deep insights into your API's usage. If you're a developer, it's super easy to send your API logs to ReadMe, Here's an overview of how the integration works:

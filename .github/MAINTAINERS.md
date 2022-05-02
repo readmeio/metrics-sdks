@@ -25,6 +25,7 @@ This will output a new key, associated with your email address to /tmp/new-ssh-k
 3. Add the public key portion to the "Deploy Keys" section in the mirror e.g. https://github.com/readmeio/metrics-sdks-node/settings/keys/new. Make sure you check "Allow write access" so it can push new code.
 4. Add the private key portion to the "Actions secrets" section of the monorepo: https://github.com/readmeio/metrics-sdks/settings/secrets/actions/new
 5. Update `./bin/split.sh` and `./.github/workflows/split-monorepo.yml` to include the new mirror and SSH key.
+6. Update the main README.md to include information about the new package.
 
 ### Issuing a new release
 #### Node

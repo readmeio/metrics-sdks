@@ -8,5 +8,6 @@ This is the monorepo for the following [ReadMe Metrics](https://readme.com/metri
 | PHP (Laravel) | [readme/metrics](https://github.com/readmeio/metrics-sdks/tree/main/packages/php) | [![](https://img.shields.io/packagist/v/readme/metrics)](https://packagist.org/packages/readme/metrics) |
 | Python (WSGI) | [readme-metrics](https://github.com/readmeio/metrics-sdks/tree/main/packages/python) | [![](https://img.shields.io/pypi/v/readme-metrics)](https://pypi.org/project/readme-metrics/) |
 | Ruby (Rails/Rack) | [readme-metrics](https://github.com/readmeio/metrics-sdks/tree/main/packages/ruby) | [![](https://img.shields.io/gem/v/readme-metrics)](https://rubygems.org/gems/readme-metrics) |
+| .NET | [ReadMe.Metrics](https://github.com/readmeio/metrics-sdks/tree/main/packages/dotnet) | [![](https://img.shields.io/nuget/v/ReadMe.Metrics)](https://www.nuget.org/packages/ReadMe.Metrics/) |
 
 Want to build your own SDK for Developer Metrics? [Check out our guide.](https://docs.readme.com/metrics/docs/building-api-metrics-middleware)

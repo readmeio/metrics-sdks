@@ -5,11 +5,7 @@
 > 🚧 Any Issues?
 > Integrations can be tricky! [Contact support](https://docs.readme.com/guides/docs/contact-support) if you have any questions/issues.
 
-
-
 [![npm](https://img.shields.io/npm/v/readmeio.svg)](https://npm.im/readmeio) [![Build](https://github.com/readmeio/metrics-sdks/workflows/nodejs/badge.svg)](https://github.com/readmeio/metrics-sdks)
-
-
 
 ## Contents
 
