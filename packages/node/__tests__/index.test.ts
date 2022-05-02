@@ -118,6 +118,7 @@ describe('#metrics', () => {
       },
     })
       .post('/v1/request', ([body]) => {
+        expect(body._version).toBe(3);
         expect(body.group).toStrictEqual(outgoingGroup);
         expect(typeof body.request.log.entries[0].startedDateTime).toBe('string');
         return true;

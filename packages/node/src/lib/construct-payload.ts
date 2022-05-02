@@ -128,6 +128,7 @@ export function constructPayload(
 
   return {
     _id: payloadData.logId || uuidv4(),
+    _version: 3,
     group: {
       id: sha256(payloadData.apiKey),
       label: payloadData.label,
