@@ -5,20 +5,7 @@ import { isValidUUIDV4 } from 'is-valid-uuid-v4';
 import packageJson from '../../package.json';
 import * as qs from 'querystring';
 
-import { constructPayload, sha256 } from '../../src/lib/construct-payload';
-
-function fixPlatform(platform: string): 'mac' | 'windows' | 'linux' | 'unknown' {
-  switch (platform) {
-    case 'darwin':
-      return 'mac';
-    case 'win32':
-      return 'windows';
-    case 'linux':
-      return 'linux';
-    default:
-      return 'unknown';
-  }
-}
+import { constructPayload, mask, fixPlatform } from '../../src/lib/construct-payload';
 
 function createApp(options?: LogOptions, payloadData?: PayloadData) {
   const requestListener = function (req: http.IncomingMessage, res: http.ServerResponse) {

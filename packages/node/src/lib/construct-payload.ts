@@ -99,7 +99,7 @@ export interface PayloadData {
  * @param platform
  * @returns
  */
-function fixPlatform(platform: string): 'mac' | 'windows' | 'linux' | 'unknown' {
+export function fixPlatform(platform: string): 'mac' | 'windows' | 'linux' | 'unknown' {
   switch (platform) {
     case 'darwin':
       return 'mac';
