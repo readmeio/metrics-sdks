@@ -48,7 +48,7 @@ describe('constructPayload()', () => {
     return request(createApp(undefined, group))
       .post('/')
       .expect(({ body }) => {
-        expect(body.group.id).toBe(sha256(group.apiKey));
+        expect(body.group.id).toBe(mask(group.apiKey));
         expect(body.group.apiKey).toBeUndefined();
       });
   });
@@ -65,7 +65,7 @@ describe('constructPayload()', () => {
     return request(createApp(undefined, groupAlt))
       .post('/')
       .expect(({ body }) => {
-        expect(body.group.id).toBe(sha256(group.apiKey));
+        expect(body.group.id).toBe(mask(group.apiKey));
         expect(body.group.apiKey).toBeUndefined();
       });
   });
