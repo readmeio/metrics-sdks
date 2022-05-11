@@ -4,8 +4,7 @@ import type { TLSSocket } from 'tls';
 
 import os from 'os';
 import { URL } from 'url';
-import { createHash } from 'crypto';
-
+import ssri from 'ssri';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -98,10 +97,19 @@ export interface PayloadData {
   responseBody?: string;
 }
 
-export function sha256(apiKey) {
-  const hash = createHash('sha256');
-  hash.update(apiKey);
-  return hash.digest('hex');
+/* This will generate an integrity hash that looks something like this:
+ *
+ * sha512-Naxska/M1INY/thefLQ49sExJ8E+89Q2bz/nC4Pet52iSRPtI9w3Cyg0QdZExt0uUbbnfMJZ0qTabiLJxw6Wrg==?1345
+ *
+ * With the last 4 digits on the end for us to use to identify it later in a list.
+ */
+export function mask(apiKey) {
+  return ssri
+    .fromData(apiKey, {
+      algorithms: ['sha512'],
+      options: [apiKey.slice(-4)],
+    })
+    .toString();
 }
 
 export function constructPayload(
@@ -116,7 +124,7 @@ export function constructPayload(
     _id: payloadData.logId || uuidv4(),
     _version: 3,
     group: {
-      id: sha256(payloadData.apiKey),
+      id: mask(payloadData.apiKey),
       label: payloadData.label,
       email: payloadData.email,
     },
