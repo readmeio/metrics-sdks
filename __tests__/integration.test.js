@@ -133,7 +133,20 @@ describe('Metrics SDK Integration Tests', () => {
     // https://uibakery.io/regex-library/uuid
     // eslint-disable-next-line no-underscore-dangle
     expect(har._id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
-    expect(har.group).toMatchSnapshot();
+
+    // Hashing is only supported in some versions of the SDK
+    /* eslint-disable jest/no-conditional-expect */
+    if (process.env.SUPPORTS_HASHING) {
+      expect(har.group.id).toBe(
+        'sha512-u2GbQ83jIqNa+a8v110+8IDztQQr4joL1xSE+wFH51zSOA1qQKPwOC8t2n2LWJQA1mX4ZLZ45SEokITzLed/ow==?-key'
+      );
+    } else {
+      expect(har.group.id).toBe('owlbert-api-key');
+    }
+    /* eslint-enable jest/no-conditional-expect */
+
+    expect(har.group.email).toBe('owlbert@example.com');
+    expect(har.group.label).toBe('Owlbert');
     expect(har.clientIPAddress).toBe('127.0.0.1');
 
     const { request, response } = har.request.log.entries[0];
