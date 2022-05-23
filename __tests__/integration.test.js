@@ -25,8 +25,16 @@ http.get[promisify.custom] = function getAsync(options) {
       .on('error', reject);
   });
 };
-
 const get = promisify(http.get);
+
+async function getRequestBody(req) {
+  let body = '';
+  // eslint-disable-next-line no-restricted-syntax
+  for await (const chunk of req) {
+    body += chunk;
+  }
+  return JSON.parse(body);
+}
 
 const randomApiKey = 'a-random-readme-api-key';
 
@@ -129,13 +137,7 @@ describe('Metrics SDK Integration Tests', () => {
     expect(req.url).toBe('/v1/request');
     expect(req.headers.authorization).toBe('Basic YS1yYW5kb20tcmVhZG1lLWFwaS1rZXk6');
 
-    let body = '';
-    // eslint-disable-next-line no-restricted-syntax
-    for await (const chunk of req) {
-      body += chunk;
-    }
-    body = JSON.parse(body);
-    const [har] = body;
+    const [har] = await getRequestBody(req);
 
     // Check for a uuid
     // https://uibakery.io/regex-library/uuid
@@ -183,14 +185,7 @@ describe('Metrics SDK Integration Tests', () => {
     });
 
     const [req] = await once(metricsServer, 'request');
-
-    let body = '';
-    // eslint-disable-next-line no-restricted-syntax
-    for await (const chunk of req) {
-      body += chunk;
-    }
-    body = JSON.parse(body);
-    const [har] = body;
+    const [har] = await getRequestBody(req);
     const { request } = har.request.log.entries[0];
 
     const requestHeaders = caseless(arrayToObject(request.headers));
