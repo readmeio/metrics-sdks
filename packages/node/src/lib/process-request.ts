@@ -10,7 +10,7 @@ import * as contentType from 'content-type';
 import * as qs from 'querystring';
 
 import { objectToArray, searchToArray } from './object-to-array';
-import { getProto } from './construct-payload';
+import { getProto, mask } from './construct-payload';
 
 /**
  * Ensure we have a string or undefined response for any header.
@@ -179,6 +179,10 @@ export default function processRequest(
   // We use a fake host here because we rely on the host header which could be redacted.
   // We only ever use this reqUrl with the fake hostname for the pathname and querystring.
   const reqUrl = new URL(req.url, `https://readme.io`);
+
+  if (req.headers.authorization) {
+    req.headers.authorization = mask(req.headers.authorization);
+  }
 
   const requestData = {
     method: req.method,

@@ -166,4 +166,34 @@ describe('Metrics SDK Integration Tests', () => {
     const responseHeaders = caseless(arrayToObject(response.headers));
     expect(responseHeaders.get('content-type')).toBe('application/json; charset=utf-8');
   });
+
+  const authorizationHeader = 'Bearer: a-random-api-key';
+  function getAuthorizationHeader() {
+    if (process.env.SUPPORTS_HASHING) {
+      return 'sha512-7S+L0vUE8Fn6HI3836rtz4b6fVf6H4JFur6SGkOnL3bFpC856+OSZkpIHphZ0ipNO+kUw1ePb5df2iYrNQCpXw==?-key';
+    }
+    return authorizationHeader;
+  }
+
+  it('should process `Authorization` header', async () => {
+    await get({
+      host: 'localhost',
+      port: PORT,
+      headers: { authorization: authorizationHeader },
+    });
+
+    const [req] = await once(metricsServer, 'request');
+
+    let body = '';
+    // eslint-disable-next-line no-restricted-syntax
+    for await (const chunk of req) {
+      body += chunk;
+    }
+    body = JSON.parse(body);
+    const [har] = body;
+    const { request } = har.request.log.entries[0];
+
+    const requestHeaders = caseless(arrayToObject(request.headers));
+    expect(requestHeaders.get('authorization')).toBe(getAuthorizationHeader());
+  });
 });

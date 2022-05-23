@@ -125,6 +125,25 @@ test('should fail gracefully with circular json objects', () => {
     });
 });
 
+it('should hash Authorization header', () => {
+  const app = createApp();
+
+  return request(app)
+    .post('/')
+    .set('authorization', 'Bearer 123456')
+    .expect(({ body }) => {
+      expect(body.headers).toStrictEqual(
+        expect.arrayContaining([
+          {
+            name: 'authorization',
+            value:
+              'sha512-31rXi6lhQcMvMwee0P6yu9xyHuAWDUEuDzcSBQCCUUvlQ6BZXcu67qy1hrD2nbrjeDLKrYrBbQoMOrLnJVmbCw==?3456',
+          },
+        ])
+      );
+    });
+});
+
 describe('options', () => {
   describe('denylist/allowlist', () => {
     it('should strip denylisted json properties', () => {
