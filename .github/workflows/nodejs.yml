@@ -31,30 +31,13 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm test
 
-  integration_express:
+  integration:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/node/examples/express
 
     steps:
     - uses: actions/checkout@v3
 
     - run: docker-compose run integration_node_express
-
-    - name: Cleanup
-      if: always()
-      run: docker-compose down
-
-  integration_hapi:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/node/examples/hapi
-
-    steps:
-    - uses: actions/checkout@v3
-
     - run: docker-compose run integration_node_hapi
 
     - name: Cleanup
