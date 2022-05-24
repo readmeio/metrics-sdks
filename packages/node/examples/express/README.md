@@ -1,6 +1,6 @@
 # ReadMe Metrics Express Demo
 
-## Install
+## Install
 
 ```sh
 npm install
