@@ -1,5 +1,4 @@
 import Hapi from '@hapi/hapi';
-// eslint-disable-next-line import/no-unresolved
 import readmeio from 'readmeio';
 
 if (!process.env.README_API_KEY) {
