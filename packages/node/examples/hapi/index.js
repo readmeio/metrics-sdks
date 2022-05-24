@@ -37,16 +37,18 @@ const init = async () => {
   server.route({
     method: 'GET',
     path: '/',
-    handler: (request, h) => {
+    handler: () => {
       return { message: 'hello world' };
     },
   });
 
   await server.start();
+  // eslint-disable-next-line no-console
   console.log('Server listening on %s', server.info.uri);
 };
 
 process.on('unhandledRejection', err => {
+  // eslint-disable-next-line no-console
   console.log(err);
   process.exit(1);
 });
