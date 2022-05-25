@@ -1,6 +1,6 @@
 import type { Response } from 'node-fetch';
 import type { PayloadData, LogOptions } from './construct-payload';
-import type { ServerResponse, IncomingMessage } from 'http';
+import type { Request, Response as ExpressResponse } from 'express';
 import type { Har } from 'har-format';
 import fetch from 'node-fetch';
 import timeoutSignal from 'timeout-signal';
@@ -100,8 +100,8 @@ export function metricsAPICall(
  */
 export function log(
   readmeAPIKey: string,
-  req: IncomingMessage,
-  res: ServerResponse,
+  req: Request,
+  res: ExpressResponse,
   payloadData: PayloadData,
   logOptions: LogOptions
 ) {

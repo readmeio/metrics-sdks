@@ -1,6 +1,7 @@
 import type { LogOptions } from './construct-payload';
 import type { ServerResponse, IncomingMessage } from 'http';
 import type { GroupingObject, OutgoingLogBody } from './metrics-log';
+import type { Request, Response } from 'express';
 import config from '../config';
 import clamp from 'lodash/clamp';
 import * as url from 'url';
@@ -29,14 +30,15 @@ export interface GroupingFunction {
   (req, res): GroupingObject;
 }
 
-interface ExtendedServerResponse extends ServerResponse {
+interface ExtendedResponse extends Response {
   _body?: string;
 }
 
 interface ExtendedIncomingMessage extends IncomingMessage {
+  originalUrl: string;
   route: any;
   hostname: string;
-  baseUrl: any;
+  baseUrl: string;
   protocol: string;
   body: string;
 }
@@ -81,8 +83,8 @@ export interface Options extends LogOptions {
  */
 export function expressMiddleware(
   readmeApiKey: string,
-  req: ExtendedIncomingMessage,
-  res: ExtendedServerResponse,
+  req: Request,
+  res: ExtendedResponse,
   group: GroupingObject,
   options: Options = {}
 ) {

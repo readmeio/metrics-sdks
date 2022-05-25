@@ -146,7 +146,7 @@ describe('#metrics', () => {
   });
 
   it('express should log the full request url with nested express apps', () => {
-    const apiMock = getReadMeApiMock(1);
+    // const apiMock = getReadMeApiMock(1);
     const mock = nock(config.host, {
       reqheaders: {
         'Content-Type': 'application/json',
@@ -164,7 +164,10 @@ describe('#metrics', () => {
     const app = express();
     const appNest = express();
 
-    appNest.use(expressMiddleware(apiKey, () => incomingGroup));
+    app.use((req, res, next) => {
+      expressMiddleware(apiKey, req, res, incomingGroup, {});
+      return next();
+    });
     appNest.get('/nested', (req, res) => {
       // We're asserting `req.url` to be `/nested` here because the way that Express does contextual route loading
       // `req.url` won't include the `/test`. The `/test` is only added later internally in Express with `req.originalUrl`.
@@ -179,7 +182,7 @@ describe('#metrics', () => {
       .expect(200)
       .expect(res => expect(res).toHaveDocumentationHeader())
       .then(() => {
-        apiMock.done();
+        // apiMock.done();
         mock.done();
       });
   });

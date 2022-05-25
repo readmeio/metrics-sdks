@@ -25,6 +25,7 @@
     "dist"
   ],
   "dependencies": {
+    "@types/express": "^4.17.13",
     "content-type": "^1.0.4",
     "find-cache-dir": "^3.3.1",
     "flat-cache": "^3.0.4",

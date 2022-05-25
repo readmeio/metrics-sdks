@@ -1,6 +1,7 @@
-import type { ServerResponse, IncomingMessage } from 'http';
+import type { IncomingMessage } from 'http';
 import type { OutgoingLogBody } from './metrics-log';
 import type { TLSSocket } from 'tls';
+import type { Request, Response } from 'express';
 import processRequest from './process-request';
 import processResponse from './process-response';
 import { name, version } from '../../package.json';
@@ -111,8 +112,8 @@ function fixPlatform(platform: string): 'mac' | 'windows' | 'linux' | 'unknown' 
 }
 
 export function constructPayload(
-  req: IncomingMessage,
-  res: ServerResponse,
+  req: Request,
+  res: Response,
   payloadData: PayloadData,
   logOptions: LogOptions
 ): OutgoingLogBody {
@@ -134,7 +135,7 @@ export function constructPayload(
           {
             pageref: payloadData.routePath
               ? new URL(payloadData.routePath, `${getProto(req)}://${req.headers.host}`).toString()
-              : new URL(req.url, `${getProto(req)}://${req.headers.host}`).toString(),
+              : new URL(req.originalUrl, `${getProto(req)}://${req.headers.host}`).toString(),
             startedDateTime: payloadData.startedDateTime.toISOString(),
             time: serverTime,
             request: processRequest(req, payloadData.requestBody, logOptions),
