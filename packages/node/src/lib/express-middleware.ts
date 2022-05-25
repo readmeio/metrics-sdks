@@ -1,4 +1,5 @@
 import type { LogOptions } from './construct-payload';
+import type { ServerResponse, IncomingMessage } from 'http';
 import type { GroupingObject, OutgoingLogBody } from './metrics-log';
 import config from '../config';
 import clamp from 'lodash/clamp';
@@ -8,12 +9,36 @@ import { constructPayload } from './construct-payload';
 import { getProjectBaseUrl } from './get-project-base-url';
 import { metricsAPICall } from './metrics-log';
 
+let queue: OutgoingLogBody[] = [];
+function doSend(readmeApiKey, options) {
+  // Copy the queue so we can send all the requests in one batch
+  const json = queue.slice();
+  // Clear out the queue so we don't resend any data in the future
+  queue = [];
+
+  // Make the log call
+  metricsAPICall(readmeApiKey, json).catch(e => {
+    // Silently discard errors and timeouts.
+    if (options.development) throw e;
+  });
+}
 // Make sure we flush the queue if the process is exited
-let doSend = () => {}; // eslint-disable-line @typescript-eslint/no-empty-function
 process.on('exit', doSend);
 
 export interface GroupingFunction {
   (req, res): GroupingObject;
+}
+
+interface ExtendedServerResponse extends ServerResponse {
+  _body?: string;
+}
+
+interface ExtendedIncomingMessage extends IncomingMessage {
+  route: any;
+  hostname: string;
+  baseUrl: any;
+  protocol: string;
+  body: string;
 }
 
 // We're doing this to buffer up the response body
@@ -27,6 +52,8 @@ function patchResponse(res) {
   res._body = '';
 
   res.write = (chunk, encoding, cb) => {
+    console.log(chunk);
+
     res._body += chunk;
     write.call(res, chunk, encoding, cb);
   };
@@ -52,97 +79,89 @@ export interface Options extends LogOptions {
  * @param options Additional options. See the documentation for more details.
  * @returns Your Express middleware
  */
-export function expressMiddleware(readmeApiKey: string, group: GroupingFunction, options: Options = {}) {
+export function expressMiddleware(
+  readmeApiKey: string,
+  req: ExtendedIncomingMessage,
+  res: ExtendedServerResponse,
+  group: GroupingObject,
+  options: Options = {}
+) {
   if (!readmeApiKey) throw new Error('You must provide your ReadMe API key');
-  if (!group) throw new Error('You must provide a grouping function');
+  if (!group) throw new Error('You must provide a group');
 
   // Ensures the buffer length is between 1 and 30
   const bufferLength = clamp(options.bufferLength || config.bufferLength, 1, 30);
-  const requestTimeout = config.timeout;
-  const encodedApiKey = Buffer.from(`${readmeApiKey}:`).toString('base64');
+  // const requestTimeout = config.timeout;
+  // const encodedApiKey = Buffer.from(`${readmeApiKey}:`).toString('base64');
   let baseLogUrl = options.baseLogUrl || undefined;
-  let queue: OutgoingLogBody[] = [];
 
-  return async (req, res, next) => {
-    if (baseLogUrl === undefined) {
-      baseLogUrl = await getProjectBaseUrl(encodedApiKey, requestTimeout);
-    }
+  // TODO fetch this from options
+  if (baseLogUrl === undefined) {
+    // baseLogUrl = await getProjectBaseUrl(encodedApiKey, requestTimeout);
+    baseLogUrl = 'https://docs.example.com';
+  }
 
-    const startedDateTime = new Date();
-    const logId = uuidv4();
+  const startedDateTime = new Date();
+  const logId = uuidv4();
 
-    if (baseLogUrl !== undefined && typeof baseLogUrl === 'string') {
-      res.setHeader('x-documentation-url', `${baseLogUrl}/logs/${logId}`);
-    }
+  patchResponse(res);
 
-    patchResponse(res);
+  if (baseLogUrl !== undefined && typeof baseLogUrl === 'string') {
+    res.setHeader('x-documentation-url', `${baseLogUrl}/logs/${logId}`);
+  }
 
-    doSend = () => {
-      // Copy the queue so we can send all the requests in one batch
-      const json = queue.slice();
-      // Clear out the queue so we don't resend any data in the future
-      queue = [];
+  function startSend() {
+    // This should in future become more sophisticated,
+    // with flush timeouts and more error checking but
+    // this is fine for now
+    const groupData = group;
 
-      // Make the log call
-      metricsAPICall(readmeApiKey, json).catch(e => {
-        // Silently discard errors and timeouts.
-        if (options.development) throw e;
-      });
-    };
+    const payload = constructPayload(
+      req,
+      // {
+      //   ...req,
 
-    function startSend() {
-      // This should in future become more sophisticated,
-      // with flush timeouts and more error checking but
-      // this is fine for now
-      const groupData = group(req, res);
+      //   // Shallow copying `req` destroys `req.headers` on Node 16 so we're re-adding it.
+      //   headers: req.headers,
 
-      const payload = constructPayload(
-        {
-          ...req,
+      //   // If you're using route nesting with `express.use()` then `req.url` is contextual to that route. So say
+      //   // you have an `/api` route that loads `/v1/upload`, `req.url` within the `/v1/upload` controller will be
+      //   // `/v1/upload`. Calling `req.originalUrl` ensures that we also capture the `/api` prefix.
+      //   url: req.originalUrl,
+      // },
+      res,
+      {
+        ...groupData,
+        logId,
+        startedDateTime,
+        responseEndDateTime: new Date(),
+        routePath: req.route
+          ? url.format({
+              protocol: req.protocol,
+              host: req.hostname,
+              pathname: `${req.baseUrl}${req.route.path}`,
+            })
+          : '',
+        responseBody: res._body,
+        requestBody: req.body,
+      },
+      options
+    );
 
-          // Shallow copying `req` destroys `req.headers` on Node 16 so we're re-adding it.
-          headers: req.headers,
+    queue.push(payload);
+    if (queue.length >= bufferLength) doSend(readmeApiKey, options);
 
-          // If you're using route nesting with `express.use()` then `req.url` is contextual to that route. So say
-          // you have an `/api` route that loads `/v1/upload`, `req.url` within the `/v1/upload` controller will be
-          // `/v1/upload`. Calling `req.originalUrl` ensures that we also capture the `/api` prefix.
-          url: req.originalUrl,
-        },
-        res,
-        {
-          ...groupData,
-          logId,
-          startedDateTime,
-          responseEndDateTime: new Date(),
-          routePath: req.route
-            ? url.format({
-                protocol: req.protocol,
-                host: req.hostname,
-                pathname: `${req.baseUrl}${req.route.path}`,
-              })
-            : '',
-          responseBody: res._body,
-          requestBody: req.body,
-        },
-        options
-      );
-      queue.push(payload);
-      if (queue.length >= bufferLength) doSend();
+    cleanup(); // eslint-disable-line @typescript-eslint/no-use-before-define
+  }
 
-      cleanup(); // eslint-disable-line @typescript-eslint/no-use-before-define
-    }
+  function cleanup() {
+    res.removeListener('finish', startSend);
+    res.removeListener('error', cleanup);
+    res.removeListener('close', cleanup);
+  }
 
-    function cleanup() {
-      res.removeListener('finish', startSend);
-      res.removeListener('error', cleanup);
-      res.removeListener('close', cleanup);
-    }
-
-    // Add response listeners
-    res.once('finish', startSend);
-    res.once('error', cleanup);
-    res.once('close', cleanup);
-
-    return next();
-  };
+  // Add response listeners
+  res.once('finish', startSend);
+  res.once('error', cleanup);
+  res.once('close', cleanup);
 }

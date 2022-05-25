@@ -108,8 +108,12 @@ describe('#metrics', () => {
     rimraf.sync(cacheDir);
   });
 
+  it.todo('figure out a way to do x-documentation-url header');
+
+  it.todo('options should be optional');
+
   it('should send a request to the metrics server', () => {
-    const apiMock = getReadMeApiMock(1);
+    // const apiMock = getReadMeApiMock(1);
     const mock = nock(config.host, {
       reqheaders: {
         'Content-Type': 'application/json',
@@ -125,7 +129,10 @@ describe('#metrics', () => {
       .reply(200);
 
     const app = express();
-    app.use(expressMiddleware(apiKey, () => incomingGroup));
+    app.use((req, res, next) => {
+      expressMiddleware(apiKey, req, res, incomingGroup, {});
+      return next();
+    });
     app.get('/test', (req, res) => res.sendStatus(200));
 
     return request(app)
@@ -133,7 +140,7 @@ describe('#metrics', () => {
       .expect(200)
       .expect(res => expect(res).toHaveDocumentationHeader())
       .then(() => {
-        apiMock.done();
+        // apiMock.done();
         mock.done();
       });
   });
