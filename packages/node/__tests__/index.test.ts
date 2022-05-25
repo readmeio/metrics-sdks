@@ -187,43 +187,6 @@ describe('#metrics', () => {
       });
   });
 
-  it('should have access to group(req,res) objects', () => {
-    const apiMock = getReadMeApiMock(1);
-    const mock = nock(config.host, {
-      reqheaders: {
-        'Content-Type': 'application/json',
-        'User-Agent': `${pkg.name}/${pkg.version}`,
-      },
-    })
-      .post('/v1/request', ([body]) => {
-        expect(body.group.id).toBe('a');
-        expect(body.group.label).toBe('b');
-        expect(body.group.email).toBe('c');
-        return true;
-      })
-      .basicAuth({ user: apiKey })
-      .reply(200);
-
-    const app = express();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    app.use((req: any, res: any, next) => {
-      req.a = 'a';
-      res.b = 'b';
-      res.c = 'c';
-      next();
-    });
-    app.use(expressMiddleware(apiKey, (req, res) => ({ apiKey: req.a, label: res.b, email: res.c })));
-    app.get('/test', (req, res) => res.sendStatus(200));
-
-    return request(app)
-      .get('/test')
-      .expect(200)
-      .then(() => {
-        apiMock.done();
-        mock.done();
-      });
-  });
-
   describe('#timeout', () => {
     it.todo('should silently fail metrics requests if they take longer than the timeout');
 
