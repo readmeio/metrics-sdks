@@ -72,6 +72,48 @@ describe('#metrics', () => {
     nock.cleanAll();
   });
 
+  it('should throw an error if `apiKey` is missing', () => {
+    const app = express();
+    app.use((req, res, next) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      expressMiddleware('', req, res, {});
+      return next();
+    });
+    app.get('/test', (req, res) => res.sendStatus(200));
+
+    // This silences console.errors from express internals
+    app.set('env', 'test');
+
+    return request(app)
+      .get('/test')
+      .expect(500)
+      .then(res => {
+        expect(res.text).toMatch(/Error: You must provide your ReadMe API key/);
+      });
+  });
+
+  it('should throw an error if `group` is missing', () => {
+    const app = express();
+    app.use((req, res, next) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      expressMiddleware(apiKey, req, res);
+      return next();
+    });
+    app.get('/test', (req, res) => res.sendStatus(200));
+
+    // This silences console.errors from express internals
+    app.set('env', 'test');
+
+    return request(app)
+      .get('/test')
+      .expect(500)
+      .then(res => {
+        expect(res.text).toMatch(/Error: You must provide a group/);
+      });
+  });
+
   it('should send a request to the metrics server', () => {
     const mock = nock(config.host, {
       reqheaders: {
