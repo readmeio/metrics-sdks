@@ -54,8 +54,6 @@ function patchResponse(res) {
   res._body = '';
 
   res.write = (chunk, encoding, cb) => {
-    console.log(chunk);
-
     res._body += chunk;
     write.call(res, chunk, encoding, cb);
   };

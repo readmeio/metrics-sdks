@@ -319,7 +319,6 @@ describe('#metrics', () => {
   });
 
   describe('`res._body`', () => {
-    let apiMock;
     const responseBody = { a: 1, b: 2, c: 3 };
     function createMock() {
       return nock(config.host, {
@@ -335,18 +334,13 @@ describe('#metrics', () => {
         .reply(200);
     }
 
-    beforeEach(() => {
-      apiMock = getReadMeApiMock(1);
-    });
-
-    afterEach(() => {
-      apiMock.done();
-    });
-
     it('should buffer up res.write() calls', async () => {
       const mock = createMock();
       const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup));
+      app.use((req, res, next) => {
+        expressMiddleware(apiKey, req, res, incomingGroup);
+        return next();
+      });
       app.get('/test', (req, res) => {
         res.write('{"a":1,');
         res.write('"b":2,');
@@ -362,7 +356,10 @@ describe('#metrics', () => {
     it('should buffer up res.end() calls', async () => {
       const mock = createMock();
       const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup));
+      app.use((req, res, next) => {
+        expressMiddleware(apiKey, req, res, incomingGroup);
+        return next();
+      });
       app.get('/test', (req, res) => res.end(JSON.stringify(responseBody)));
 
       await request(app)
@@ -376,7 +373,10 @@ describe('#metrics', () => {
     it('should work for res.send() calls', async () => {
       const mock = createMock();
       const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup));
+      app.use((req, res, next) => {
+        expressMiddleware(apiKey, req, res, incomingGroup);
+        return next();
+      });
       app.get('/test', (req, res) => res.send(responseBody));
 
       await request(app)
