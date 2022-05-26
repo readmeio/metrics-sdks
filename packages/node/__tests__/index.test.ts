@@ -195,7 +195,7 @@ describe('#metrics', () => {
 
   describe('#bufferLength', () => {
     it('should send requests when number hits `bufferLength` size', async function test() {
-      const apiMock = getReadMeApiMock(1);
+      // const apiMock = getReadMeApiMock(1);
       const mock = nock(config.host, {
         reqheaders: {
           'Content-Type': 'application/json',
@@ -209,7 +209,10 @@ describe('#metrics', () => {
         .reply(200);
 
       const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup, { bufferLength: 3 }));
+      app.use((req, res, next) => {
+        expressMiddleware(apiKey, req, res, incomingGroup, { bufferLength: 3 });
+        return next();
+      });
       app.get('/test', (req, res) => res.sendStatus(200));
 
       // We need to make sure that the logId isn't being preserved between buffered requests.
@@ -221,9 +224,10 @@ describe('#metrics', () => {
         .expect(res => {
           expect(res).toHaveDocumentationHeader();
           logUrl = res.headers['x-documentation-url'];
+          expect(logUrl).toBeDefined();
         });
 
-      expect(apiMock.isDone()).toBe(true);
+      // expect(apiMock.isDone()).toBe(true);
       expect(mock.isDone()).toBe(false);
 
       await request(app)
@@ -233,6 +237,7 @@ describe('#metrics', () => {
           expect(res).toHaveDocumentationHeader();
           expect(res.headers['x-documentation-url']).not.toBe(logUrl);
           logUrl = res.headers['x-documentation-url'];
+          expect(logUrl).toBeDefined();
         });
 
       expect(mock.isDone()).toBe(false);
@@ -243,10 +248,12 @@ describe('#metrics', () => {
         .expect(res => {
           expect(res).toHaveDocumentationHeader();
           expect(res.headers['x-documentation-url']).not.toBe(logUrl);
+          logUrl = res.headers['x-documentation-url'];
+          expect(logUrl).toBeDefined();
         });
 
       expect(mock.isDone()).toBe(true);
-      apiMock.done();
+      // apiMock.done();
       mock.done();
     });
 
@@ -287,7 +294,10 @@ describe('#metrics', () => {
       );
 
       const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup, { bufferLength }));
+      app.use((req, res, next) => {
+        expressMiddleware(apiKey, req, res, incomingGroup, { bufferLength });
+        return next();
+      });
       app.get('/test', (req, res) => res.sendStatus(200));
 
       return Promise.all(
