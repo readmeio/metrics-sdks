@@ -43,23 +43,6 @@ function getReadMeApiMock(numberOfTimes) {
     .reply(200, { baseUrl: baseLogUrl });
 }
 
-function getCache() {
-  const encodedApiKey = Buffer.from(`${apiKey}:`).toString('base64');
-  const fsSafeApikey = crypto.createHash('md5').update(encodedApiKey).digest('hex');
-  const cacheKey = [pkg.name, pkg.version, fsSafeApikey].join('-');
-
-  return flatCache.load(cacheKey, cacheDir);
-}
-
-function hydrateCache(lastUpdated) {
-  const cache = getCache();
-
-  // Postdate the cache to two days ago so it'll bee seen as stale.
-  cache.setKey('lastUpdated', lastUpdated);
-  cache.setKey('baseUrl', baseLogUrl);
-  cache.save();
-}
-
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jest {
@@ -258,9 +241,6 @@ describe('#metrics', () => {
     });
 
     it('should clear out the queue when sent', () => {
-      // Hydrate the cache so we don't need to mess with mocking out the API.
-      hydrateCache(Math.round(Date.now() / 1000));
-
       const numberOfLogs = 20;
       const numberOfMocks = 4;
       const bufferLength = numberOfLogs / numberOfMocks;
@@ -311,7 +291,7 @@ describe('#metrics', () => {
   });
 
   describe('#baseLogUrl', () => {
-    it('should not call the API if the baseLogUrl supplied as a middleware option', async () => {
+    it('should set x-documentation-url if `baseLogUrl` is passed', async () => {
       const mock = nock(config.host, {
         reqheaders: {
           'Content-Type': 'application/json',
@@ -323,7 +303,10 @@ describe('#metrics', () => {
         .reply(200);
 
       const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup, { baseLogUrl }));
+      app.use((req, res, next) => {
+        expressMiddleware(apiKey, req, res, incomingGroup, { baseLogUrl });
+        return next();
+      });
       app.get('/test', (req, res) => res.sendStatus(200));
 
       await request(app)
@@ -332,142 +315,6 @@ describe('#metrics', () => {
         .expect(res => expect(res).toHaveDocumentationHeader());
 
       mock.done();
-    });
-
-    it('should not call the API for project data if the cache is fresh', async () => {
-      const apiMock = getReadMeApiMock(1);
-      const metricsMock = nock(config.host, {
-        reqheaders: {
-          'Content-Type': 'application/json',
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .post('/v1/request')
-        .basicAuth({ user: apiKey })
-        .reply(200);
-
-      const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup));
-      app.get('/test', (req, res) => res.sendStatus(200));
-
-      // Cache will be populated with this call as the cache doesn't exist yet.
-      await request(app)
-        .get('/test')
-        .expect(200)
-        .expect(res => expect(res).toHaveDocumentationHeader());
-
-      // Spin up a new app so we're forced to look for the baseUrl in the cache instead of what's saved in-memory
-      // within the middleware.
-      const app2 = express();
-      app2.use(expressMiddleware(apiKey, () => incomingGroup));
-      app2.get('/test', (req, res) => res.sendStatus(200));
-
-      // Cache will be hit with this request and shouldn't make another call to the API for data it already has.
-      await request(app2)
-        .get('/test')
-        .expect(200)
-        .expect(res => expect(res).toHaveDocumentationHeader());
-
-      apiMock.done();
-      metricsMock.done();
-    });
-
-    it('should populate the cache if not present', async () => {
-      const apiMock = getReadMeApiMock(1);
-      const metricsMock = nock(config.host, {
-        reqheaders: {
-          'Content-Type': 'application/json',
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .post('/v1/request')
-        .basicAuth({ user: apiKey })
-        .reply(200);
-
-      const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup));
-      app.get('/test', (req, res) => res.sendStatus(200));
-
-      await request(app)
-        .get('/test')
-        .expect(200)
-        .expect(res => expect(res).toHaveDocumentationHeader());
-
-      apiMock.done();
-      metricsMock.done();
-    });
-
-    it('should refresh the cache if stale', async () => {
-      // Hydate and postdate the cache to two days ago so it'll bee seen as stale.
-      hydrateCache(Math.round(Date.now() / 1000 - 86400 * 2));
-
-      const apiMock = getReadMeApiMock(1);
-      const metricsMock = nock(config.host, {
-        reqheaders: {
-          'Content-Type': 'application/json',
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .post('/v1/request')
-        .basicAuth({ user: apiKey })
-        .reply(200);
-
-      const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup));
-      app.get('/test', (req, res) => res.sendStatus(200));
-
-      await request(app)
-        .get('/test')
-        .expect(200)
-        .expect(res => expect(res).toHaveDocumentationHeader());
-
-      apiMock.done();
-      metricsMock.done();
-    });
-
-    it('should temporarily set baseUrl to null if the call to the ReadMe API fails for whatever reason', async () => {
-      const apiMock = nock(config.readmeApiUrl, {
-        reqheaders: {
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .get('/v1/')
-        .basicAuth({ user: apiKey })
-        .reply(401, {
-          error: 'APIKEY_NOTFOUNDD',
-          message: "We couldn't find your API key",
-          suggestion:
-            "The API key you passed in (moc··········Key) doesn't match any keys we have in our system. API keys must be passed in as the username part of basic auth. You can get your API key in Configuration > API Key, or in the docs.",
-          docs: 'https://docs.readme.com/developers/logs/fake-uuid',
-          help: "If you need help, email support@readme.io and mention log 'fake-uuid'.",
-        });
-
-      const metricsMock = nock(config.host, {
-        reqheaders: {
-          'Content-Type': 'application/json',
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .post('/v1/request')
-        .basicAuth({ user: apiKey })
-        .reply(200);
-
-      const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup));
-      app.get('/test', (req, res) => res.sendStatus(200));
-
-      await request(app)
-        .get('/test')
-        .expect(200)
-        .expect(res => {
-          expect(getCache().getKey('baseUrl')).toBeNull();
-
-          // `x-documentation-url` header should not be present since we couldn't get the base URL!
-          expect(Object.keys(res.headers)).not.toContain('x-documentation-url');
-        });
-
-      apiMock.done();
-      metricsMock.done();
     });
   });
 
