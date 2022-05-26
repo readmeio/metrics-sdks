@@ -91,15 +91,8 @@ export function expressMiddleware(
 
   // Ensures the buffer length is between 1 and 30
   const bufferLength = clamp(options.bufferLength || config.bufferLength, 1, 30);
-  // const requestTimeout = config.timeout;
-  // const encodedApiKey = Buffer.from(`${readmeApiKey}:`).toString('base64');
-  let baseLogUrl = options.baseLogUrl || undefined;
 
-  // TODO fetch this from options
-  if (baseLogUrl === undefined) {
-    // baseLogUrl = await getProjectBaseUrl(encodedApiKey, requestTimeout);
-    baseLogUrl = 'https://docs.example.com';
-  }
+  const baseLogUrl = options.baseLogUrl || undefined;
 
   const startedDateTime = new Date();
   const logId = uuidv4();

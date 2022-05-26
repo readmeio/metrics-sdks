@@ -2,10 +2,7 @@ import type { ServerResponse } from 'http';
 import express from 'express';
 import request from 'supertest';
 import nock from 'nock';
-import rimraf from 'rimraf';
 import * as crypto from 'crypto';
-import flatCache from 'flat-cache';
-import findCacheDir from 'find-cache-dir';
 import { isValidUUIDV4 } from 'is-valid-uuid-v4';
 import config from '../src/config';
 import pkg from '../package.json';
@@ -29,19 +26,6 @@ const outgoingGroup = {
 };
 
 const baseLogUrl = 'https://docs.example.com';
-const cacheDir = findCacheDir({ name: pkg.name });
-
-function getReadMeApiMock(numberOfTimes) {
-  return nock(config.readmeApiUrl, {
-    reqheaders: {
-      'User-Agent': `${pkg.name}/${pkg.version}`,
-    },
-  })
-    .get('/v1/')
-    .basicAuth({ user: apiKey })
-    .times(numberOfTimes)
-    .reply(200, { baseUrl: baseLogUrl });
-}
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -86,17 +70,9 @@ describe('#metrics', () => {
 
   afterEach(() => {
     nock.cleanAll();
-
-    // Clean up the cache dir between tests.
-    rimraf.sync(cacheDir);
   });
 
-  it.todo('figure out a way to do x-documentation-url header');
-
-  it.todo('options should be optional');
-
   it('should send a request to the metrics server', () => {
-    // const apiMock = getReadMeApiMock(1);
     const mock = nock(config.host, {
       reqheaders: {
         'Content-Type': 'application/json',
@@ -113,7 +89,7 @@ describe('#metrics', () => {
 
     const app = express();
     app.use((req, res, next) => {
-      expressMiddleware(apiKey, req, res, incomingGroup, {});
+      expressMiddleware(apiKey, req, res, incomingGroup);
       return next();
     });
     app.get('/test', (req, res) => res.sendStatus(200));
@@ -121,15 +97,12 @@ describe('#metrics', () => {
     return request(app)
       .get('/test')
       .expect(200)
-      .expect(res => expect(res).toHaveDocumentationHeader())
       .then(() => {
-        // apiMock.done();
         mock.done();
       });
   });
 
   it('express should log the full request url with nested express apps', () => {
-    // const apiMock = getReadMeApiMock(1);
     const mock = nock(config.host, {
       reqheaders: {
         'Content-Type': 'application/json',
@@ -148,7 +121,7 @@ describe('#metrics', () => {
     const appNest = express();
 
     app.use((req, res, next) => {
-      expressMiddleware(apiKey, req, res, incomingGroup, {});
+      expressMiddleware(apiKey, req, res, incomingGroup);
       return next();
     });
     appNest.get('/nested', (req, res) => {
@@ -163,9 +136,7 @@ describe('#metrics', () => {
     return request(app)
       .get('/test/nested')
       .expect(200)
-      .expect(res => expect(res).toHaveDocumentationHeader())
       .then(() => {
-        // apiMock.done();
         mock.done();
       });
   });
@@ -178,7 +149,6 @@ describe('#metrics', () => {
 
   describe('#bufferLength', () => {
     it('should send requests when number hits `bufferLength` size', async function test() {
-      // const apiMock = getReadMeApiMock(1);
       const mock = nock(config.host, {
         reqheaders: {
           'Content-Type': 'application/json',
@@ -193,7 +163,7 @@ describe('#metrics', () => {
 
       const app = express();
       app.use((req, res, next) => {
-        expressMiddleware(apiKey, req, res, incomingGroup, { bufferLength: 3 });
+        expressMiddleware(apiKey, req, res, incomingGroup, { bufferLength: 3, baseLogUrl });
         return next();
       });
       app.get('/test', (req, res) => res.sendStatus(200));
@@ -210,7 +180,6 @@ describe('#metrics', () => {
           expect(logUrl).toBeDefined();
         });
 
-      // expect(apiMock.isDone()).toBe(true);
       expect(mock.isDone()).toBe(false);
 
       await request(app)
@@ -236,7 +205,6 @@ describe('#metrics', () => {
         });
 
       expect(mock.isDone()).toBe(true);
-      // apiMock.done();
       mock.done();
     });
 
@@ -362,10 +330,7 @@ describe('#metrics', () => {
       });
       app.get('/test', (req, res) => res.end(JSON.stringify(responseBody)));
 
-      await request(app)
-        .get('/test')
-        .expect(200)
-        .expect(res => expect(res).toHaveDocumentationHeader());
+      await request(app).get('/test').expect(200);
 
       mock.done();
     });
@@ -379,10 +344,7 @@ describe('#metrics', () => {
       });
       app.get('/test', (req, res) => res.send(responseBody));
 
-      await request(app)
-        .get('/test')
-        .expect(200)
-        .expect(res => expect(res).toHaveDocumentationHeader());
+      await request(app).get('/test').expect(200);
 
       mock.done();
     });
