@@ -6,7 +6,7 @@ import * as crypto from 'crypto';
 import { isValidUUIDV4 } from 'is-valid-uuid-v4';
 import config from '../src/config';
 import pkg from '../package.json';
-import readmeio from '../src';
+import * as readmeio from '../src';
 import FormData from 'form-data';
 import multer from 'multer';
 
