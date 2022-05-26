@@ -12,7 +12,6 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 app.use((req, res, next) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   readmeio.log(process.env.README_API_KEY, req, res, {
     // User's API Key
     apiKey: 'owlbert-api-key',
