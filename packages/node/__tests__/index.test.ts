@@ -389,8 +389,6 @@ describe('#metrics', () => {
   });
 
   describe('`req.body`', () => {
-    let apiMock;
-
     function createMock(checkLocation: 'text' | 'params', requestBody: unknown) {
       return nock(config.host, {
         reqheaders: {
@@ -405,14 +403,6 @@ describe('#metrics', () => {
         .reply(200);
     }
 
-    beforeEach(() => {
-      apiMock = getReadMeApiMock(1);
-    });
-
-    afterEach(() => {
-      apiMock.done();
-    });
-
     it('should accept multipart/form-data', async () => {
       const form = new FormData();
       form.append('password', '123456');
@@ -424,7 +414,10 @@ describe('#metrics', () => {
       const mock = createMock('text', JSON.stringify({ password: '123456', apiKey: 'abc', another: 'Hello world' }));
       const app = express();
       app.use(upload.none());
-      app.use(expressMiddleware(apiKey, () => incomingGroup));
+      app.use((req, res, next) => {
+        expressMiddleware(apiKey, req, res, incomingGroup);
+        return next();
+      });
       app.post('/test', (req, res) => {
         res.status(200).end();
       });
