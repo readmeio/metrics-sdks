@@ -24,10 +24,6 @@ function doSend(readmeApiKey, options) {
 // Make sure we flush the queue if the process is exited
 process.on('exit', doSend);
 
-export interface GroupingFunction {
-  (req, res): GroupingObject;
-}
-
 interface ExtendedResponse extends Response {
   _body?: string;
 }

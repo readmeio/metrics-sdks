@@ -6,7 +6,7 @@ import * as crypto from 'crypto';
 import { isValidUUIDV4 } from 'is-valid-uuid-v4';
 import config from '../src/config';
 import pkg from '../package.json';
-import { expressMiddleware } from '../src';
+import readmeio from '../src';
 import FormData from 'form-data';
 import multer from 'multer';
 
@@ -77,7 +77,7 @@ describe('#metrics', () => {
     app.use((req, res, next) => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      expressMiddleware('', req, res, {});
+      readmeio.log('', req, res, {});
       return next();
     });
     app.get('/test', (req, res) => res.sendStatus(200));
@@ -98,7 +98,7 @@ describe('#metrics', () => {
     app.use((req, res, next) => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      expressMiddleware(apiKey, req, res);
+      readmeio.log(apiKey, req, res);
       return next();
     });
     app.get('/test', (req, res) => res.sendStatus(200));
@@ -131,7 +131,7 @@ describe('#metrics', () => {
 
     const app = express();
     app.use((req, res, next) => {
-      expressMiddleware(apiKey, req, res, incomingGroup);
+      readmeio.log(apiKey, req, res, incomingGroup);
       return next();
     });
     app.get('/test', (req, res) => res.sendStatus(200));
@@ -163,7 +163,7 @@ describe('#metrics', () => {
     const appNest = express();
 
     app.use((req, res, next) => {
-      expressMiddleware(apiKey, req, res, incomingGroup);
+      readmeio.log(apiKey, req, res, incomingGroup);
       return next();
     });
     appNest.get('/nested', (req, res) => {
@@ -205,7 +205,7 @@ describe('#metrics', () => {
 
       const app = express();
       app.use((req, res, next) => {
-        expressMiddleware(apiKey, req, res, incomingGroup, { bufferLength: 3, baseLogUrl });
+        readmeio.log(apiKey, req, res, incomingGroup, { bufferLength: 3, baseLogUrl });
         return next();
       });
       app.get('/test', (req, res) => res.sendStatus(200));
@@ -285,7 +285,7 @@ describe('#metrics', () => {
 
       const app = express();
       app.use((req, res, next) => {
-        expressMiddleware(apiKey, req, res, incomingGroup, { bufferLength });
+        readmeio.log(apiKey, req, res, incomingGroup, { bufferLength });
         return next();
       });
       app.get('/test', (req, res) => res.sendStatus(200));
@@ -314,7 +314,7 @@ describe('#metrics', () => {
 
       const app = express();
       app.use((req, res, next) => {
-        expressMiddleware(apiKey, req, res, incomingGroup, { baseLogUrl });
+        readmeio.log(apiKey, req, res, incomingGroup, { baseLogUrl });
         return next();
       });
       app.get('/test', (req, res) => res.sendStatus(200));
@@ -348,7 +348,7 @@ describe('#metrics', () => {
       const mock = createMock();
       const app = express();
       app.use((req, res, next) => {
-        expressMiddleware(apiKey, req, res, incomingGroup);
+        readmeio.log(apiKey, req, res, incomingGroup);
         return next();
       });
       app.get('/test', (req, res) => {
@@ -367,7 +367,7 @@ describe('#metrics', () => {
       const mock = createMock();
       const app = express();
       app.use((req, res, next) => {
-        expressMiddleware(apiKey, req, res, incomingGroup);
+        readmeio.log(apiKey, req, res, incomingGroup);
         return next();
       });
       app.get('/test', (req, res) => res.end(JSON.stringify(responseBody)));
@@ -381,7 +381,7 @@ describe('#metrics', () => {
       const mock = createMock();
       const app = express();
       app.use((req, res, next) => {
-        expressMiddleware(apiKey, req, res, incomingGroup);
+        readmeio.log(apiKey, req, res, incomingGroup);
         return next();
       });
       app.get('/test', (req, res) => res.send(responseBody));
@@ -419,7 +419,7 @@ describe('#metrics', () => {
       const app = express();
       app.use(upload.none());
       app.use((req, res, next) => {
-        expressMiddleware(apiKey, req, res, incomingGroup);
+        readmeio.log(apiKey, req, res, incomingGroup);
         return next();
       });
       app.post('/test', (req, res) => {
