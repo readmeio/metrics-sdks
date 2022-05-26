@@ -1,5 +1,4 @@
 import type { LogOptions } from './construct-payload';
-import type { ServerResponse, IncomingMessage } from 'http';
 import type { GroupingObject, OutgoingLogBody } from './metrics-log';
 import type { Request, Response } from 'express';
 import config from '../config';
@@ -7,7 +6,6 @@ import clamp from 'lodash/clamp';
 import * as url from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import { constructPayload } from './construct-payload';
-import { getProjectBaseUrl } from './get-project-base-url';
 import { metricsAPICall } from './metrics-log';
 
 let queue: OutgoingLogBody[] = [];
@@ -32,15 +30,6 @@ export interface GroupingFunction {
 
 interface ExtendedResponse extends Response {
   _body?: string;
-}
-
-interface ExtendedIncomingMessage extends IncomingMessage {
-  originalUrl: string;
-  route: any;
-  hostname: string;
-  baseUrl: string;
-  protocol: string;
-  body: string;
 }
 
 // We're doing this to buffer up the response body
