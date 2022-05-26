@@ -1,12 +1,9 @@
 import type { Response } from 'node-fetch';
-import type { PayloadData, LogOptions } from './construct-payload';
-import type { Request, Response as ExpressResponse } from 'express';
 import type { Har } from 'har-format';
 import fetch from 'node-fetch';
 import timeoutSignal from 'timeout-signal';
 import pkg from '../../package.json';
 import config from '../config';
-import { constructPayload } from './construct-payload';
 
 export interface GroupingObject {
   /**

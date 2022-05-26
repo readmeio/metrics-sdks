@@ -64,7 +64,7 @@ export interface Options extends LogOptions {
  * @param options Additional options. See the documentation for more details.
  * @returns Your Express middleware
  */
-export function expressMiddleware(
+export function log(
   readmeApiKey: string,
   req: Request,
   res: ExtendedResponse,
