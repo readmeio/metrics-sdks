@@ -6,7 +6,7 @@ import timeoutSignal from 'timeout-signal';
 import fetch from 'node-fetch';
 import config from '../config';
 
-export async function getProjectBaseUrl(readmeApiKey: string, requestTimeout: number) {
+export async function getProjectBaseUrl(readmeApiKey: string, requestTimeout = config.timeout) {
   const encodedApiKey = Buffer.from(`${readmeApiKey}:`).toString('base64');
   const cacheDir = findCacheDir({ name: pkg.name, create: true });
   const fsSafeApikey = crypto.createHash('md5').update(encodedApiKey).digest('hex');

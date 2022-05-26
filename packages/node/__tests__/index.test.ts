@@ -9,6 +9,7 @@ import pkg from '../package.json';
 import * as readmeio from '../src';
 import FormData from 'form-data';
 import multer from 'multer';
+import { getReadMeApiMock } from './lib/get-project-base-url.test';
 
 const upload = multer();
 
@@ -25,19 +26,17 @@ const outgoingGroup = {
   email: 'test@example.com',
 };
 
-const baseLogUrl = 'https://docs.example.com';
-
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jest {
     interface Matchers<R> {
-      toHaveDocumentationHeader(res?: ServerResponse): R;
+      toHaveDocumentationHeader(baseLogUrl: string): R;
     }
   }
 }
 
 expect.extend({
-  toHaveDocumentationHeader(res) {
+  toHaveDocumentationHeader(res, baseLogUrl) {
     const { matcherHint, printExpected, printReceived } = this.utils;
     const message = (pass, actual) => () => {
       return (
@@ -191,6 +190,7 @@ describe('#metrics', () => {
 
   describe('#bufferLength', () => {
     it('should send requests when number hits `bufferLength` size', async function test() {
+      const baseLogUrl = 'https://docs.example.com';
       const mock = nock(config.host, {
         reqheaders: {
           'Content-Type': 'application/json',
@@ -217,7 +217,7 @@ describe('#metrics', () => {
         .get('/test')
         .expect(200)
         .expect(res => {
-          expect(res).toHaveDocumentationHeader();
+          expect(res).toHaveDocumentationHeader(baseLogUrl);
           logUrl = res.headers['x-documentation-url'];
           expect(logUrl).toBeDefined();
         });
@@ -228,7 +228,7 @@ describe('#metrics', () => {
         .get('/test')
         .expect(200)
         .expect(res => {
-          expect(res).toHaveDocumentationHeader();
+          expect(res).toHaveDocumentationHeader(baseLogUrl);
           expect(res.headers['x-documentation-url']).not.toBe(logUrl);
           logUrl = res.headers['x-documentation-url'];
           expect(logUrl).toBeDefined();
@@ -240,7 +240,7 @@ describe('#metrics', () => {
         .get('/test')
         .expect(200)
         .expect(res => {
-          expect(res).toHaveDocumentationHeader();
+          expect(res).toHaveDocumentationHeader(baseLogUrl);
           expect(res.headers['x-documentation-url']).not.toBe(logUrl);
           logUrl = res.headers['x-documentation-url'];
           expect(logUrl).toBeDefined();
@@ -302,6 +302,8 @@ describe('#metrics', () => {
 
   describe('#baseLogUrl', () => {
     it('should set x-documentation-url if `baseLogUrl` is passed', async () => {
+      const baseLogUrl = 'https://docs.example.com';
+
       const mock = nock(config.host, {
         reqheaders: {
           'Content-Type': 'application/json',
@@ -322,8 +324,40 @@ describe('#metrics', () => {
       await request(app)
         .get('/test')
         .expect(200)
-        .expect(res => expect(res).toHaveDocumentationHeader());
+        .expect(res => expect(res).toHaveDocumentationHeader(baseLogUrl));
 
+      mock.done();
+    });
+
+    it('should work to call `getProjectBaseUrl()` first', async () => {
+      const baseLogUrl = 'https://docs.readme.com';
+      const readmeApiMock = getReadMeApiMock(1, baseLogUrl);
+
+      const mock = nock(config.host, {
+        reqheaders: {
+          'Content-Type': 'application/json',
+          'User-Agent': `${pkg.name}/${pkg.version}`,
+        },
+      })
+        .post('/v1/request')
+        .basicAuth({ user: apiKey })
+        .reply(200);
+
+      const app = express();
+      app.use(async (req, res, next) => {
+        const logUrl = await readmeio.getProjectBaseUrl(apiKey);
+
+        readmeio.log(apiKey, req, res, incomingGroup, { baseLogUrl: logUrl });
+        return next();
+      });
+      app.get('/test', (req, res) => res.sendStatus(200));
+
+      await request(app)
+        .get('/test')
+        .expect(200)
+        .expect(res => expect(res).toHaveDocumentationHeader(baseLogUrl));
+
+      readmeApiMock.done();
       mock.done();
     });
   });

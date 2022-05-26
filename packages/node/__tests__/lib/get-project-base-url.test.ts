@@ -12,7 +12,8 @@ const apiKey = 'mockReadMeApiKey';
 const baseLogUrl = 'https://docs.example.com';
 const cacheDir = findCacheDir({ name: pkg.name });
 
-function getReadMeApiMock(numberOfTimes) {
+// eslint-disable-next-line jest/no-export
+export function getReadMeApiMock(numberOfTimes, baseUrl = baseLogUrl) {
   return nock(config.readmeApiUrl, {
     reqheaders: {
       'User-Agent': `${pkg.name}/${pkg.version}`,
@@ -21,7 +22,7 @@ function getReadMeApiMock(numberOfTimes) {
     .get('/v1/')
     .basicAuth({ user: apiKey })
     .times(numberOfTimes)
-    .reply(200, { baseUrl: baseLogUrl });
+    .reply(200, { baseUrl });
 }
 
 function getCache() {
