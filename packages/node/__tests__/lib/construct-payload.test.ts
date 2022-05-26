@@ -1,5 +1,6 @@
 import type { LogOptions, PayloadData } from '../../src/lib/construct-payload';
-import * as http from 'http';
+import { createServer } from 'http';
+import type { Request, Response } from 'express';
 import request from 'supertest';
 import { isValidUUIDV4 } from 'is-valid-uuid-v4';
 import packageJson from '../../package.json';
@@ -21,7 +22,7 @@ function fixPlatform(platform: string): 'mac' | 'windows' | 'linux' | 'unknown' 
 }
 
 function createApp(options?: LogOptions, payloadData?: PayloadData) {
-  const requestListener = function (req: http.IncomingMessage, res: http.ServerResponse) {
+  const requestListener = function (req: Request, res: Response) {
     let body = '';
     let parsedBody: Record<string, unknown> | undefined;
 
@@ -45,7 +46,7 @@ function createApp(options?: LogOptions, payloadData?: PayloadData) {
     });
   };
 
-  return http.createServer(requestListener);
+  return createServer(requestListener);
 }
 
 describe('constructPayload()', () => {

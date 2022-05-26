@@ -1,11 +1,12 @@
 import type { LogOptions } from 'src/lib/construct-payload';
+import type { Request, Response } from 'express';
 import request from 'supertest';
-import * as http from 'http';
+import { createServer } from 'http';
 import processRequest from '../../src/lib/process-request';
 import FormData from 'form-data';
 
 function createApp(reqOptions?: LogOptions, shouldPreParse = false, bodyOverride?) {
-  const requestListener = function (req: http.IncomingMessage, res: http.ServerResponse) {
+  const requestListener = function (req: Request, res: Response) {
     let body = '';
 
     req.on('readable', function () {
@@ -25,7 +26,7 @@ function createApp(reqOptions?: LogOptions, shouldPreParse = false, bodyOverride
     });
   };
 
-  return http.createServer(requestListener);
+  return createServer(requestListener);
 }
 
 test('should create expected json response when preparsed', () => {

@@ -135,7 +135,8 @@ export function constructPayload(
           {
             pageref: payloadData.routePath
               ? new URL(payloadData.routePath, `${getProto(req)}://${req.headers.host}`).toString()
-              : new URL(req.originalUrl, `${getProto(req)}://${req.headers.host}`).toString(),
+              : // req.originalUrl is express specific, req.url is node.js
+                new URL(req.originalUrl || req.url, `${getProto(req)}://${req.headers.host}`).toString(),
             startedDateTime: payloadData.startedDateTime.toISOString(),
             time: serverTime,
             request: processRequest(req, payloadData.requestBody, logOptions),
