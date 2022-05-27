@@ -1,4 +1,3 @@
-import type { ServerResponse } from 'http';
 import express from 'express';
 import request from 'supertest';
 import nock from 'nock';
