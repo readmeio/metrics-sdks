@@ -142,6 +142,35 @@ describe('#metrics', () => {
       });
   });
 
+  it('should set `pageref` correctly based on `req.route`', () => {
+    const mock = nock(config.host, {
+      reqheaders: {
+        'Content-Type': 'application/json',
+        'User-Agent': `${pkg.name}/${pkg.version}`,
+      },
+    })
+      .post('/v1/request', ([body]) => {
+        expect(body.request.log.entries[0].pageref).toBe('http://127.0.0.1/test/:id');
+        return true;
+      })
+      .basicAuth({ user: apiKey })
+      .reply(200);
+
+    const app = express();
+    app.use((req, res, next) => {
+      readmeio.log(apiKey, req, res, incomingGroup);
+      return next();
+    });
+    app.get('/test/:id', (req, res) => res.sendStatus(200));
+
+    return request(app)
+      .get('/test/hello')
+      .expect(200)
+      .then(() => {
+        mock.done();
+      });
+  });
+
   it('express should log the full request url with nested express apps', () => {
     const mock = nock(config.host, {
       reqheaders: {
