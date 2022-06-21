@@ -38,7 +38,7 @@
     "@types/har-format": "^1.2.7",
     "@types/jest": "^27.4.1",
     "@types/multer": "^1.4.7",
-    "@types/node": "^17.0.24",
+    "@types/node": "^18.0.0",
     "eslint": "^8.10.0",
     "express": "^4.17.1",
     "form-data": "^4.0.0",
