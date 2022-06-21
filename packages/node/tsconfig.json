@@ -9,5 +9,10 @@
     "resolveJsonModule": true,
     "baseUrl": "."
   },
-  "include": ["src/**/*"]
+  "include": [
+    "src/**/*",
+    // We have to explicitly list these config files
+    // due to the dynamic require in certain envs
+    "src/config/*.json"
+  ]
 }
