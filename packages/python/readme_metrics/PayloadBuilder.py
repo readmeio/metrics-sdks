@@ -46,7 +46,7 @@ class PayloadBuilder:
         """
         self.denylist = denylist
         self.allowlist = allowlist
-        self.development_mode = "true" if development_mode else "false"
+        self.development_mode = development_mode
         self.grouping_function = grouping_function
         self.logger = logger
 
