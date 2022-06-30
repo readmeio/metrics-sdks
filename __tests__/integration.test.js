@@ -137,7 +137,17 @@ describe('Metrics SDK Integration Tests', () => {
     expect(har.clientIPAddress).toBe('127.0.0.1');
     expect(har.development).toBe(false);
 
-    const { request, response } = har.request.log.entries[0];
+    const { request, response, startedDateTime } = har.request.log.entries[0];
+
+    // It should look like this, with optional microseconds component:
+    // JavaScript: new Date.toISOString()
+    // - 2022-06-30T10:21:55.394Z
+    // Python: datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    // - 2022-06-30T10:31:43Z
+    // TODO I'm not sure how to make this regex "safe", it has something to do
+    // with the optional non-capturing group at the end: (?:.\d{3})?
+    // eslint-disable-next-line unicorn/no-unsafe-regex
+    expect(startedDateTime).toMatch(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:.\d{3})?Z/);
 
     expect(request.url).toBe(`http://localhost:${PORT}/`);
     expect(request.method).toBe('GET');
