@@ -325,7 +325,7 @@ class TestPayloadBuilder:
         next(middleware(environ, app.mockStartResponse))
         payload = self.createPayload(config)
         data = payload(metrics.req, metrics.res)
-        assert data['_id'] == str(uuid.UUID(data['_id'], version=4))
+        assert data["_id"] == str(uuid.UUID(data["_id"], version=4))
 
     # for test GET/POST/PUT I'm putting the status code tests for now since we cant
     # verify the body yet for status 401 and 403, they can also be moved to

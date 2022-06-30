@@ -38,9 +38,7 @@ class TestFlaskExtension:
             # ensure that before_request has set request.rm_start_dt to
             # roughly the current datetime
             assert hasattr(request, "rm_start_dt")
-            req_start_dt = datetime.strptime(
-                request.rm_start_dt, "%Y-%m-%dT%H:%M:%SZ"
-            )
+            req_start_dt = datetime.strptime(request.rm_start_dt, "%Y-%m-%dT%H:%M:%SZ")
             current_dt = datetime.utcnow()
             assert abs(current_dt - req_start_dt) < timedelta(seconds=1)
 
