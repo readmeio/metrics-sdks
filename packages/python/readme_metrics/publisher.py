@@ -24,7 +24,6 @@ def publish_batch(config, queue):
 
         version = importlib.import_module(__package__).__version__
         url = urljoin(os.getenv('METRICS_SERVER', config.METRICS_API), "/v1/request")
-        print(url)
 
         readme_result = requests.post(
             url,
