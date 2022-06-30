@@ -84,6 +84,8 @@ describe('Metrics SDK Integration Tests', () => {
     });
     return new Promise((resolve, reject) => {
       httpServer.stderr.on('data', data => {
+        // For some reason Flask prints on stderr 🤷‍♂️
+        if (data.toString().match(/Running on/)) return resolve();
         // eslint-disable-next-line no-console
         console.error(`stderr: ${data}`);
         return reject(data.toString());
@@ -159,8 +161,11 @@ describe('Metrics SDK Integration Tests', () => {
 
     expect(response.status).toBe(200);
     expect(response.statusText).toBe('OK');
-    expect(response.content.text).toBe(JSON.stringify({ message: 'hello world' }));
-    expect(response.content.size).toBe(25);
+    // Flask prints a \n character after the JSON response
+    // https://github.com/pallets/flask/issues/4635
+    expect(response.content.text.replace('\n', '')).toBe(JSON.stringify({ message: 'hello world' }));
+    // The \n character above means we cannot compare to a fixed number
+    expect(response.content.size).toStrictEqual(response.content.text.length);
     expect(response.content.mimeType).toBe('application/json; charset=utf-8');
 
     const responseHeaders = caseless(arrayToObject(response.headers));
