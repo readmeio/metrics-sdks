@@ -1,6 +1,7 @@
 import pytest  # pylint: disable=import-error
 import requests
 import json
+import uuid
 
 from .fixtures import Environ
 
@@ -312,6 +313,19 @@ class TestPayloadBuilder:
         config = self.mockMiddlewareConfig(development_mode=True)
         payload = self.createPayload(config)
         assert payload.development_mode == True
+
+    def testUuid(self):
+        config = self.mockMiddlewareConfig(development_mode=True)
+        responseObjectString = "{ 'responseObject': 'value' }"
+        environ = Environ.MockEnviron().getEnvironForRequest(b"", "POST")
+        app = MockApplication(responseObjectString)
+        metrics = MetricsCoreMock()
+        middleware = MetricsMiddleware(app, config)
+        middleware.metrics_core = metrics
+        next(middleware(environ, app.mockStartResponse))
+        payload = self.createPayload(config)
+        data = payload(metrics.req, metrics.res)
+        assert data['_id'] == str(uuid.UUID(data['_id'], version=4))
 
     # for test GET/POST/PUT I'm putting the status code tests for now since we cant
     # verify the body yet for status 401 and 403, they can also be moved to

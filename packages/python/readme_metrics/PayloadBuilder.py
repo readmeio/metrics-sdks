@@ -7,6 +7,7 @@ import time
 import importlib
 from typing import List, Optional
 from urllib import parse
+import uuid
 
 import requests
 from readme_metrics import ResponseInfoWrapper
@@ -67,6 +68,7 @@ class PayloadBuilder:
             return None
 
         payload = {
+            "_id": str(uuid.uuid4()),
             "group": group,
             "clientIPAddress": request.environ.get("REMOTE_ADDR"),
             "development": self.development_mode,
