@@ -23,3 +23,11 @@ services:
     command: npm run test:integration
     environment:
       - EXAMPLE_SERVER=dotnet examples/net6.0/out/net6.0.dll
+
+  integration_python_flask:
+    build:
+      context: .
+      dockerfile: ./__tests__/integrations/python.Dockerfile
+    command: npm run test:integration
+    environment:
+      - EXAMPLE_SERVER=python examples/flask/app.py
