@@ -135,6 +135,7 @@ describe('Metrics SDK Integration Tests', () => {
     expect(har._id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
     expect(har.group).toMatchSnapshot();
     expect(har.clientIPAddress).toBe('127.0.0.1');
+    expect(har.development).toBe(false);
 
     const { request, response } = har.request.log.entries[0];
 
