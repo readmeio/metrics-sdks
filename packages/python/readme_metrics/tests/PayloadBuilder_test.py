@@ -90,6 +90,7 @@ class TestPayloadBuilder:
                 },
             ),
             buffer_length=1,
+            development_mode=kwargs.get("development_mode"),
             denylist=kwargs.get("denylist", []),
             allowlist=kwargs.get("allowlist", []),
             blacklist=kwargs.get("blacklist", []),
@@ -302,25 +303,15 @@ class TestPayloadBuilder:
         }
         assert group == expected_group
 
-    @pytest.mark.skip(reason="@todo")
     def testProduction(self):
-        # Tests when the website is called in production
-        # payload = createPayload(MetricsApiConfig(#params here))
-        # jsonRes = self.data_fetcher.getJSON(url)
-        # readMeRes = self.getMetricData()
-        # similar = compareRequests(jsonRes, readMeRes)
-        # self.assertTrue(similar)
-        pass
+        config = self.mockMiddlewareConfig(development_mode=False)
+        payload = self.createPayload(config)
+        assert payload.development_mode == False
 
-    @pytest.mark.skip(reason="@todo")
     def testDevelopment(self):
-        # Tests when the website is called in development mode
-        # payload = createPayload(MetricsApiConfig(#params here))
-        # jsonRes = self.data_fetcher.getJSON(url)
-        # readMeRes = self.getMetricData()
-        # similar = compareRequests(jsonRes, readMeRes)
-        # self.assertTrue(similar)
-        pass
+        config = self.mockMiddlewareConfig(development_mode=True)
+        payload = self.createPayload(config)
+        assert payload.development_mode == True
 
     # for test GET/POST/PUT I'm putting the status code tests for now since we cant
     # verify the body yet for status 401 and 403, they can also be moved to
