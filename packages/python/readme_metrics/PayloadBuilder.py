@@ -184,7 +184,7 @@ class PayloadBuilder:
             "headers": headers,  # headers.items(),
             "content": {
                 "text": body,
-                "size": response.content_length,
+                "size": int(response.content_length),
                 "mimeType": response.content_type,
             },
         }
