@@ -29,6 +29,8 @@ class MetricsApiConfig:
             send to ReadMe.
 
             If this option is configured, ONLY the allowlisted properties will be sent.
+        IGNORED_CONTENT_ENCODING_TYPES (List[str]): A list of content encoding types
+            readme should ignore.
         ALLOWED_HTTP_HOSTS (List[str]): A list of allowed http hosts for sending
             data to the ReadMe API.
         METRICS_API (str): Base URL of the ReadMe metrics API.
@@ -63,6 +65,7 @@ class MetricsApiConfig:
         denylist: List[str] = None,
         blacklist: List[str] = None,
         whitelist: List[str] = None,
+        ignored_content_encoding_types: List[str] = [],
         allowed_http_hosts: List[str] = None,
         timeout: int = 3,
     ):
@@ -104,6 +107,8 @@ class MetricsApiConfig:
                 sent.
             blacklist (List[str], optional): Deprecated, prefer denylist.
             whitelist (List[str], optional): Deprecated, prefer allowlist.
+            ignored_content_encoding_types (List[str]): A list of content encoding types
+            readme should ignore.
             allowed_http_hosts (List[str], optional): A list of HTTP hosts which should be
                 logged to ReadMe. If this is present, requests will only be sent to ReadMe
                 whose Host header matches one of the allowed hosts.
@@ -122,6 +127,7 @@ class MetricsApiConfig:
         self.IS_BACKGROUND_MODE = background_worker_mode
         self.DENYLIST = denylist or blacklist or []
         self.ALLOWLIST = allowlist or whitelist or []
+        self.IGNORED_CONTENT_ENCODING_TYPES = ignored_content_encoding_types
         self.ALLOWED_HTTP_HOSTS = allowed_http_hosts
         self.METRICS_API_TIMEOUT = timeout
         self.LOGGER = util_build_logger()

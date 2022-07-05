@@ -30,6 +30,9 @@ class ReadMeMetrics:
         try:
             request.rm_start_dt = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
             request.rm_start_ts = int(time.time() * 1000)
+            content_encoding = getattr(request, "content_encoding", None)
+            if content_encoding in self.config.IGNORED_CONTENT_ENCODING_TYPES:
+                return
             if "Content-Length" in request.headers or request.data:
                 request.rm_content_length = request.headers["Content-Length"] or "0"
                 request.rm_body = request.data or ""
