@@ -34,6 +34,7 @@ class PayloadBuilder:
         development_mode: bool,
         grouping_function,
         logger: Logger,
+        ignored_content_encoding_types: List[str],
     ):
         """Creates a PayloadBuilder instance with the supplied configuration
 
@@ -50,6 +51,7 @@ class PayloadBuilder:
         self.development_mode = development_mode
         self.grouping_function = grouping_function
         self.logger = logger
+        self.ignored_content_encoding_types = ignored_content_encoding_types
 
     def __call__(self, request, response: ResponseInfoWrapper) -> dict:
         """Builds a HAR payload encompassing the request & response data
@@ -146,7 +148,11 @@ class PayloadBuilder:
         headers = self._redact_dict(request.headers)
         params = parse.parse_qsl(self._get_query_string(request))
 
-        if getattr(request, "content_length", None):
+        content_encoding = getattr(request, "content_encoding", None)
+
+        if content_encoding in self.ignored_content_encoding_types:
+            post_data = {}
+        elif getattr(request, "content_length", None):
             post_data = self._process_body(request.rm_body)
         else:
             post_data = {}
