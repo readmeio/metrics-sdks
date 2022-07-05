@@ -1,3 +1,26 @@
+## <small>5.1.4 (2022-07-05)</small>
+
+* fix: add types for libraries used in source code (#490) ([dac0568](https://github.com/readmeio/metrics-sdks/commit/dac0568)), closes [#490](https://github.com/readmeio/metrics-sdks/issues/490)
+* fix: keep composer lock in git (#495) ([7682467](https://github.com/readmeio/metrics-sdks/commit/7682467)), closes [#495](https://github.com/readmeio/metrics-sdks/issues/495)
+* fix(python): bug fixes, general improvements and integration test suite ([8ecdbc1](https://github.com/readmeio/metrics-sdks/commit/8ecdbc1))
+* ci: attempt to fix php builds in ci (#494) ([93b0a4f](https://github.com/readmeio/metrics-sdks/commit/93b0a4f)), closes [#494](https://github.com/readmeio/metrics-sdks/issues/494)
+* chore: update package-lock after new dependencies added ([9cb4453](https://github.com/readmeio/metrics-sdks/commit/9cb4453))
+* chore(deps-dev): bump @commitlint/cli from 17.0.2 to 17.0.3 (#484) ([b6cce3e](https://github.com/readmeio/metrics-sdks/commit/b6cce3e)), closes [#484](https://github.com/readmeio/metrics-sdks/issues/484)
+* chore(deps-dev): bump @commitlint/config-conventional (#483) ([2d97bcf](https://github.com/readmeio/metrics-sdks/commit/2d97bcf)), closes [#483](https://github.com/readmeio/metrics-sdks/issues/483)
+* chore(deps-dev): bump @readme/eslint-config from 8.7.6 to 8.8.0 (#485) ([656ff8e](https://github.com/readmeio/metrics-sdks/commit/656ff8e)), closes [#485](https://github.com/readmeio/metrics-sdks/issues/485)
+* chore(deps-dev): bump @readme/eslint-config in /packages/node (#487) ([2134ca7](https://github.com/readmeio/metrics-sdks/commit/2134ca7)), closes [#487](https://github.com/readmeio/metrics-sdks/issues/487)
+* chore(deps-dev): bump @types/node from 17.0.31 to 18.0.0 (#476) ([5e3173b](https://github.com/readmeio/metrics-sdks/commit/5e3173b)), closes [#476](https://github.com/readmeio/metrics-sdks/issues/476)
+* chore(deps-dev): bump eslint from 8.14.0 to 8.18.0 in /packages/node (#473) ([246ce5a](https://github.com/readmeio/metrics-sdks/commit/246ce5a)), closes [#473](https://github.com/readmeio/metrics-sdks/issues/473)
+* chore(deps-dev): bump eslint from 8.18.0 to 8.19.0 (#491) ([398ce1a](https://github.com/readmeio/metrics-sdks/commit/398ce1a)), closes [#491](https://github.com/readmeio/metrics-sdks/issues/491)
+* chore(deps-dev): bump nock from 13.2.4 to 13.2.7 (#478) ([2324265](https://github.com/readmeio/metrics-sdks/commit/2324265)), closes [#478](https://github.com/readmeio/metrics-sdks/issues/478)
+* chore(deps-dev): bump nock from 13.2.4 to 13.2.8 in /packages/node (#488) ([bedee54](https://github.com/readmeio/metrics-sdks/commit/bedee54)), closes [#488](https://github.com/readmeio/metrics-sdks/issues/488)
+* chore(deps-dev): bump prettier from 2.6.2 to 2.7.1 in /packages/node (#486) ([3f55b9d](https://github.com/readmeio/metrics-sdks/commit/3f55b9d)), closes [#486](https://github.com/readmeio/metrics-sdks/issues/486)
+* chore(deps-dev): bump typescript from 4.7.2 to 4.7.4 in /packages/node (#489) ([0c75bf8](https://github.com/readmeio/metrics-sdks/commit/0c75bf8)), closes [#489](https://github.com/readmeio/metrics-sdks/issues/489)
+* chore(deps): bump actions/setup-python from 3 to 4 (#481) ([8349209](https://github.com/readmeio/metrics-sdks/commit/8349209)), closes [#481](https://github.com/readmeio/metrics-sdks/issues/481)
+* feat(python): bump version to 2.0.1 ([ab236b9](https://github.com/readmeio/metrics-sdks/commit/ab236b9))
+
+
+
 ## <small>5.1.3 (2022-06-21)</small>
 
 * chore: bump browserslist/caniuse dep ([fd9968a](https://github.com/readmeio/metrics-sdks/commit/fd9968a))
