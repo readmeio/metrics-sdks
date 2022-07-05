@@ -78,6 +78,7 @@ def test_redaction_with_allowlist():
         development_mode=True,
         grouping_function=None,
         logger=logger,
+        ignored_content_encoding_types=[],
     )._redact_dict(mapping)
     assert allowlist_result == expected_allowlist_result
 
@@ -89,6 +90,7 @@ def test_redaction_with_denylist():
         development_mode=True,
         grouping_function=None,
         logger=logger,
+        ignored_content_encoding_types=[],
     )._redact_dict(mapping)
     assert denylist_result == expected_denylist_result
 
@@ -101,5 +103,6 @@ def test_redaction_with_both():
         development_mode=True,
         grouping_function=None,
         logger=logger,
+        ignored_content_encoding_types=[],
     )._redact_dict(mapping)
     assert denylist_result == expected_denylist_result
