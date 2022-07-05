@@ -26,6 +26,7 @@
   ],
   "dependencies": {
     "@types/har-format": "^1.2.7",
+    "@types/node-fetch": "^2.6.2",
     "content-type": "^1.0.4",
     "find-cache-dir": "^3.3.1",
     "flat-cache": "^3.0.4",
