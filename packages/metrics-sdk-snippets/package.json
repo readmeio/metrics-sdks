@@ -1,0 +1,13 @@
+{
+  "name": "@readme/metrics-sdk-snippets",
+  "version": "1.0.0",
+  "description": "Generate snippets for ReadMe Metrics SDKs in multiple languages",
+  "main": "index.js",
+  "scripts": {
+    "pretest": "eslint .",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+  },
+  "author": "Dom Harrington",
+  "license": "ISC",
+  "type": "module"
+}
