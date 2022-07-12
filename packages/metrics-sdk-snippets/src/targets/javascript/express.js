@@ -22,6 +22,7 @@ export default function express(params, options) {
   code.push(1, '// Verify the request is legitimate and came from ReadMe');
   code.push(1, "const signature = req.headers['readme-signature'];");
   code.push(1, '// Your ReadMe secret');
+  // TODO should pass in JWT secret here
   code.push(1, "const secret = 'rdme_xxxx';");
   code.push(1, 'try {');
   code.push(2, 'readme.verify(req.body, signature, secret);');
@@ -32,7 +33,23 @@ export default function express(params, options) {
 
   code.push(1, '// Fetch the user from the db');
   code.push(1, 'db.find({ email: req.body.email }).then(user => {');
-  code.push(2, 'return res.json({});');
+  code.push(2, 'return res.json({');
+
+  code.push(3, '// OAS Server variables');
+  // TODO should handle default server variable values
+  params.server.forEach(server => {
+    code.push(3, `${server}: 'test123'`);
+  });
+  code.blank();
+
+  code.push(3, '// OAS Security variables');
+  params.security.forEach(({ name, type }) => {
+    if (type === 'http') return code.push(3, `${name}: { user: 'user', pass: 'pass' },`);
+
+    return code.push(3, `${name}: 'apiKey',`);
+  });
+
+  code.push(2, '});');
   code.push(1, '});');
   code.push('});');
 
