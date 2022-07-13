@@ -44,17 +44,16 @@ export default function express(params, options) {
   code.push(2, 'return res.json({');
 
   if (server.length > 0) code.push(3, '// OAS Server variables');
-  // TODO should handle default server variable values
-  server.forEach(server => {
-    code.push(3, `${server}: 'test123'`);
+  server.forEach(variable => {
+    code.push(3, `${variable.name}: '${variable.default || variable.name}'`);
   });
   code.blank();
 
   if (security.length > 0) code.push(3, '// OAS Security variables');
-  security.forEach(({ name, type }) => {
-    if (type === 'http') return code.push(3, `${name}: { user: 'user', pass: 'pass' },`);
+  security.forEach(variable => {
+    if (variable.type === 'http') return code.push(3, `${variable.name}: { user: 'user', pass: 'pass' },`);
 
-    return code.push(3, `${name}: 'apiKey',`);
+    return code.push(3, `${variable.name}: '${variable.default || variable.name}',`);
   });
 
   code.push(2, '});');
