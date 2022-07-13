@@ -6,6 +6,14 @@ export default function express(params, options) {
     ...options,
   };
 
+  const { server, security } = params.reduce(
+    (prev, next) => {
+      prev[next.source].push(next);
+      return prev;
+    },
+    { server: [], security: [] }
+  );
+
   const code = new CodeBuilder(opts.indent);
 
   code.push('// Save this code as “server.js”');
@@ -37,13 +45,13 @@ export default function express(params, options) {
 
   code.push(3, '// OAS Server variables');
   // TODO should handle default server variable values
-  params.server.forEach(server => {
+  server.forEach(server => {
     code.push(3, `${server}: 'test123'`);
   });
   code.blank();
 
   code.push(3, '// OAS Security variables');
-  params.security.forEach(({ name, type }) => {
+  security.forEach(({ name, type }) => {
     if (type === 'http') return code.push(3, `${name}: { user: 'user', pass: 'pass' },`);
 
     return code.push(3, `${name}: 'apiKey',`);
