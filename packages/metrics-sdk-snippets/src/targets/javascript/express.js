@@ -43,14 +43,14 @@ export default function express(params, options) {
   code.push(1, 'db.find({ email: req.body.email }).then(user => {');
   code.push(2, 'return res.json({');
 
-  code.push(3, '// OAS Server variables');
+  if (server.length > 0) code.push(3, '// OAS Server variables');
   // TODO should handle default server variable values
   server.forEach(server => {
     code.push(3, `${server}: 'test123'`);
   });
   code.blank();
 
-  code.push(3, '// OAS Security variables');
+  if (security.length > 0) code.push(3, '// OAS Security variables');
   security.forEach(({ name, type }) => {
     if (type === 'http') return code.push(3, `${name}: { user: 'user', pass: 'pass' },`);
 
