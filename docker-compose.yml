@@ -8,6 +8,14 @@ services:
     environment:
       - EXAMPLE_SERVER=node ./packages/node/examples/express/index.js
 
+  integration_node_hapi:
+    build:
+      context: .
+      dockerfile: ./__tests__/integrations/node.Dockerfile
+    command: npm run test:integration
+    environment:
+      - EXAMPLE_SERVER=node ./packages/node/examples/hapi/index.js
+
   integration_dotnet_v6.0:
     build:
       context: .
@@ -15,3 +23,11 @@ services:
     command: npm run test:integration
     environment:
       - EXAMPLE_SERVER=dotnet examples/net6.0/out/net6.0.dll
+
+  integration_python_flask:
+    build:
+      context: .
+      dockerfile: ./__tests__/integrations/python.Dockerfile
+    command: npm run test:integration
+    environment:
+      - EXAMPLE_SERVER=python examples/flask/app.py

@@ -49,7 +49,10 @@
     ]
   },
   "config": {
-    "optimize-autoloader": true
+    "optimize-autoloader": true,
+    "allow-plugins": {
+      "ocramius/package-versions": true
+    }
   },
   "autoload": {
     "psr-4": {

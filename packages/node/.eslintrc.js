@@ -33,6 +33,10 @@ module.exports = {
         // In some versions of node that is true, but in others it's false
         // which was causing this rule to trigger 🤯
         'eslint-comments/no-unused-disable': 'off',
+        // We don't want the top level eslint task to fail if the examples
+        // folders are missing dependencies. These will be tested separately
+        // during the integration testing step.
+        'import/no-unresolved': 'off',
       },
     },
   ],

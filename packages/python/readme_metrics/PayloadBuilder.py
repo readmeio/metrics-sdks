@@ -7,6 +7,7 @@ import time
 import importlib
 from typing import List, Optional
 from urllib import parse
+import uuid
 
 import requests
 from readme_metrics import ResponseInfoWrapper
@@ -46,7 +47,7 @@ class PayloadBuilder:
         """
         self.denylist = denylist
         self.allowlist = allowlist
-        self.development_mode = "true" if development_mode else "false"
+        self.development_mode = development_mode
         self.grouping_function = grouping_function
         self.logger = logger
 
@@ -67,6 +68,7 @@ class PayloadBuilder:
             return None
 
         payload = {
+            "_id": str(uuid.uuid4()),
             "group": group,
             "clientIPAddress": request.environ.get("REMOTE_ADDR"),
             "development": self.development_mode,
@@ -182,7 +184,7 @@ class PayloadBuilder:
             "headers": headers,  # headers.items(),
             "content": {
                 "text": body,
-                "size": response.content_length,
+                "size": int(response.content_length),
                 "mimeType": response.content_type,
             },
         }

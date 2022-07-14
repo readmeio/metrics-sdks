@@ -1,8 +1,10 @@
+import os
 import importlib
 import json
 import math
 from queue import Empty, Queue
 import time
+from urllib.parse import urljoin
 
 import requests
 
@@ -21,7 +23,7 @@ def publish_batch(config, queue):
             return
 
         version = importlib.import_module(__package__).__version__
-        url = config.METRICS_API + "/request"
+        url = urljoin(os.getenv("METRICS_SERVER", config.METRICS_API), "/v1/request")
 
         readme_result = requests.post(
             url,
