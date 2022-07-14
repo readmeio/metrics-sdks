@@ -9,7 +9,7 @@ export function verify(body: WebhookBody, signature: string, secret: string): We
   
   // Make sure timestamp is recent to prevent replay attacks
   const THIRTY_MIN = 30 * 60 * 1000;
-  if (new Date().getTime() - new Date(time).getTime() > THIRTY_MIN) {
+  if (new Date().getTime() - new Date(+time).getTime() > THIRTY_MIN) {
     throw new Error('Expired Signature');
   }
 
