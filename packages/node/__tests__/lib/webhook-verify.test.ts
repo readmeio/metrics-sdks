@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 import { verify } from '../../src/lib/webhook-verify';
 
