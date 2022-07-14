@@ -12,7 +12,7 @@ describe('verify()', () => {
     const signature = `t=${time},v0=${hmac.update(unsigned).digest('hex')}`;
 
     const verifiedBody = verify(body, signature, secret);
-    expect(verifiedBody).toEqual(body);
+    expect(verifiedBody).toStrictEqual(body);
   });
 
   it('should throw an error if signature is invalid', () => {
@@ -25,7 +25,7 @@ describe('verify()', () => {
 
     expect(() => {
       verify(body, signature, secret);
-    }).toThrow();
+    }).toThrow(/Invalid Signature/);
   });
 
   it('should throw an error if timestamp is too old', () => {

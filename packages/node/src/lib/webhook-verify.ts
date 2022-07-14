@@ -1,11 +1,11 @@
 import crypto from 'crypto';
 
 interface WebhookBody {
-  email: String;
+  email: string;
 }
 
 export function verify(body: WebhookBody, signature: string, secret: string): WebhookBody {
-  const [fullMatch, time, readmeSignature] = /^t\=(.*){1},v0\=(.*)/.exec(signature);
+  const [, time, readmeSignature] = /^t=(\d*){1},v0=([a-f0-9]{64})/.exec(signature);
 
   // Make sure timestamp is recent to prevent replay attacks
   const THIRTY_MIN = 30 * 60 * 1000;
