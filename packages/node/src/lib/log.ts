@@ -142,4 +142,5 @@ export function log(
   res.once('finish', startSend);
   res.once('error', cleanup);
   res.once('close', cleanup);
+  return logId;
 }

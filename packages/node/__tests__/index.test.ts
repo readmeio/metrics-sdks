@@ -129,7 +129,8 @@ describe('#metrics', () => {
 
     const app = express();
     app.use((req, res, next) => {
-      readmeio.log(apiKey, req, res, incomingGroup);
+      const logId = readmeio.log(apiKey, req, res, incomingGroup);
+      res.setHeader('x-log-id', logId);
       return next();
     });
     app.get('/test', (req, res) => res.sendStatus(200));
@@ -137,6 +138,7 @@ describe('#metrics', () => {
     return request(app)
       .get('/test')
       .expect(200)
+      .expect('x-log-id', /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       .then(() => {
         mock.done();
       });
