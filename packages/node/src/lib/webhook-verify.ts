@@ -5,7 +5,30 @@ interface WebhookBody {
 }
 
 export function verify(body: WebhookBody, signature: string, secret: string): WebhookBody {
-  const [, time, readmeSignature] = /^t=(\d*){1},v0=([a-f0-9]{64})/.exec(signature);
+  // Inspired by stripe-node
+  // https://github.com/stripe/stripe-node/blob/4e82ccafda2017654ac264c070e7ebfa0e662fcd/lib/Webhooks.js#L240-L258
+  const expectedScheme = 'v0';
+  /* eslint-disable no-param-reassign */
+  const { time, readmeSignature } = signature.split(',').reduce(
+    (accum, item) => {
+      const kv = item.split('=');
+
+      if (kv[0] === 't') {
+        accum.time = Number(kv[1]);
+      }
+
+      if (kv[0] === expectedScheme) {
+        accum.readmeSignature = kv[1];
+      }
+
+      return accum;
+    },
+    {
+      time: -1,
+      readmeSignature: '',
+    }
+  );
+  /* eslint-enable no-param-reassign */
 
   // Make sure timestamp is recent to prevent replay attacks
   const THIRTY_MIN = 30 * 60 * 1000;
