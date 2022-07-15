@@ -84,6 +84,8 @@ describe('Metrics SDK Integration Tests', () => {
     });
     return new Promise((resolve, reject) => {
       httpServer.stderr.on('data', data => {
+        // For some reason Flask prints on stderr 🤷‍♂️
+        if (data.toString().match(/Running on/)) return resolve();
         // eslint-disable-next-line no-console
         console.error(`stderr: ${data}`);
         return reject(data.toString());
@@ -135,8 +137,19 @@ describe('Metrics SDK Integration Tests', () => {
     expect(har._id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
     expect(har.group).toMatchSnapshot();
     expect(har.clientIPAddress).toBe('127.0.0.1');
+    expect(har.development).toBe(false);
 
-    const { request, response } = har.request.log.entries[0];
+    const { request, response, startedDateTime } = har.request.log.entries[0];
+
+    // It should look like this, with optional microseconds component:
+    // JavaScript: new Date.toISOString()
+    // - 2022-06-30T10:21:55.394Z
+    // Python: datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    // - 2022-06-30T10:31:43Z
+    // TODO I'm not sure how to make this regex "safe", it has something to do
+    // with the optional non-capturing group at the end: (?:.\d{3})?
+    // eslint-disable-next-line unicorn/no-unsafe-regex
+    expect(startedDateTime).toMatch(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:.\d{3})?Z/);
 
     expect(request.url).toBe(`http://localhost:${PORT}/`);
     expect(request.method).toBe('GET');
@@ -148,8 +161,11 @@ describe('Metrics SDK Integration Tests', () => {
 
     expect(response.status).toBe(200);
     expect(response.statusText).toBe('OK');
-    expect(response.content.text).toBe(JSON.stringify({ message: 'hello world' }));
-    expect(response.content.size).toBe(25);
+    // Flask prints a \n character after the JSON response
+    // https://github.com/pallets/flask/issues/4635
+    expect(response.content.text.replace('\n', '')).toBe(JSON.stringify({ message: 'hello world' }));
+    // The \n character above means we cannot compare to a fixed number
+    expect(response.content.size).toStrictEqual(response.content.text.length);
     expect(response.content.mimeType).toBe('application/json; charset=utf-8');
 
     const responseHeaders = caseless(arrayToObject(response.headers));
