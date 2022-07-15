@@ -179,7 +179,7 @@ export default function processRequest(
   // We use a fake host here because we rely on the host header which could be redacted.
   // We only ever use this reqUrl with the fake hostname for the pathname and querystring.
   // req.originalUrl is express specific, req.url is node.js
-  const reqUrl = new URL(req.originalUrl || req.url, `https://readme.io`);
+  const reqUrl = new URL(req.originalUrl || req.url, 'https://readme.io');
 
   const requestData = {
     method: req.method,
