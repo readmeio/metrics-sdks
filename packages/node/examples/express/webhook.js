@@ -24,7 +24,8 @@ app.post('/webhook', express.json({ type: 'application/json' }), (req, res) => {
     return res.sendStatus(401);
   }
   // Fetch the user from the db
-  db.find({ email: req.body.email }).then(user => {
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define, @typescript-eslint/no-unused-vars
+  return db.find({ email: req.body.email }).then(user => {
     return res.json({
       // OAS Security variables
       petstore_auth: 'default-key',
