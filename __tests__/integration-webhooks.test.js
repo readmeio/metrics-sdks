@@ -110,4 +110,14 @@ describe('Metrics SDK Webhook Integration Tests', () => {
 
     expect(response.statusCode).toBe(401);
   });
+
+  it('should return with a 401 if the signature is empty/missing', async () => {
+    const response = await post(`http://localhost:${PORT}/webhook`, JSON.stringify({ email: 'dom@readme.io' }), {
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+
+    expect(response.statusCode).toBe(401);
+  });
 });

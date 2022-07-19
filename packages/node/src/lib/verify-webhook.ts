@@ -4,7 +4,9 @@ interface WebhookBody {
   email: string;
 }
 
-export default function verifyWebhook(body: WebhookBody, signature: string, secret: string): WebhookBody {
+export default function verifyWebhook(body: WebhookBody, signature: string = '', secret: string): WebhookBody {
+  if (!signature) throw new Error('Missing Signature');
+
   // Inspired by stripe-node
   // https://github.com/stripe/stripe-node/blob/4e82ccafda2017654ac264c070e7ebfa0e662fcd/lib/Webhooks.js#L240-L258
   const expectedScheme = 'v0';

@@ -41,4 +41,18 @@ describe('verifyWebhook()', () => {
       verifyWebhook(body, signature, secret);
     }).toThrow(/Expired Signature/);
   });
+
+  it('should throw an error if signature is missing', () => {
+    const body = { email: 'marc@readme.io' };
+    const secret = 'docs4dayz';
+    const time = new Date();
+    time.setHours(time.getHours() - 1);
+    const unsigned = `${time.getTime()}.${JSON.stringify(body)}`;
+    const hmac = crypto.createHmac('sha256', secret);
+    const signature = undefined;
+
+    expect(() => {
+      verifyWebhook(body, signature, secret);
+    }).toThrow(/Missing Signature/);
+  });
 });
