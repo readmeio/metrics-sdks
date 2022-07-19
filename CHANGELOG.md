@@ -1,3 +1,15 @@
+## 5.2.0 (2022-07-19)
+
+* feat: add webhook verify utility function to node (#457) ([3cefdb9](https://github.com/readmeio/metrics-sdks/commit/3cefdb9)), closes [#457](https://github.com/readmeio/metrics-sdks/issues/457)
+* chore(deps-dev): bump @types/node from 18.0.0 to 18.0.1 (#493) ([8f6e1db](https://github.com/readmeio/metrics-sdks/commit/8f6e1db)), closes [#493](https://github.com/readmeio/metrics-sdks/issues/493)
+* chore(deps): bump actions/cache from 3.0.3 to 3.0.4 (#482) ([230f8f7](https://github.com/readmeio/metrics-sdks/commit/230f8f7)), closes [#482](https://github.com/readmeio/metrics-sdks/issues/482)
+* chore(deps): bump composer/composer in /packages/php (#496) ([987a0ab](https://github.com/readmeio/metrics-sdks/commit/987a0ab)), closes [#496](https://github.com/readmeio/metrics-sdks/issues/496)
+* chore(deps): bump django from 3.2.13 to 3.2.14 in /packages/python (#500) ([51d65d8](https://github.com/readmeio/metrics-sdks/commit/51d65d8)), closes [#500](https://github.com/readmeio/metrics-sdks/issues/500)
+* chore(deps): bump guzzlehttp/guzzle from 7.4.1 to 7.4.5 in /packages/php (#497) ([8ef3733](https://github.com/readmeio/metrics-sdks/commit/8ef3733)), closes [#497](https://github.com/readmeio/metrics-sdks/issues/497)
+* chore(deps): bump guzzlehttp/psr7 from 2.1.0 to 2.4.0 in /packages/php (#498) ([54f750e](https://github.com/readmeio/metrics-sdks/commit/54f750e)), closes [#498](https://github.com/readmeio/metrics-sdks/issues/498)
+
+
+
 ## <small>5.1.4 (2022-07-05)</small>
 
 * fix: add types for libraries used in source code (#490) ([dac0568](https://github.com/readmeio/metrics-sdks/commit/dac0568)), closes [#490](https://github.com/readmeio/metrics-sdks/issues/490)
