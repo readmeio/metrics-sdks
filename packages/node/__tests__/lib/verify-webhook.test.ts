@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 
-import { verify } from '../../src/lib/webhook-verify';
+import verifyWebhook from '../../src/lib/verify-webhook';
 
-describe('verify()', () => {
+describe('verifyWebhook()', () => {
   it('should return the body if the signature is valid', () => {
     const body = { email: 'marc@readme.io' };
     const secret = 'docs4dayz';
@@ -11,7 +11,7 @@ describe('verify()', () => {
     const hmac = crypto.createHmac('sha256', secret);
     const signature = `t=${time},v0=${hmac.update(unsigned).digest('hex')}`;
 
-    const verifiedBody = verify(body, signature, secret);
+    const verifiedBody = verifyWebhook(body, signature, secret);
     expect(verifiedBody).toStrictEqual(body);
   });
 
@@ -24,7 +24,7 @@ describe('verify()', () => {
     const signature = `t=${time},v0=${hmac.update(unsigned).digest('hex')}`;
 
     expect(() => {
-      verify(body, signature, secret);
+      verifyWebhook(body, signature, secret);
     }).toThrow(/Invalid Signature/);
   });
 
@@ -38,7 +38,7 @@ describe('verify()', () => {
     const signature = `t=${time.getTime()},v0=${hmac.update(unsigned).digest('hex')}`;
 
     expect(() => {
-      verify(body, signature, secret);
+      verifyWebhook(body, signature, secret);
     }).toThrow(/Expired Signature/);
   });
 });

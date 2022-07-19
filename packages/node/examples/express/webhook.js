@@ -18,7 +18,7 @@ app.post('/webhook', express.json({ type: 'application/json' }), (req, res) => {
   // Your ReadMe secret
   const secret = process.env.README_API_KEY;
   try {
-    readme.verify(req.body, signature, secret);
+    readme.verifyWebhook(req.body, signature, secret);
   } catch (e) {
     // Handle invalid requests
     return res.sendStatus(401);
