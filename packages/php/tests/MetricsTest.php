@@ -143,7 +143,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $actual_request = array_shift($this->api_calls);
         $actual_request = $actual_request['request'];
 
-        $this->assertSame('/request', $actual_request->getRequestTarget());
+        $this->assertSame('/v1/request', $actual_request->getRequestTarget());
 
         $actual_payload = json_decode($actual_request->getBody(), true);
         $this->assertCount(1, $actual_payload);
