@@ -163,7 +163,7 @@ class PayloadBuilder:
             "httpVersion": request.environ["SERVER_PROTOCOL"],
             "headers": [{"name": k, "value": v} for (k, v) in headers.items()],
             "queryString": [{"name": k, "value": v} for (k, v) in params],
-            **post_data,
+            "postData": post_data,
         }
 
     def _build_response_payload(self, response: ResponseInfoWrapper) -> dict:
