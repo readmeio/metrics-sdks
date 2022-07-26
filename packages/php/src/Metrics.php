@@ -142,7 +142,7 @@ class Metrics
         // If not in development mode, all requests should be async.
         if (!$this->development_mode) {
             try {
-                $promise = $this->client->postAsync('/request', [
+                $promise = $this->client->postAsync('/v1/request', [
                     'headers' => $headers,
                     'json' => [$payload]
                 ]);
@@ -159,7 +159,7 @@ class Metrics
         }
 
         try {
-            $metrics_response = $this->client->post('/request', [
+            $metrics_response = $this->client->post('/v1/request', [
                 'headers' => $headers,
                 'json' => [$payload]
             ]);
