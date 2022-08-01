@@ -36,7 +36,7 @@
     "uuid": "^8.2.0"
   },
   "devDependencies": {
-    "@readme/eslint-config": "^8.7.0",
+    "@readme/eslint-config": "^9.0.0",
     "@types/jest": "^27.4.1",
     "@types/multer": "^1.4.7",
     "@types/node": "^18.0.0",
