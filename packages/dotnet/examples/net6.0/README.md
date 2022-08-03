@@ -1,6 +1,6 @@
 # ReadMe Metrics .NET 6.0 Demo
 
-## Install
+## Install
 
 ```sh
 brew install dotnet

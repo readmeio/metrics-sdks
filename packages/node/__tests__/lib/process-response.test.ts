@@ -1,5 +1,4 @@
 import * as http from 'http';
-import * as qs from 'querystring';
 
 import request from 'supertest';
 
@@ -15,24 +14,11 @@ function testResponse(
   resContentType = 'application/json'
 ) {
   const requestListener = function (req: http.IncomingMessage, res: TestServerResponse) {
-    let body = '';
-    let parsedBody: Record<string, unknown> | undefined;
-
-    req.on('readable', function () {
-      const chunk = req.read();
-      if (chunk) {
-        body += chunk;
-      }
-    });
+    // Have to do this otherwise the request is never read
+    // and the tests timeout
+    req.on('readable', function () {});
 
     req.on('end', function () {
-      if (req.headers['content-type'] === 'application/json') {
-        parsedBody = JSON.parse(body);
-      } else if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        parsedBody = qs.parse(body);
-      }
-
       res.setHeader('Content-Type', resContentType);
       res.setHeader('etag', 'ajh4kjthklu3qa4h5tkjlha3214');
       res.setHeader('last-modified', 'Thu, 01 Jan 1970 00:00:00 GMT');

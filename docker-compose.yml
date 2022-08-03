@@ -4,15 +4,23 @@ services:
     build:
       context: .
       dockerfile: ./__tests__/integrations/node.Dockerfile
-    command: npm run test:integration
+    command: npm run test:integration-metrics
     environment:
       - EXAMPLE_SERVER=node ./packages/node/examples/express/index.js
+
+  integration_webhooks_node_express:
+    build:
+      context: .
+      dockerfile: ./__tests__/integrations/node.Dockerfile
+    command: npm run test:integration-webhooks
+    environment:
+      - EXAMPLE_SERVER=node ./packages/node/examples/express/webhook.js
 
   integration_node_hapi:
     build:
       context: .
       dockerfile: ./__tests__/integrations/node.Dockerfile
-    command: npm run test:integration
+    command: npm run test:integration-metrics
     environment:
       - EXAMPLE_SERVER=node ./packages/node/examples/hapi/index.js
 
@@ -20,7 +28,7 @@ services:
     build:
       context: .
       dockerfile: ./__tests__/integrations/dotnet.Dockerfile
-    command: npm run test:integration
+    command: npm run test:integration-metrics
     environment:
       - EXAMPLE_SERVER=dotnet examples/net6.0/out/net6.0.dll
 
@@ -28,6 +36,6 @@ services:
     build:
       context: .
       dockerfile: ./__tests__/integrations/python.Dockerfile
-    command: npm run test:integration
+    command: npm run test:integration-metrics
     environment:
       - EXAMPLE_SERVER=python examples/flask/app.py

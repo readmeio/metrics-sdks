@@ -7,7 +7,8 @@
     "prepare": "husky install",
     "publish": "npx lerna publish",
     "test": "npm test --workspaces",
-    "test:integration": "NODE_OPTIONS=--experimental-vm-modules npx jest",
+    "test:integration-metrics": "NODE_OPTIONS=--experimental-vm-modules npx jest __tests__/integration.test.js",
+    "test:integration-webhooks": "NODE_OPTIONS=--experimental-vm-modules npx jest __tests__/integration-webhooks.test.js",
     "version": "npx conventional-changelog-cli --pkg lerna.json -i CHANGELOG.md -s && git add CHANGELOG.md"
   },
   "repository": {
@@ -24,7 +25,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.0.2",
     "@commitlint/config-conventional": "^17.0.2",
-    "@readme/eslint-config": "^8.7.3",
+    "@readme/eslint-config": "^9.0.0",
     "caseless": "^0.12.0",
     "eslint": "^8.14.0",
     "get-port": "^6.1.2",

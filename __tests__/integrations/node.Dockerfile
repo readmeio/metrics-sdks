@@ -18,6 +18,6 @@ RUN npm ci
 
 # Install top level dependencies
 WORKDIR /src
-ADD __tests__ ./
+ADD __tests__ ./__tests__
 ADD package*.json ./
 RUN npm ci
