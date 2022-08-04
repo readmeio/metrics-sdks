@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://www.nuget.org/packages/ReadMe.Metrics/"><img src="https://img.shields.io/nuget/v/ReadMe.Metrics.svg?style=for-the-badge" alt="NPM Version"></a>
+  <a href="https://www.nuget.org/packages/ReadMe.Metrics/"><img src="https://img.shields.io/nuget/v/ReadMe.Metrics.svg?style=for-the-badge" alt="Latest release"></a>
   <a href="https://github.com/readmeio/metrics-sdks"><img src="https://img.shields.io/github/workflow/status/readmeio/metrics-sdks/dotnet.svg?style=for-the-badge" alt="Build status"></a>
 </p>
 

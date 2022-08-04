@@ -9,8 +9,8 @@
 </p>
 
 <p align="center">
-  <a href="https://npm.im/readmeio"><img src="https://img.shields.io/npm/v/readmeio.svg?style=for-the-badge" alt="NPM Version"></a>
-  <a href="https://npm.im/readmeio"><img src="https://img.shields.io/node/v/readmeio.svg?style=for-the-badge" alt="Node Version"></a>
+  <a href="https://npm.im/readmeio"><img src="https://img.shields.io/npm/v/readmeio.svg?style=for-the-badge" alt="Latest release"></a>
+  <a href="https://npm.im/readmeio"><img src="https://img.shields.io/node/v/readmeio.svg?style=for-the-badge" alt="Supported Node versions"></a>
   <a href="https://github.com/readmeio/metrics-sdks"><img src="https://img.shields.io/github/workflow/status/readmeio/metrics-sdks/nodejs.svg?style=for-the-badge" alt="Build status"></a>
 </p>
 
