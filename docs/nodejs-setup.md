@@ -12,9 +12,9 @@ category: 5f7cefc76b6e5e04c3a4c74c
 
 If you're a developer, it takes a few small steps to send your API logs to [ReadMe](http://readme.com/) so your team can get deep insights into your API's usage with [ReadMe Metrics](https://readme.com/metrics). Here's an overview of how the integration works:
 
-* You add the Node.js SDK to your server manually or via the included [Express.js](https://expressjs.com/) middleware.
-* The Node.js SDK sends ReadMe the details of your API's incoming requests and outgoing responses, with the option for you to redact any private parameters or headers.
-* ReadMe uses these request and response details to populate Metrics charts which can be used to analyze specific API calls or monitor aggregate usage data.
+- You add the Node.js SDK to your server manually or via the included [Express.js](https://expressjs.com/) middleware.
+- The Node.js SDK sends ReadMe the details of your API's incoming requests and outgoing responses, with the option for you to redact any private parameters or headers.
+- ReadMe uses these request and response details to populate Metrics charts which can be used to analyze specific API calls or monitor aggregate usage data.
 
 ## Express.js Integration
 
@@ -69,11 +69,16 @@ The Express middleware accepts the following parameters:
 
 > Note that this middleware is not likely to be sensitive to order. If you are new to Express, see [How to Write Middleware for Express.js Apps](https://stormpath.com/blog/how-to-write-middleware-for-express-apps).
 
-| Parameter |Required? | Description |
+<!--
+Prettier's table formatting is cursed, hence this ignore block.
+-->
+<!-- prettier-ignore-start -->
+| Parameter | Required? | Description |
 | :--- | :--- | :--- |
 | `readmeAPIKey` | yes | The API key for your ReadMe project. This ensures your requests end up in your dashboard. You can read more about the API key in [our docs](https://docs.readme.com/reference/authentication). |
 | `groupFn` | yes | A function that helps translate incoming request data to our metrics grouping data. You can read more under [Grouping Function](#grouping-function).
 | `options` | no | Additional options. You can read more under [Additional Express Options](#additional-express-options)
+<!-- prettier-ignore-end -->
 
 #### Example
 
@@ -87,10 +92,16 @@ The grouping function is a function your script should include that extracts ide
 
 Return data:
 
-| Field | Required? | Type | Usage
+<!--
+Prettier's table formatting is cursed, hence this ignore block.
+-->
+<!-- prettier-ignore-start -->
+| Field | Required? | Type | Usage |
+| :--- | :--- | :--- | :--- |
 | `apiKey` | yes | string | API Key used to make the request. Note that this is different from the `readmeAPIKey` described above and should be a value from your API that is unique to each of your users. |
 | `label` | no | string | This will be the user's display name in the API Metrics Dashboard, since it's much easier to remember a name than an API key. |
 | `email` | no | string | Email of the user that is making the call. |
+<!-- prettier-ignore-end -->
 
 #### Example
 
@@ -104,6 +115,10 @@ app.use(readme.express(readmeAPIKey, req => ({
 
 ### Additional Express Options
 
+<!--
+Prettier's table formatting is cursed, hence this ignore block.
+-->
+<!-- prettier-ignore-start -->
 | Option | Type | Description |
 | :--- | :--- | :--- |
 | denyList | Array of strings | An array of parameter names that will be redacted from the query parameters, request body (when JSON or form-encoded), response body (when JSON) and headers. For nested request parameters use dot notation (e.g. `a.b.c` to redact the field `c` within `{ a: { b: { c: 'foo' }}}`). |
@@ -112,6 +127,7 @@ app.use(readme.express(readmeAPIKey, req => ({
 | fireAndForget | bool | Defaults to `true`. When `false`, the server will wait for the response from the metrics call. This will be slower, but the response is useful in debugging problems. |
 | bufferLength | number | Defaults to `1`. This value should be a number representing the amount of requests to group up before sending them over the network. Increasing this value will increase performance but delay the time until logs show up in the dashboard. The default value is 1. |
 | baseLogUrl | string | This value is used when building the x-documentation-url header (see docs [below](#documentation-url)). It is your ReadMe documentation's base URL (e.g. `https://example.readme.com`). If not provided, we will make one API call a day to determine your base URL (more info in [Documentation URL](https://docs.readme.com/docs/sending-logs-to-readme-with-nodejs#documentation-url). If provided, we will use that value and never look it up automatically. |
+<!-- prettier-ignore-end -->
 
 #### Example
 
@@ -172,18 +188,25 @@ const server = http.createServer((req, res) => {
     const timeOfResponse = new Date();
     const response = 'Hello World';
 
-    readme.log(readmeAPIKey, req, res, {
-      apiKey: "abcdef1234",
-      label: "User One",
-      email: "userone@example.com",
-      startedDateTime: timeOfRequest,
-      responseEndDateTime: timeOfResponse,
-      responseBody: response
-    }, {
-      development: true,
-      fireAndForget: true
-    })
-      .then((result) => {
+    readme
+      .log(
+        readmeAPIKey,
+        req,
+        res,
+        {
+          apiKey: 'abcdef1234',
+          label: 'User One',
+          email: 'userone@example.com',
+          startedDateTime: timeOfRequest,
+          responseEndDateTime: timeOfResponse,
+          responseBody: response,
+        },
+        {
+          development: true,
+          fireAndForget: true,
+        }
+      )
+      .then(result => {
         console.log(result);
       });
   });
@@ -206,7 +229,7 @@ Your server should log out an object that looks like this:
 
 ```js
 {
-  ids: ['cedb5593-d840-46a9-8ac3-98248ac124bc']
+  ids: ['cedb5593-d840-46a9-8ac3-98248ac124bc'];
 }
 ```
 
@@ -218,6 +241,10 @@ Take one of your IDs and go to the following URL to see what details were logged
 
 ### `log` Reference
 
+<!--
+Prettier's table formatting is cursed, hence this ignore block.
+-->
+<!-- prettier-ignore-start -->
 | Parameter | Required? | Type | Description |
 | :--- | :--- | :--- | :--- |
 | `readmeAPIKey` | yes | string | The API key for your ReadMe project. This ensures your requests end up in your dashboard. You can read more about the API key in [our docs](https://docs.readme.com/reference/authentication).
@@ -225,17 +252,22 @@ Take one of your IDs and go to the following URL to see what details were logged
 | `res` | yes | ServerResponse | A Node.js `ServerResponse` object, usually found in your server's request handler.
 | `payloadData` | yes | Object | A collection of information that will be logged alongside this request. See [Payload Data](#payload-data) for more details.
 | `logOptions` | no | Object | Additional options. You can read more under [Additional Node.js Options](#additional-nodejs-options).
+<!-- prettier-ignore-end -->
 
 #### Example
 
 ```js
-readme.log(readmeAPIKey, req, res, payloadData, logOptions)
+readme.log(readmeAPIKey, req, res, payloadData, logOptions);
 ```
 
 ### Payload Data
 
 When logging your request with Node.js's native `Request` and `Response` data we can't get all the information we need this `log` parameter `log`; it helps you provide all the information we can't otherwise retrieve for you.
 
+<!--
+Prettier's table formatting is cursed, hence this ignore block.
+-->
+<!-- prettier-ignore-start -->
 | Option | Required? | Type | Description |
 | :--- | :--- | :--- | :--- |
 | `apiKey` | yes | string | API Key used to make the request. Note that this is different from the `readmeAPIKey` described above and should be a value from your API that is unique to each of your users. |
@@ -247,6 +279,7 @@ When logging your request with Node.js's native `Request` and `Response` data we
 | `routePath` | no | string | If provided this path will be used instead of the request path. This is useful for grouping common routes together as `/users/{user_id}` instead of each page being unique as `/users/1`, `/users/2`, etc. |
 | `requestBody` | no | Object or string | The incoming request body. You should provide this function a parsed object, but a string is acceptable if necessary. |
 | `responseBody` | no | string | The outgoing request body as a string. |
+<!-- prettier-ignore-end -->
 
 #### Example
 
@@ -268,12 +301,17 @@ When logging your request with Node.js's native `Request` and `Response` data we
 
 ### Additional Node.js Options
 
+<!--
+Prettier's table formatting is cursed, hence this ignore block.
+-->
+<!-- prettier-ignore-start -->
 | Option | Type | Description |
 | :--- | :--- | :--- |
 | `denyList` | Array of strings | An array of parameter names that will be redacted from the query parameters, request body (when provided as an object, or as a JSON or form encoded string), response body (when JSON) and headers. |
 | `allowList` | Array of strings | If included, `denyList` will be ignored and all parameters but those in this list will be redacted. |
 | `development` | bool | Defaults to `false`. When `true`, the log will be marked as a development log. This is great for separating staging or test data from data coming from customers. |
 | `fireAndForget` | bool | Defaults to `true`. When `false`, the server will wait for the response from the metrics call. This will be slower, but the response is useful in debugging problems. |
+<!-- prettier-ignore-end -->
 
 #### Example
 
@@ -287,4 +325,4 @@ When logging your request with Node.js's native `Request` and `Response` data we
 
 ## Limitations
 
-* The Express.js plugin only supports `allowList` and `denyList` for JSON and form-encoded request bodies. If you need `allowList` or `denyList` support for other request bodies, you can parse the request body yourself, and provide it to the [`log` function](#log-reference).
+- The Express.js plugin only supports `allowList` and `denyList` for JSON and form-encoded request bodies. If you need `allowList` or `denyList` support for other request bodies, you can parse the request body yourself, and provide it to the [`log` function](#log-reference).

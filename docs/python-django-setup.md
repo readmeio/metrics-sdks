@@ -12,10 +12,10 @@ category: 5f7cefc76b6e5e04c3a4c74c
 
 If you're a developer, it takes a few small steps to send your API logs to [ReadMe](http://readme.com/) so your team can get deep insights into your API's usage with [ReadMe Metrics](https://readme.com/metrics). Here's an overview of how the integration works:
 
-* You install the `ReadMeMetrics` [Django](https://www.djangoproject.com/) Middleware and configure your Django app to use it.
-* You write a grouping function, which is used to tie each API request to the user or API key that initiated the request.
-* The middleware will send to ReadMe the request and response objects that your server generates each time a user makes a request to your API. The entire objects are sent, unless you deny or allow specific keys from the request.
-* ReadMe extracts information to display in Metrics, such as which endpoint is being called, response code, and error messages. It also identifies the customer who called your API, using the data returned by your grouping function.
+- You install the `ReadMeMetrics` [Django](https://www.djangoproject.com/) Middleware and configure your Django app to use it.
+- You write a grouping function, which is used to tie each API request to the user or API key that initiated the request.
+- The middleware will send to ReadMe the request and response objects that your server generates each time a user makes a request to your API. The entire objects are sent, unless you deny or allow specific keys from the request.
+- ReadMe extracts information to display in Metrics, such as which endpoint is being called, response code, and error messages. It also identifies the customer who called your API, using the data returned by your grouping function.
 
 ## Steps
 
@@ -55,9 +55,9 @@ README_METRICS_CONFIG = MetricsApiConfig(
 
 The `MetricsApiConfig` object takes the following parameters:
 
-* Your ReadMe API Key. If you're [logged in](https://dash.readme.io/to/metrics) to these docs, this string is automatically populated in the preceeding code.
-* A function that takes the `Request` object and returns a `dict` describing the user, or `None` if the request should not be logged
-* Additional options: see details [below](#section-configuration-options)
+- Your ReadMe API Key. If you're [logged in](https://dash.readme.io/to/metrics) to these docs, this string is automatically populated in the preceeding code.
+- A function that takes the `Request` object and returns a `dict` describing the user, or `None` if the request should not be logged
+- Additional options: see details [below](#section-configuration-options)
 
 4. Add our `MetricsMiddleware` to your list of middleware, also in your app's `settings.py` file:
 
@@ -73,11 +73,16 @@ MIDDLEWARE = [
 
 There are three fields that you can use to identify the user making the API call. We recommend passing all three to make API Metrics as useful as possible.
 
+<!--
+Prettier's table formatting is cursed, hence this ignore block.
+-->
+<!-- prettier-ignore-start -->
 | Field | Type | Description |
 | :--- | :--- | :--- |
 | api_key | string | **Required** API key used to make the request, or another unique identifier of the user who made the request. |
 | label | string | Display name for the user or account holder in the API Metrics Dashboard, since it's much more useful to have names than just unique identifiers or API keys. |
 | email | string | Email address of the user or account holder that is making the call. |
+<!-- prettier-ignore-end -->
 
 ## Configuration Options
 
@@ -94,6 +99,10 @@ README_METRICS_CONFIG = MetricsApiConfig(
 )
 ```
 
+<!--
+Prettier's table formatting is cursed, hence this ignore block.
+-->
+<!-- prettier-ignore-start -->
 | Option | Type | Description |
 | :--- | :--- | :--- |
 | `buffer_length` | int | By default, we only send logs to ReadMe after 10 requests are made. Depending on the usage of your API it make make sense to send logs more or less frequently. |
@@ -103,3 +112,4 @@ README_METRICS_CONFIG = MetricsApiConfig(
 | `allowlist`	| dict | Defaults to `None`. An array of headers and JSON body properties to send to ReadMe. If you configure an allowlist then all other properties will be dropped. Otherwise the semantics are similar to `denylist`. |
 | `allowed_http_hosts` | dict | Defaults to `None`. A list of HTTP hosts which should be logged to ReadMe. If this is present, requests will only be sent to ReadMe whose Host header matches one of the allowed hosts. |
 | timeout | int | Defaults to `3`. Timeout (in seconds) for calls back to the ReadMe Metrics API. |
+<!-- prettier-ignore-end -->

@@ -24,11 +24,11 @@ It's a few small steps if you're a developer! There are only two steps required 
 
 First, you will need to modify your API to return two new headers with your request. These allow ReadMe to understand who is making the call.
 
-| Header | Description |
-| :--- | :--- |
-| `x-readme-id` | Unique identifier for the caller. This can be anything that is unique such as an id of a user in your database. |
-| `x-readme-label` | This will be augment the log in ReadMe, since it's much easier to remember a label than a unique identifier. |
-| `x-readme-email` | *(Optional)* For further insight into API calls, you can send an email along with your request to target users more easily. |
+| Header           | Description                                                                                                                 |
+| :--------------- | :-------------------------------------------------------------------------------------------------------------------------- |
+| `x-readme-id`    | Unique identifier for the caller. This can be anything that is unique such as an id of a user in your database.             |
+| `x-readme-label` | This will be augment the log in ReadMe, since it's much easier to remember a label than a unique identifier.                |
+| `x-readme-email` | _(Optional)_ For further insight into API calls, you can send an email along with your request to target users more easily. |
 
 Here's an example of setting these headers in [Express.js](https://expressjs.com/):
 
@@ -59,9 +59,9 @@ To install:
 
 1. Click the blue "Preview on your site" button.
 2. In the page that opens, which allows you to sign in to ReadMe via OAuth:
-    * Select your project
-    * Give Cloudflare your doc project's API key (which you can find at `https://dash.readme.io/yourProject/api-key`)
-    * Configure which routes the worker should be applied to, i.e., which API routes you want to get usage metrics about.
+   - Select your project
+   - Give Cloudflare your doc project's API key (which you can find at `https://dash.readme.io/yourProject/api-key`)
+   - Configure which routes the worker should be applied to, i.e., which API routes you want to get usage metrics about.
 
 ![Cloudflare App installation](https://files.readme.io/5f77c35-readme.png)
 

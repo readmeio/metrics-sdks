@@ -6,6 +6,8 @@
     "lint": "eslint . && npm run lint --workspaces",
     "lint:docs": "alex .",
     "prepare": "husky install",
+    "prettier": "prettier --list-different \"./**/**.{js,ts,md}\"",
+    "prettier:write": "prettier --list-different --write \"./**/**.{js,ts,md}\"",
     "publish": "npx lerna publish",
     "test": "npm test --workspaces",
     "test:integration-metrics": "NODE_OPTIONS=--experimental-vm-modules npx jest __tests__/integration.test.js",

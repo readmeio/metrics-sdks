@@ -19,7 +19,6 @@ With [ReadMe's Metrics API](https://readme.com/metrics) your team can get deep i
 - The .NET SDK sends ReadMe the details of your API's incoming requests and outgoing responses, with the option for you to redact any private parameters or headers.
 - ReadMe uses these request and response details to create an API Metrics Dashboard which can be used to analyze specific API calls or monitor aggregate usage data. Additionally, if your users log into your API documentation we'll show them logs of the requests they made!
 
-
 ```
 dotnet add package Readme.Metrics
 ```

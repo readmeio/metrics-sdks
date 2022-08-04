@@ -2,6 +2,10 @@
 
 This is the monorepo for the following [ReadMe Metrics](https://readme.com/metrics/) SDKs:
 
+<!--
+Prettier's table formatting is cursed, hence this ignore block.
+-->
+<!-- prettier-ignore-start -->
 | Language / Framework | Package | Version |
 | :--- | :--- | :--- |
 | NodeJS (Express) | [readmeio](https://github.com/readmeio/metrics-sdks/tree/main/packages/node) | [![](https://img.shields.io/npm/v/readmeio)](https://npm.im/readmeio) |
@@ -9,5 +13,6 @@ This is the monorepo for the following [ReadMe Metrics](https://readme.com/metri
 | Python (WSGI) | [readme-metrics](https://github.com/readmeio/metrics-sdks/tree/main/packages/python) | [![](https://img.shields.io/pypi/v/readme-metrics)](https://pypi.org/project/readme-metrics/) |
 | Ruby (Rails/Rack) | [readme-metrics](https://github.com/readmeio/metrics-sdks/tree/main/packages/ruby) | [![](https://img.shields.io/gem/v/readme-metrics)](https://rubygems.org/gems/readme-metrics) |
 | .NET | [ReadMe.Metrics](https://github.com/readmeio/metrics-sdks/tree/main/packages/dotnet) | [![](https://img.shields.io/nuget/v/ReadMe.Metrics)](https://www.nuget.org/packages/ReadMe.Metrics/) |
+<!-- prettier-ignore-end -->
 
 Want to build your own SDK for Developer Metrics? [Check out our guide.](https://docs.readme.com/metrics/docs/building-api-metrics-middleware)

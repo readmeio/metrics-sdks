@@ -16,9 +16,12 @@ category: 5f7cefc76b6e5e04c3a4c74c
 
 If you're a developer, it takes a few small steps to send your API logs to [ReadMe](http://readme.com/) so your team can get deep insights into your API's usage with [ReadMe Metrics](https://readme.com/metrics). Here's an overview of how the integration works:
 
-* You add the ReadMe middleware to your [Laravel](https://laravel.com/) application.
-* The middleware sends to ReadMe the response object that your Laravel application generates each time a user makes a request to your API. The entire response is sent, unless you blacklist or whitelist keys.
-* ReadMe populates Metrics with this information, such as which endpoint is being called, response code, and error messages. It also identifies the customer who called your API, using whichever keys in the middleware you call out as containing relevant customer info.
+<!-- TODO: we should rename these options! -->
+<!-- alex ignore blacklist whitelist -->
+
+- You add the ReadMe middleware to your [Laravel](https://laravel.com/) application.
+- The middleware sends to ReadMe the response object that your Laravel application generates each time a user makes a request to your API. The entire response is sent, unless you blacklist or whitelist keys.
+- ReadMe populates Metrics with this information, such as which endpoint is being called, response code, and error messages. It also identifies the customer who called your API, using whichever keys in the middleware you call out as containing relevant customer info.
 
 ## Steps
 
@@ -59,7 +62,7 @@ protected $middlewareGroups = [
 ```
 
 4. Configure the middleware in the newly created configuration file from step 2: `config/readme.php`:
-    * Change `YOUR README API KEY` to <<user>>. If you're currently logged into these docs, you can see your ReadMe API key in the preceding sentence; otherwise, you can find it at `https://dash.readme.io/project/YOUR PROJECT/api-key`.
+   - Change `YOUR README API KEY` to <<user>>. If you're currently logged into these docs, you can see your ReadMe API key in the preceding sentence; otherwise, you can find it at `https://dash.readme.io/project/YOUR PROJECT/api-key`.
 5. Modify the `constructGroup` function in the newly created `app/Handler/ReadMe.php` handler to return data specific to your API. See [Identfying the API Caller](#section-identifying-the-api-caller) for detailed instructions.
 
 ## Identifying the API Caller
@@ -92,28 +95,39 @@ class ReadMe implements \ReadMe\Handler
 }
 ```
 
+<!--
+Prettier's table formatting is cursed, hence this ignore block.
+-->
+<!-- prettier-ignore-start -->
 | Field | Usage |
 | :--- | :--- |
 | `api_key` | **Required** API Key used to make the request.
 | `label` | This will be used to identify the user on ReadMe, since it's much easier to remember a name than a unique identifier.
 | `email` | Email of the person that is making the call.
+<!-- prettier-ignore-end -->
 
 ## Configuration Options
 
 There are a few configurable options in `config/readme.php` that let you change how logs are sent to ReadMe.
 
+<!--
+Prettier's table formatting is cursed, hence this ignore block.
+-->
+<!-- prettier-ignore-start -->
 | Option | Type | Description |
 | :--- | :--- | :--- |
 | development_mode | bool | When disabled, `development_mode` will make all API requests asynchronously as well as silencing all possible errors in transit. This defaults to `true`, and you should change it to false before deploying your integration to production. |
 | blacklist | Array of strings | An array of keys from your API requests and responses that you wish to blacklist from sending to ReadMe. If this option is present, it will be favored over the `whitelist` option below. |
 | whitelist | Array of strings | An array of keys from your API requests and responses that you only wish to send to ReadMe. |
 | base_log_url | string | This is the base URL for your ReadMe project. Normally this would be `https://projectName.readme.io` or `https://docs.yourdomain.com`, however if this value is not supplied, a request to the ReadMe API will be made once a day to retrieve it. This data is cached into `$COMPOSER_HOME/cache`. |
+<!-- prettier-ignore-end -->
 
 > ⚠️
 >
 > `blacklist` and `whitelist` do not support support dot-notation so only top-level keys can be specified.
 
 ## FAQ
+
 ### How can I upgrade to v2.0?
 
 1. Copy `config/readme.php` to `config\readme.php.backup`.

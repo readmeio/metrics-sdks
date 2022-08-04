@@ -16,9 +16,12 @@ category: 5f7cefc76b6e5e04c3a4c74c
 
 If you're a developer, it takes a few small steps to send your API logs to [ReadMe](http://readme.com/) so your team can get deep insights into your API's usage with [ReadMe Metrics](https://readme.com/metrics). Here's an overview of how the integration works:
 
-* You add the ReadMe middleware to your [WSGI](https://wsgi.readthedocs.io/) server.
-* The middleware sends to ReadMe the request and response objects that your server generates each time a user makes a request to your API. The entire objects are sent, unless you blacklist or whitelist keys.
-* ReadMe extracts information to display in Metrics, such as which endpoint is being called, response code, and error messages. It also identifies the customer who called your API, using whichever keys in the middleware you call out as containing relevant customer info.
+<!-- TODO: we should rename these options! -->
+<!--alex ignore blacklist whitelist-->
+
+- You add the ReadMe middleware to your [WSGI](https://wsgi.readthedocs.io/) server.
+- The middleware sends to ReadMe the request and response objects that your server generates each time a user makes a request to your API. The entire objects are sent, unless you blacklist or whitelist keys.
+- ReadMe extracts information to display in Metrics, such as which endpoint is being called, response code, and error messages. It also identifies the customer who called your API, using whichever keys in the middleware you call out as containing relevant customer info.
 
 ## Steps
 
@@ -52,16 +55,16 @@ app.wsgi_app = MetricsMiddleware(
 
 The `MetricsAPIConfig` takes the following parameters:
 
-* Your ReadMe API Key. If you're [logged in](https://dash.readme.io/to/metrics) to these docs, this string is automatically populated in the preceeding code.
-* A function that takes the `Request` object and returns a dict describing the user, or None if the request should not be logged
-* Additional options: see details [below](#section-configuration-options)
+- Your ReadMe API Key. If you're [logged in](https://dash.readme.io/to/metrics) to these docs, this string is automatically populated in the preceeding code.
+- A function that takes the `Request` object and returns a dict describing the user, or None if the request should not be logged
+- Additional options: see details [below](#section-configuration-options)
 
 ### Minimal middleware configuration
 
 Here's the bare minimum you need to configure:
 
-* The ReadMe API Key: The first parameter is your project's ReadMe API Key. If you're logged in to these docs, this string is automatically populated in the proceeding middleware code. You can also see it here: <<user>>. Otherwise, copy and paste it in from `https://dash.readme.com/project/YOUR PROJECT/v/api-key`.
-* API caller identification: To identify the API caller, replace `<userId>`, `<userNameToShowInDashboard>`, and `<userEmailAddress>` with the appropriate properties in your req object that contain your user data. More details follow in the next section.
+- The ReadMe API Key: The first parameter is your project's ReadMe API Key. If you're logged in to these docs, this string is automatically populated in the proceeding middleware code. You can also see it here: <<user>>. Otherwise, copy and paste it in from `https://dash.readme.com/project/YOUR PROJECT/v/api-key`.
+- API caller identification: To identify the API caller, replace `<userId>`, `<userNameToShowInDashboard>`, and `<userEmailAddress>` with the appropriate properties in your req object that contain your user data. More details follow in the next section.
 
 ## Identifying the API Caller
 
@@ -81,11 +84,16 @@ app.wsgi_app = MetricsMiddleware(
 )
 ```
 
+<!--
+Prettier's table formatting is cursed, hence this ignore block.
+-->
+<!-- prettier-ignore-start -->
 | Field | Type | Description |
 | :--- | :--- | :--- |
 | api_key | string | **Required** API key used to make the request, or another unique identifier of the user who made the request. |
 | label | string | Display name for the user or account holder in the API Metrics Dashboard, since it's much more useful to have names than just unique identifiers or API keys. |
 | email | string | Email address of the user or account holder that is making the call. |
+<!-- prettier-ignore-end -->
 
 ## Configuration Options
 
@@ -109,9 +117,14 @@ app.wsgi_app = MetricsMiddleware(
 )
 ```
 
+<!--
+Prettier's table formatting is cursed, hence this ignore block.
+-->
+<!-- prettier-ignore-start -->
 | Option | Type | Description |
 | :--- | :--- | :--- |
 | development | bool | Defaults to `False`. If `True`, the log will be separate from normal production logs. This is great for separating staging or test data from data coming from customers. |
 | bufferLength | int | By default, we only send logs to ReadMe after 10 requests are made. Depending on the usage of your API it make make sense to send logs more or less frequently. |
 | denylist | dict | Defaults to `None`. An array of keys from your API requests and responses headers and bodies that you wish to block from being sent to ReadMe.<br /><br />If you configure a `denylist`, it will override any `allowlist` configuration. |
 | allowlist | dict | Defaults to `None`. An array of keys from your API requests and responses headers and bodies that you only wish to send to ReadMe. |
+<!-- prettier-ignore-end -->

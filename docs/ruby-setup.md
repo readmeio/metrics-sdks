@@ -12,9 +12,12 @@ category: 5f7cefc76b6e5e04c3a4c74c
 
 If you're a developer, it takes a few small steps to send your API logs to [ReadMe](http://readme.com/) so your team can get deep insights into your API's usage with [ReadMe Metrics](https://readme.com/metrics). Here's an overview of how the integration works:
 
-* You add the ReadMe middleware to your Rails application.
-* The middleware sends to ReadMe the request and response objects that your Express server generates each time a user makes a request to your API. The entire objects are sent, unless you blacklist or whitelist keys.
-* ReadMe extracts information to display in Metrics, such as which endpoint is being called, response code, and error messages. It also identifies the customer who called your API, using whichever keys in the middleware you call out as containing relevant customer info.
+<!-- TODO: we should rename these options! -->
+<!--alex ignore blacklist whitelist-->
+
+- You add the ReadMe middleware to your Rails application.
+- The middleware sends to ReadMe the request and response objects that your Express server generates each time a user makes a request to your API. The entire objects are sent, unless you blacklist or whitelist keys.
+- ReadMe extracts information to display in Metrics, such as which endpoint is being called, response code, and error messages. It also identifies the customer who called your API, using whichever keys in the middleware you call out as containing relevant customer info.
 
 ## Getting Started
 
@@ -105,15 +108,24 @@ end
 
 Additional you can also send the following two optional pieces of data within this payload:
 
+<!--
+Prettier's table formatting is cursed, hence this ignore block.
+-->
+<!-- prettier-ignore-start -->
 | Parameter | Type | Description |
 | :--- | :--- | :--- |
 | `log_id` | string | A UUIDv4 identifier. If not provided this will be automatically generated for you. Providing your own `log_id` is useful if you want to know the URL of the log in advance, i.e. `{your_base_url}/logs/{your_log_id}`. |
 | `ignore` | bool | A flag that when set to `true` will suppress sending the log. |
+<!-- prettier-ignore-end -->
 
 ## Configuration options
 
 There are a few options in addition to `api_key` you can pass in to change how the logs are sent to ReadMe. These are all optional:
 
+<!--
+Prettier's table formatting is cursed, hence this ignore block.
+-->
+<!-- prettier-ignore-start -->
 | Option | Type | Description |
 | :--- | :--- | :--- |
 | `development` | bool | Defaults to `false`. If `true`, the log will be separate from normal production logs. This is great for separating staging or test data from data coming from customers. |
@@ -121,6 +133,7 @@ There are a few options in addition to `api_key` you can pass in to change how t
 | `reject_params` | Array of strings | An array of strings representing keys from your API requests' and responses' bodies and headers that you wish to omit from sending to ReadMe.<br /><br />You may only configure either `reject_params` or `allow_only` at one time.<br /><br />`reject_params: ["Authorization", "password"]` |
 | `allow_only` | Array of strings | An array of strings representing keys from your API requests' and responses' bodies and headers that you only wish to send to ReadMe. All other keys will be omitted.<br /><br />You may only configure either `reject_params` or `allow_only` at one time. |
 | `logger` | Logger | A logger class that conforms to the same interface as `Logger` or `RailsLogger`. Pass this option in if you have some custom logging solution and you want to send logs from the middleware to the same location. By default we have a `Logger` in place that logs to `stdout`. |
+<!-- prettier-ignore-end -->
 
 ## Sample Applications
 
