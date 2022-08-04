@@ -1,6 +1,6 @@
 # ReadMe Metrics Hapi Demo
 
-## Install
+## Install
 
 ```sh
 npm install
