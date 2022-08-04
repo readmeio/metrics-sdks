@@ -23,7 +23,7 @@ With [ReadMe's Metrics API](https://readme.com/metrics) your team can get deep i
 gem "readme-metrics"
 ```
 
-* [Integration Documentation](https://docs.readme.com/docs/ruby-api-metrics-set-up)
+**For more information on setup, check out our [integration documentation](https://docs.readme.com/docs/ruby-api-metrics-set-up).**
 
 > 🚧 Any Issues?
 >
