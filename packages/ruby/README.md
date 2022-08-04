@@ -9,9 +9,11 @@ Track your API metrics within ReadMe.
 
 ## Installation
 
-Add it to your Gemfile
+Add it to your Gemfile:
 
-`gem "readme-metrics"`
+```ruby
+gem "readme-metrics"
+```
 
 ## Usage
 
