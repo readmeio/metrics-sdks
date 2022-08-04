@@ -21,7 +21,7 @@ If you're a developer, it's super easy to send your API request data to ReadMe, 
 
 1. From the directory of your codebase, run the following command in your command line to install the Flask variant of the `readme-metrics` package from [pypi](https://pypi.org/project/readme-metrics/). You can also add this to your `requirements.txt` file.
 
-```shell
+```bash
 pip install readme-metrics[Flask]
 ```
 

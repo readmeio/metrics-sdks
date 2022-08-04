@@ -16,7 +16,7 @@ category: 5f7cefc76b6e5e04c3a4c74c
 
 If you're a developer, it's super easy to send your API request data to ReadMe, so your team can get deep insights into your API's usage. Here's an overview of how the integration works:
 
-* You add ReadMe middleware to your [WSGI](https://wsgi.readthedocs.io/) server.
+* You add the ReadMe middleware to your [WSGI](https://wsgi.readthedocs.io/) server.
 * The middleware sends to ReadMe the request and response objects that your server generates each time a user makes a request to your API. The entire objects are sent, unless you blacklist or whitelist keys.
 * ReadMe extracts information to display in Metrics, such as which endpoint is being called, response code, and error messages. It also identifies the customer who called your API, using whichever keys in the middleware you call out as containing relevant customer info.
 
@@ -24,7 +24,7 @@ If you're a developer, it's super easy to send your API request data to ReadMe, 
 
 1. From the directory of your codebase, run the following command in your command line to install the `readme-metrics` package from pypi:
 
-```shell
+```bash
 pip install readme-metrics
 ```
 

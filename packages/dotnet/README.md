@@ -13,9 +13,9 @@
   <a href="https://github.com/readmeio/metrics-sdks"><img src="https://img.shields.io/github/workflow/status/readmeio/metrics-sdks/dotnet.svg?style=for-the-badge" alt="Build status"></a>
 </p>
 
-With ReadMe's Metrics API your team can get deep insights into your API's usage. If you're a developer it's a few small steps to send your API logs to ReadMe so your team can get deep insights into your API's usage. Here's an overview of how the integration works:
+With [ReadMe's Metrics API](https://readme.com/metrics) your team can get deep insights into your API's usage. If you're a developer it's a few small steps to send your API logs to [ReadMe](http://readme.com/) so your team can get deep insights into your API's usage. Here's an overview of how the integration works:
 
-- Add the `Readme.Metrics` NuGet package to your API server and integrate the middleware.
+- Add the `Readme.Metrics` [NuGet](https://www.nuget.org/) package to your API server and integrate the middleware.
 - The .NET SDK sends ReadMe the details of your API's incoming requests and outgoing responses, with the option for you to redact any private parameters or headers.
 - ReadMe uses these request and response details to create an API Metrics Dashboard which can be used to analyze specific API calls or monitor aggregate usage data. Additionally, if your users log into your API documentation we'll show them logs of the requests they made!
 

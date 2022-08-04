@@ -14,9 +14,9 @@
   <a href="https://github.com/readmeio/metrics-sdks"><img src="https://img.shields.io/github/workflow/status/readmeio/metrics-sdks/php.svg?style=for-the-badge" alt="Build status"></a>
 </p>
 
-With ReadMe's Metrics API your team can get deep insights into your API's usage. If you're a developer it's a few small steps to send your API logs to ReadMe so your team can get deep insights into your API's usage. Here's an overview of how the integration works:
+With [ReadMe's Metrics API](https://readme.com/metrics) your team can get deep insights into your API's usage. If you're a developer it's a few small steps to send your API logs to [ReadMe](http://readme.com/) so your team can get deep insights into your API's usage. Here's an overview of how the integration works:
 
-* You add ReadMe middleware to your [Laravel](https://laravel.com/) application.
+* You add the ReadMe middleware to your [Laravel](https://laravel.com/) application.
 * The middleware sends to ReadMe the response object that your Laravel application generates each time a user makes a request to your API. The entire response is sent, unless you blacklist or whitelist keys.
 * ReadMe populates Metrics with this information, such as which endpoint is being called, response code, and error messages. It also identifies the customer who called your API, using whichever keys in the middleware you call out as containing relevant customer info.
 

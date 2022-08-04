@@ -19,7 +19,7 @@ With ReadMe's Metrics API your team can get deep insights into your API's usage.
 
 1. Install the `Readme.Metrics` NuGet package using [Visual Studio or VS Code](https://docs.microsoft.com/en-us/nuget/install-nuget-client-tools) or the following command:
 
-```shell
+```bash
 dotnet add package Readme.Metrics
 ```
 

@@ -25,7 +25,7 @@ With ReadMe's Metrics API your team can get deep insights into your API's usage.
 1. Locate the file in your organization's API codebase that contains your Express server. Often this file is named `express.js` or `app.js`. You can also search on the code snippet express().
 2. From the directory of this codebase, run the following command in your command line to install the [`readmeio` package from `npm`](https://www.npmjs.com/package/readmeio):
 
-```shell
+```bash
 npm install readmeio --save
 ```
 
@@ -57,7 +57,7 @@ For more details about the parameters you can provide to the `express` function,
 
 5. Test a request:
 
-```shell
+```bash
 curl -i {my api url}
 ```
 
@@ -141,7 +141,7 @@ If you wish to not rely on this cache, you can opt to supply a `baseLogUrl` opti
 
 1. Install readmeio via your package manager:
 
-```shell
+```bash
 npm install readmeio --save
 ```
 
@@ -198,7 +198,7 @@ For more details about the parameters you can provide to the `log` function, ref
 
 5. Test a request:
 
-```shell
+```bash
 curl -i {my api url}
 ```
 

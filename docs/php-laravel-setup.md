@@ -16,7 +16,7 @@ category: 5f7cefc76b6e5e04c3a4c74c
 
 If you're a developer, it's super easy to send your API request data to ReadMe, so your team can get deep insights into your API's usage. Here's an overview of how the integration works:
 
-* You add ReadMe middleware to your [Laravel](https://laravel.com/) application.
+* You add the ReadMe middleware to your [Laravel](https://laravel.com/) application.
 * The middleware sends to ReadMe the response object that your Laravel application generates each time a user makes a request to your API. The entire response is sent, unless you blacklist or whitelist keys.
 * ReadMe populates Metrics with this information, such as which endpoint is being called, response code, and error messages. It also identifies the customer who called your API, using whichever keys in the middleware you call out as containing relevant customer info.
 
@@ -28,13 +28,13 @@ If you're a developer, it's super easy to send your API request data to ReadMe, 
 
 1. From the directory of your company's API codebase, run the following command in your command line to install the `readme/metrics` package from [Packagist](https://packagist.org/packages/readme/metrics):
 
-```shell
+```bash
 composer require readme/metrics
 ```
 
 2. Install the configuration file for `readme/metrics`, named `readme.php`, into your application with the following command:
 
-```shell
+```bash
 php artisan vendor:publish --provider="ReadMe\ServiceProvider"
 ```
 
@@ -119,13 +119,13 @@ There are a few configurable options in `config/readme.php` that let you change 
 1. Copy `config/readme.php` to `config\readme.php.backup`.
 2. Update the SDK:
 
-```shell
+```bash
 composer update readme/metrics
 ```
 
 3. Re-run the config publishing step from our installation instructions:
 
-```shell
+```bash
 php artisan vendor:publish --provider="ReadMe\ServiceProvider"
 ```
 
