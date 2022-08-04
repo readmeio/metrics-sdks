@@ -20,7 +20,7 @@
   },
   "workspaces": [
     "./packages/node",
-    "./packages/metrics-sdk-snippets"
+    "./packages/sdk-snippets"
   ],
   "devDependencies": {
     "@commitlint/cli": "^17.0.2",
