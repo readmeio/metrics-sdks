@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "clean": "npx lerna clean",
-    "lint": "eslint . && npm run lint --workspaces",
+    "lint": "eslint __tests__ && npm run lint --workspaces",
     "prepare": "husky install",
     "publish": "npx lerna publish",
     "test": "npm test --workspaces",
