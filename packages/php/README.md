@@ -24,7 +24,7 @@ With [ReadMe's Metrics API](https://readme.com/metrics) your team can get deep i
 composer require readme/metrics
 ```
 
-* [Integration Documentation](https://docs.readme.com/docs/sending-logs-to-readme-with-php-laravel)
+**For more information on setup, check out our [integration documentation](https://docs.readme.com/docs/sending-logs-to-readme-with-php-laravel).**
 
 > 🚧 Any Issues?
 >
