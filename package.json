@@ -4,6 +4,7 @@
   "scripts": {
     "clean": "npx lerna clean",
     "lint": "eslint . && npm run lint --workspaces",
+    "lint:docs": "alex .",
     "prepare": "husky install",
     "publish": "npx lerna publish",
     "test": "npm test --workspaces",
@@ -25,6 +26,7 @@
     "@commitlint/cli": "^17.0.2",
     "@commitlint/config-conventional": "^17.0.2",
     "@readme/eslint-config": "^9.0.0",
+    "alex": "^10.0.0",
     "caseless": "^0.12.0",
     "eslint": "^8.14.0",
     "get-port": "^6.1.2",
