@@ -10,9 +10,9 @@ category: 5f7cefc76b6e5e04c3a4c74c
 
 ## Overview
 
-With ReadMe's Metrics API your team can get deep insights into your API's usage. If you're a developer, it's super easy to send your API request data to ReadMe. Here's an overview of how the integration works:
+If you're a developer it's a few small steps to send your API logs to [ReadMe](http://readme.com/) so your team can get deep insights into your API's usage with [ReadMe Metrics](https://readme.com/metrics). Here's an overview of how the integration works:
 
-* You add the Node.js SDK to your server manually or via the included Express middleware.
+* You add the Node.js SDK to your server manually or via the included [Express.js](https://expressjs.com/) middleware.
 * The Node.js SDK sends ReadMe the details of your API's incoming requests and outgoing responses, with the option for you to redact any private parameters or headers.
 * ReadMe uses these request and response details to populate Metrics charts which can be used to analyze specific API calls or monitor aggregate usage data.
 
@@ -234,7 +234,7 @@ readme.log(readmeAPIKey, req, res, payloadData, logOptions)
 
 ### Payload Data
 
-When logging your request with Node.js's native request and response data we can't get all the information we need. This parameter to the `log` function includes all the information we can't easily retrieve for you.
+When logging your request with Node.js's native `Request` and `Response` data we can't get all the information we need this `log` parameter `log`; it helps you provide all the information we can't otherwise retrieve for you.
 
 | Option | Required? | Type | Description |
 | :--- | :--- | :--- | :--- |

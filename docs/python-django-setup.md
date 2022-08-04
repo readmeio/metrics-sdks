@@ -10,7 +10,7 @@ category: 5f7cefc76b6e5e04c3a4c74c
 
 ## Overview
 
-If you're a developer, it's super easy to send your API request data to ReadMe, so your team can get deep insights into your API's usage. Here's an overview of how the integration works:
+If you're a developer it's a few small steps to send your API logs to [ReadMe](http://readme.com/) so your team can get deep insights into your API's usage with [ReadMe Metrics](https://readme.com/metrics). Here's an overview of how the integration works:
 
 * You install the `ReadMeMetrics` [Django](https://www.djangoproject.com/) Middleware and configure your Django app to use it.
 * You write a grouping function, which is used to tie each API request to the user or API key that initiated the request.

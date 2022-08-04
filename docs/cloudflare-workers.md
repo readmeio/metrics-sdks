@@ -8,7 +8,7 @@ category: 5f7cefc76b6e5e04c3a4c74c
 >
 > Integrations can be tricky! [Contact support](https://docs.readme.com/guides/docs/contact-support) if you have any questions/issues.
 
-If you'd rather not use one of our language-oriented SDKs, we have another option: Cloudflare Workers!
+If you'd rather not use one of our language-oriented SDKs for sending your API logs into [ReadMe](https://readme.com) so you can get deep insights on your API's usage with [ReadMe Metrics](https://readme.com/metrics), we have another option: Cloudflare Workers!
 
 ## Overview
 
@@ -18,7 +18,7 @@ We have released a [service worker](https://developer.mozilla.org/en-US/docs/Web
 
 ## Setup
 
-It's super easy if you're a developer! There are only two steps required to get our worker setup with your API.
+It's a few small steps if you're a developer! There are only two steps required to get our worker setup with your API.
 
 ### In Your API
 
@@ -65,8 +65,7 @@ To install:
 
 ![Cloudflare App installation](https://files.readme.io/5f77c35-readme.png)
 
-Once you log in with ReadMe and configure which routes to track on your API, you are all set! Just click the install button to finish the process and logs should start appearing in your dashboard as requests come in.
-
+Once you log in with ReadMe and configure which routes to track on your API, you are all set! Click the install button to finish the process and logs should start appearing in your dashboard as requests come in.
 
 > 🚧 DNS Records Setting
 >
