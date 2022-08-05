@@ -1,6 +1,6 @@
 version: '3'
 services:
-  integration_node_express:
+  integration_metrics_node_express:
     build:
       context: .
       dockerfile: ./__tests__/integrations/node.Dockerfile
@@ -16,7 +16,7 @@ services:
     environment:
       - EXAMPLE_SERVER=node ./packages/node/examples/express/webhook.js
 
-  integration_node_hapi:
+  integration_metrics_node_hapi:
     build:
       context: .
       dockerfile: ./__tests__/integrations/node.Dockerfile
@@ -24,7 +24,7 @@ services:
     environment:
       - EXAMPLE_SERVER=node ./packages/node/examples/hapi/index.js
 
-  integration_dotnet_v6.0:
+  integration_metrics_dotnet_v6.0:
     build:
       context: .
       dockerfile: ./__tests__/integrations/dotnet.Dockerfile
@@ -32,7 +32,7 @@ services:
     environment:
       - EXAMPLE_SERVER=dotnet examples/net6.0/out/net6.0.dll
 
-  integration_python_flask:
+  integration_metrics_python_flask:
     build:
       context: .
       dockerfile: ./__tests__/integrations/python.Dockerfile
