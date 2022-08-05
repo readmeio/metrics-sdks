@@ -36,8 +36,8 @@ app.MapPost("/webhook", async context =>
     var unsigned = time + "." + json;
     var hmac = HMAC.Create("HMACSHA256");
     hmac.Initialize();
-    hmac.Key = Unicode.GetBytes(secret);
-    var result = Unicode.GetBytes(unsigned);
+    hmac.Key = UTF8.GetBytes(secret);
+    var result = UTF8.GetBytes(unsigned);
     var hash = hmac.ComputeHash(result);
 
     var verifySignature = new StringBuilder(hash.Length * 2);
