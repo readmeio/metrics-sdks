@@ -4,5 +4,10 @@
     "@readme/eslint-config/typescript",
     "@readme/eslint-config/testing"
   ],
-  "root": true
+  "root": true,
+  "settings": {
+    "jest": {
+      "version": 28
+    }
+  }
 }
