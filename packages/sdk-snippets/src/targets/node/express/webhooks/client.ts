@@ -1,5 +1,5 @@
 import type { Client } from '../../../targets';
-import { CodeBuilder } from '@readme/httpsnippet/dist/helpers/code-builder';
+import { CodeBuilder } from '../../../../helpers/code-builder';
 
 export const express: Client = {
   info: {
@@ -14,7 +14,7 @@ export const express: Client = {
       ...options,
     };
 
-    const { blank, join, push } = new CodeBuilder({ indent: opts.indent });
+    const { blank, join, push, ranges, variable } = new CodeBuilder({ indent: opts.indent });
 
     push('// Save this code as `server.js`');
     push('// Run the server with `node server.js`');
@@ -49,8 +49,9 @@ export const express: Client = {
 
     if (server.length) {
       push('// OAS Server variables', 3);
-      server.forEach(variable => {
-        push(`${variable.name}: '${variable.default || variable.name}',`, 3);
+      server.forEach(data => {
+        push(`${data.name}: '${data.default || data.name}',`, 3);
+        variable('server', data.name);
       });
     }
 
@@ -60,12 +61,15 @@ export const express: Client = {
 
     if (security.length) {
       push('// OAS Security variables', 3);
-      security.forEach(variable => {
-        if (variable.type === 'http') {
-          return push(`${variable.name}: { user: 'user', pass: 'pass' },`, 3);
+      security.forEach(data => {
+        if (data.type === 'http') {
+          push(`${data.name}: { user: 'user', pass: 'pass' },`, 3);
+          variable('security', data.name);
+          return;
         }
 
-        return push(`${variable.name}: '${variable.default || variable.name}',`, 3);
+        push(`${data.name}: '${data.default || data.name}',`, 3);
+        variable('security', data.name);
       });
     }
 
@@ -73,6 +77,9 @@ export const express: Client = {
     push('});', 1);
     push('});');
 
-    return join();
+    return {
+      ranges: ranges(),
+      snippet: join(),
+    };
   },
 };

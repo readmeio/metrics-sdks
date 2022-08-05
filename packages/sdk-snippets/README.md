@@ -37,7 +37,21 @@ const { convert } = new MetricsSDKSnippet([
 console.log(convert('webhooks', 'node', 'express'));
 ```
 
-Outputs a [ReadMe Node Metrics SDK](https://npm.im/readmeio) webhooks example:
+This generates the following object:
+
+```js
+{
+  ranges: {
+    "security": {
+      "petstore_auth": { "line": 26 }, // The line where this data is at.
+      "basic_auth": { "line": 27 }
+    }
+  },
+  snippet: '// see below',
+}
+```
+
+The generated snippet for this results in a [ReadMe Node Metrics SDK](https://npm.im/readmeio) webhooks example:
 
 ```js
 // Save this code as `server.js`

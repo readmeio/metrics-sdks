@@ -101,7 +101,10 @@ export const express: Client = {
 
     push('// This is an example client snippet generator');
 
-    return join();
+    return {
+      ranges: ranges(),
+      snippet: join()
+    };
   },
 };
 ```

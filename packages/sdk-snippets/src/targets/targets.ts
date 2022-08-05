@@ -1,5 +1,6 @@
 import type { Merge } from 'type-fest';
-import type { CodeBuilderOptions } from '@readme/httpsnippet/dist/helpers/code-builder';
+import type { CodeBuilder } from '../helpers/code-builder';
+
 import type { SecurityParameter, ServerParameter } from '..';
 
 import { node } from './node/target';
@@ -15,13 +16,21 @@ export interface ClientInfo {
   description: string;
 }
 
+export interface ClientRanges {
+  security?: Record<string, { line: number }>;
+  server?: Record<string, { line: number }>;
+}
+
 export type Converter<T extends Record<string, any>> = (
   params: {
     security: SecurityParameter[];
     server: ServerParameter[];
   },
-  options?: Merge<CodeBuilderOptions, T>
-) => string;
+  options?: Merge<CodeBuilder, T>
+) => {
+  ranges: ClientRanges;
+  snippet: string;
+};
 
 export interface Client<T extends Record<string, any> = Record<string, any>> {
   info: ClientInfo;

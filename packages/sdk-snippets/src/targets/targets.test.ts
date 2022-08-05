@@ -54,23 +54,28 @@ availableWebhookTargets()
 
     describe(`${title} snippet generation`, () => {
       clients.filter(testFilter('key', clientFilter)).forEach(({ key: clientId }) => {
-        fixtures.filter(testFilter(0, fixtureFilter)).forEach(([fixture, parameters]) => {
-          const expectedPath = path.join(
-            'src',
-            'targets',
-            targetId,
-            clientId,
-            snippetType,
-            'fixtures',
-            `${fixture}${extname(targetId)}`
-          );
+        const fixtureBasePath = path.join('src', 'targets', targetId, clientId, snippetType, 'fixtures');
 
-          let expected: string;
+        fixtures.filter(testFilter(0, fixtureFilter)).forEach(([fixture, parameters]) => {
+          const outputPath = path.join(fixtureBasePath, fixture, `output${extname(targetId)}`);
+          const rangesPath = path.join(fixtureBasePath, fixture, 'ranges.json');
+
+          let expectedOutput: string;
           try {
-            expected = readFileSync(expectedPath).toString();
+            expectedOutput = readFileSync(outputPath).toString();
           } catch (err) {
             throw new Error(
-              `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${expectedPath}\``
+              `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${outputPath}\``
+            );
+          }
+
+          let expectedRanges: string;
+          try {
+            expectedRanges = readFileSync(rangesPath).toString();
+            expectedRanges = JSON.parse(expectedRanges);
+          } catch (err) {
+            throw new Error(
+              `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output ranges fixture: \`/${rangesPath}\``
             );
           }
 
@@ -78,12 +83,19 @@ availableWebhookTargets()
           const result = convert(snippetType, targetId, clientId);
 
           if (OVERWRITE_EVERYTHING && result) {
-            writeFileSync(expectedPath, String(result));
+            writeFileSync(rangesPath, JSON.stringify(result.ranges, null, 2));
+            writeFileSync(outputPath, String(result.snippet));
             return;
           }
 
-          it(`${clientId} request should match fixture for "${fixture}.js"`, () => {
-            expect(result).toStrictEqual(expected);
+          it(`${clientId} request should match fixture for "${fixture}"`, () => {
+            // eslint-disable-next-line jest/no-if
+            if (!result) {
+              throw new Error(`Generated ${fixture} snippet for ${clientId} was \`false\``);
+            }
+
+            expect(result.ranges).toStrictEqual(expectedRanges);
+            expect(result.snippet).toStrictEqual(expectedOutput);
           });
         });
       });
