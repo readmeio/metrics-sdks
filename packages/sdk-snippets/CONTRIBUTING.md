@@ -49,13 +49,13 @@ export const node: Target = {
 
 ## Creating a new Client
 
-Clients are what *actually* generate snippets. For Node, if you want to generate snippets for [Express](https://expressjs.com/) you would create an Express client. To create a new client for a target you created above, or for an existing target you need to do the following:
+Clients are what _actually_ generate snippets. For Node, if you want to generate snippets for [Express](https://expressjs.com/) you would create an Express client. To create a new client for a target you created above, or for an existing target you need to do the following:
 
 1. Determine what kind of client you're creating. Is it for Metrics SDK webhooks snippet or a Metrics SDK server?
 2. Create a new directory in `src/targets/{TARGET}/` named after the client you're creating (i.e. Laravel would be `laravel`).
 3. Create another sub directory within that for `wehbooks` or `server`. If you're creating a client for both, create both.
 4. Create a `client.ts` in the `webhooks` or `server` directory. This will be where you create your client.
-    - See below for what this should look like.
+   - See below for what this should look like.
 5. Create a `fixtures` directory in this same directory. This will be where all of of the output fixtures and snapshots are placed and sourced from in unit tests.
 6. Once you have your `client.ts` in place you need to update the target so it's aware. Load up the `target.ts` file for this target and add it to `services.server.clientsById` or `services.webhooks.clientsById`.
 
@@ -65,8 +65,8 @@ Once that's all done and your client is constructed you're ready to run unit tes
 npx jest src/targets/targets.test.ts
 ```
 
-* Running this on a brand new client will throw exceptions for missing fixture snapshots, add those to `src/targets/{TARGET}/{CLIENT}/{server|webhooks}/fixtures` as they come up.
-* If you happen to make changes to your client and it breaks your fixture snapshots you can re-run Jest with `OVERWRITE_EVERYTHING=true` update your fixtures.
+- Running this on a brand new client will throw exceptions for missing fixture snapshots, add those to `src/targets/{TARGET}/{CLIENT}/{server|webhooks}/fixtures` as they come up.
+- If you happen to make changes to your client and it breaks your fixture snapshots you can re-run Jest with `OVERWRITE_EVERYTHING=true` update your fixtures.
 
 ```bash
 OVERWRITE_EVERYTHING=true npx jest src/targets/targets.test.ts
