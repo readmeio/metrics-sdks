@@ -47,15 +47,18 @@ export const express: Client = {
     push('db.find({ email: req.body.email }).then(user => {', 1);
     push('return res.json({', 2);
 
-    if (server.length > 0) {
+    if (server.length) {
       push('// OAS Server variables', 3);
       server.forEach(variable => {
-        push(`${variable.name}: '${variable.default || variable.name}'`, 3);
+        push(`${variable.name}: '${variable.default || variable.name}',`, 3);
       });
+    }
+
+    if (server.length && security.length) {
       blank();
     }
 
-    if (security.length > 0) {
+    if (security.length) {
       push('// OAS Security variables', 3);
       security.forEach(variable => {
         if (variable.type === 'http') {

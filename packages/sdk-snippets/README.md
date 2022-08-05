@@ -17,20 +17,20 @@ npm install --save @readme/metrics-sdk-snippets
 ## Usage
 
 ```js
-import { MetricsSDKSnippet } from "@readme/metrics-sdk-snippets";
+import { MetricsSDKSnippet } from '@readme/metrics-sdk-snippets';
 
 const { convert } = new MetricsSDKSnippet([
   {
-    name: "petstore_auth",
-    default: "default-key",
-    source: "security",
-    type: "oauth2",
+    name: 'petstore_auth',
+    default: 'default-key',
+    source: 'security',
+    type: 'oauth2',
   },
   {
-    name: "basic_auth",
-    default: "default",
-    source: "security",
-    type: "http",
+    name: 'basic_auth',
+    default: 'default',
+    source: 'security',
+    type: 'http',
   },
 ]);
 
