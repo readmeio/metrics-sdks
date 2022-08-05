@@ -41,10 +41,10 @@ export interface TargetInfo {
 export interface Target {
   info: TargetInfo;
   services: {
-    webhooks?: {
+    webhooks: {
       clientsById: Record<ClientId, Client>;
     };
-    server?: {
+    server: {
       clientsById: Record<ClientId, Client>;
     };
   };
