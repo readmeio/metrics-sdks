@@ -1,48 +1,31 @@
-# readme/metrics
+# ReadMe Metrics
 
-Track your API metrics within ReadMe.
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/33762/182927634-2aebeb46-c215-4ac3-9e98-61f931e33583.png" />
+</p>
 
-[![Packagist](https://img.shields.io/packagist/v/readme/metrics.svg)](https://packagist.org/packages/readme/metrics)
-[![Build](https://github.com/readmeio/metrics-sdks/workflows/php/badge.svg)](https://github.com/readmeio/metrics-sdks)
+<p align="center">
+  Track usage of your API and troubleshoot issues faster.
+</p>
 
-[![](https://d3vv6lp55qjaqc.cloudfront.net/items/1M3C3j0I0s0j3T362344/Untitled-2.png)](https://readme.io)
+<p align="center">
+  <a href="https://packagist.org/packages/readme/metrics"><img src="https://img.shields.io/packagist/v/readme/metrics.svg?style=for-the-badge" alt="Latest release"></a>
+  <a href="https://packagist.org/packages/readme/metrics"><img src="https://img.shields.io/packagist/php-v/readme/metrics.svg?style=for-the-badge" alt="Supported PHP versions"></a>
+  <a href="https://github.com/readmeio/metrics-sdks"><img src="https://img.shields.io/github/workflow/status/readmeio/metrics-sdks/php.svg?style=for-the-badge" alt="Build status"></a>
+</p>
 
-## Installation
+With [ReadMe's Metrics API](https://readme.com/metrics) your team can get deep insights into your API's usage. If you're a developer, it takes a few small steps to send your API logs to [ReadMe](http://readme.com). Here's an overview of how the integration works:
+
+- You add the ReadMe middleware to your [Laravel](https://laravel.com/) application.
+- The middleware sends to ReadMe the response object that your Laravel application generates each time a user makes a request to your API. The entire response is sent, unless you allow or deny keys.
+- ReadMe populates Metrics with this information, such as which endpoint is being called, response code, and error messages. It also identifies the customer who called your API, using whichever keys in the middleware you call out as containing relevant customer info.
 
 ```
 composer require readme/metrics
 ```
 
-## Usage
+**For more information on setup, check out our [integration documentation](https://docs.readme.com/docs/sending-logs-to-readme-with-php-laravel).**
 
-`readme/metrics` is currently targeted towards codebases utilizing the [Laravel](https://laravel.com/) framework. To get up and running, you'll need to do the following things:
-
-1. Publish our config file into your `config/` directory:
-
-```
-php artisan vendor:publish --provider="ReadMe\ServiceProvider"
-```
-
-2. In `config/readme.php`, change `api_key` to `"<<apiKey>>"`, which is the API key for your [ReadMe project](https://dash.readme.io).
-3. In that config file, you will also see a `group_handler` that will be set to `App\Handler\ReadMe::class`. This file will exist within `app\Handler` in your application and you should change the contents of its `constructGroup` function to return data that's relevant to your codebase and users. We've provided some simple defaults but you'll likely need to change them.
-
-Once you've done all that, add `\ReadMe\Middleware::class` into your API middleware in `app/Http/Kernel.php` and API Metrics will start streaming to your ReadMe project!
-
-### `res.headers['x-documentation-url']`
-
-With the middleware loaded, all requests that funneled through it will receive a `x-documentation-url` header applied to the response. The value of this header will be the URL on ReadMe Metrics with which you can view the log for that request.
-
-Note that in order to generate this URL, an API request is made to ReadMe once a day, and cached to a local file in `$COMPOSER_HOME/cache`, to retrieve your projects `base_url`. If this request to ReadMe fails, the `x-documentation-url` header will not be added to responses.
-
-If you wish to not rely on this cache, you can opt to supply a `base_log_url` option within `config/readme.php`. This value should evaluate to the public-facing URL of your ReadMe project.
-
-### Configuration Options
-
-There are a few options you can pass in to change how the logs are sent to ReadMe. These are configured within `config/readme.php`.
-
-| Option           | Use                                                                                                                                                                                                                                                                                                             |
-| :--------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| development_mode | **default: false** If true, the log will be separate from normal production logs. This is great for separating staging or test data from data coming from customers                                                                                                                                             |
-| denylist         | **optional** An array of keys from your API requests, responses headers, and request bodies that you wish to not be sent to ReadMe.<br /><br />If you configure a denylist, it will override any allowlist configuration.                                                                                       |
-| allowlist        | **optional** An array of keys from your API requests and responses headers and bodies that you only wish to send to ReadMe.                                                                                                                                                                                     |
-| base_log_url     | **optional** This is the base URL for your ReadMe project. Normally this would be `https://projectName.readme.io` or `https://docs.yourdomain.com`, however if this value is not supplied, a request to the ReadMe API will be made once a day to retrieve it. This data is cached into `$COMPOSER_HOME/cache`. |
+> 🚧 Any Issues?
+>
+> Integrations can be tricky! [Contact support](https://docs.readme.com/guides/docs/contact-support) if you have any questions/issues.
