@@ -1,8 +1,8 @@
-import type { ClientId, TargetId } from './targets/targets';
+import type { ClientId, SnippetType, TargetId } from './targets/targets';
 
 import { targets } from './targets/targets';
 
-export { availableTargets, extname } from './helpers/utils';
+export { availableServerTargets, availableWebhookTargets, extname } from './helpers/utils';
 
 export interface ServerParameter {
   name: string;
@@ -26,18 +26,18 @@ export class MetricsSDKSnippet {
     this.params = input;
   }
 
-  convert = (targetId: TargetId, clientId?: ClientId, options?: any) => {
+  convert = (snippetType: SnippetType, targetId: TargetId, clientId?: ClientId, options?: any) => {
     if (!options && clientId) {
       // eslint-disable-next-line no-param-reassign
       options = clientId;
     }
 
     const target = targets[targetId];
-    if (!target) {
+    if (!target || !target.services.webhooks) {
       return false;
     }
 
-    const { convert } = target.clientsById[clientId || target.info.default];
+    const { convert } = target.services[snippetType].clientsById[clientId || target.info.default];
 
     // Reduce our parameters into a set keyed by their type.
     const { server, security } = this.params.reduce(

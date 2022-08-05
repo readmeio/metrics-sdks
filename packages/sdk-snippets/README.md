@@ -34,10 +34,10 @@ const { convert } = new MetricsSDKSnippet([
   },
 ]);
 
-console.log(convert('node', 'express'));
+console.log(convert('webhooks', 'node', 'express'));
 ```
 
-Outputs:
+Outputs a [ReadMe Node Metrics SDK](https://npm.im/readmeio) webhooks example:
 
 ```js
 // Save this code as `server.js`

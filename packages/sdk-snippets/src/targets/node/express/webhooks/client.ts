@@ -1,4 +1,4 @@
-import type { Client } from '../../targets';
+import type { Client } from '../../../targets';
 import { CodeBuilder } from '@readme/httpsnippet/dist/helpers/code-builder';
 
 export const express: Client = {
@@ -6,7 +6,7 @@ export const express: Client = {
     key: 'express',
     title: 'Express',
     link: 'https://expressjs.com/',
-    description: 'ReadMe Metrics SDK on Express',
+    description: 'ReadMe Metrics Webhooks SDK usage on Express',
   },
   convert: ({ security, server }, options) => {
     const opts = {

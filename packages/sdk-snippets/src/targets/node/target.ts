@@ -1,5 +1,5 @@
 import type { Target } from '../targets';
-import { express } from './express/client';
+import { express } from './express/webhooks/client';
 
 export const node: Target = {
   info: {
@@ -9,7 +9,11 @@ export const node: Target = {
     default: 'native',
     cli: 'node %s',
   },
-  clientsById: {
-    express,
+  services: {
+    webhooks: {
+      clientsById: {
+        express,
+      },
+    },
   },
 };

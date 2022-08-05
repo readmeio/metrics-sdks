@@ -5,7 +5,7 @@ import type { SecurityParameter, ServerParameter } from '..';
 import { node } from './node/target';
 
 export type TargetId = keyof typeof targets;
-
+export type SnippetType = 'webhooks' | 'server';
 export type ClientId = string;
 
 export interface ClientInfo {
@@ -40,7 +40,14 @@ export interface TargetInfo {
 
 export interface Target {
   info: TargetInfo;
-  clientsById: Record<ClientId, Client>;
+  services: {
+    webhooks?: {
+      clientsById: Record<ClientId, Client>;
+    };
+    server?: {
+      clientsById: Record<ClientId, Client>;
+    };
+  };
 }
 
 export const targets = {

@@ -1,9 +1,9 @@
 import type { Parameters } from '..';
-import type { ClientId, TargetId } from './targets';
+import type { ClientId, SnippetType, TargetId } from './targets';
 import { readdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 
-import { availableTargets, extname } from '../helpers/utils';
+import { availableWebhookTargets, extname } from '../helpers/utils';
 import { MetricsSDKSnippet } from '..';
 
 const expectedBasePath = ['src', 'fixtures', 'parameters'];
@@ -47,9 +47,11 @@ const testFilter =
   (item: T) =>
     list.length > 0 ? list.includes(item[property]) : true;
 
-availableTargets()
+availableWebhookTargets()
   .filter(testFilter('key', targetFilter))
-  .forEach(({ key: targetId, title, extname: fixtureExtension, clients }) => {
+  .forEach(({ key: targetId, title, clients }) => {
+    const snippetType: SnippetType = 'webhooks';
+
     describe(`${title} snippet generation`, () => {
       clients.filter(testFilter('key', clientFilter)).forEach(({ key: clientId }) => {
         fixtures.filter(testFilter(0, fixtureFilter)).forEach(([fixture, parameters]) => {
@@ -58,6 +60,7 @@ availableTargets()
             'targets',
             targetId,
             clientId,
+            snippetType,
             'fixtures',
             `${fixture}${extname(targetId)}`
           );
@@ -67,14 +70,12 @@ availableTargets()
             expected = readFileSync(expectedPath).toString();
           } catch (err) {
             throw new Error(
-              `Missing a test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/src/targets/${targetId}/${clientId}/fixtures/${fixture}${
-                fixtureExtension ?? ''
-              }\``
+              `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${expectedPath}\``
             );
           }
 
           const { convert } = new MetricsSDKSnippet(parameters);
-          const result = convert(targetId, clientId);
+          const result = convert(snippetType, targetId, clientId);
 
           if (OVERWRITE_EVERYTHING && result) {
             writeFileSync(expectedPath, String(result));

@@ -5,11 +5,19 @@ export interface AvailableTarget extends TargetInfo {
   clients: ClientInfo[];
 }
 
-export const availableTargets = () =>
+export const availableWebhookTargets = () =>
   Object.keys(targets).map<AvailableTarget>(targetId => ({
     ...targets[targetId as TargetId].info,
-    clients: Object.keys(targets[targetId as TargetId].clientsById).map(
-      clientId => targets[targetId as TargetId].clientsById[clientId].info
+    clients: Object.keys(targets[targetId as TargetId].services?.webhooks.clientsById).map(
+      clientId => targets[targetId as TargetId].services.webhooks.clientsById[clientId].info
+    ),
+  }));
+
+export const availableServerTargets = () =>
+  Object.keys(targets).map<AvailableTarget>(targetId => ({
+    ...targets[targetId as TargetId].info,
+    clients: Object.keys(targets[targetId as TargetId].services?.server.clientsById).map(
+      clientId => targets[targetId as TargetId].services.server.clientsById[clientId].info
     ),
   }));
 
