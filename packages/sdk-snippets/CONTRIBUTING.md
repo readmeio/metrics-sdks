@@ -103,7 +103,7 @@ export const express: Client = {
 
     return {
       ranges: ranges(),
-      snippet: join()
+      snippet: join(),
     };
   },
 };
