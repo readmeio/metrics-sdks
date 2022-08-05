@@ -120,4 +120,6 @@ describe('Metrics SDK Webhook Integration Tests', () => {
 
     expect(response.statusCode).toBe(401);
   });
+
+  it.todo('should return an error with an expired signature');
 });
