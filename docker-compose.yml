@@ -32,6 +32,16 @@ services:
     environment:
       - EXAMPLE_SERVER=dotnet examples/net6.0/out/net6.0.dll
 
+  integration_webhooks_dotnet_v6.0:
+    build:
+      context: .
+      # TODO update docker file to not include examples folder directly,
+      # maybe bring it in from environment variable?
+      dockerfile: ./__tests__/integrations/dotnet.Dockerfile
+    command: npm run test:integration-webhooks
+    environment:
+      - EXAMPLE_SERVER=dotnet examples/net6.0-webhook/out/net6.0-webhook.dll
+
   integration_metrics_python_flask:
     build:
       context: .
