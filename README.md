@@ -1,6 +1,6 @@
 [![](https://user-images.githubusercontent.com/33762/182927634-2aebeb46-c215-4ac3-9e98-61f931e33583.png)](https://readme.com/metrics)
 
-This is the monorepo for SDK's for [ReadMe's Metrics](https://readme.com/metrics/) product:
+This is the monorepo for SDK's for [ReadMe's Metrics](https://readme.com/metrics/) product.
 
 <!--
 Prettier's table formatting is cursed, hence this ignore block.
