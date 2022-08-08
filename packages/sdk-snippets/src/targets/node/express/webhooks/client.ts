@@ -63,9 +63,12 @@ export const express: Client = {
       push('// OAS Security variables', 3);
       security.forEach(data => {
         if (data.type === 'http') {
-          push(`${data.name}: { user: 'user', pass: 'pass' },`, 3);
-          variable('security', data.name);
-          return;
+          // Only HTTP Basic auth has any special handling for supplying auth.
+          if (data.scheme === 'basic') {
+            push(`${data.name}: { user: 'user', pass: 'pass' },`, 3);
+            variable('security', data.name);
+            return;
+          }
         }
 
         push(`${data.name}: '${data.default || data.default === '' ? data.default : data.name}',`, 3);

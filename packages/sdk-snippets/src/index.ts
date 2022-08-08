@@ -4,26 +4,27 @@ import { targets } from './targets/targets';
 
 export { availableServerTargets, availableWebhookTargets, extname } from './helpers/utils';
 
-export interface ServerParameter {
+export interface ServerVariable {
   name: string;
   default: string;
   source: 'server';
 }
 
-export interface SecurityParameter {
+export interface SecurityVariable {
   name: string;
   default: string;
   source: 'security';
-  type: string;
+  type: 'apiKey' | 'http' | 'oauth';
+  scheme?: 'basic' | 'bearer';
 }
 
-export type Parameters = (ServerParameter | SecurityParameter)[];
+export type Variables = (ServerVariable | SecurityVariable)[];
 
 export class MetricsSDKSnippet {
-  params: Parameters = [];
+  variables: Variables = [];
 
-  constructor(input: Parameters) {
-    this.params = input;
+  constructor(input: Variables) {
+    this.variables = input;
   }
 
   convert = (snippetType: SnippetType, targetId: TargetId, clientId?: ClientId, options?: any) => {
@@ -39,8 +40,8 @@ export class MetricsSDKSnippet {
 
     const { convert } = target.services[snippetType][clientId || target.info.default];
 
-    // Reduce our parameters into a set keyed by their type.
-    const { server, security } = this.params.reduce(
+    // Reduce our variables into a set keyed by their type.
+    const { server, security } = this.variables.reduce(
       (prev, next) => {
         prev[next.source].push(next);
         return prev;

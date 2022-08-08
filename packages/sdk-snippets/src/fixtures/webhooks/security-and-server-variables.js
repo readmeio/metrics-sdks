@@ -10,5 +10,16 @@ module.exports = [
     default: 'default',
     source: 'security',
     type: 'http',
+    scheme: 'basic',
+  },
+  {
+    name: 'name',
+    default: 'default-name',
+    source: 'server',
+  },
+  {
+    name: 'port',
+    default: '',
+    source: 'server',
   },
 ];

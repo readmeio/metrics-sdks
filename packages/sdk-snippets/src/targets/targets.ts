@@ -1,7 +1,7 @@
 import type { Merge } from 'type-fest';
 import type { CodeBuilder } from '../helpers/code-builder';
 
-import type { SecurityParameter, ServerParameter } from '..';
+import type { SecurityVariable, ServerVariable } from '..';
 
 import { node } from './node/target';
 
@@ -23,8 +23,8 @@ export interface ClientRanges {
 
 export type Converter<T extends Record<string, any>> = (
   params: {
-    security: SecurityParameter[];
-    server: ServerParameter[];
+    security: SecurityVariable[];
+    server: ServerVariable[];
   },
   options?: Merge<CodeBuilder, T>
 ) => {

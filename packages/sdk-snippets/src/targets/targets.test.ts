@@ -1,4 +1,4 @@
-import type { Parameters } from '..';
+import type { Variables } from '..';
 import type { ClientId, SnippetType, TargetId } from './targets';
 import { readdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
@@ -6,11 +6,11 @@ import path from 'path';
 import { availableWebhookTargets, extname } from '../helpers/utils';
 import { MetricsSDKSnippet } from '..';
 
-const expectedBasePath = ['src', 'fixtures', 'parameters'];
+const expectedBasePath = ['src', 'fixtures', 'webhooks'];
 
 const inputFileNames = readdirSync(path.join(...expectedBasePath), 'utf-8');
 
-const fixtures: [string, Parameters][] = inputFileNames.map(inputFileName => [
+const fixtures: [string, Variables][] = inputFileNames.map(inputFileName => [
   inputFileName.replace(path.extname(inputFileName), ''),
   // eslint-disable-next-line import/no-dynamic-require, global-require
   require(path.resolve(...expectedBasePath, inputFileName)),
@@ -47,51 +47,53 @@ const testFilter =
   (item: T) =>
     list.length > 0 ? list.includes(item[property]) : true;
 
-availableWebhookTargets()
-  .filter(testFilter('key', targetFilter))
-  .forEach(({ key: targetId, title, clients }) => {
-    const snippetType: SnippetType = 'webhooks';
+describe('webhooks', () => {
+  availableWebhookTargets()
+    .filter(testFilter('key', targetFilter))
+    .forEach(({ key: targetId, title, clients }) => {
+      const snippetType: SnippetType = 'webhooks';
 
-    describe(`${title} snippet generation`, () => {
-      clients.filter(testFilter('key', clientFilter)).forEach(({ key: clientId }) => {
-        fixtures.filter(testFilter(0, fixtureFilter)).forEach(([fixture, parameters]) => {
-          const fixturePath = path.join(
-            'src',
-            'targets',
-            targetId,
-            clientId,
-            snippetType,
-            'fixtures',
-            `${fixture}${extname(targetId)}`
-          );
-
-          let expectedOutput: string;
-          try {
-            expectedOutput = readFileSync(fixturePath).toString();
-          } catch (err) {
-            throw new Error(
-              `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${fixturePath}\``
+      describe(`${title} snippet generation`, () => {
+        clients.filter(testFilter('key', clientFilter)).forEach(({ key: clientId }) => {
+          fixtures.filter(testFilter(0, fixtureFilter)).forEach(([fixture, variables]) => {
+            const fixturePath = path.join(
+              'src',
+              'targets',
+              targetId,
+              clientId,
+              snippetType,
+              'fixtures',
+              `${fixture}${extname(targetId)}`
             );
-          }
 
-          const { convert } = new MetricsSDKSnippet(parameters);
-          const result = convert(snippetType, targetId, clientId);
-
-          if (OVERWRITE_EVERYTHING && result) {
-            writeFileSync(fixturePath, String(result.snippet));
-            return;
-          }
-
-          it(`${clientId} request should match fixture for "${fixture}"`, () => {
-            // eslint-disable-next-line jest/no-if
-            if (!result) {
-              throw new Error(`Generated ${fixture} snippet for ${clientId} was \`false\``);
+            let expectedOutput: string;
+            try {
+              expectedOutput = readFileSync(fixturePath).toString();
+            } catch (err) {
+              throw new Error(
+                `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${fixturePath}\``
+              );
             }
 
-            expect(result.ranges).toMatchSnapshot();
-            expect(result.snippet).toStrictEqual(expectedOutput);
+            const { convert } = new MetricsSDKSnippet(variables);
+            const result = convert(snippetType, targetId, clientId);
+
+            if (OVERWRITE_EVERYTHING && result) {
+              writeFileSync(fixturePath, String(result.snippet));
+              return;
+            }
+
+            it(`${clientId} request should match fixture for "${fixture}"`, () => {
+              // eslint-disable-next-line jest/no-if
+              if (!result) {
+                throw new Error(`Generated ${fixture} snippet for ${clientId} was \`false\``);
+              }
+
+              expect(result.ranges).toMatchSnapshot();
+              expect(result.snippet).toStrictEqual(expectedOutput);
+            });
           });
         });
       });
     });
-  });
+});
