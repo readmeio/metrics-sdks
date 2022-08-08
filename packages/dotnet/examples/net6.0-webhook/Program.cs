@@ -51,10 +51,13 @@ app.MapPost("/webhook", async context =>
       throw new Exception("Invalid Signature");
     }
   }
-  catch (Exception)
+  catch (Exception e)
   {
     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-    await context.Response.WriteAsync("");
+    await context.Response.WriteAsJsonAsync(new
+    {
+      error = e.Message,
+    });
     return;
   }
 

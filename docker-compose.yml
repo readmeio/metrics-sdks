@@ -35,8 +35,6 @@ services:
   integration_webhooks_dotnet_v6.0:
     build:
       context: .
-      # TODO update docker file to not include examples folder directly,
-      # maybe bring it in from environment variable?
       dockerfile: ./__tests__/integrations/dotnet.Dockerfile
     command: npm run test:integration-webhooks
     environment:

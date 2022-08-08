@@ -29,6 +29,16 @@ function post(url, body, options) {
 
 const randomApiKey = 'rdme_abcdefghijklmnopqrstuvwxyz';
 
+async function getResponseBody(response) {
+  let responseBody = '';
+  // eslint-disable-next-line no-restricted-syntax
+  for await (const chunk of response) {
+    responseBody += chunk;
+  }
+  expect(responseBody).not.toBe('');
+  return JSON.parse(responseBody);
+}
+
 describe('Metrics SDK Webhook Integration Tests', () => {
   let httpServer;
   let PORT;
@@ -86,12 +96,7 @@ describe('Metrics SDK Webhook Integration Tests', () => {
         'content-type': 'application/json',
       },
     });
-    let responseBody = '';
-    // eslint-disable-next-line no-restricted-syntax
-    for await (const chunk of response) {
-      responseBody += chunk;
-    }
-    responseBody = JSON.parse(responseBody);
+    const responseBody = await getResponseBody(response);
 
     expect(response.statusCode).toBe(200);
     expect(responseBody).toMatchObject({
@@ -103,12 +108,14 @@ describe('Metrics SDK Webhook Integration Tests', () => {
   it('should return with a 401 if the signature is not correct', async () => {
     const response = await post(`http://localhost:${PORT}/webhook`, JSON.stringify({ email: 'dom@readme.io' }), {
       headers: {
-        'readme-signature': 'adsdsdas',
+        'readme-signature': `t=${Date.now()},v0=abcdefghjkl`,
         'content-type': 'application/json',
       },
     });
+    const responseBody = await getResponseBody(response);
 
     expect(response.statusCode).toBe(401);
+    expect(responseBody.error).toBe('Invalid Signature');
   });
 
   it('should return with a 401 if the signature is empty/missing', async () => {
@@ -117,8 +124,10 @@ describe('Metrics SDK Webhook Integration Tests', () => {
         'content-type': 'application/json',
       },
     });
+    const responseBody = await getResponseBody(response);
 
     expect(response.statusCode).toBe(401);
+    expect(responseBody.error).toBe('Missing Signature');
   });
 
   it.todo('should return an error with an expired signature');

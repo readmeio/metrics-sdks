@@ -21,7 +21,7 @@ app.post('/webhook', express.json({ type: 'application/json' }), (req, res) => {
     readme.verifyWebhook(req.body, signature, secret);
   } catch (e) {
     // Handle invalid requests
-    return res.sendStatus(401);
+    return res.status(401).json({ error: e.message });
   }
   // Fetch the user from the db
   // eslint-disable-next-line @typescript-eslint/no-use-before-define, @typescript-eslint/no-unused-vars
