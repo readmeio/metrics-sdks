@@ -54,28 +54,23 @@ availableWebhookTargets()
 
     describe(`${title} snippet generation`, () => {
       clients.filter(testFilter('key', clientFilter)).forEach(({ key: clientId }) => {
-        const fixtureBasePath = path.join('src', 'targets', targetId, clientId, snippetType, 'fixtures');
-
         fixtures.filter(testFilter(0, fixtureFilter)).forEach(([fixture, parameters]) => {
-          const outputPath = path.join(fixtureBasePath, fixture, `output${extname(targetId)}`);
-          const rangesPath = path.join(fixtureBasePath, fixture, 'ranges.json');
+          const fixturePath = path.join(
+            'src',
+            'targets',
+            targetId,
+            clientId,
+            snippetType,
+            'fixtures',
+            `${fixture}${extname(targetId)}`
+          );
 
           let expectedOutput: string;
           try {
-            expectedOutput = readFileSync(outputPath).toString();
+            expectedOutput = readFileSync(fixturePath).toString();
           } catch (err) {
             throw new Error(
-              `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${outputPath}\``
-            );
-          }
-
-          let expectedRanges: string;
-          try {
-            expectedRanges = readFileSync(rangesPath).toString();
-            expectedRanges = JSON.parse(expectedRanges);
-          } catch (err) {
-            throw new Error(
-              `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output ranges fixture: \`/${rangesPath}\``
+              `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${fixturePath}\``
             );
           }
 
@@ -83,8 +78,7 @@ availableWebhookTargets()
           const result = convert(snippetType, targetId, clientId);
 
           if (OVERWRITE_EVERYTHING && result) {
-            writeFileSync(rangesPath, JSON.stringify(result.ranges, null, 2));
-            writeFileSync(outputPath, String(result.snippet));
+            writeFileSync(fixturePath, String(result.snippet));
             return;
           }
 
@@ -94,7 +88,7 @@ availableWebhookTargets()
               throw new Error(`Generated ${fixture} snippet for ${clientId} was \`false\``);
             }
 
-            expect(result.ranges).toStrictEqual(expectedRanges);
+            expect(result.ranges).toMatchSnapshot();
             expect(result.snippet).toStrictEqual(expectedOutput);
           });
         });

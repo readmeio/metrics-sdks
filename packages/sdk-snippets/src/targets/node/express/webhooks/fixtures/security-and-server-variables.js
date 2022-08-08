@@ -24,7 +24,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
     return res.json({
       // OAS Server variables
       name: 'default-name',
-      port: 'port',
+      port: '',
 
       // OAS Security variables
       petstore_auth: 'default-key',

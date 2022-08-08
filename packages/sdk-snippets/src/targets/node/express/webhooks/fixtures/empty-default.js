@@ -23,8 +23,10 @@ app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
   db.find({ email: req.body.email }).then(user => {
     return res.json({
       // OAS Server variables
-      name: 'default-name',
-      port: 'port',
+      name: '',
+
+      // OAS Security variables
+      petstore_auth: '',
     });
   });
 });

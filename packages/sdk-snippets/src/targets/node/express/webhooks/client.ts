@@ -50,7 +50,7 @@ export const express: Client = {
     if (server.length) {
       push('// OAS Server variables', 3);
       server.forEach(data => {
-        push(`${data.name}: '${data.default || data.name}',`, 3);
+        push(`${data.name}: '${data.default || data.default === '' ? data.default : data.name}',`, 3);
         variable('server', data.name);
       });
     }
@@ -68,7 +68,7 @@ export const express: Client = {
           return;
         }
 
-        push(`${data.name}: '${data.default || data.name}',`, 3);
+        push(`${data.name}: '${data.default || data.default === '' ? data.default : data.name}',`, 3);
         variable('security', data.name);
       });
     }
