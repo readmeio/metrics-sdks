@@ -1,4 +1,4 @@
-# ReadMe Metrics Express Demo
+# ReadMe Metrics/Webhooks Express Demo
 
 ## Install
 
@@ -6,14 +6,29 @@
 npm install
 ```
 
-## Run
+## Metrics
+
+### Run
 
 ```sh
-README_API_KEY=<Your ReadMe API Key here> npm start
+README_API_KEY=<Your ReadMe API Key here> npm run start:metrics
 ```
 
-## Test
-
+### Test
 ```sh
 curl http://localhost:4000
+```
+
+## Webhooks
+
+### Run
+```sh
+README_API_KEY=<Your ReadMe API Key here> npm run start:webhook
+```
+
+### Test
+<!-- TODO add documentation here about how to create a valid HMAC in the shell -->
+
+```sh
+curl http://localhost:4000/webhook -d '{"email": "test@example.com"}'
 ```
