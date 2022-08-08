@@ -25,5 +25,10 @@
         "node/no-extraneous-require": "off"
       }
     }
-  ]
+  ],
+  "settings": {
+    "jest": {
+      "version": 28
+    }
+  }
 }
