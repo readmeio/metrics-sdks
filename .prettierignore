@@ -1,3 +1,5 @@
+packages/cloudflare-worker/coverage/
+packages/cloudflare-worker/dist/
 packages/node/coverage/
 packages/node/dist/
 packages/php/vendor/
