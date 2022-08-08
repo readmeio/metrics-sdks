@@ -6,7 +6,13 @@ var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
 var port = Environment.GetEnvironmentVariable("PORT") ?? "4000";
-var secret = Environment.GetEnvironmentVariable("README_API_KEY") ?? "";
+var secret = Environment.GetEnvironmentVariable("README_API_KEY");
+
+if (secret == null)
+{
+  Console.Error.WriteLine("Missing `README_API_KEY` environment variable");
+  System.Environment.Exit(1);
+}
 
 app.MapPost("/webhook", async context =>
 {
