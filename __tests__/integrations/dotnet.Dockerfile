@@ -5,6 +5,9 @@ ADD packages/dotnet /src
 WORKDIR /src/examples/net6.0
 RUN dotnet publish -o out
 
+WORKDIR /src/examples/net6.0-webhook
+RUN dotnet publish -o out
+
 # Build runtime image
 # TODO add this to base.Dockerfile?
 FROM node:16

@@ -10,7 +10,7 @@
     "prettier:write": "prettier --list-different --write \"./**/**.{js,ts,md}\"",
     "publish": "npx lerna publish",
     "test": "npm test --workspaces",
-    "test:integration-metrics": "NODE_OPTIONS=--experimental-vm-modules npx jest __tests__/integration.test.js",
+    "test:integration-metrics": "NODE_OPTIONS=--experimental-vm-modules npx jest __tests__/integration-metrics.test.js",
     "test:integration-webhooks": "NODE_OPTIONS=--experimental-vm-modules npx jest __tests__/integration-webhooks.test.js",
     "version": "npx conventional-changelog-cli --pkg lerna.json -i CHANGELOG.md -s && git add CHANGELOG.md"
   },
