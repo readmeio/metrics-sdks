@@ -130,5 +130,26 @@ describe('Metrics SDK Webhook Integration Tests', () => {
     expect(responseBody.error).toBe('Missing Signature');
   });
 
-  it.todo('should return an error with an expired signature');
+  it('should return an error with an expired signature', async () => {
+    // Expiry time is 30 mins
+    const FORTY_MIN = 40 * 60 * 1000;
+    const time = Date.now() - FORTY_MIN;
+    const body = {
+      email: 'dom@readme.io',
+    };
+    const unsigned = `${time}.${JSON.stringify(body)}`;
+    const hmac = crypto.createHmac('sha256', randomApiKey);
+    const output = `t=${time},v0=${hmac.update(unsigned).digest('hex')}`;
+
+    const response = await post(`http://localhost:${PORT}/webhook`, JSON.stringify(body), {
+      headers: {
+        'readme-signature': output,
+        'content-type': 'application/json',
+      },
+    });
+    const responseBody = await getResponseBody(response);
+
+    expect(response.statusCode).toBe(401);
+    expect(responseBody.error).toBe('Expired Signature');
+  });
 });
