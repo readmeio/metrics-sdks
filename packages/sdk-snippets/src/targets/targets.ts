@@ -50,12 +50,8 @@ export interface TargetInfo {
 export interface Target {
   info: TargetInfo;
   services: {
-    webhooks: {
-      clientsById: Record<ClientId, Client>;
-    };
-    server: {
-      clientsById: Record<ClientId, Client>;
-    };
+    webhooks: Record<ClientId, Client>;
+    server: Record<ClientId, Client>;
   };
 }
 

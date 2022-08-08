@@ -37,7 +37,7 @@ export class MetricsSDKSnippet {
       return false;
     }
 
-    const { convert } = target.services[snippetType].clientsById[clientId || target.info.default];
+    const { convert } = target.services[snippetType][clientId || target.info.default];
 
     // Reduce our parameters into a set keyed by their type.
     const { server, security } = this.params.reduce(

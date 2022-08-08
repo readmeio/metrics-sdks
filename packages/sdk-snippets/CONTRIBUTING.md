@@ -33,13 +33,9 @@ export const node: Target = {
     cli: 'node %s',
   },
   services: {
-    server: {
-      clientsById: {},
-    },
+    server: {},
     webhooks: {
-      clientsById: {
-        express, // The Client in question
-      },
+      express, // The Client in question
     },
   },
 };
@@ -57,7 +53,7 @@ Clients are what _actually_ generate snippets. For Node, if you want to generate
 4. Create a `client.ts` in the `webhooks` or `server` directory. This will be where you create your client.
    - See below for what this should look like.
 5. Create a `fixtures` directory in this same directory. This will be where all of of the output fixtures and snapshots are placed and sourced from in unit tests.
-6. Once you have your `client.ts` in place you need to update the target so it's aware. Load up the `target.ts` file for this target and add it to `services.server.clientsById` or `services.webhooks.clientsById`.
+6. Once you have your `client.ts` in place you need to update the target so it's aware. Load up the `target.ts` file for this target and add it to `services.server` or `services.webhooks`.
 
 Once that's all done and your client is constructed you're ready to run unit tests.
 

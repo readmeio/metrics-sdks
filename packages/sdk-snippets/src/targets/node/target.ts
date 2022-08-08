@@ -10,13 +10,9 @@ export const node: Target = {
     cli: 'node %s',
   },
   services: {
-    server: {
-      clientsById: {},
-    },
+    server: {},
     webhooks: {
-      clientsById: {
-        express,
-      },
+      express,
     },
   },
 };
