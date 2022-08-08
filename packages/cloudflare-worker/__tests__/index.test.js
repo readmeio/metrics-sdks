@@ -3,7 +3,7 @@ const nock = require('nock');
 const globals = require('./service-worker-globals');
 
 function requireWorker() {
-  delete require.cache[require.resolve('../')];
+  delete require.cache[require.resolve('../src')];
   return require('../src'); // eslint-disable-line global-require
 }
 
