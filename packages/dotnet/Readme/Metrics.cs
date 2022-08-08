@@ -109,8 +109,5 @@ namespace Readme
       configValues.options = optionsObj;
       return configValues;
     }
-
-
   }
-
 }
