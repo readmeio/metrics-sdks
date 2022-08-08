@@ -95,7 +95,8 @@ describe('Metrics SDK Webhook Integration Tests', () => {
   });
 
   it('should return an error with an expired signature', async () => {
-    // Expiry time is 30 mins
+    // The expiry time for the HMAC is 30 mins, so here we're
+    // creating an expired one which is 40 mins old
     const FORTY_MIN = 40 * 60 * 1000;
     const time = Date.now() - FORTY_MIN;
     const body = {
