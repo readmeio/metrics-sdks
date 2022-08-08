@@ -68,8 +68,8 @@ If you're not a maintainer of [`ReadMe.Metrics`](https://www.nuget.org/packages/
 
 To publish a new version:
 
-1. `cd packages/dotnet/Readme`
-2. Update `<Version>` in `Readme.csproj`
+1. `cd packages/dotnet/ReadMe`
+2. Update `<Version>` in `ReadMe.csproj`
 <!-- Please forgive me for this -->
 
 ```sh

@@ -35,7 +35,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - run: docker-compose run integration_python_flask
+    - run: docker-compose run integration_metrics_python_flask
 
     - name: Cleanup
       if: always()
