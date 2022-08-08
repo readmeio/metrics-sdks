@@ -6,13 +6,13 @@ export { availableServerTargets, availableWebhookTargets, extname } from './help
 
 export interface ServerVariable {
   name: string;
-  default: string;
+  default?: string;
   source: 'server';
 }
 
 export interface SecurityVariable {
   name: string;
-  default: string;
+  default?: string;
   source: 'security';
   type: 'apiKey' | 'http' | 'oauth';
   scheme?: 'basic' | 'bearer';
