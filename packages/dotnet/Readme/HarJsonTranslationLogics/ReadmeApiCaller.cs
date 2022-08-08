@@ -4,20 +4,20 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Readme.HarJsonTranslationLogics
+namespace ReadMe.HarJsonTranslationLogics
 {
-  class ReadmeApiCaller
+  class ReadMeApiCaller
   {
     private readonly string _harJsonObject;
     private readonly string _apiKey;
 
-    public ReadmeApiCaller(string harJsonObject, string apiKey)
+    public ReadMeApiCaller(string harJsonObject, string apiKey)
     {
       _harJsonObject = harJsonObject;
       _apiKey = apiKey;
     }
 
-    public void SendHarObjToReadmeApi()
+    public void SendHarObjToReadMeApi()
     {
       try
       {

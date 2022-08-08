@@ -1,8 +1,8 @@
-﻿namespace Readme.HarJsonObjectModels
+﻿namespace ReadMe.HarJsonObjectModels
 {
-    class Headers
-    {
-        public string name { get; set; }
-        public string value { get; set; }
-    }
+  class Headers
+  {
+    public string name { get; set; }
+    public string value { get; set; }
+  }
 }

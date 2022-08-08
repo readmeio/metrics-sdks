@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Readme.HarJsonObjectModels;
-using Readme.HarJsonTranslationLogics;
+using ReadMe.HarJsonObjectModels;
+using ReadMe.HarJsonTranslationLogics;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Readme
+namespace ReadMe
 {
   public class Metrics
   {
@@ -40,8 +40,8 @@ namespace Readme
             HarJsonBuilder harJsonBuilder = new HarJsonBuilder(_next, context, _configuration, configValues);
 
             string harJsonObj = await harJsonBuilder.BuildHar();
-            ReadmeApiCaller readmeApiCaller = new ReadmeApiCaller(harJsonObj, configValues.apiKey);
-            readmeApiCaller.SendHarObjToReadmeApi();
+            ReadMeApiCaller readmeApiCaller = new ReadMeApiCaller(harJsonObj, configValues.apiKey);
+            readmeApiCaller.SendHarObjToReadMeApi();
           }
           else
           {

@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json;
 
-namespace Readme.HarJsonObjectModels
+namespace ReadMe.HarJsonObjectModels
 {
-    [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-    class Cookies
-    {
-        public string name { get; set; }
-        public string value { get; set; }
-    }
+  [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
+  class Cookies
+  {
+    public string name { get; set; }
+    public string value { get; set; }
+  }
 }

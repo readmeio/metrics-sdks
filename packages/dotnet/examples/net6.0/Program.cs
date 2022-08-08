@@ -27,7 +27,7 @@ app.Use(async (context, next) =>
   await next();
 });
 
-app.UseMiddleware<Readme.Metrics>();
+app.UseMiddleware<ReadMe.Metrics>();
 
 app.MapGet("/", async context =>
 {

@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using static System.Text.Encoding;
 using System.Text;
 
-namespace Readme
+namespace ReadMe
 {
   public static class Webhook
   {

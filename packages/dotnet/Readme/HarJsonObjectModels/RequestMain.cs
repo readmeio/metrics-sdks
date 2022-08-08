@@ -1,12 +1,12 @@
-﻿namespace Readme.HarJsonObjectModels
+﻿namespace ReadMe.HarJsonObjectModels
 {
-    class RequestMain
-    {
-        public Log log { get; set; }
+  class RequestMain
+  {
+    public Log log { get; set; }
 
-        public RequestMain(Log log)
-        {
-            this.log = log;
-        }
+    public RequestMain(Log log)
+    {
+      this.log = log;
     }
+  }
 }
