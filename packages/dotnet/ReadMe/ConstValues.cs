@@ -1,6 +1,6 @@
 using System;
 
-namespace Readme
+namespace ReadMe
 {
   public static class ConstValues
   {

@@ -12,16 +12,16 @@ category: 5f7cefc76b6e5e04c3a4c74c
 
 If you're a developer, it takes a few small steps to send your API logs to [ReadMe](http://readme.com/) so your team can get deep insights into your API's usage with [ReadMe Metrics](https://readme.com/metrics). Here's an overview of how the integration works:
 
-- Add the `Readme.Metrics` [NuGet](https://www.nuget.org/) package to your API server and integrate the middleware.
+- Add the `ReadMe.Metrics` [NuGet](https://www.nuget.org/) package to your API server and integrate the middleware.
 - The .NET SDK sends ReadMe the details of your API's incoming requests and outgoing responses, with the option for you to redact any private parameters or headers.
 - ReadMe uses these request and response details to create an API Metrics Dashboard which can be used to analyze specific API calls or monitor aggregate usage data. Additionally, if your users log into your API documentation we'll show them logs of the requests they made!
 
 ## ASP.NET Core Integration
 
-1. Install the `Readme.Metrics` NuGet package using [Visual Studio or VS Code](https://docs.microsoft.com/en-us/nuget/install-nuget-client-tools) or the following command:
+1. Install the `ReadMe.Metrics` NuGet package using [Visual Studio or VS Code](https://docs.microsoft.com/en-us/nuget/install-nuget-client-tools) or the following command:
 
 ```bash
-dotnet add package Readme.Metrics
+dotnet add package ReadMe.Metrics
 ```
 
 2. Find the file that creates your `app`. This is often in a `Startup.cs` or `Program.cs` file depending on your version of .NET, and is located in your root directory. Find the where your `app` is created, and add the following line before the routing is enabled. For full details on each option, read more about the [Group Object](#group-object).
@@ -42,14 +42,14 @@ app.Use(async (context, next) =>
 3. Add the logging middleware to your API server. This will be added immediately after your custom middleware from step 2.
 
 ```asp
-app.UseMiddleware<Readme.Metrics>();
+app.UseMiddleware<ReadMe.Metrics>();
 ```
 
 4. Locate `appsettings.json` in the root directory of your Application. Add the following JSON to your configuration and fill in any applicable values. For full details on each option read more about the [ReadMe Object in appsettings.json](https://docs.readme.com/docs/readme-object-in-appsettingsjson).
 
 ```json
 "readme": {
-    "apiKey": "<Your Readme API Key>",
+    "apiKey": "<Your ReadMe API Key>",
     "options": {
         "allowList": [ "<Any parameters you want allowed in your log. See docs>" ],
         "denyList": [ "<Any parameters you want removed from your log. See docs>"],
@@ -61,15 +61,13 @@ app.UseMiddleware<Readme.Metrics>();
 
 For a full example take a look at our example projects:
 
-- [.NET Core 3.1](https://github.com/readmeio/metrics-sdks-dotnet/blob/04987ee32bcdcd0339736bc645475d05df5237ee/ReadmeMetricsAPI3/Startup.cs#L33-L45)
-- [.NET Core 5](https://github.com/readmeio/metrics-sdks-dotnet/blob/04987ee32bcdcd0339736bc645475d05df5237ee/ReadmeMetricsAPI5/Startup.cs#L33-L45)
-- [.NET Core 6](https://github.com/readmeio/metrics-sdks-dotnet/blob/04987ee32bcdcd0339736bc645475d05df5237ee/ReadmeMetricsAPI6/Program.cs#L15-L27)
+- [.NET Core 6](https://github.com/readmeio/metrics-sdks/tree/main/packages/dotnet/examples/net6.0)
 
 ## ASP.NET Core Middleware Reference
 
 ### Group Object
 
-Before assigning the Readme.Metrics middleware you should assign custom middleware to extract certain grouping parameters, as seen in step 2 of the ASP.NET Core Integration. The grouping parameters includes three values: apiKey, label and email. While only apiKey is required, we recommend providing all three values to get the most out of the metrics dashboard.
+Before assigning the ReadMe.Metrics middleware you should assign custom middleware to extract certain grouping parameters, as seen in step 2 of the ASP.NET Core Integration. The grouping parameters includes three values: apiKey, label and email. While only apiKey is required, we recommend providing all three values to get the most out of the metrics dashboard.
 
 <!--
 Prettier's table formatting is cursed, hence this ignore block.
@@ -155,4 +153,4 @@ Make sure to supply a `baseLogUrl` option into your readme settings, which shoul
    - Additionally, it would be useful to include:
      - Any other config values you are using.
      - The Method, URL, Query Parameters, Request Body and Headers of the API call you are trying to log.
-     - The response of the API call to the metrics server (i.e. the value of `response` on [this line](https://github.com/readmeio/metrics-sdks-dotnet/blob/d849f12d33277870f846c974bf0eeed27788f3d8/Readme/HarJsonTranslationLogics/ReadmeApiCaller.cs#L30)).
+     - The response of the API call to the metrics server (i.e. the value of `response` on [this line](https://github.com/readmeio/metrics-sdks/blob/99dc92e891bde0167b59f8c224c7201fe4035d60/packages/dotnet/Readme/HarJsonTranslationLogics/ReadmeApiCaller.cs#L30)).
