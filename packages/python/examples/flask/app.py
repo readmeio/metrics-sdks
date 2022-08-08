@@ -1,7 +1,13 @@
 import os
+import sys
 from flask import Flask
 from readme_metrics import MetricsApiConfig
 from readme_metrics.flask_readme import ReadMeMetrics
+
+if os.getenv("README_API_KEY") is None:
+    sys.stderr.write("Missing `README_API_KEY` environment variable")
+    sys.stderr.flush()
+    os._exit(1)
 
 app = Flask(__name__)
 
