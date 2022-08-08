@@ -82,43 +82,6 @@ describe('Metrics SDK Webhook Integration Tests', () => {
     return httpServer.kill();
   });
 
-  it('should return with a user object if the signature is correct', async () => {
-    const time = Date.now();
-    const body = {
-      email: 'dom@readme.io',
-    };
-    const unsigned = `${time}.${JSON.stringify(body)}`;
-    const hmac = crypto.createHmac('sha256', randomApiKey);
-    const output = `t=${time},v0=${hmac.update(unsigned).digest('hex')}`;
-
-    const response = await post(`http://localhost:${PORT}/webhook`, JSON.stringify(body), {
-      headers: {
-        'readme-signature': output,
-        'content-type': 'application/json',
-      },
-    });
-    expect(response.statusCode).toBe(200);
-
-    const responseBody = await getResponseBody(response);
-    expect(responseBody).toMatchObject({
-      petstore_auth: 'default-key',
-      basic_auth: { user: 'user', pass: 'pass' },
-    });
-  });
-
-  it('should return with a 401 if the signature is not correct', async () => {
-    const response = await post(`http://localhost:${PORT}/webhook`, JSON.stringify({ email: 'dom@readme.io' }), {
-      headers: {
-        'readme-signature': `t=${Date.now()},v0=abcdefghjkl`,
-        'content-type': 'application/json',
-      },
-    });
-    expect(response.statusCode).toBe(401);
-
-    const responseBody = await getResponseBody(response);
-    expect(responseBody.error).toBe('Invalid Signature');
-  });
-
   it('should return with a 401 if the signature is empty/missing', async () => {
     const response = await post(`http://localhost:${PORT}/webhook`, JSON.stringify({ email: 'dom@readme.io' }), {
       headers: {
@@ -152,5 +115,42 @@ describe('Metrics SDK Webhook Integration Tests', () => {
 
     const responseBody = await getResponseBody(response);
     expect(responseBody.error).toBe('Expired Signature');
+  });
+
+  it('should return with a 401 if the signature is not correct', async () => {
+    const response = await post(`http://localhost:${PORT}/webhook`, JSON.stringify({ email: 'dom@readme.io' }), {
+      headers: {
+        'readme-signature': `t=${Date.now()},v0=abcdefghjkl`,
+        'content-type': 'application/json',
+      },
+    });
+    expect(response.statusCode).toBe(401);
+
+    const responseBody = await getResponseBody(response);
+    expect(responseBody.error).toBe('Invalid Signature');
+  });
+
+  it('should return with a user object if the signature is correct', async () => {
+    const time = Date.now();
+    const body = {
+      email: 'dom@readme.io',
+    };
+    const unsigned = `${time}.${JSON.stringify(body)}`;
+    const hmac = crypto.createHmac('sha256', randomApiKey);
+    const output = `t=${time},v0=${hmac.update(unsigned).digest('hex')}`;
+
+    const response = await post(`http://localhost:${PORT}/webhook`, JSON.stringify(body), {
+      headers: {
+        'readme-signature': output,
+        'content-type': 'application/json',
+      },
+    });
+    expect(response.statusCode).toBe(200);
+
+    const responseBody = await getResponseBody(response);
+    expect(responseBody).toMatchObject({
+      petstore_auth: 'default-key',
+      basic_auth: { user: 'user', pass: 'pass' },
+    });
   });
 });
