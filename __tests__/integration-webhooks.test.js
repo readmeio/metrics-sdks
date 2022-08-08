@@ -97,9 +97,9 @@ describe('Metrics SDK Webhook Integration Tests', () => {
         'content-type': 'application/json',
       },
     });
-    const responseBody = await getResponseBody(response);
-
     expect(response.statusCode).toBe(200);
+
+    const responseBody = await getResponseBody(response);
     expect(responseBody).toMatchObject({
       petstore_auth: 'default-key',
       basic_auth: { user: 'user', pass: 'pass' },
@@ -113,9 +113,9 @@ describe('Metrics SDK Webhook Integration Tests', () => {
         'content-type': 'application/json',
       },
     });
-    const responseBody = await getResponseBody(response);
-
     expect(response.statusCode).toBe(401);
+
+    const responseBody = await getResponseBody(response);
     expect(responseBody.error).toBe('Invalid Signature');
   });
 
@@ -125,9 +125,9 @@ describe('Metrics SDK Webhook Integration Tests', () => {
         'content-type': 'application/json',
       },
     });
-    const responseBody = await getResponseBody(response);
-
     expect(response.statusCode).toBe(401);
+
+    const responseBody = await getResponseBody(response);
     expect(responseBody.error).toBe('Missing Signature');
   });
 
@@ -148,9 +148,9 @@ describe('Metrics SDK Webhook Integration Tests', () => {
         'content-type': 'application/json',
       },
     });
-    const responseBody = await getResponseBody(response);
-
     expect(response.statusCode).toBe(401);
+
+    const responseBody = await getResponseBody(response);
     expect(responseBody.error).toBe('Expired Signature');
   });
 });
