@@ -49,7 +49,7 @@ Clients are what _actually_ generate snippets. For Node, if you want to generate
 
 1. Determine what kind of client you're creating. Is it for Metrics SDK webhooks snippet or a Metrics SDK server?
 2. Create a new directory in `src/targets/{TARGET}/` named after the client you're creating (i.e. Laravel would be `laravel`).
-3. Create another sub directory within that for `wehbooks` or `server`. If you're creating a client for both, create both.
+3. Create another sub directory within that for `webhooks` or `server`. If you're creating a client for both, create both.
 4. Create a `client.ts` in the `webhooks` or `server` directory. This will be where you create your client.
    - See below for what this should look like.
 5. Create a `fixtures` directory in this same directory. This will be where all of of the output fixtures and snapshots are placed and sourced from in unit tests.
