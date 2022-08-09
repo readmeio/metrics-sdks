@@ -6,12 +6,11 @@ const fastify = Fastify({
 });
 
 fastify.decorateRequest('readmeStartTime', '');
-fastify.addHook('onRequest', (request, reply, next) => {
+fastify.addHook('onRequest', async request => {
   request.readmeStartTime = new Date();
-  next();
 });
 
-fastify.addHook('onSend', (request, reply, payload, next) => {
+fastify.addHook('onSend', async (request, reply, payload) => {
   const payloadData = {
     // User's API Key
     apiKey: 'owlbert-api-key',
@@ -26,7 +25,6 @@ fastify.addHook('onSend', (request, reply, payload, next) => {
   };
 
   readmeio.log(process.env.README_API_KEY, request, reply, payloadData, { fireAndForget: true });
-  next();
 });
 
 fastify.get('/', (request, reply) => {
