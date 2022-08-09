@@ -1,3 +1,7 @@
+packages/node/coverage/
+packages/node/dist/
+packages/php/vendor/
+packages/sdk-snippets/src/targets/**/fixtures/
 CHANGELOG.md
 dist
 venv

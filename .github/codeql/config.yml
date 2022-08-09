@@ -1,0 +1,5 @@
+paths-ignore:
+  - '__tests__/**'
+  - '**/fixtures/'
+  - '**/*.test.js'
+  - '**/*.test.ts'

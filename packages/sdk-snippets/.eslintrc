@@ -1,0 +1,13 @@
+{
+  "extends": [
+    "@readme/eslint-config",
+    "@readme/eslint-config/typescript",
+    "@readme/eslint-config/testing"
+  ],
+  "root": true,
+  "settings": {
+    "jest": {
+      "version": 28
+    }
+  }
+}

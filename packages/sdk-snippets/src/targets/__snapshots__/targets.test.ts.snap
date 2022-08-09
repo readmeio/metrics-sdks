@@ -1,0 +1,84 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`webhooks Node.js snippet generation express request should match fixture for "empty" 1`] = `Object {}`;
+
+exports[`webhooks Node.js snippet generation express request should match fixture for "empty-default" 1`] = `
+Object {
+  "security": Object {
+    "petstore_auth": Object {
+      "line": 29,
+    },
+  },
+  "server": Object {
+    "name": Object {
+      "line": 26,
+    },
+  },
+}
+`;
+
+exports[`webhooks Node.js snippet generation express request should match fixture for "security-and-server-variables" 1`] = `
+Object {
+  "security": Object {
+    "basic_auth": Object {
+      "line": 31,
+    },
+    "petstore_auth": Object {
+      "line": 30,
+    },
+  },
+  "server": Object {
+    "name": Object {
+      "line": 26,
+    },
+    "port": Object {
+      "line": 27,
+    },
+  },
+}
+`;
+
+exports[`webhooks Node.js snippet generation express request should match fixture for "security-types" 1`] = `
+Object {
+  "security": Object {
+    "api_key": Object {
+      "line": 26,
+    },
+    "http_basic": Object {
+      "line": 27,
+    },
+    "http_bearer": Object {
+      "line": 28,
+    },
+    "oauth2": Object {
+      "line": 29,
+    },
+  },
+}
+`;
+
+exports[`webhooks Node.js snippet generation express request should match fixture for "security-variables" 1`] = `
+Object {
+  "security": Object {
+    "basic_auth": Object {
+      "line": 27,
+    },
+    "petstore_auth": Object {
+      "line": 26,
+    },
+  },
+}
+`;
+
+exports[`webhooks Node.js snippet generation express request should match fixture for "server-variables" 1`] = `
+Object {
+  "server": Object {
+    "name": Object {
+      "line": 26,
+    },
+    "port": Object {
+      "line": 27,
+    },
+  },
+}
+`;

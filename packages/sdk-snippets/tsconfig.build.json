@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "declaration": true,
+    "downlevelIteration": true,
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "skipLibCheck": true
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["dist", "./src/fixtures/", "./src/**/fixtures", "**/*.test.ts"]
+}
