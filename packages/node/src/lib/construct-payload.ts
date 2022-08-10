@@ -1,11 +1,15 @@
-import type { ServerResponse, IncomingMessage } from 'http';
 import type { OutgoingLogBody } from './metrics-log';
+import type { ServerResponse, IncomingMessage } from 'http';
 import type { TLSSocket } from 'tls';
+
+import { URL } from 'url';
+
+import { v4 as uuidv4 } from 'uuid';
+
+import { name, version } from '../../package.json';
+
 import processRequest from './process-request';
 import processResponse from './process-response';
-import { name, version } from '../../package.json';
-import { v4 as uuidv4 } from 'uuid';
-import { URL } from 'url';
 
 /**
  * Extracts the protocol string from the incoming request

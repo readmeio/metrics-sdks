@@ -16,7 +16,9 @@ function testResponse(
   const requestListener = function (req: http.IncomingMessage, res: TestServerResponse) {
     // Have to do this otherwise the request is never read
     // and the tests timeout
-    req.on('readable', function () {});
+    req.on('readable', function () {
+      // no-op
+    });
 
     req.on('end', function () {
       res.setHeader('Content-Type', resContentType);

@@ -1,4 +1,5 @@
 import { URLSearchParams } from 'url';
+
 import { objectToArray, searchToArray } from '../../src/lib/object-to-array';
 
 describe('#object-to-array', () => {
