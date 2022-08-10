@@ -34,20 +34,10 @@ function addSshKey() {
     fi
 }
 
-addSshKey sdks-node METRICS_SDK_NODE_PRIVATE_KEY
+# Because https://packagist.org/ works off by repository syncing, not published tags, in order to
+# publish the PHP SDK it cannot be contained within a monorepo so we need to split it off into a
+# read-only mirror we've got. Packagist then monitors this mirror for any changes and publishes
+# changes when we push code to it.
 addSshKey sdks-php METRICS_SDK_PHP_PRIVATE_KEY
-addSshKey sdks-python METRICS_SDK_PYTHON_PRIVATE_KEY
-addSshKey sdks-ruby METRICS_SDK_RUBY_PRIVATE_KEY
-addSshKey sdks-dotnet METRICS_SDK_DOTNET_PRIVATE_KEY
-
-remote sdks-node git@github.com:readmeio/metrics-sdks-node.git
 remote sdks-php git@github.com:readmeio/metrics-sdks-php.git
-remote sdks-python git@github.com:readmeio/metrics-sdks-python.git
-remote sdks-ruby git@github.com:readmeio/metrics-sdks-ruby.git
-remote sdks-dotnet git@github.com:readmeio/metrics-sdks-dotnet.git
-
-split 'packages/node' sdks-node
 split 'packages/php' sdks-php
-split 'packages/python' sdks-python
-split 'packages/ruby' sdks-ruby
-split 'packages/dotnet' sdks-dotnet
