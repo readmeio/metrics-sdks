@@ -1,6 +1,7 @@
 import type { Entry } from 'har-format';
 import type { LogOptions } from './construct-payload';
 import type { ServerResponse } from 'http';
+import { STATUS_CODES } from 'http';
 import removeProperties from 'lodash/omit';
 import removeOtherProperties from 'lodash/pick';
 
@@ -53,7 +54,14 @@ export default function processResponse(
 
   return {
     status: res.statusCode,
-    statusText: res.statusMessage,
+    // In fastify, at the point where we have to fetch the statusMessage
+    // from the response, it is not set because the headers haven't been
+    // flushed yet, so we need to fetch the default value from Node.
+    // https://nodejs.org/dist/latest-v14.x/docs/api/http.html#http_response_statusmessage
+    //
+    // This is the same thing that Node.js does internally:
+    // https://github.com/nodejs/node/blob/9b8ba2536044ae08a1cd747a3aa52df7d1815e7e/lib/_http_server.js#L318
+    statusText: res.statusMessage || STATUS_CODES[res.statusCode],
     headers: objectToArray(headers),
     content: {
       text: JSON.stringify(body),

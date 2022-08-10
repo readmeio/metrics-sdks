@@ -39,6 +39,7 @@ jobs:
 
     - run: docker-compose run integration_metrics_node_express
     - run: docker-compose run integration_metrics_node_hapi
+    - run: docker-compose run integration_metrics_node_fastify
     - run: docker-compose run integration_webhooks_node_express
 
     - name: Cleanup

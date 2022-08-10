@@ -24,6 +24,14 @@ services:
     environment:
       - EXAMPLE_SERVER=node ./packages/node/examples/hapi/index.js
 
+  integration_metrics_node_fastify:
+    build:
+      context: .
+      dockerfile: ./__tests__/integrations/node.Dockerfile
+    command: npm run test:integration-metrics
+    environment:
+      - EXAMPLE_SERVER=node ./packages/node/examples/fastify/index.js
+
   integration_metrics_dotnet_v6.0:
     build:
       context: .
