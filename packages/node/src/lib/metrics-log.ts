@@ -20,11 +20,11 @@ export interface GroupingObject {
   /**
    * This will be the user's display name in the API Metrics Dashboard, since it's much easier to remember a name than an API key.
    */
-  label: string;
+  label?: string;
   /**
    * Email of the user that is making the call
    */
-  email: string;
+  email?: string;
 }
 
 export interface OutgoingLogBody {
