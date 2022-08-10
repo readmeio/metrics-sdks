@@ -52,7 +52,7 @@ function log(...args) {
 }
 
 module.exports.fetchAndCollect = async function fetchAndCollect(request) {
-  log(`Readme CloudFlare Worker v${version}`, 'https://github.com/readmeio/cloudflare-worker');
+  log(`Readme CloudFlare Worker v${version}`, 'https://npm.im/@readme/cloudflare-worker');
   const startedDateTime = new Date();
 
   const { req, body: requestBody } = await getRequestBody(request);
