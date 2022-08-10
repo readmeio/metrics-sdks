@@ -7,7 +7,7 @@ addEventListener('fetch', event => {
 
   if (matchRouteWhitelist(event.request.url)) {
     event.respondWith(respond(event));
-  }  else {
+  } else {
     event.respondWith(fetch(event.request));
   }
 });
@@ -15,11 +15,18 @@ addEventListener('fetch', event => {
 async function respond(event) {
   const { response, har } = await readme.fetchAndCollect(event.request);
 
-  event.waitUntil(readme.metrics(event.request.authentications.account.token.token, {
-    id: response.headers.get(CONSTANTS.HEADERS.ID),
-    email: response.headers.get(CONSTANTS.HEADERS.EMAIL),
-    label: response.headers.get(CONSTANTS.HEADERS.LABEL),
-  }, event.request, har));
+  event.waitUntil(
+    readme.metrics(
+      event.request.authentications.account.token.token,
+      {
+        id: response.headers.get(CONSTANTS.HEADERS.ID),
+        email: response.headers.get(CONSTANTS.HEADERS.EMAIL),
+        label: response.headers.get(CONSTANTS.HEADERS.LABEL),
+      },
+      event.request,
+      har
+    )
+  );
 
   return response;
 }

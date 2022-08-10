@@ -4,9 +4,9 @@ const nock = require('nock');
 const globals = require('./service-worker-globals');
 
 function requireTemplate() {
-  delete require.cache[require.resolve('../template.js')];
+  delete require.cache[require.resolve('../src/template.js')];
   delete require.cache[require.resolve('@readme/cloudflare-worker')];
-  require('../template'); // eslint-disable-line global-require
+  require('../src/template'); // eslint-disable-line global-require
 }
 
 class FetchEvent {

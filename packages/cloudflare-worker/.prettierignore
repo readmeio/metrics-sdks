@@ -1,3 +1,2 @@
-coverage
-dist
-template.js
+coverage/
+dist/

@@ -1,4 +1,4 @@
-const matchRouteWhitelist = require('../lib/cloudflare-routing');
+const matchRouteWhitelist = require('../src/lib/cloudflare-routing');
 const globals = require('./service-worker-globals');
 
 describe('cloudflare-routing()', () => {

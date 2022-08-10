@@ -8,7 +8,7 @@ module.exports = () => {
   if (!HOST) throw new Error('Must provide a host');
 
   return {
-    entry: path.join(__dirname, '/template.js'),
+    entry: path.join(__dirname, '/src/template.js'),
     target: 'webworker',
     mode: process.env.NODE_ENV || 'production',
     optimization: {
@@ -26,14 +26,11 @@ module.exports = () => {
       alias: {
         // Setting up an alias here allows us to keep the template
         // code tidy whilst allowing us to keep it inside of this repo
-        '@readme/cloudflare-worker': path.resolve(__dirname, 'index.js'),
-      },
-      fallback: {
-        path: require.resolve('path-browserify'),
+        '@readme/cloudflare-worker': path.resolve(__dirname, 'src/index.js'),
       },
     },
     output: {
-      filename: 'main.js',
+      filename: 'index.js',
       path: path.join(__dirname, '/dist'),
     },
   };
