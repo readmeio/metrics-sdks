@@ -1,7 +1,7 @@
-import http from 'http';
-import crypto from 'crypto';
-import { cwd } from 'process';
 import { spawn } from 'child_process';
+import crypto from 'crypto';
+import http from 'http';
+import { cwd } from 'process';
 
 import getPort from 'get-port';
 

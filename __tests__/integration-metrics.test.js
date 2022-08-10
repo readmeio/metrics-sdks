@@ -1,10 +1,11 @@
+import { spawn } from 'child_process';
+import { once } from 'events';
 import http from 'http';
 import { cwd } from 'process';
-import { spawn } from 'child_process';
 import { promisify } from 'util';
-import { once } from 'events';
-import getPort from 'get-port';
+
 import caseless from 'caseless';
+import getPort from 'get-port';
 
 if (!process.env.EXAMPLE_SERVER) {
   // eslint-disable-next-line no-console
