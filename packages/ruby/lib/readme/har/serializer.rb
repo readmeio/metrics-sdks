@@ -33,7 +33,7 @@ module Readme
         {
           name: Readme::Metrics::SDK_NAME,
           version: Readme::Metrics::VERSION,
-          comment: "#{Readme::Metrics::PLATFORM}/#{RUBY_VERSION}"
+          comment: "#{RUBY_PLATFORM}/#{RUBY_VERSION}"
         }
       end
 
