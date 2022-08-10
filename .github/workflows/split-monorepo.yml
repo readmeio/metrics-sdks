@@ -18,10 +18,6 @@ jobs:
     - name: Split repository into git mirrors
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        METRICS_SDK_NODE_PRIVATE_KEY: ${{ secrets.METRICS_SDK_NODE_PRIVATE_KEY }}
         METRICS_SDK_PHP_PRIVATE_KEY: ${{ secrets.METRICS_SDK_PHP_PRIVATE_KEY }}
-        METRICS_SDK_PYTHON_PRIVATE_KEY: ${{ secrets.METRICS_SDK_PYTHON_PRIVATE_KEY }}
-        METRICS_SDK_RUBY_PRIVATE_KEY: ${{ secrets.METRICS_SDK_RUBY_PRIVATE_KEY }}
-        METRICS_SDK_DOTNET_PRIVATE_KEY: ${{ secrets.METRICS_SDK_DOTNET_PRIVATE_KEY }}
       run: ./bin/split.sh
       shell: bash
