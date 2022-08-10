@@ -5,6 +5,9 @@
     "@readme/eslint-config/testing"
   ],
   "root": true,
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off"
+  },
   "settings": {
     "jest": {
       "version": 28
