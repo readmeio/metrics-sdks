@@ -293,9 +293,9 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('8.8.8.8', $payload['clientIPAddress']);
         $this->assertFalse($payload['development']);
 
-        $this->assertSame('readme/metrics', $payload['request']['log']['creator']['name']);
+        $this->assertSame('readme-metrics (php)', $payload['request']['log']['creator']['name']);
         $this->assertIsString($payload['request']['log']['creator']['version']);
-        $this->assertSame(PHP_OS_FAMILY . '/php v' . PHP_VERSION, $payload['request']['log']['creator']['comment']);
+        $this->assertSame(Metrics::getHARCreatorVersion(), $payload['request']['log']['creator']['comment']);
 
         $this->assertCount(1, $payload['request']['log']['entries']);
 

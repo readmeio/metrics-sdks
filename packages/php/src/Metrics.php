@@ -2,8 +2,8 @@
 
 namespace ReadMe;
 
-use Closure;
 use Composer\Factory;
+use Composer\InstalledVersions;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlMultiHandler;
 use GuzzleHttp\HandlerStack;
@@ -11,7 +11,6 @@ use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use PackageVersions\Versions;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Response;
@@ -106,8 +105,7 @@ class Metrics
             'timeout' => $curl_timeout,
         ]);
 
-        /** @psalm-suppress DeprecatedClass */
-        $this->package_version = Versions::getVersion(self::PACKAGE_NAME);
+        $this->package_version = InstalledVersions::getVersion(self::PACKAGE_NAME);
         $this->cache_dir = Factory::createConfig()->get('cache-dir');
 
         $this->user_agent = 'readme-metrics-php/' . $this->package_version;
@@ -220,9 +218,9 @@ class Metrics
             'request' => [
                 'log' => [
                     'creator' => [
-                        'name' => self::PACKAGE_NAME,
+                        'name' => 'readme-metrics (php)',
                         'version' => $this->package_version,
-                        'comment' => PHP_OS_FAMILY . '/php v' . PHP_VERSION
+                        'comment' => self::getHARCreatorVersion(),
                     ],
                     'entries' => [
                         [
@@ -452,6 +450,16 @@ class Metrics
                 'value' => (is_scalar($input[$key])) ? $input[$key] : json_encode($input[$key])
             ];
         }, array_keys($input));
+    }
+
+    /**
+     * Retrieve the version string that we'll use in the HAR `creator` object.
+     *
+     * @example arm64-darwin21.3.0/8.1.8
+     */
+    public static function getHARCreatorVersion(): string
+    {
+        return php_uname('m') . '-' . strtolower(php_uname('s')) . php_uname('r') . '/' . PHP_VERSION;
     }
 
     /**
