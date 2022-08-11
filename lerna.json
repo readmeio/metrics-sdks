@@ -1,4 +1,4 @@
 {
-  "packages": ["packages/node", "packages/cloudflare-worker", "packages/sdk-snippets"],
-  "version": "5.2.1"
+  "version": "independent",
+  "useWorkspaces": true
 }
