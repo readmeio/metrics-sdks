@@ -1,11 +1,14 @@
-import type { Response } from 'node-fetch';
 import type { PayloadData, LogOptions } from './construct-payload';
-import type { ServerResponse, IncomingMessage } from 'http';
 import type { Har } from 'har-format';
+import type { ServerResponse, IncomingMessage } from 'http';
+import type { Response } from 'node-fetch';
+
 import fetch from 'node-fetch';
 import timeoutSignal from 'timeout-signal';
+
 import pkg from '../../package.json';
 import config from '../config';
+
 import { constructPayload } from './construct-payload';
 
 export interface GroupingObject {
@@ -20,11 +23,11 @@ export interface GroupingObject {
   /**
    * This will be the user's display name in the API Metrics Dashboard, since it's much easier to remember a name than an API key.
    */
-  label: string;
+  label?: string;
   /**
    * Email of the user that is making the call
    */
-  email: string;
+  email?: string;
 }
 
 export interface OutgoingLogBody {

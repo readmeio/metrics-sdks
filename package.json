@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "clean": "npx lerna clean",
-    "lint": "eslint . && npm run lint --workspaces",
+    "lint": "eslint __tests__ && npm run lint --workspaces",
     "lint:docs": "alex .",
     "prepare": "husky install",
     "prettier": "prettier --list-different \"./**/**.{js,ts,md}\"",
@@ -22,19 +22,21 @@
     "node": ">=14"
   },
   "workspaces": [
-    "./packages/node"
+    "./packages/cloudflare-worker",
+    "./packages/node",
+    "./packages/sdk-snippets"
   ],
   "devDependencies": {
     "@commitlint/cli": "^17.0.2",
     "@commitlint/config-conventional": "^17.0.2",
-    "@readme/eslint-config": "^9.0.0",
+    "@readme/eslint-config": "^10.0.0",
     "alex": "^10.0.0",
     "caseless": "^0.12.0",
-    "eslint": "^8.14.0",
+    "eslint": "^8.21.0",
     "get-port": "^6.1.2",
-    "husky": "^7.0.2",
-    "jest": "^27.5.1",
-    "prettier": "^2.6.2"
+    "husky": "^8.0.1",
+    "jest": "^28.1.3",
+    "prettier": "^2.7.1"
   },
   "commitlint": {
     "extends": [

@@ -14,6 +14,8 @@ This automatically happens via github action on pushes to main. We use [Deploy K
 
 ### Adding a new mirror
 
+> ℹ️ You only need to do this if the new package cannot be published from tagged releases or a monorepo structure (like PHP with Packagist).
+
 To add a new package (and a new mirrored repository), you have to generate a new SSH key, upload the public key to the mirrored repo and add the private key to the parent repo's secrets.
 
 1. Generating a new SSH key:
@@ -25,7 +27,7 @@ ssh-keygen -t ed25519 -C "$(git config user.email)" -f /tmp/new-ssh-key -N ""
 This will output a new key, associated with your email address to /tmp/new-ssh-key. The new key will have no passphrase because it will be used in a github action environment with no way to provide the passphrase.
 
 2. Upload this to our 1password account
-3. Add the public key portion to the "Deploy Keys" section in the mirror e.g. https://github.com/readmeio/metrics-sdks-node/settings/keys/new. Make sure you check "Allow write access" so it can push new code.
+3. Add the public key portion to the "Deploy Keys" section in the mirror e.g. https://github.com/readmeio/metrics-sdks-php/settings/keys/new. Make sure you check "Allow write access" so it can push new code.
 4. Add the private key portion to the "Actions secrets" section of the monorepo: https://github.com/readmeio/metrics-sdks/settings/secrets/actions/new
 5. Update `./bin/split.sh` and `./.github/workflows/split-monorepo.yml` to include the new mirror and SSH key.
 6. Update the main README.md to include information about the new package.
@@ -68,8 +70,8 @@ If you're not a maintainer of [`ReadMe.Metrics`](https://www.nuget.org/packages/
 
 To publish a new version:
 
-1. `cd packages/dotnet/Readme`
-2. Update `<Version>` in `Readme.csproj`
+1. `cd packages/dotnet/ReadMe`
+2. Update `<Version>` in `ReadMe.csproj`
 <!-- Please forgive me for this -->
 
 ```sh

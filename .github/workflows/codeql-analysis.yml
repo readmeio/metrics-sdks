@@ -4,8 +4,6 @@ on:
   pull_request:
     branches:
       - main
-    paths-ignore:
-      - '**/node_modules/**'
 
 jobs:
   analyze:
@@ -28,6 +26,7 @@ jobs:
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
       with:
+        config-file: ./.github/codeql/config.yml
         languages: ${{ matrix.language }}
 
     - name: Autobuild

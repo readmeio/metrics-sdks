@@ -1,8 +1,11 @@
 import type { LogOptions } from 'src/lib/construct-payload';
-import request from 'supertest';
+
 import * as http from 'http';
-import processRequest from '../../src/lib/process-request';
+
 import FormData from 'form-data';
+import request from 'supertest';
+
+import processRequest from '../../src/lib/process-request';
 
 function createApp(reqOptions?: LogOptions, shouldPreParse = false, bodyOverride?) {
   const requestListener = function (req: http.IncomingMessage, res: http.ServerResponse) {

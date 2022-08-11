@@ -21,7 +21,7 @@ app.MapPost("/webhook", async context =>
 
   try
   {
-    Readme.Webhook.Verify(body, signature, secret);
+    ReadMe.Webhook.Verify(body, signature, secret);
   }
   catch (Exception e)
   {
