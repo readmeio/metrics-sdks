@@ -13,7 +13,11 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.0, 8.1]
-        laravel: [6.*, 7.*, 8.*, 9.*]
+        laravel:
+          - 6.* # EOL: September 6th, 2022
+          - 7.* # EOL: March 3rd, 2021
+          - 8.* # EOL: January 24th, 2023
+          - 9.* # EOL: February 8th, 2024
 
     name: build (${{ matrix.php }} w/ Laravel ${{ matrix.laravel }}
 
