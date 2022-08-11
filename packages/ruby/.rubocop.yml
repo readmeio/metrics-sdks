@@ -3,25 +3,12 @@ require:
   - rubocop-rspec
 
 AllCops:
+  NewCops: enable
   TargetRubyVersion: 2.7
 
 # https://docs.rubocop.org/rubocop/cops_layout.html
-Layout/EmptyLinesAroundAttributeAccessor:
-  Enabled: true
 Layout/LineLength:
   Max: 150
-Layout/SpaceAroundMethodCallOperator:
-  Enabled: true
-
-# https://docs.rubocop.org/rubocop/cops_lint.html
-Lint/DeprecatedOpenSSLConstant:
-  Enabled: true
-Lint/MixedRegexpCaptureTypes:
-  Enabled: true
-Lint/RaiseException:
-  Enabled: true
-Lint/StructNewOverride:
-  Enabled: true
 
 # https://docs.rubocop.org/rubocop/cops_metrics.html
 Metrics/AbcSize:
@@ -38,24 +25,6 @@ Metrics/MethodLength:
   Enabled: false
 Metrics/PerceivedComplexity:
   Max: 20
-
-# https://docs.rubocop.org/rubocop-performance/cops.html
-Performance/AncestorsInclude:
-  Enabled: true
-Performance/BigDecimalWithNumericArgument:
-  Enabled: true
-Performance/RedundantSortBlock:
-  Enabled: true
-Performance/RedundantStringChars:
-  Enabled: true
-Performance/ReverseFirst:
-  Enabled: true
-Performance/SortReverse:
-  Enabled: true
-Performance/Squeeze:
-  Enabled: true
-Performance/StringInclude:
-  Enabled: true
 
 # https://www.rubydoc.info/gems/rubocop-rspec/RuboCop/Cop/RSpec
 RSpec/AnyInstance:
@@ -81,26 +50,12 @@ Style/Documentation:
   Enabled: false
 Style/ExpandPathArguments:
   Enabled: false
-Style/ExponentialNotation:
-  Enabled: true
 Style/FrozenStringLiteralComment:
   Enabled: false
 Style/GuardClause:
   Exclude:
     - 'lib/readme/filter.rb'
     - 'lib/readme/metrics.rb'
-Style/HashEachMethods:
-  Enabled: true
-Style/HashTransformKeys:
-  Enabled: true
-Style/HashTransformValues:
-  Enabled: true
 Style/IfUnlessModifier:
   Exclude:
     - 'lib/readme/metrics.rb'
-Style/RedundantRegexpCharacterClass:
-  Enabled: true
-Style/RedundantRegexpEscape:
-  Enabled: true
-Style/SlicingWithRange:
-  Enabled: true
