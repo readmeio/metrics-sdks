@@ -420,19 +420,6 @@ RSpec.describe Readme::Metrics do
         .with { |request| validate_json('readmeMetrics', request.body) })
     end
 
-    it 'throws when provided an unsupported field' do
-      def app
-        json_app_with_middleware({}, { nananana: 'booboo' })
-      end
-
-      post '/api/foo'
-
-      expect {
-        WebMock.to(have_requested(:post, Readme::Metrics::ENDPOINT)
-          .with { |request| validate_json('readmeMetrics', request.body) })
-      }.to raise_error # rubocop:disable RSpec/UnspecifiedException
-    end
-
     it 'can ignore sending logs' do
       def app
         json_app_with_middleware({}, { ignore: true })

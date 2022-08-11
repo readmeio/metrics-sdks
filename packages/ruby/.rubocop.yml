@@ -59,3 +59,9 @@ Style/GuardClause:
 Style/IfUnlessModifier:
   Exclude:
     - 'lib/readme/metrics.rb'
+Style/RescueStandardError:
+  # We should ideally have this rule enabled but I'm paranoid that we don't have full documentation
+  # on all types of errors that might be thrown in the couple places this rule is being suppressed
+  # and by only catching `StandardError` we'll miss out on something else and potentially take down
+  # someones integration.
+  Enabled: false

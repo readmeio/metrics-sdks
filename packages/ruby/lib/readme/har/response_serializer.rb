@@ -48,7 +48,7 @@ module Readme
           size: @response.content_length,
           text: Har::Collection.new(@filter, parsed_body).to_h.to_json
         }
-      rescue StandardError
+      rescue
         pass_through_content
       end
 

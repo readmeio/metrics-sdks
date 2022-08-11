@@ -51,7 +51,7 @@ module Readme
           start_time: start_time,
           end_time: end_time
         )
-      rescue StandardError => e
+      rescue => e
         Readme::Metrics.logger.warn "The following error occured when trying to log to the ReadMe metrics API: #{e.message}. Request not logged."
         [status, headers, body]
       end

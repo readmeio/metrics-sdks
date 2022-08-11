@@ -6,7 +6,7 @@ har_json = File.read(File.expand_path('../../fixtures/har.json', __FILE__))
 RSpec.describe Readme::Payload do
   let(:har) { double('har', to_json: har_json) }
 
-  uuid = UUID.new
+  let(:uuid) { UUID.new }
 
   it 'returns JSON matching the payload schema' do
     result = described_class.new(
@@ -29,14 +29,14 @@ RSpec.describe Readme::Payload do
   end
 
   it 'accepts a custom log uuid' do
-    uuid = uuid.generate
+    custom_uuid = uuid.generate
     result = described_class.new(
       har,
-      { api_key: '1', label: 'Owlbert', email: 'owlbert@example.com', log_id: uuid },
+      { api_key: '1', label: 'Owlbert', email: 'owlbert@example.com', log_id: custom_uuid },
       development: true
     )
 
-    expect(JSON.parse(result.to_json)).to include('logId' => uuid)
+    expect(JSON.parse(result.to_json)).to include('logId' => custom_uuid)
     expect(result.to_json).to match_json_schema('payload')
   end
 
