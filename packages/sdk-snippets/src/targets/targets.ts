@@ -1,7 +1,6 @@
-import type { Merge } from 'type-fest';
-import type { CodeBuilder } from '../helpers/code-builder';
-
 import type { SecurityVariable, ServerVariable } from '..';
+import type { CodeBuilder } from '../helpers/code-builder';
+import type { Merge } from 'type-fest';
 
 import { node } from './node/target';
 

@@ -1,9 +1,13 @@
 import type { LogOptions } from './construct-payload';
 import type { GroupingObject, OutgoingLogBody } from './metrics-log';
-import config from '../config';
-import clamp from 'lodash/clamp';
+
 import * as url from 'url';
+
+import clamp from 'lodash/clamp';
 import { v4 as uuidv4 } from 'uuid';
+
+import config from '../config';
+
 import { constructPayload } from './construct-payload';
 import { getProjectBaseUrl } from './get-project-base-url';
 import { metricsAPICall } from './metrics-log';

@@ -1,17 +1,20 @@
 import type { ServerResponse } from 'http';
+
+import * as crypto from 'crypto';
+
 import express from 'express';
-import request from 'supertest';
+import findCacheDir from 'find-cache-dir';
+import flatCache from 'flat-cache';
+import FormData from 'form-data';
+import { isValidUUIDV4 } from 'is-valid-uuid-v4';
+import multer from 'multer';
 import nock from 'nock';
 import rimraf from 'rimraf';
-import * as crypto from 'crypto';
-import flatCache from 'flat-cache';
-import findCacheDir from 'find-cache-dir';
-import { isValidUUIDV4 } from 'is-valid-uuid-v4';
-import config from '../src/config';
+import request from 'supertest';
+
 import pkg from '../package.json';
 import { expressMiddleware } from '../src';
-import FormData from 'form-data';
-import multer from 'multer';
+import config from '../src/config';
 
 const upload = multer();
 

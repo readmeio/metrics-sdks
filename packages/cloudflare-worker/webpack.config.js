@@ -1,5 +1,7 @@
-const webpack = require('webpack');
 const path = require('path');
+
+const webpack = require('webpack');
+
 const { version } = require('./package.json');
 
 const HOST = process.env.HOST;

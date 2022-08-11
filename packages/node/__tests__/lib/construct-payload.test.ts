@@ -1,10 +1,12 @@
 import type { LogOptions, PayloadData } from '../../src/lib/construct-payload';
+
 import * as http from 'http';
-import request from 'supertest';
-import { isValidUUIDV4 } from 'is-valid-uuid-v4';
-import packageJson from '../../package.json';
 import * as qs from 'querystring';
 
+import { isValidUUIDV4 } from 'is-valid-uuid-v4';
+import request from 'supertest';
+
+import packageJson from '../../package.json';
 import { constructPayload } from '../../src/lib/construct-payload';
 
 function fixPlatform(platform: string): 'mac' | 'windows' | 'linux' | 'unknown' {

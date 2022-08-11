@@ -1,10 +1,11 @@
 import type { Variables } from '..';
 import type { ClientId, SnippetType, TargetId } from './targets';
+
 import { readdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 
-import { availableWebhookTargets, extname } from '../helpers/utils';
 import { MetricsSDKSnippet } from '..';
+import { availableWebhookTargets, extname } from '../helpers/utils';
 
 const expectedBasePath = ['src', 'fixtures', 'webhooks'];
 

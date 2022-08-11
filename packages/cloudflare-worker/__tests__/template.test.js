@@ -1,4 +1,5 @@
 const http = require('http');
+
 const nock = require('nock');
 
 const globals = require('./service-worker-globals');

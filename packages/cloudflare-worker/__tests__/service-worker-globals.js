@@ -1,5 +1,6 @@
-const fetch = require('node-fetch');
 const { URL } = require('url');
+
+const fetch = require('node-fetch');
 
 const { Headers, Request, Response } = fetch;
 
