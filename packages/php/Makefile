@@ -1,0 +1,17 @@
+install: # Install all dependencies
+	composer install
+
+static-analysis: ## Run static analysis checks
+	./vendor/bin/psalm
+
+lint: ## Run code standard checks
+	./vendor/bin/phpcs -p src/ tests/
+
+lint-fix: ## Attempt to automatically fix any code standard violations
+	./vendor/bin/phpcbf src/ tests/
+
+test: ## Run unit tests
+	./vendor/bin/phpunit
+
+help: ## Show this help
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

@@ -40,13 +40,13 @@ jobs:
           composer update --prefer-stable --prefer-dist --no-interaction --no-suggest
 
       - name: Check code standards
-        run: composer run-script lint
+        run: make lint
 
-      # - name: Execute static analysis
-      #   run: composer run-script psalm
+      - name: Execute static analysis
+        run: make static-analysis
 
       - name: Run tests
-        run: composer run-script phpunit
+        run: make test
 
   test-php74:
     runs-on: ubuntu-latest

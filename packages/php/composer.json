@@ -35,19 +35,6 @@
       ]
     }
   },
-  "scripts": {
-    "coverage": "phpunit --coverage-html reports/",
-    "lint": "phpcs --standard=phpcs.xml src/ tests/",
-    "lint:fix": "phpcbf --standard=phpcs.xml src/ tests/",
-    "phpunit": "phpunit tests/",
-    "psalm": "psalm",
-    "psalm:taintAnalysis": "psalm --taint-analysis",
-    "test": [
-      "composer run lint",
-      "composer run psalm",
-      "composer run phpunit"
-    ]
-  },
   "config": {
     "optimize-autoloader": true,
     "allow-plugins": {
