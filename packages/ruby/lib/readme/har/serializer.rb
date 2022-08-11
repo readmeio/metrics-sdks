@@ -33,9 +33,9 @@ module Readme
 
       def creator
         {
-          name: Readme::Metrics::SDK_NAME,
+          name: 'readme-metrics (ruby)',
           version: Readme::Metrics::VERSION,
-          comment: "#{RUBY_PLATFORM}/#{RUBY_VERSION}"
+          comment: "#{RUBY_PLATFORM}/#{RUBY_VERSION}" # arm64-darwin21/2.7.2
         }
       end
 
