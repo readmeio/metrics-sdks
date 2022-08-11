@@ -1,4 +1,4 @@
-require "uuid"
+require 'uuid'
 
 module Readme
   class Payload
@@ -14,11 +14,11 @@ module Readme
       @uuid = UUID.new
     end
 
-    def to_json
+    def to_json(*_args)
       {
         logId: UUID.validate(@log_id) ? @log_id : @uuid.generate,
         group: @user_info,
-        clientIPAddress: "1.1.1.1",
+        clientIPAddress: '1.1.1.1',
         development: @development,
         request: JSON.parse(@har.to_json)
       }.to_json

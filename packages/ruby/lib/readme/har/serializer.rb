@@ -1,13 +1,15 @@
-require "rack"
-require "readme/metrics"
-require "readme/har/request_serializer"
-require "readme/har/response_serializer"
-require "readme/har/collection"
+# frozen-string-literal: true
+
+require 'rack'
+require 'readme/metrics'
+require 'readme/har/request_serializer'
+require 'readme/har/response_serializer'
+require 'readme/har/collection'
 
 module Readme
   module Har
     class Serializer
-      HAR_VERSION = "1.2"
+      HAR_VERSION = '1.2'
 
       def initialize(request, response, start_time, end_time, filter)
         @http_request = request
@@ -17,7 +19,7 @@ module Readme
         @filter = filter
       end
 
-      def to_json
+      def to_json(*_args)
         {
           log: {
             version: HAR_VERSION,

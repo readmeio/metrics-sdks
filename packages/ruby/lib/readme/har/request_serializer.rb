@@ -1,6 +1,6 @@
-require "cgi"
-require "readme/har/collection"
-require "readme/filter"
+require 'cgi'
+require 'readme/har/collection'
+require 'readme/filter'
 
 module Readme
   module Har
@@ -18,7 +18,7 @@ module Readme
           httpVersion: @request.http_version,
           headers: Har::Collection.new(@filter, @request.headers).to_a,
           cookies: Har::Collection.new(@filter, @request.cookies).to_a,
-          postData: postData,
+          postData: post_data,
           headersSize: -1,
           bodySize: @request.content_length
         }.compact
@@ -29,14 +29,14 @@ module Readme
       def url
         url = URI(@request.url)
         headers = @request.headers
-        forward_proto = headers["X-Forwarded-Proto"]
-        forward_host = headers["X-Forwarded-Host"]
+        forward_proto = headers['X-Forwarded-Proto']
+        forward_host = headers['X-Forwarded-Host']
         url.host = forward_host if forward_host.is_a?(String)
         url.scheme = forward_proto if forward_proto.is_a?(String)
         url.to_s
       end
 
-      def postData
+      def post_data
         if @request.content_type.nil?
           nil
         elsif @request.form_data?
@@ -59,22 +59,22 @@ module Readme
       def request_body
         if @filter.pass_through?
           pass_through_body
-        elsif is_form_urlencoded?
+        elsif form_urlencoded?
           form_urlencoded_body
-        elsif is_json?
+        elsif json?
           json_body
         else
           @request.body
         end
       end
 
-      def is_json?
-        ["application/json", "application/x-json", "text/json", "text/x-json"]
-          .include?(@request.content_type) || @request.content_type.include?("+json")
+      def json?
+        ['application/json', 'application/x-json', 'text/json', 'text/x-json']
+          .include?(@request.content_type) || @request.content_type.include?('+json')
       end
 
-      def is_form_urlencoded?
-        @request.content_type == "application/x-www-form-urlencoded"
+      def form_urlencoded?
+        @request.content_type == 'application/x-www-form-urlencoded'
       end
 
       def json_body

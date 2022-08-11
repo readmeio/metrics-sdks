@@ -1,21 +1,21 @@
-require "readme/content_type_helper"
+require 'readme/content_type_helper'
 
 RSpec.describe Readme::ContentTypeHelper do
-  describe "#json?" do
-    it "is true for all various JSON types" do
-      Readme::ContentTypeHelper::JSON_MIME_TYPES.each do |mime|
+  describe '#json?' do
+    it 'is true for all various JSON types' do
+      described_class::JSON_MIME_TYPES.each do |mime|
         request = FakeRequest.new(mime)
         expect(request).to be_json
       end
     end
 
-    it "is true when the content_type has the charset appended" do
-      request = FakeRequest.new("application/json; charset=utf-8")
+    it 'is true when the content_type has the charset appended' do
+      request = FakeRequest.new('application/json; charset=utf-8')
       expect(request).to be_json
     end
 
-    it "is false for non-json types" do
-      request = FakeRequest.new("text/plain")
+    it 'is false for non-json types' do
+      request = FakeRequest.new('text/plain')
 
       expect(request).not_to be_json
     end

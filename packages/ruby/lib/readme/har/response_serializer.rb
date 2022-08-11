@@ -1,5 +1,5 @@
-require "rack/utils"
-require "readme/har/collection"
+require 'rack/utils'
+require 'readme/har/collection'
 
 module Readme
   module Har
@@ -37,7 +37,7 @@ module Readme
       end
 
       def empty_content
-        {mimeType: "", size: 0}
+        { mimeType: '', size: 0 }
       end
 
       def json_content
@@ -48,7 +48,7 @@ module Readme
           size: @response.content_length,
           text: Har::Collection.new(@filter, parsed_body).to_h.to_json
         }
-      rescue
+      rescue StandardError
         pass_through_content
       end
 

@@ -1,0 +1,90 @@
+require:
+  - rubocop-performance
+  - rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 2.7
+
+# https://docs.rubocop.org/rubocop/cops_layout.html#layoutlinelength
+Layout/LineLength:
+  Max: 150
+
+# https://docs.rubocop.org/rubocop/cops_metrics.html#metricsabcsize
+Metrics/AbcSize:
+  Enabled: false
+
+# https://docs.rubocop.org/rubocop/cops_metrics.html#metricscyclomaticcomplexity
+Metrics/CyclomaticComplexity:
+  Max: 20
+
+# https://docs.rubocop.org/rubocop/cops_metrics.html#metricsblocklength
+Metrics/BlockLength:
+  Exclude:
+    - spec/readme/*.rb
+    - spec/readme/har/*.rb
+
+# https://docs.rubocop.org/rubocop/cops_metrics.html#metricsclasslength
+Metrics/ClassLength:
+  Enabled: false
+
+# https://docs.rubocop.org/rubocop/cops_metrics.html#metricsmethodlength
+Metrics/MethodLength:
+  Enabled: false
+
+# https://docs.rubocop.org/rubocop/cops_metrics.html#metricsperceivedcomplexity
+Metrics/PerceivedComplexity:
+  Max: 20
+
+# https://www.rubydoc.info/gems/rubocop-rspec/RuboCop/Cop/RSpec/AnyInstance
+RSpec/AnyInstance:
+  Enabled: false
+
+# https://www.rubydoc.info/gems/rubocop-rspec/RuboCop/Cop/RSpec/ExampleLength
+RSpec/ExampleLength:
+  Enabled: false
+
+# https://www.rubydoc.info/gems/rubocop-rspec/RuboCop/Cop/RSpec/LeakyConstantDeclaration
+RSpec/LeakyConstantDeclaration:
+  Exclude:
+    - spec/readme/*.rb
+
+# https://www.rubydoc.info/gems/rubocop-rspec/RuboCop/Cop/RSpec/MultipleExpectations
+RSpec/MultipleExpectations:
+  Enabled: false
+
+# https://www.rubydoc.info/gems/rubocop-rspec/RuboCop/Cop/RSpec/VerifiedDoubles
+RSpec/VerifiedDoubles:
+  Enabled: false
+
+# https://docs.rubocop.org/rubocop/cops_style.html#styleblockdelimiters
+Style/BlockDelimiters:
+  Exclude:
+    - spec/**/*
+
+# https://docs.rubocop.org/rubocop/cops_style.html#styleclassvars
+Style/ClassVars:
+  Exclude:
+    - 'lib/readme/metrics.rb'
+
+# https://docs.rubocop.org/rubocop/cops_style.html#styledocumentation
+Style/Documentation:
+  Enabled: false
+
+# https://docs.rubocop.org/rubocop/cops_style.html#styleexpandpatharguments
+Style/ExpandPathArguments:
+  Enabled: false
+
+# https://docs.rubocop.org/rubocop/cops_style.html#stylefrozenstringliteralcomment
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# https://docs.rubocop.org/rubocop/cops_style.html#styleguardclause
+Style/GuardClause:
+  Exclude:
+    - 'lib/readme/filter.rb'
+    - 'lib/readme/metrics.rb'
+
+# https://docs.rubocop.org/rubocop/cops_style.html#styleifunlessmodifier
+Style/IfUnlessModifier:
+  Exclude:
+    - 'lib/readme/metrics.rb'
