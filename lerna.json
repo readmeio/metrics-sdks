@@ -1,6 +1,4 @@
 {
-  "packages": [
-    "packages/node"
-  ],
+  "packages": ["packages/node", "packages/cloudflare-worker", "packages/sdk-snippets"],
   "version": "5.2.1"
 }
