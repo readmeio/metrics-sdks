@@ -12,7 +12,9 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.0, 8.1]
+        php:
+          - 8.0 # EOL: November 26, 2023
+          - 8.1 # EOL: November 25, 2024
         laravel:
           - 8.* # EOL: January 24th, 2023
           - 9.* # EOL: February 8th, 2024
