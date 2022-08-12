@@ -7,9 +7,6 @@ class Middleware
     /** @var Metrics */
     private $metrics;
 
-    /**
-     * @psalm-suppress UndefinedFunction `config()` is a Laravel global that's present when this class is used.
-     */
     public function __construct()
     {
         $this->metrics = new Metrics(
