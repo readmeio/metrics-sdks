@@ -49,7 +49,7 @@ class Metrics
     /** @var Client */
     private $readme_api_client;
 
-    /** @var string */
+    /** @var string|null */
     private $package_version;
 
     /** @var string */
@@ -108,7 +108,7 @@ class Metrics
         $this->package_version = InstalledVersions::getVersion(self::PACKAGE_NAME);
         $this->cache_dir = Factory::createConfig()->get('cache-dir');
 
-        $this->user_agent = 'readme-metrics-php/' . $this->package_version;
+        $this->user_agent = 'readme-metrics-php/' . $this->package_version ?? 'unknown';
     }
 
     /**
