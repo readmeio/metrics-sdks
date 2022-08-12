@@ -87,10 +87,10 @@ class Metrics
             $this->base_log_url = $options['base_log_url'];
         }
 
-        // In development mode, requests are sent asynchronously (as well as PHP can without
-        // directly invoking shell cURL commands), so a very small timeout here ensures that the
-        // Metrics code will finish as fast as possible, send the POST request to the background
-        // and continue on with whatever else the application needs to execute.
+        // In development mode, requests are sent asynchronously (as well as PHP can without directly invoking
+        // shell cURL commands), so a very small timeout here ensures that the Metrics code will finish as fast as
+        // possible, send the POST request to the background and continue on with whatever else the application
+        // needs to execute.
         $curl_timeout = (!$this->development_mode) ? 0.2 : 0;
 
         $this->curl_handler = new CurlMultiHandler();
@@ -147,10 +147,10 @@ class Metrics
 
                 $this->curl_handler->execute();
             } catch (\Exception $e) {
-                // Usually this'll happen from a connection timeout exception from Guzzle trying to
-                // wait for us to resolve the promise we set up, but since we just want this to be
-                // a fire and forget request, we don't actually care about the response coming back
-                // from the Metrics API and all exceptions here can be discarded.
+                // Usually this'll happen from a connection timeout exception from Guzzle trying to wait for us to
+                // resolve the promise we set up, but since we just want this to be a fire and forget request, we don't
+                // actually care about the response coming back from the Metrics API and all exceptions here can be
+                // discarded.
                 //
                 // @todo we should log this somewhere
             }
@@ -174,9 +174,9 @@ class Metrics
 
         $json = json_decode($json);
         if (!isset($json->errors)) {
-            // If we didn't get any errors back from the Metrics API, but didn't get an `OK`
-            // response, then something must be up with it so don't worry about communicating that
-            // here since there isn't anything actionable for the user.
+            // If we didn't get any errors back from the Metrics API, but didn't get an `OK` response, then something
+            // must be up with it so don't worry about communicating that here since there isn't anything actionable
+            // for the user.
             return;
         }
 
@@ -207,8 +207,7 @@ class Metrics
         }
 
         if ($api_key_exists) {
-            // Swap the externally documented `api_key` field into backwards compatible and
-            // internally used `id` field.
+            // Swap the externally documented `api_key` field into backwards compatible and internally used `id` field.
             $group['id'] = $group['api_key'];
             unset($group['api_key']);
         }
@@ -245,11 +244,10 @@ class Metrics
     private function processRequest(Request $request): array
     {
         /**
-         * Since Laravel (currently as of 6.8.0) dumps $_GET and $_POST into `->query` and
-         * `->request` instead of putting $_GET into only `->query` and $_POST` into `->request`,
-         * we have no easy way way to dump only POST data into `postData`. So because of that,
-         * we're eschewing that and manually reconstructing our potential POST payload into an
-         * array here.
+         * Since Laravel (currently as of 6.8.0) dumps $_GET and $_POST into `->query` and `->request` instead of
+         * putting $_GET into only `->query` and $_POST` into `->request`, we have no easy way way to dump only POST
+         * data into `postData`. So because of that, we're eschewing that and manually reconstructing our potential
+         * POST payload into an array here.
          *
          * @var array $params
          */
