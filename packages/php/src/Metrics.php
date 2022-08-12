@@ -91,11 +91,9 @@ class Metrics
     /**
      * @todo Handle bad token 401 errors?
      * @todo Change this to a queueing model like in readme-node?
-     * @param Request $request
-     * @param Response $response
      * @throws MetricsException
      */
-    public function track(Request $request, &$response): void
+    public function track(Request $request, Response &$response): void
     {
         if (empty($this->base_log_url)) {
             $this->base_log_url = $this->getProjectBaseUrl();
@@ -162,13 +160,7 @@ class Metrics
         throw $ex;
     }
 
-    /**
-     * @param string $log_id
-     * @param Request $request
-     * @param Response $response
-     * @return array
-     */
-    public function constructPayload(string $log_id, Request $request, $response): array
+    public function constructPayload(string $log_id, Request $request, Response $response): array
     {
         $request_start = defined('LARAVEL_START') ? LARAVEL_START : $_SERVER['REQUEST_TIME_FLOAT'];
         $group = $this->group_handler::constructGroup($request);
@@ -262,11 +254,7 @@ class Metrics
         return $data;
     }
 
-    /**
-     * @param Response $response
-     * @return array
-     */
-    private function processResponse($response): array
+    private function processResponse(Response $response): array
     {
         if ($response instanceof JsonResponse) {
             $body = $response->getData(true);
@@ -372,7 +360,6 @@ class Metrics
     /**
      * Retrieve the cache file that'll be used to store the base URL for the `x-documentation-url` header.
      *
-     * @return string
      */
     public function getCacheFile(): string
     {
@@ -391,11 +378,9 @@ class Metrics
     }
 
     /**
-     * Convert a HeaderBag into an acceptable nested array for the Metrics API.
+     * Convert a Laravel `HeaderBag` into an acceptable nested headers array for the HAR payload.
      *
      * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#headers}
-     * @param HeaderBag $headers
-     * @return array
      */
     protected static function convertHeaderBagToArray(HeaderBag $headers): array
     {
@@ -456,9 +441,6 @@ class Metrics
      *
      * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#querystring}
      * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#params}
-     * @param array $input
-     * @return array
-     * @psalm-suppress PossiblyUndefinedArrayOffset
      */
     protected static function convertObjectToArray(array $input): array
     {
@@ -483,10 +465,8 @@ class Metrics
     /**
      * Given an array, exclude data at the highest associative level of it based upon the configured allowlist.
      *
-     * @param array $data
-     * @return array
      */
-    private function excludeDataFromDenylist($data = []): array
+    private function excludeDataFromDenylist(array $data = []): array
     {
         // If `$data` is an array with associative keys, let's run the denylist against that, otherwise run the
         // denylist against the keys inside the top-level array.
@@ -505,10 +485,8 @@ class Metrics
     /**
      * Given an array, return only data at the highest level of it that matches the configured allowlist.
      *
-     * @param array $data
-     * @return array
      */
-    private function excludeDataNotInAllowlist($data = []): array
+    private function excludeDataNotInAllowlist(array $data = []): array
     {
         $ret = [];
 
@@ -538,10 +516,8 @@ class Metrics
     /**
      * Return whether or not a given array is associative.
      *
-     * @param array $array
-     * @return bool
      */
-    private function isArrayAssoc($array = []): bool
+    private function isArrayAssoc(array $array = []): bool
     {
         return count(array_filter(array_keys($array), 'is_string')) > 0;
     }
