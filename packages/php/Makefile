@@ -7,6 +7,9 @@ lint: ## Run code standard checks
 lint-fix: ## Attempt to automatically fix any code standard violations
 	./vendor/bin/phpcbf src/ tests/
 
+psalm-sarif-report: ## Generate a sarif report of Psalm's taint analysis checks
+	./vendor/bin/psalm --taint-analysis  --report=results.sarif
+
 static-analysis: ## Run static analysis checks
 	./vendor/bin/psalm
 
