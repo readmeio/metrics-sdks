@@ -45,17 +45,9 @@ jobs:
         run: make lint
 
       - name: Run static analysis
-        run: make static-analysis
+        run: |
+          make static-analysis
+          make taint-analysis
 
       - name: Run tests
         run: make test
-
-      - name: Security analysis
-        run: make psalm-sarif-report
-
-      - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          # Path to SARIF file relative to the root of the repository
-          sarif_file: packages/php/results.sarif
-          # category: my-analysis-tool
