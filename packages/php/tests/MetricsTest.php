@@ -49,11 +49,11 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
     private const MOCK_FILES_PARAMS = [
         'testfileparam' => [
-            'name' => 'owlbert',
+            'name' => 'owlbert.png',
             'type' => 'application/octet-stream',
             'tmp_name' => __DIR__ . '/fixtures/owlbert.png',
             'error' => 0,
-            'size' => 701048
+            'size' => 400
         ]
     ];
 
@@ -388,9 +388,37 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             ['name' => 'another', 'value' => 'Hello world'],
             [
                 'name' => 'testfileparam',
-                'value' => file_get_contents(self::MOCK_FILES_PARAMS['testfileparam']['tmp_name']),
-                'fileName' => 'owlbert',
+                'value' => file_get_contents(__DIR__ . '/fixtures/owlbert.dataurl.txt'),
+                'fileName' => 'owlbert.png',
                 'contentType' => 'image/png'
+            ]
+        ], $params);
+    }
+
+    /**
+     * @group constructPayload
+     */
+    public function testConstructPayloadWithUnsafeFileInPOSTRequest(): void
+    {
+        $unsafe_payload = [
+            'testfileparam' => [
+                'name' => 'pwned',
+                'type' => 'application/octet-stream',
+                'tmp_name' => '/etc/passwd',
+                'error' => 0,
+                'size' => 0
+            ]
+        ];
+
+        $request = $this->getMockRequest([], $unsafe_payload);
+        $response = $this->getMockJsonResponse();
+        $payload = $this->metrics->constructPayload('fake-uuid', $request, $response);
+
+        $params = $payload['request']['log']['entries'][0]['request']['postData']['params'];
+        $this->assertSame([
+            [
+                'name' => 'testfileparam',
+                'value' => json_encode($unsafe_payload['testfileparam'])
             ]
         ], $params);
     }

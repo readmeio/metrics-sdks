@@ -239,25 +239,17 @@ class Metrics
     }
 
     /**
-     * @psalm-suppress TaintedInput
+     * Process an incoming request into a HAR `request` object.
+     *
+     * Because Laravel (currently as of 6.8.0) dumps `$_GET` and `$_POST` into `->query` and
+     * `->request` instead of putting `$_GET` into only `->query` and `$_POST` into `->request`, we
+     * have no easy way way to dump only POST data into `postData`. So because of that, we're opting
+     * to instead use the `$_{METHOD}` global accessors instead of Laravel Request helper functions.
+     *
+     * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#request}
      */
     private function processRequest(Request $request): array
     {
-        /**
-         * Since Laravel (currently as of 6.8.0) dumps $_GET and $_POST into `->query` and `->request` instead of
-         * putting $_GET into only `->query` and $_POST` into `->request`, we have no easy way way to dump only POST
-         * data into `postData`. So because of that, we're eschewing that and manually reconstructing our potential
-         * POST payload into an array here.
-         *
-         * @var array $params
-         */
-        $params = array_replace_recursive($_POST, $_FILES);
-        if (!empty($this->denylist)) {
-            $params = $this->excludeDataFromDenylist($params);
-        } elseif (!empty($this->allowlist)) {
-            $params = $this->excludeDataNotInAllowlist($params);
-        }
-
         return [
             'method' => $request->method(),
             'url' => $request->fullUrl(),
@@ -266,9 +258,31 @@ class Metrics
             'queryString' => static::convertObjectToArray($_GET),
             'postData' => [
                 'mimeType' => 'application/json',
-                'params' => static::convertObjectToArray($params)
+                'params' => array_merge(
+                    static::convertObjectToArray($this->sanitizeInputPerConfig($_POST)),
+                    static::convertFileObjectForArray($this->sanitizeInputPerConfig($_FILES))
+                )
             ]
         ];
+    }
+
+    /**
+     * Sanitize a set of data per the configured `denylist` and `allowlist`.
+     *
+     * @psalm-taint-escape file Psalm's taint analysis thinks that `$_POST` and `$_FILES` are
+     *      unsafe because we're using `file_get_contents()` on `$data[]['tmp_name]` further down
+     *      the stack in `convertFileObjectForArray` but because we're only doing this if it's in
+     *      `$_FILES` it's safe.
+     */
+    private function sanitizeInputPerConfig(array $data): array
+    {
+        if (!empty($this->denylist)) {
+            return $this->excludeDataFromDenylist($data);
+        } elseif (!empty($this->allowlist)) {
+            return $this->excludeDataNotInAllowlist($data);
+        }
+
+        return $data;
     }
 
     /**
@@ -403,6 +417,7 @@ class Metrics
     /**
      * Convert a HeaderBag into an acceptable nested array for the Metrics API.
      *
+     * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#headers}
      * @param HeaderBag $headers
      * @return array
      */
@@ -428,8 +443,43 @@ class Metrics
     }
 
     /**
-     * Convert a key/value object-style array into an acceptable nested array for the Metrics API.
+     * Convert a `$_FILES` object-style array into an acceptable nested array for the HAR payload.
      *
+     * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#params}
+     */
+    protected static function convertFileObjectForArray(array $input): array
+    {
+        return array_map(function ($key) use ($input) {
+            // In order to protect ourselves from loading files of the filesystem that didn't come
+            // from a real file upload and the `$_FILES` array we should only ever handle
+            // `tmp_name` in the incoming payload if we know it's from a `$_FILES` context.
+            //
+            // If we don't do this then we open ourselves up to having bad actor $_POST payloads
+            // mimicking themselves as a `$_FILES` payload in order to read and send something like
+            $file = $input[$key];
+
+            $mimeType = MimeTypes::getDefault()->guessMimeType($file['tmp_name']);
+            $base64 = base64_encode(file_get_contents($file['tmp_name']));
+            $dataURL = join(';', [
+                'data:' . $mimeType,
+                'name=' . $file['name'],
+                'base64,' . $base64
+            ]);
+
+            return [
+                'name' => $key,
+                'value' => $dataURL,
+                'fileName' => $file['name'],
+                'contentType' => $mimeType
+            ];
+        }, array_keys($input));
+    }
+
+    /**
+     * Convert a key/value object-style array into an acceptable nested array for the HAR payload.
+     *
+     * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#querystring}
+     * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#params}
      * @param array $input
      * @return array
      * @psalm-suppress PossiblyUndefinedArrayOffset
@@ -437,16 +487,6 @@ class Metrics
     protected static function convertObjectToArray(array $input): array
     {
         return array_map(function ($key) use ($input) {
-            if (isset($input[$key]['tmp_name'])) {
-                $file = $input[$key];
-                return [
-                    'name' => $key,
-                    'value' => file_get_contents($file['tmp_name']),
-                    'fileName' => $file['name'],
-                    'contentType' => MimeTypes::getDefault()->guessMimeType($file['tmp_name'])
-                ];
-            }
-
             return [
                 'name' => $key,
                 'value' => (is_scalar($input[$key])) ? $input[$key] : json_encode($input[$key])
