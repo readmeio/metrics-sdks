@@ -14,55 +14,8 @@ jobs:
       matrix:
         php: [8.0, 8.1]
         laravel:
-          - 6.* # EOL: September 6th, 2022
-          - 7.* # EOL: March 3rd, 2021
           - 8.* # EOL: January 24th, 2023
           - 9.* # EOL: February 8th, 2024
-
-    name: build (${{ matrix.php }} w/ Laravel ${{ matrix.laravel }}
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Cache dependencies
-        uses: actions/cache@v3.0.5
-        with:
-          path: ~/.composer/cache/files
-          key: dependencies-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-
-      # Installing a specific version of Laravel will force us to use compatible versions of
-      # `illuminate/http` and `illuminate/support`. If we didn't do this step then we'd always only
-      # ever test on the latest versions of those two packages.
-      - name: Install dependencies
-        run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
-          composer update --prefer-stable --prefer-dist --no-interaction --no-suggest
-
-      - name: Check code standards
-        run: make lint
-
-      - name: Execute static analysis
-        run: make static-analysis
-
-      - name: Run tests
-        run: make test
-
-  test-php74:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/php
-
-    strategy:
-      fail-fast: true
-      matrix:
-        php: [7.4]
-        laravel: [6.*, 7.*, 8.*]
 
     name: build (${{ matrix.php }} w/ Laravel ${{ matrix.laravel }}
 

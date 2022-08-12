@@ -5,7 +5,7 @@ static-analysis: ## Run static analysis checks
 	./vendor/bin/psalm
 
 lint: ## Run code standard checks
-	./vendor/bin/phpcs -p src/ tests/
+	./vendor/bin/phpcs -p -s src/ tests/
 
 lint-fix: ## Attempt to automatically fix any code standard violations
 	./vendor/bin/phpcbf src/ tests/
