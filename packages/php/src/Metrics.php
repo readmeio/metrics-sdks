@@ -370,6 +370,7 @@ class Metrics
                             throw $e;
                         }
 
+                        /** @psalm-suppress PossiblyNullReference */
                         $json = (string) $e->getResponse()->getBody();
                         $json = json_decode($json);
                     } catch (\Exception $e) {
@@ -479,6 +480,9 @@ class Metrics
      *
      * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#querystring}
      * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#params}
+     * @param array $input
+     * @return array
+     * @psalm-suppress PossiblyUndefinedArrayOffset
      */
     protected static function convertObjectToArray(array $input): array
     {
