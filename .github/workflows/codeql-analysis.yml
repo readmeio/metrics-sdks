@@ -1,4 +1,4 @@
-name: CodeQL
+name: "CodeQL"
 
 on:
   pull_request:
@@ -17,10 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language:
-          - javascript
-          - php
-          - python
+        language: [ 'javascript', 'python' ]
 
     steps:
     - name: Checkout repository
