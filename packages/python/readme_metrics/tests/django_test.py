@@ -1,9 +1,6 @@
 from datetime import datetime, timedelta
-import os
 import time
-from unittest.mock import Mock, MagicMock, patch
-
-import pytest
+from unittest.mock import Mock
 
 from readme_metrics import MetricsApiConfig
 from readme_metrics.django import MetricsMiddleware

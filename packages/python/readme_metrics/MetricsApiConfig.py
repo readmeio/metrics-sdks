@@ -1,3 +1,4 @@
+# pylint: disable=too-many-instance-attributes
 import importlib
 from typing import List, Any, Callable
 

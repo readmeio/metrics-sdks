@@ -1,10 +1,8 @@
 from datetime import datetime, timedelta
 import time
-from unittest.mock import Mock, MagicMock
-from werkzeug.datastructures import EnvironHeaders
+from unittest.mock import Mock
 
 from flask import Flask, request
-import pytest
 from readme_metrics import MetricsApiConfig
 from readme_metrics.flask_readme import ReadMeMetrics
 from readme_metrics.ResponseInfoWrapper import ResponseInfoWrapper

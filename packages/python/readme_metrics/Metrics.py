@@ -2,9 +2,6 @@ import atexit
 import math
 import queue
 import threading
-import requests
-import json
-import importlib
 
 from readme_metrics import MetricsApiConfig
 from readme_metrics.publisher import publish_batch
@@ -59,7 +56,7 @@ class Metrics:
             # PayloadBuilder returns None when the grouping function returns
             # None (an indication that the request should not be logged.)
             self.config.LOGGER.debug(
-                f"Not enqueueing request, grouping function returned None"
+                "Not enqueueing request, grouping function returned None"
             )
             return
 
@@ -88,6 +85,6 @@ class Metrics:
     def host_allowed(self, host):
         if self.config.ALLOWED_HTTP_HOSTS:
             return host in self.config.ALLOWED_HTTP_HOSTS
-        else:
-            # If the allowed_http_hosts has not been set (None by default), send off the data to be queued
-            return True
+
+        # If `allowed_http_hosts`` has not been set (None by default), send off the data to be queued.
+        return True

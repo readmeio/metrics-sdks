@@ -9,7 +9,6 @@ from typing import List, Optional
 from urllib import parse
 import uuid
 
-import requests
 from readme_metrics import ResponseInfoWrapper
 
 
@@ -143,7 +142,7 @@ class PayloadBuilder:
         Returns:
             dict: Wrapped request payload
         """
-        headers = self._redact_dict(request.headers)
+        headers = self.redact_dict(request.headers)
         params = parse.parse_qsl(self._get_query_string(request))
 
         if getattr(request, "content_length", None):
@@ -169,7 +168,7 @@ class PayloadBuilder:
         Returns:
             dict: Wrapped response payload
         """
-        headers = self._redact_dict(response.headers)
+        headers = self.redact_dict(response.headers)
         body = self._process_body(response.body).get("text")
 
         headers = [{"name": k, "value": v} for (k, v) in headers.items()]
@@ -237,6 +236,7 @@ class PayloadBuilder:
         if "wsgi.url_scheme" in request.environ:
             scheme = request.environ["wsgi.url_scheme"]
 
+        # pylint: disable=protected-access
         if hasattr(request, "_get_raw_host"):
             # Django request objects already have a properly formatted host field
             host = request._get_raw_host()
@@ -248,8 +248,8 @@ class PayloadBuilder:
 
         if scheme and path and host:
             return f"{scheme}://{host}{path}"
-        else:
-            raise Exception("Don't know how to build URL from this type of request")
+
+        raise Exception("Don't know how to build URL from this type of request")
 
     # always returns a dict with some of these fields: text, mimeType, params
     def _process_body(self, body):
@@ -285,27 +285,27 @@ class PayloadBuilder:
                     "mimeType": "multipart/form-data",
                     "params": [{"name": k, "value": v} for (k, v) in params],
                 }
-            else:
-                return {"text": body}
+
+            return {"text": body}
 
         if (self.denylist or self.allowlist) and isinstance(body_data, dict):
-            redacted_data = self._redact_dict(body_data)
+            redacted_data = self.redact_dict(body_data)
             body = json.dumps(redacted_data)
 
         return {"text": body, "mimeType": "application/json"}
 
-    def _redact_dict(self, mapping: Mapping):
-        def _redact_value(v):
-            if isinstance(v, str):
-                return f"[REDACTED {len(v)}]"
-            else:
-                return "[REDACTED]"
+    def redact_dict(self, mapping: Mapping):
+        def _redact_value(val):
+            if isinstance(val, str):
+                return f"[REDACTED {len(val)}]"
+
+            return "[REDACTED]"
 
         # Short-circuit this function if there's no allowlist or denylist
         if not (self.allowlist or self.denylist):
             return mapping
 
-        result = dict()
+        result = {}
         for (key, value) in mapping.items():
             if self.denylist and key in self.denylist:
                 result[key] = _redact_value(value)

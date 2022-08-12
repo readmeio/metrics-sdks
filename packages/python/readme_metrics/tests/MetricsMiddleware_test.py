@@ -1,12 +1,11 @@
-import pytest  # pylint: disable=import-error
-import requests
 import json
 
-from .fixtures import Environ
+import requests
+import pytest
 
 from readme_metrics import MetricsApiConfig
 from readme_metrics import MetricsMiddleware
-from readme_metrics.Metrics import Metrics
+from .fixtures import Environ
 
 # for this, I'm not exactly sure how to test the __call__ function
 # possible options I considered was making a mock server inside this test case

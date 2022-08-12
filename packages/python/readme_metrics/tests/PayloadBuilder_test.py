@@ -1,13 +1,13 @@
-import pytest  # pylint: disable=import-error
-import requests
 import json
 import uuid
 
-from .fixtures import Environ
+import requests
+import pytest
 
 from readme_metrics import MetricsApiConfig
 from readme_metrics import MetricsMiddleware
 from readme_metrics.PayloadBuilder import PayloadBuilder
+from .fixtures import Environ
 
 
 # fetch json requests
@@ -75,7 +75,7 @@ class TestPayloadBuilder:
         res = None
         return res
 
-    def compareRequests(self, fromReq, fromPayload):
+    def compareRequests(self):
         # Compare the two contents and check if they are similar(?)
         return True
 
@@ -307,12 +307,12 @@ class TestPayloadBuilder:
     def testProduction(self):
         config = self.mockMiddlewareConfig(development_mode=False)
         payload = self.createPayload(config)
-        assert payload.development_mode == False
+        assert payload.development_mode is False
 
     def testDevelopment(self):
         config = self.mockMiddlewareConfig(development_mode=True)
         payload = self.createPayload(config)
-        assert payload.development_mode == True
+        assert payload.development_mode is True
 
     def testUuid(self):
         config = self.mockMiddlewareConfig(development_mode=True)
