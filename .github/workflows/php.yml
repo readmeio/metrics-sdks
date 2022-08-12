@@ -44,8 +44,16 @@ jobs:
       - name: Check code standards
         run: make lint
 
-      - name: Execute static analysis
-        run: make static-analysis
-
       - name: Run tests
         run: make test
+
+      - name: Static analysis
+        uses: docker://vimeo/psalm-github-actions
+        with:
+          security_analysis: true
+          report_file: results.sarif
+
+      - name: Upload Security Analysis results to GitHub
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: results.sarif
