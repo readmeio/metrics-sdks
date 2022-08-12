@@ -246,7 +246,7 @@ class Metrics
     /**
      * Sanitize a set of data per the configured `denylist` and `allowlist`.
      *
-     * @sspsalm-taint-escape file Psalm's taint analysis thinks that `$_POST` and `$_FILES` are
+     * @psalm-taint-escape file Psalm's taint analysis thinks that `$_POST` and `$_FILES` are
      *      unsafe because we're using `file_get_contents()` on `$data[]['tmp_name]` further down
      *      the stack in `convertFileObjectForArray` but because we're only doing this if it's in
      *      `$_FILES` it's safe.
