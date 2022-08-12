@@ -1,14 +1,17 @@
 install: # Install all dependencies
 	composer install
 
-static-analysis: ## Run static analysis checks
-	./vendor/bin/psalm
-
 lint: ## Run code standard checks
-	./vendor/bin/phpcs -p -s src/ tests/
+	./vendor/bin/phpcs --colors -p -s src/ tests/
 
 lint-fix: ## Attempt to automatically fix any code standard violations
 	./vendor/bin/phpcbf src/ tests/
+
+static-analysis: ## Run static analysis checks
+	./vendor/bin/psalm
+
+taint-analysis: ## Run static analysis taint checks
+	./vendor/bin/psalm --taint-analysis
 
 test: ## Run unit tests
 	./vendor/bin/phpunit

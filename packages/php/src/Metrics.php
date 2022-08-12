@@ -22,48 +22,25 @@ class Metrics
     protected const METRICS_API = 'https://metrics.readme.io';
     protected const README_API = 'https://dash.readme.io';
 
-    /** @var string */
-    private $api_key;
+    private bool $development_mode = false;
+    private array $denylist = [];
+    private array $allowlist = [];
+    private string|null $base_log_url = null;
 
-    /** @var bool */
-    private $development_mode = false;
+    private CurlMultiHandler $curl_handler;
+    private Client $client;
+    private Client $readme_api_client;
 
-    /** @var array */
-    private $denylist = [];
-
-    /** @var array */
-    private $allowlist = [];
-
-    /** @var string|null */
-    private $base_log_url = null;
-
-    /** @var class-string */
-    private $group_handler;
-
-    /** @var CurlMultiHandler */
-    private $curl_handler;
-
-    /** @var Client */
-    private $client;
-
-    /** @var Client */
-    private $readme_api_client;
-
-    /** @var string|null */
-    private $package_version;
-
-    /** @var string */
-    private $cache_dir;
-
-    /** @var string */
-    private $user_agent;
+    private string|null $package_version;
+    private string $cache_dir;
+    private string $user_agent;
 
     /**
      * @param string $api_key
      * @param class-string $group_handler
      * @param array $options
      */
-    public function __construct(string $api_key, string $group_handler, array $options = [])
+    public function __construct(public string $api_key, public string $group_handler, array $options = [])
     {
         $this->api_key = base64_encode($api_key . ':');
         $this->group_handler = $group_handler;
@@ -248,8 +225,6 @@ class Metrics
          * putting $_GET into only `->query` and $_POST` into `->request`, we have no easy way way to dump only POST
          * data into `postData`. So because of that, we're eschewing that and manually reconstructing our potential
          * POST payload into an array here.
-         *
-         * @var array $params
          */
         $params = array_replace_recursive($_POST, $_FILES);
         if (!empty($this->denylist)) {
@@ -306,7 +281,6 @@ class Metrics
      * Make an API request to ReadMe to retrieve the base log URL that'll be used to populate the `x-documentation-url`
      * header.
      *
-     * @return string|null
      */
     private function getProjectBaseUrl(): ?string
     {
@@ -426,8 +400,6 @@ class Metrics
     /**
      * Convert a key/value object-style array into an acceptable nested array for the Metrics API.
      *
-     * @param array $input
-     * @return array
      * @psalm-suppress PossiblyUndefinedArrayOffset
      */
     protected static function convertObjectToArray(array $input): array

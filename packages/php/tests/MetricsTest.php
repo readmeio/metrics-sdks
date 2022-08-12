@@ -57,26 +57,15 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    /** @var Metrics */
-    private $metrics;
+    private Metrics $metrics;
 
     /** @var class-string */
     private $group_handler = TestHandler::class;
 
-    /** @var array */
-    private $api_calls = [];
-
-    /** @var array */
-    private $api_calls_to_readme = [];
-
-    /** @var string */
-    private $readme_api_key = 'mockReadMeApiKey';
-
-    /** @var string */
-    private $base_log_url = 'https://docs.example.com';
-
-    /** @var string */
-    private $log_uuid;
+    private array $api_calls = [];
+    private array $api_calls_to_readme = [];
+    private string $readme_api_key = 'mockReadMeApiKey';
+    private string $base_log_url = 'https://docs.example.com';
 
     public static function setUpBeforeClass(): void
     {
@@ -110,7 +99,6 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group track
      * @dataProvider providerDevelopmentModeToggle
-     * @param bool $development_mode
      */
     public function testTrack(bool $development_mode): void
     {
@@ -188,7 +176,6 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group track
      * @dataProvider providerDevelopmentModeToggle
-     * @param bool $development_mode
      */
     public function testTrackHandlesApiErrors(bool $development_mode): void
     {
@@ -239,7 +226,6 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group track
      * @dataProvider providerDevelopmentModeToggle
-     * @param bool $development_mode
      */
     public function testTrackHandlesApiServerUnavailability(bool $development_mode): void
     {
@@ -518,7 +504,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
         $request_data = $payload['request']['log']['entries'][0]['request'];
 
-        // Allowlist should not affect $_GET params.
+        // Allowlist should not affect `$_GET` params.
         $this->assertSame([
             ['name' => 'val', 'value' => '1'],
             ['name' => 'arr', 'value' => '[null,"3"]']
@@ -545,7 +531,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
         $request_data = $payload['request']['log']['entries'][0]['request'];
 
-        // Blacklist should not affect $_GET params.
+        // Blacklist should not affect `$_GET` params.
         $this->assertSame([
             ['name' => 'val', 'value' => '1'],
             ['name' => 'arr', 'value' => '[null,"3"]']
@@ -630,7 +616,6 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group getProjectBaseUrl
      * @dataProvider providerDevelopmentModeToggle
-     * @param bool $development_mode
      */
     public function testProjectBaseUrlIsNotFetchedIfSuppliedAsOption(bool $development_mode): void
     {
@@ -660,7 +645,6 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group getProjectBaseUrl
      * @dataProvider providerDevelopmentModeToggle
-     * @param bool $development_mode
      */
     public function testProjectBaseUrlNotFetchedIfCacheIsFresh(bool $development_mode): void
     {
@@ -695,7 +679,6 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group getProjectBaseUrl
      * @dataProvider providerDevelopmentModeToggle
-     * @param bool $development_mode
      */
     public function testProjectBaseUrlDataCacheIsRefreshedIfStale(bool $development_mode): void
     {
