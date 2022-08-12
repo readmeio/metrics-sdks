@@ -2,14 +2,6 @@
 <ruleset colors="true">
     <description>ReadMe coding standards</description>
 
-    <rule ref="Generic.CodeAnalysis">
-        <exclude name="Generic.CodeAnalysis.EmptyStatement.DetectedCatch" />
-        <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter" />
-    </rule>
-
-    <rule ref="Generic.ControlStructures" />
-    <rule ref="Generic.Files.LineLength" />
-
     <rule ref="PSR12" />
     <rule ref="Squiz.Strings.DoubleQuoteUsage" />
 </ruleset>
