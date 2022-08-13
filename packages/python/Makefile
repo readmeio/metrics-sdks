@@ -2,7 +2,7 @@ install: # Install all dependencies
 	pip3 install -r requirements.txt
 
 lint: ## Run code standard checks
-	pylint --output-format=colorized readme_metrics/
+	pylint --output-format=colorized examples/ readme_metrics/
 	black --check .
 
 lint-fix: ## Run code formatting checks
