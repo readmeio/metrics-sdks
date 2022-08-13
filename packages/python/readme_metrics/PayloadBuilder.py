@@ -123,6 +123,7 @@ class PayloadBuilder:
                 )
         extra_fields = set(group.keys()).difference(["id", "email", "label"])
         if extra_fields:
+            # pylint: disable=C0301
             self.logger.warning(
                 "Grouping function included unexpected field(s) in response: %s; discarding those fields and logging request anyway",
                 extra_fields,

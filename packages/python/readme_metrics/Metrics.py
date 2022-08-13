@@ -11,8 +11,8 @@ from readme_metrics.ResponseInfoWrapper import ResponseInfoWrapper
 
 class Metrics:
     """
-    This is the internal central controller class invoked by the ReadMe middleware. It
-    queues requests for submission. The submission is processed by readme_metrics.publisher.publish_batch().
+    This is the internal central controller class invoked by the ReadMe middleware. It queues
+    requests for submission for processing by `readme_metrics.publisher.publish_batch()`.
     """
 
     PACKAGE_NAME: str = "readme/metrics"
@@ -46,6 +46,7 @@ class Metrics:
             response (ResponseInfoWrapper): Response object
         """
         if not self.host_allowed(request.environ["HTTP_HOST"]):
+            # pylint: disable=C0301
             self.config.LOGGER.debug(
                 f"Not enqueueing request, host {request.environ['HTTP_HOST']} not in ALLOWED_HTTP_HOSTS"
             )
@@ -86,5 +87,6 @@ class Metrics:
         if self.config.ALLOWED_HTTP_HOSTS:
             return host in self.config.ALLOWED_HTTP_HOSTS
 
-        # If `allowed_http_hosts`` has not been set (None by default), send off the data to be queued.
+        # If `allowed_http_hosts`` has not been set (None by default), send off the data to be
+        # queued.
         return True
