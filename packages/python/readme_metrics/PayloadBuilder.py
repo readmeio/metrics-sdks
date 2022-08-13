@@ -1,10 +1,12 @@
 from collections.abc import Mapping
+import importlib
 import json
 from json import JSONDecodeError
 from logging import Logger
-import sys
+import os
+import platform
 import time
-import importlib
+
 from typing import List, Optional
 from urllib import parse
 import uuid
@@ -74,9 +76,9 @@ class PayloadBuilder:
             "request": {
                 "log": {
                     "creator": {
-                        "name": __name__,
+                        "name": "readme-metrics (python)",
                         "version": importlib.import_module(__package__).__version__,
-                        "comment": sys.version,
+                        "comment": self._get_har_creator_comment(),
                     },
                     "entries": [
                         {
@@ -92,6 +94,17 @@ class PayloadBuilder:
         }
 
         return payload
+
+    def _get_har_creator_comment(self):
+        # arm64-darwin21.3.0/3.8.9
+        return (
+            platform.machine()
+            + "-"
+            + platform.system().lower()
+            + os.uname().release
+            + "/"
+            + platform.python_version()
+        )
 
     def _validate_group(self, group: Optional[dict]):
         if group is None:

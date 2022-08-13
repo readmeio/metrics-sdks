@@ -312,3 +312,22 @@ class TestPayloadBuilder:
         data = payload(metrics.req, metrics.res)
 
         assert data["_id"] == str(uuid.UUID(data["_id"], version=4))
+
+    def test_har_creator(self):
+        config = self.mockMiddlewareConfig(development_mode=True)
+        environ = Environ.MockEnviron().getEnvironForRequest(b"", "POST")
+        app = MockApplication("{ 'responseObject': 'value' }")
+
+        metrics = MetricsCoreMock()
+        middleware = MetricsMiddleware(app, config)
+        middleware.metrics_core = metrics
+
+        next(middleware(environ, app.mockStartResponse))
+
+        payload = self.createPayload(config)
+        data = payload(metrics.req, metrics.res)
+        creator = data["request"]["log"]["creator"]
+
+        assert creator["name"] == "readme-metrics (python)"
+        assert isinstance(creator["version"], str)
+        assert isinstance(creator["comment"], str)
