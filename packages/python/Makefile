@@ -1,5 +1,6 @@
 install: # Install all dependencies
 	pip3 install -r requirements.txt
+	pip3 install -r requirements.dev.txt
 
 lint: ## Run code standard checks
 	pylint --output-format=colorized examples/ readme_metrics/
