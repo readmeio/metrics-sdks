@@ -65,6 +65,7 @@ module Readme
       request = HttpRequest.new(env)
       har = Har::Serializer.new(request, response, start_time, end_time, @filter)
       user_info = @get_user_info.call(env)
+      ip = env['REMOTE_ADDR']
 
       if !user_info_valid?(user_info)
         Readme::Metrics.logger.warn Errors.bad_block_message(user_info)
@@ -73,7 +74,7 @@ module Readme
       elsif !can_filter? request, response
         Readme::Metrics.logger.warn "Request or response body MIME type isn't supported for filtering. Omitting request from ReadMe API logging"
       else
-        payload = Payload.new(har, user_info, development: @development)
+        payload = Payload.new(har, user_info, ip, development: @development)
         @@request_queue.push(payload.to_json) unless payload.ignore
       end
     end

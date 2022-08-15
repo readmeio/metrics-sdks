@@ -1,17 +1,19 @@
 require 'readme/payload'
+require 'socket'
 require 'uuid'
 
 har_json = File.read(File.expand_path('../../fixtures/har.json', __FILE__))
 
 RSpec.describe Readme::Payload do
   let(:har) { double('har', to_json: har_json) }
-
+  let(:ip_address) { Socket.ip_address_list.detect(&:ipv4_private?).ip_address }
   let(:uuid) { UUID.new }
 
   it 'returns JSON matching the payload schema' do
     result = described_class.new(
       har,
       { id: '1', label: 'Owlbert', email: 'owlbert@example.com' },
+      ip_address,
       development: true
     )
 
@@ -22,6 +24,7 @@ RSpec.describe Readme::Payload do
     result = described_class.new(
       har,
       { api_key: '1', label: 'Owlbert', email: 'owlbert@example.com' },
+      ip_address,
       development: true
     )
 
@@ -33,6 +36,7 @@ RSpec.describe Readme::Payload do
     result = described_class.new(
       har,
       { api_key: '1', label: 'Owlbert', email: 'owlbert@example.com', log_id: custom_uuid },
+      ip_address,
       development: true
     )
 
@@ -44,10 +48,23 @@ RSpec.describe Readme::Payload do
     result = described_class.new(
       har,
       { api_key: '1', label: 'Owlbert', email: 'owlbert@example.com', log_id: 'invalid' },
+      ip_address,
       development: true
     )
 
     expect(JSON.parse(result.to_json)).not_to include('logId' => 'invalid')
+    expect(result.to_json).to match_json_schema('payload')
+  end
+
+  it 'record a clientIPAddress' do
+    result = described_class.new(
+      har,
+      { api_key: '1', label: 'Owlbert', email: 'owlbert@example.com' },
+      ip_address,
+      development: true
+    )
+
+    expect(JSON.parse(result.to_json)).to include('clientIPAddress' => ip_address)
     expect(result.to_json).to match_json_schema('payload')
   end
 end
