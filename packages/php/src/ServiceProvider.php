@@ -4,11 +4,7 @@ namespace ReadMe;
 
 class ServiceProvider extends \Illuminate\Support\ServiceProvider
 {
-    /**
-     * @psalm-suppress UndefinedFunction `config_path()` is a Laravel global that's present when this class is used.
-     * @return void
-     */
-    public function boot()
+    public function boot(): void
     {
         $this->publishes([
             __DIR__ . '/config.dist.php' => config_path('readme.php'),

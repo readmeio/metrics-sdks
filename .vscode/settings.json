@@ -1,0 +1,13 @@
+{
+  "search.exclude": {
+    // Hide generated output
+    "**/package-lock.json": true,
+    "**/composer.lock": true,
+
+    // Hide test coverage directories
+    "**/coverage": true,
+
+    // Hide vendor directories
+    "**/{node_modules,vendor}": true,
+  }
+}

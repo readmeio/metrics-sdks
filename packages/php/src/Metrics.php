@@ -2,8 +2,8 @@
 
 namespace ReadMe;
 
-use Closure;
 use Composer\Factory;
+use Composer\InstalledVersions;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlMultiHandler;
 use GuzzleHttp\HandlerStack;
@@ -11,7 +11,6 @@ use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use PackageVersions\Versions;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,48 +22,25 @@ class Metrics
     protected const METRICS_API = 'https://metrics.readme.io';
     protected const README_API = 'https://dash.readme.io';
 
-    /** @var string */
-    private $api_key;
+    private bool $development_mode = false;
+    private array $denylist = [];
+    private array $allowlist = [];
+    private string|null $base_log_url = null;
 
-    /** @var bool */
-    private $development_mode = false;
+    private CurlMultiHandler $curl_handler;
+    private Client $client;
+    private Client $readme_api_client;
 
-    /** @var array */
-    private $denylist = [];
-
-    /** @var array */
-    private $allowlist = [];
-
-    /** @var string|null */
-    private $base_log_url = null;
-
-    /** @var class-string */
-    private $group_handler;
-
-    /** @var CurlMultiHandler */
-    private $curl_handler;
-
-    /** @var Client */
-    private $client;
-
-    /** @var Client */
-    private $readme_api_client;
-
-    /** @var string */
-    private $package_version;
-
-    /** @var string */
-    private $cache_dir;
-
-    /** @var string */
-    private $user_agent;
+    private string|null $package_version;
+    private string $cache_dir;
+    private string $user_agent;
 
     /**
      * @param string $api_key
      * @param class-string $group_handler
      * @param array $options
      */
-    public function __construct(string $api_key, string $group_handler, array $options = [])
+    public function __construct(public string $api_key, public string $group_handler, array $options = [])
     {
         $this->api_key = base64_encode($api_key . ':');
         $this->group_handler = $group_handler;
@@ -106,21 +82,18 @@ class Metrics
             'timeout' => $curl_timeout,
         ]);
 
-        /** @psalm-suppress DeprecatedClass */
-        $this->package_version = Versions::getVersion(self::PACKAGE_NAME);
+        $this->package_version = InstalledVersions::getVersion(self::PACKAGE_NAME);
         $this->cache_dir = Factory::createConfig()->get('cache-dir');
 
-        $this->user_agent = 'readme-metrics-php/' . $this->package_version;
+        $this->user_agent = 'readme-metrics-php/' . $this->package_version ?? 'unknown';
     }
 
     /**
      * @todo Handle bad token 401 errors?
      * @todo Change this to a queueing model like in readme-node?
-     * @param Request $request
-     * @param Response $response
      * @throws MetricsException
      */
-    public function track(Request $request, &$response): void
+    public function track(Request $request, Response &$response): void
     {
         if (empty($this->base_log_url)) {
             $this->base_log_url = $this->getProjectBaseUrl();
@@ -153,6 +126,8 @@ class Metrics
                 // resolve the promise we set up, but since we just want this to be a fire and forget request, we don't
                 // actually care about the response coming back from the Metrics API and all exceptions here can be
                 // discarded.
+                //
+                // @todo we should log this somewhere
             }
 
             return;
@@ -185,13 +160,7 @@ class Metrics
         throw $ex;
     }
 
-    /**
-     * @param string $log_id
-     * @param Request $request
-     * @param Response $response
-     * @return array
-     */
-    public function constructPayload(string $log_id, Request $request, $response): array
+    public function constructPayload(string $log_id, Request $request, Response $response): array
     {
         $request_start = defined('LARAVEL_START') ? LARAVEL_START : $_SERVER['REQUEST_TIME_FLOAT'];
         $group = $this->group_handler::constructGroup($request);
@@ -207,7 +176,7 @@ class Metrics
         }
 
         if ($api_key_exists) {
-            // Swap externally documented api_key field into backwards compatible & internally used id field
+            // Swap the externally documented `api_key` field into backwards compatible and internally used `id` field.
             $group['id'] = $group['api_key'];
             unset($group['api_key']);
         }
@@ -220,9 +189,9 @@ class Metrics
             'request' => [
                 'log' => [
                     'creator' => [
-                        'name' => self::PACKAGE_NAME,
+                        'name' => 'readme-metrics (php)',
                         'version' => $this->package_version,
-                        'comment' => PHP_OS_FAMILY . '/php v' . PHP_VERSION
+                        'comment' => self::getHARCreatorVersion(),
                     ],
                     'entries' => [
                         [
@@ -285,11 +254,7 @@ class Metrics
         return $data;
     }
 
-    /**
-     * @param Response $response
-     * @return array
-     */
-    private function processResponse($response): array
+    private function processResponse(Response $response): array
     {
         if ($response instanceof JsonResponse) {
             $body = $response->getData(true);
@@ -324,7 +289,6 @@ class Metrics
      * Make an API request to ReadMe to retrieve the base log URL that'll be used to populate the `x-documentation-url`
      * header.
      *
-     * @return string|null
      */
     private function getProjectBaseUrl(): ?string
     {
@@ -396,7 +360,6 @@ class Metrics
     /**
      * Retrieve the cache file that'll be used to store the base URL for the `x-documentation-url` header.
      *
-     * @return string
      */
     public function getCacheFile(): string
     {
@@ -415,11 +378,9 @@ class Metrics
     }
 
     /**
-     * Convert a HeaderBag into an acceptable nested array for the Metrics API.
+     * Convert a Laravel `HeaderBag` into an acceptable nested headers array for the HAR payload.
      *
      * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#headers}
-     * @param HeaderBag $headers
-     * @return array
      */
     protected static function convertHeaderBagToArray(HeaderBag $headers): array
     {
@@ -480,9 +441,6 @@ class Metrics
      *
      * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#querystring}
      * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#params}
-     * @param array $input
-     * @return array
-     * @psalm-suppress PossiblyUndefinedArrayOffset
      */
     protected static function convertObjectToArray(array $input): array
     {
@@ -495,12 +453,20 @@ class Metrics
     }
 
     /**
+     * Retrieve the version string that we'll use in the HAR `creator` object.
+     *
+     * @example arm64-darwin21.3.0/8.1.8
+     */
+    public static function getHARCreatorVersion(): string
+    {
+        return php_uname('m') . '-' . strtolower(php_uname('s')) . php_uname('r') . '/' . PHP_VERSION;
+    }
+
+    /**
      * Given an array, exclude data at the highest associative level of it based upon the configured allowlist.
      *
-     * @param array $data
-     * @return array
      */
-    private function excludeDataFromDenylist($data = []): array
+    private function excludeDataFromDenylist(array $data = []): array
     {
         // If `$data` is an array with associative keys, let's run the denylist against that, otherwise run the
         // denylist against the keys inside the top-level array.
@@ -519,10 +485,8 @@ class Metrics
     /**
      * Given an array, return only data at the highest level of it that matches the configured allowlist.
      *
-     * @param array $data
-     * @return array
      */
-    private function excludeDataNotInAllowlist($data = []): array
+    private function excludeDataNotInAllowlist(array $data = []): array
     {
         $ret = [];
 
@@ -552,10 +516,8 @@ class Metrics
     /**
      * Return whether or not a given array is associative.
      *
-     * @param array $array
-     * @return bool
      */
-    private function isArrayAssoc($array = []): bool
+    private function isArrayAssoc(array $array = []): bool
     {
         return count(array_filter(array_keys($array), 'is_string')) > 0;
     }
