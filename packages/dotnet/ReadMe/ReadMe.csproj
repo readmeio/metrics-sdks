@@ -9,7 +9,11 @@
     <Product>ReadMe.Metrics DotnetCore</Product>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>readme2.png</PackageIcon>
-    <Description>The Metrics API gives you access to usage data for your API and hub, so you can make more data-driven decisions around your platform and API roadmap. Many of the metrics that you can get using this API are also available as visualizations directly in ReadMe in our Metrics charts.</Description>
+    <Description>Track usage of your API and troubleshoot issues faster.</Description>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>..\ReadMe.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +23,11 @@
     <PackageReference Include="RestSharp" Version="106.13.0" />
 
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -31,5 +40,4 @@
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
-
 </Project>
