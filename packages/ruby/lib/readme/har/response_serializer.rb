@@ -1,5 +1,5 @@
-require "rack/utils"
-require "readme/har/collection"
+require 'rack/utils'
+require 'readme/har/collection'
 
 module Readme
   module Har
@@ -37,7 +37,7 @@ module Readme
       end
 
       def empty_content
-        {mimeType: "", size: 0}
+        { mimeType: '', size: 0 }
       end
 
       def json_content

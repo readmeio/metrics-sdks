@@ -1,4 +1,4 @@
-require "readme/metrics"
+require 'readme/metrics'
 
 module Readme
   class RequestQueue
@@ -30,8 +30,8 @@ module Readme
       Thread.new do
         HTTParty.post(
           Readme::Metrics::ENDPOINT,
-          basic_auth: {username: @api_key, password: ""},
-          headers: {"Content-Type" => "application/json"},
+          basic_auth: { username: @api_key, password: '' },
+          headers: { 'Content-Type' => 'application/json' },
           body: to_json(payloads)
         )
       end
@@ -42,7 +42,7 @@ module Readme
     end
 
     def to_json(payloads)
-      "[#{payloads.join(", ")}]"
+      "[#{payloads.join(', ')}]"
     end
   end
 end

@@ -11,7 +11,7 @@ module Readme
       end
 
       def to_a
-        filtered_hash.map { |name, value| {name: name, value: value} }
+        filtered_hash.map { |name, value| { name: name, value: value } }
       end
 
       private

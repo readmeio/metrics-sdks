@@ -1,6 +1,6 @@
-require "rack"
-require "rack/request"
-require_relative "content_type_helper"
+require 'rack'
+require 'rack/request'
+require_relative 'content_type_helper'
 
 module Readme
   class HttpRequest
@@ -11,7 +11,7 @@ module Readme
       Rack::HTTP_VERSION,
       Rack::HTTP_HOST,
       Rack::HTTP_PORT
-    ]
+    ].freeze
 
     def initialize(env)
       @request = Rack::Request.new(env)
@@ -50,7 +50,7 @@ module Readme
     end
 
     def options?
-      @request.request_method == "OPTIONS"
+      @request.request_method == 'OPTIONS'
     end
 
     def headers
@@ -82,20 +82,22 @@ module Readme
     # Other "headers" like version and host are prefixed with `HTTP_` by Rack but
     # don't seem to be considered legit HTTP headers.
     def http_header?(name)
-      name.start_with?("HTTP") && !HTTP_NON_HEADERS.include?(name)
+      name.start_with?('HTTP') && !HTTP_NON_HEADERS.include?(name)
     end
 
     # Headers like `Content-Type: application/json` come into rack like
     # `"HTTP_CONTENT_TYPE" => "application/json"`.
     def normalize_header_name(header)
-      header.delete_prefix("HTTP_").split("_").map(&:capitalize).join("-")
+      header.delete_prefix('HTTP_').split('_').map(&:capitalize).join('-')
     end
 
     # These special headers are explicitly _not_ prefixed with HTTP_ in the Rack
     # env so we need to add them in manually
     def unprefixed_headers
-      {"Content-Type" => @request.content_type,
-       "Content-Length" => @request.content_length}.compact
+      {
+        'Content-Type' => @request.content_type,
+        'Content-Length' => @request.content_length
+      }.compact
     end
   end
 end
