@@ -1,10 +1,8 @@
 from datetime import datetime, timedelta
 import time
-from unittest.mock import Mock, MagicMock
-from werkzeug.datastructures import EnvironHeaders
+from unittest.mock import Mock
 
 from flask import Flask, request
-import pytest
 from readme_metrics import MetricsApiConfig
 from readme_metrics.flask_readme import ReadMeMetrics
 from readme_metrics.ResponseInfoWrapper import ResponseInfoWrapper
@@ -21,7 +19,7 @@ class TestFlaskExtension:
     def setUp(self):
         pass
 
-    def testInit(self):
+    def test_init(self):
         # the extension should register itself with the Flask application
         # provided to the constructor
         app = Mock()
@@ -29,7 +27,7 @@ class TestFlaskExtension:
         app.before_request.assert_called_with(extension.before_request)
         app.after_request.assert_called_with(extension.after_request)
 
-    def testBeforeRequest(self):
+    def test_before_request(self):
         app = Flask(__name__)
         extension = ReadMeMetrics(config=mock_config, app=app)
         with app.test_request_context("/"):
@@ -49,7 +47,7 @@ class TestFlaskExtension:
             current_millis = time.time() * 1000.0
             assert abs(current_millis - req_start_millis) < 1000.00
 
-    def testAfterRequest(self):
+    def test_after_request(self):
         app = Flask(__name__)
         print("hello")
         extension = ReadMeMetrics(config=mock_config, app=app)

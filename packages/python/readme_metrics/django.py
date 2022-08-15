@@ -46,5 +46,5 @@ class MetricsMiddleware:
             # Errors in the Metrics SDK should never cause the application to
             # throw an error. Log it but don't re-raise.
             self.config.LOGGER.exception(e)
-        finally:
-            return response
+
+        return response

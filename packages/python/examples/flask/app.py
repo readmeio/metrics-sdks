@@ -6,6 +6,7 @@ from readme_metrics.flask_readme import ReadMeMetrics
 app = Flask(__name__)
 
 
+# pylint: disable=W0613
 def grouping_function(request):
     return {
         # User's API Key
@@ -37,4 +38,4 @@ def hello_world():
 
 
 if __name__ == "__main__":
-    app.run(debug=False, host="127.0.0.1", port=os.getenv("PORT", 4000))
+    app.run(debug=False, host="127.0.0.1", port=os.getenv("PORT", "4000"))
