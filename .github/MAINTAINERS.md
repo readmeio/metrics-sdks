@@ -56,6 +56,12 @@ To publish a new version:
 
 1. `cd packages/python`
 2. Update `version` in `readme_metrics/__init__.py`
+<!-- Please forgive me for this -->
+
+```sh
+NEW_VERSION="x.x.x"; sed -i '' "s/\(__version__ = \)\"\([^\"]*\)\"/\1\"$NEW_VERSION\"/" readme_metrics/__init__.py; unset NEW_VERSION
+```
+
 3. Commit the changes to `readme_metrics/__init__.py` (and mirror that change).
 4. `rm dist/*`
 5. `python3 setup.py sdist bdist_wheel`
