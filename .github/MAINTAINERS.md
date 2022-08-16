@@ -44,7 +44,7 @@ To publish a new version of the PHP package, after you mirror the codebase with 
 
 #### Ruby
 
-To publish a new version of the Ruby [package](https://rubygems.org/gems/readme-metrics/) bump the package version in `version.rb`, and then run `gem build readme-metrics` and `gem publish <BUILT_GEM>`.
+To publish a new version of the Ruby [package](https://rubygems.org/gems/readme-metrics/) bump the package version in `version.rb`, and then run `gem build readme-metrics` and `gem push <BUILT_GEM>`.
 
 #### Python
 
