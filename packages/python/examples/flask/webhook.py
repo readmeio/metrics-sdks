@@ -1,9 +1,7 @@
 import os
 import sys
-import json
-import hmac
-from datetime import datetime, timedelta
 from flask import Flask, request
+from readme_metrics.VerifyWebhook import VerifyWebhook
 
 if os.getenv("README_API_KEY") is None:
     sys.stderr.write("Missing `README_API_KEY` environment variable")
@@ -15,43 +13,15 @@ app = Flask(__name__)
 
 @app.post("/webhook")
 def webhook():
+    # Verify the request is legitimate and came from ReadMe
+    signature = request.headers.get("readme-signature", None)
+    # Your ReadMe secret
+    secret = os.getenv("README_API_KEY").encode("utf8")
     try:
-        signature = request.headers.get("readme-signature", None)
-
-        if signature is None:
-            raise Exception("Missing Signature")
-
-        parsed_input = dict(
-            (x.strip(), y.strip())
-            for x, y in (element.split("=") for element in signature.split(","))
-        )
-
-        time = parsed_input["t"]
-
-        if datetime.now() - datetime.fromtimestamp(
-            int(parsed_input["t"]) / 1000
-        ) > timedelta(minutes=30):
-            raise Exception("Expired Signature")
-
-        body = request.get_json()
-        unsigned = time + "." + json.dumps(body, separators=(",", ":"))
-        verify_signature = hmac.new(
-            os.getenv("README_API_KEY").encode("utf8"),
-            unsigned.encode("utf8"),
-            "sha256",
-        ).hexdigest()
-        readme_signature = parsed_input["v0"]
-        if (
-            hmac.compare_digest(
-                verify_signature.encode(), readme_signature.encode("utf8")
-            )
-            is False
-        ):
-            raise Exception("Invalid Signature")
-
-    except Exception as e:
+        VerifyWebhook(request.get_json(), signature, secret)
+    except Exception as error:
         return (
-            {"error": str(e)},
+            {"error": str(error)},
             401,
             {"Content-Type": "application/json; charset=utf-8"},
         )
