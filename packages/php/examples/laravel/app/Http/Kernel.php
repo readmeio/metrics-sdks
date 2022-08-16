@@ -14,6 +14,8 @@ class Kernel extends HttpKernel
     protected $middlewareGroups = [
         'web' => [],
 
-        'api' => [],
+        'api' => [
+            \ReadMe\Middleware::class,
+        ],
     ];
 }

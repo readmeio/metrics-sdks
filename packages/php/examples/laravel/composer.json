@@ -1,7 +1,8 @@
 {
     "require": {
         "php": "^8.0.2",
-        "laravel/framework": "^9.19"
+        "laravel/framework": "^9.19",
+        "readme/metrics": "^10.0"
     },
     "autoload": {
         "psr-4": {
