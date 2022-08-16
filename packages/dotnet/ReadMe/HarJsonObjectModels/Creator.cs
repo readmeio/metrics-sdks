@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace ReadMe.HarJsonObjectModels
 {
@@ -7,9 +7,9 @@ namespace ReadMe.HarJsonObjectModels
   class Creator
   {
     public string name { get; set; }
-    public string version { get; set; }
-    //comment is OS and its version
-    public string comment { get; set; }
 
+    public string version { get; set; }
+
+    public string comment { get; set; }
   }
 }

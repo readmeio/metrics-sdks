@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace ReadMe.HarJsonObjectModels
 {
@@ -7,10 +7,11 @@ namespace ReadMe.HarJsonObjectModels
   class PostData
   {
     public string mimeType { get; set; }
+
     public string text { get; set; }
+
     public string comment { get; set; }
 
     public List<Params> @params { get; set; }
-
   }
 }
