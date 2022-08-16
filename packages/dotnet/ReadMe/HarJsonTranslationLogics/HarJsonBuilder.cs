@@ -113,7 +113,7 @@ namespace ReadMe.HarJsonTranslationLogics
      */
     private string GetCreatorVersion()
     {
-      return RuntimeInformation.OSArchitecture + "/" + Environment.OSVersion.Platform + "/" + Environment.OSVersion.Version;
+      return RuntimeInformation.OSArchitecture + "-" + Environment.OSVersion.Platform + "/" + Environment.OSVersion.Version;
     }
 
     private async Task<string> ProcessResponseBody(HttpContext context)
