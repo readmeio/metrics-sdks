@@ -2,13 +2,19 @@
     "require": {
         "php": "^8.0.2",
         "laravel/framework": "^9.19",
-        "readme/metrics": "^10.0"
+        "readme/metrics": "*"
     },
     "autoload": {
         "psr-4": {
             "App\\": "app/"
         }
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../src/"
+        }
+    ],
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
