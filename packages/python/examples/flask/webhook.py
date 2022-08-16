@@ -8,7 +8,7 @@ from flask import Flask, request
 if os.getenv("README_API_KEY") is None:
     sys.stderr.write("Missing `README_API_KEY` environment variable")
     sys.stderr.flush()
-    os._exit(1)
+    sys.exit(1)
 
 app = Flask(__name__)
 
@@ -21,16 +21,16 @@ def webhook():
         if signature is None:
             raise Exception("Missing Signature")
 
-        input = dict(
+        parsed_input = dict(
             (x.strip(), y.strip())
             for x, y in (element.split("=") for element in signature.split(","))
         )
 
-        time = input["t"]
+        time = parsed_input["t"]
 
-        if datetime.now() - datetime.fromtimestamp(int(input["t"]) / 1000) > timedelta(
-            minutes=30
-        ):
+        if datetime.now() - datetime.fromtimestamp(
+            int(parsed_input["t"]) / 1000
+        ) > timedelta(minutes=30):
             raise Exception("Expired Signature")
 
         body = request.get_json()
@@ -40,7 +40,7 @@ def webhook():
             unsigned.encode("utf8"),
             "sha256",
         ).hexdigest()
-        readme_signature = input["v0"]
+        readme_signature = parsed_input["v0"]
         if (
             hmac.compare_digest(
                 verify_signature.encode(), readme_signature.encode("utf8")
@@ -67,4 +67,4 @@ def webhook():
 
 
 if __name__ == "__main__":
-    app.run(debug=False, host="127.0.0.1", port=os.getenv("PORT", 4000))
+    app.run(debug=False, host="127.0.0.1", port=os.getenv("PORT", "4000"))
