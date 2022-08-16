@@ -82,7 +82,7 @@ NEW_VERSION="x.x.x"; sed -i '' "s/\(<Version.*>\)[^<>]*\(<\/Version.*\)/\1$NEW_V
 <!-- And for this 🙏 -->
 
 ```sh
-NEW_VERSION="x.x.x"; sed -i '' "s/\(version = \)\"\([^\"]*\)\"/\1\"$NEW_VERSION\"/" ConstValues.cs; unset NEW_VERSION
+NEW_VERSION="x.x.x"; sed -i '' "s/\(Version = \)\"\([^\"]*\)\"/\1\"$NEW_VERSION\"/" ConstValues.cs; unset NEW_VERSION
 ```
 
 <!-- https://docs.microsoft.com/en-us/nuget/create-packages/creating-a-package-dotnet-cli#run-the-pack-command -->

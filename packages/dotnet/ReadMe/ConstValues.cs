@@ -6,7 +6,7 @@ namespace ReadMe
   {
     public static readonly string Name = "readmeio.net";
 
-    public static readonly string Version = "2.0.0";
+    public static readonly string Version = "2.1.0";
 
     public static readonly int Wait = 0;
 
