@@ -101,34 +101,19 @@ namespace ReadMe.HarJsonTranslationLogics
     private Creator BuildCreator()
     {
       Creator creator = new Creator();
-      creator.name = ConstValues.name;
+      creator.name = "readme-metrics (dotnet)";
       creator.version = ConstValues.version;
-      creator.comment = GetOS();
+      creator.comment = GetCreatorVersion();
       return creator;
     }
-    private string GetOS()
-    {
-      string os = null;
-      if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-      {
-        os = "windows";
-      }
-      else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-      {
-        os = "mac";
-      }
-      else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-      {
-        os = "linux";
-      }
-      else
-      {
-        os = "unknown";
-      }
-      os = os + "/" + Environment.OSVersion.Version;
-      return os;
-    }
 
+    /**
+     * @example x86-win32nt/6.2.9200.0
+     */
+    private string GetCreatorVersion()
+    {
+      return RuntimeInformation.OSArchitecture + "-" + Environment.OSVersion.Platform + "/" + Environment.OSVersion.Version;
+    }
 
     private async Task<string> ProcessResponseBody(HttpContext context)
     {
@@ -145,9 +130,5 @@ namespace ReadMe.HarJsonTranslationLogics
         return null;
       }
     }
-
-
   }
-
-
 }
