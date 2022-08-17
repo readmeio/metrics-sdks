@@ -101,3 +101,50 @@ NEW_VERSION="x.x.x"; sed -i '' "s/\(Version = \)\"\([^\"]*\)\"/\1\"$NEW_VERSION\
 ```sh
 dotnet nuget push ./bin/Debug/ReadMe.Metrics.<version>.nupkg --api-key <apiKey> --source https://api.nuget.org/v3/index.json
 ```
+
+## Building an integration test
+We have an integration testing layer for both Metrics and Webhooks to ensure the different SDKs are compliant and act the same given certain parameters. 
+
+### Metrics
+To build a Metrics integration test server, you must write an HTTP server that does the following:
+
+- Looks for an `README_API_KEY` environment variable, and exits with an exit code of 1 if it does not exist.
+- Spawns an HTTP server that listens on the `PORT` environment variable, or 4000 if no environment variable exists.
+- The HTTP server should have a listener on `GET /` that responds with a 200 status code, and a JSON response body of `{ "message": "hello world" }`
+- The HTTP server should have a Metrics SDK installed, that responds with the following identification object for the user making the request:
+
+```json
+{
+  "apiKey": "owlbert-api-key",
+  "label": "Owlbert",
+  "email": "owlbert@example.com",
+}
+```
+
+- The Metrics SDK you are using should accept a `METRICS_SERVER` environment variable which controls where the request data gets sent to
+
+Once you have written a server that complies to the above requirements, you can run the integration test suite from the top level directory with the following command:
+
+```sh
+EXAMPLE_SERVER="<command to run your server>" npm run test:integration-metrics
+```
+
+`EXAMPLE_SERVER` tells the test how to spawn your server as a child process. So for Node.js/Express, you can run the following:
+
+```sh
+EXAMPLE_SERVER="node ./packages/node/examples/express/index.js" npm run test:integration-metrics
+```
+
+This should then be configured to run as part of the GitHub Actions CI process, to do this you will need to setup the following:
+
+- a Dockerfile which spins up the required environment to run the test. These are located in `__tests__/integrations` (see [`node.Dockerfile`](https://github.com/readmeio/metrics-sdks/blob/911e972fef596934d6332d258defb9a57b6ed3a0/__tests__/integrations/node.Dockerfile#L28) for an example)
+- a block in docker-compose.yml telling Docker how to run your test; including the `EXAMPLE_SERVER` env variable from above (see [`integration_metrics_node_express`](https://github.com/readmeio/metrics-sdks/blob/911e972fef596934d6332d258defb9a57b6ed3a0/docker-compose.yml#L3-L9) for an example)
+- an `integration` test block inside the github workflow, which runs the docker-compose service that you just setup (see [`nodejs.yml`](https://github.com/readmeio/metrics-sdks/blob/911e972fef596934d6332d258defb9a57b6ed3a0/.github/workflows/nodejs.yml#L34-L47) for an example)
+
+We do this via docker-compose so that you can test the docker environments locally like so:
+
+```sh
+docker-compose run integration_metrics_node_express
+```
+
+If this is all setup then you should see these running on push into GitHub.
