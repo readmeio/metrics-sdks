@@ -121,7 +121,9 @@ To build a Metrics integration test server, you must write an HTTP server that d
 }
 ```
 
-- The Metrics SDK you are using should accept a `METRICS_SERVER` environment variable which controls where the request data gets sent to
+- The Metrics SDK you are using should accept a `METRICS_SERVER` environment variable which controls where the request data gets sent to.
+
+You can view the Node.js/Express example server here for additional guidance and example: [packages/node/examples/express/index.js](https://github.com/readmeio/metrics-sdks/blob/main/packages/node/examples/express/index.js)
 
 Once you have written a server that complies to the above requirements, you can run the integration test suite from the top level directory with the following command:
 
