@@ -19,7 +19,7 @@ use Symfony\Component\Mime\MimeTypes;
 class Metrics
 {
     protected const PACKAGE_NAME = 'readme/metrics';
-    protected const METRICS_API = 'https://metrics.readme.io';
+    protected const METRICS_SERVER = 'https://metrics.readme.io';
     protected const README_API = 'https://dash.readme.io';
 
     private bool $development_mode = false;
@@ -73,7 +73,7 @@ class Metrics
         $this->curl_handler = new CurlMultiHandler();
         $this->client = (isset($options['client'])) ? $options['client'] : new Client([
             'handler' => HandlerStack::create($this->curl_handler),
-            'base_uri' => self::METRICS_API,
+            'base_uri' => env('METRICS_SERVER', self::METRICS_SERVER),
             'timeout' => $curl_timeout,
         ]);
 
