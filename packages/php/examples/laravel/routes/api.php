@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/user', function () {
     return [
-        'api_key' => session()->getId(),
+        'api_key' => uniqid(),
         'email' => 'buster@example.com',
     ];
 });

@@ -28,8 +28,10 @@ class Middleware
     /**
      * @throws \ReadMe\MetricsException
      */
-    public function terminate(\Illuminate\Http\Request $request, \Symfony\Component\HttpFoundation\Response $response): void
-    {
+    public function terminate(
+        \Illuminate\Http\Request $request,
+        \Symfony\Component\HttpFoundation\Response $response
+    ): void {
         $this->metrics->track($request, $response);
     }
 }
