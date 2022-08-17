@@ -121,6 +121,7 @@ To build a Metrics integration test server, you must write an HTTP server that d
 }
 ```
 
+- The HTTP server should use the `README_API_KEY` environment variable as the API key to authenticate against Metrics.
 - The Metrics SDK you are using should accept a `METRICS_SERVER` environment variable which controls where the request data gets sent to.
 
 You can view the Node.js/Express example server here for additional guidance and example: [packages/node/examples/express/index.js](https://github.com/readmeio/metrics-sdks/blob/main/packages/node/examples/express/index.js)
@@ -147,6 +148,47 @@ We do this via docker-compose so that you can test the docker environments local
 
 ```sh
 docker-compose run integration_metrics_node_express
+```
+
+If this is all setup then you should see these running on push into GitHub.
+
+### Webhooks
+To build a Webhooks integration test server, you must write an HTTP server that does the following:
+
+- Looks for an `README_API_KEY` environment variable, and exits with an exit code of 1 if it does not exist.
+- Spawns an HTTP server that listens on the `PORT` environment variable, or 4000 if no environment variable exists.
+- The HTTP server should have a listener on `POST /webhook` that must verify the incoming signature from the `readme-signature` request header. It must validate the following cases:
+  - If the signature is **missing**, it should return with a 401 status code, and a JSON response body of `{ "error": "Missing Signature" }`
+  - If the signature is **invalid**, it should return with a 401 status code, and a JSON response body of `{ "error": "Invalid Signature" }`
+  - If the signature has **expired**, it should return with a 401 status code, and a JSON response body of `{ "error": "Expired Signature" }`
+  - If the signature passes validation, it should respond with a 200 status code, and a JSON response body of `{ "petstore_auth": "default-key", "basic_auth": { user: "user", pass: "pass" } }`
+
+- The HTTP server should use the `README_API_KEY` environment variable as the secret to validate the Webhook signature.
+
+You can view the Node.js/Express example server here for additional guidance and example: [packages/node/examples/express/webhook.js](https://github.com/readmeio/metrics-sdks/blob/main/packages/node/examples/express/webhook.js)
+
+Once you have written a server that complies to the above requirements, you can run the integration test suite from the top level directory with the following command:
+
+```sh
+EXAMPLE_SERVER="<command to run your server>" npm run test:integration-webhooks
+```
+
+`EXAMPLE_SERVER` tells the test how to spawn your server as a child process. So for Node.js/Express, you can run the following:
+
+```sh
+EXAMPLE_SERVER="node ./packages/node/examples/express/webhook.js" npm run test:integration-metrics
+```
+
+This should then be configured to run as part of the GitHub Actions CI process, to do this you will need to setup the following:
+
+- a Dockerfile which spins up the required environment to run the test. These are located in `__tests__/integrations` (see [`node.Dockerfile`](https://github.com/readmeio/metrics-sdks/blob/911e972fef596934d6332d258defb9a57b6ed3a0/__tests__/integrations/node.Dockerfile#L28) for an example)
+- a block in docker-compose.yml telling Docker how to run your test; including the `EXAMPLE_SERVER` env variable from above (see [`integration_webhooks_node_express`](https://github.com/readmeio/metrics-sdks/blob/4544380a283dfd9c5e24e65c73cbfdb038d2d96b/docker-compose.yml#L11-L17) for an example)
+- an `integration` test block inside the github workflow, which runs the docker-compose service that you just setup (see [`nodejs.yml`](https://github.com/readmeio/metrics-sdks/blob/911e972fef596934d6332d258defb9a57b6ed3a0/.github/workflows/nodejs.yml#L34-L47) for an example)
+
+We do this via docker-compose so that you can test the docker environments locally like so:
+
+```sh
+docker-compose run integration_webhooks_node_express
 ```
 
 If this is all setup then you should see these running on push into GitHub.
