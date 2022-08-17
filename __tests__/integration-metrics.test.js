@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/no-unsafe-regex */
-import { spawn } from 'child_process';
+import { execSync, spawn } from 'child_process';
 import { once } from 'events';
 import http from 'http';
 import { cwd } from 'process';
@@ -89,6 +89,7 @@ describe('Metrics SDK Integration Tests', () => {
         ...process.env,
       },
     });
+
     return new Promise((resolve, reject) => {
       httpServer.stderr.on('data', data => {
         if (data.toString().match(/Running on/)) return resolve(); // For some reason Flask prints on stderr 🤷‍♂️
@@ -112,6 +113,24 @@ describe('Metrics SDK Integration Tests', () => {
   });
 
   afterAll(() => {
+    /**
+     * There's a fun quirk with Laravel's Artisan web server where when you spawn it it also spawns
+     * another thread that components of the web server. When we kill the main Artisan process
+     * we've created here that kills the main Artisan process, and frees up the address:port it was
+     * bound to but it unfortunately doesn't clean up the sub-thread.
+     *
+     * Annoyingly sending CTRL+C when you run `php artisan serve` by itself cleans up this process
+     * but sending `proc.kill('SIGINT')` (and neither `SIGTERM`) doesn't. The only way we can clean
+     * up this orphan process is to look for the process by querying the system for its parent
+     * thread and then manually invoking a `kill` command to dust it.
+     */
+    if (httpServer.spawnargs.includes('php')) {
+      const pid = execSync(`pgrep -P ${httpServer.pid}`);
+      if (pid) {
+        execSync(`kill -9 ${pid}`);
+      }
+    }
+
     httpServer.kill();
     return new Promise((resolve, reject) => {
       metricsServer.close(err => {
