@@ -103,9 +103,11 @@ dotnet nuget push ./bin/Debug/ReadMe.Metrics.<version>.nupkg --api-key <apiKey> 
 ```
 
 ## Building an integration test
-We have an integration testing layer for both Metrics and Webhooks to ensure the different SDKs are compliant and act the same given certain parameters. 
+
+We have an integration testing layer for both Metrics and Webhooks to ensure the different SDKs are compliant and act the same given certain parameters.
 
 ### Metrics
+
 To build a Metrics integration test server, you must write an HTTP server that does the following:
 
 - Looks for an `README_API_KEY` environment variable, and exits with an exit code of 1 if it does not exist.
@@ -117,7 +119,7 @@ To build a Metrics integration test server, you must write an HTTP server that d
 {
   "apiKey": "owlbert-api-key",
   "label": "Owlbert",
-  "email": "owlbert@example.com",
+  "email": "owlbert@example.com"
 }
 ```
 
@@ -153,11 +155,13 @@ docker-compose run integration_metrics_node_express
 If this is all setup then you should see these running on push into GitHub.
 
 ### Webhooks
+
 To build a Webhooks integration test server, you must write an HTTP server that does the following:
 
 - Looks for an `README_API_KEY` environment variable, and exits with an exit code of 1 if it does not exist.
 - Spawns an HTTP server that listens on the `PORT` environment variable, or 4000 if no environment variable exists.
 - The HTTP server should have a listener on `POST /webhook` that must verify the incoming signature from the `readme-signature` request header. It must validate the following cases:
+
   - If the signature is **missing**, it should return with a 401 status code, and a JSON response body of `{ "error": "Missing Signature" }`
   - If the signature is **invalid**, it should return with a 401 status code, and a JSON response body of `{ "error": "Invalid Signature" }`
   - If the signature has **expired**, it should return with a 401 status code, and a JSON response body of `{ "error": "Expired Signature" }`
