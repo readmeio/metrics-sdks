@@ -12,7 +12,9 @@ class Kernel extends HttpKernel
      * @var array<string, array<int, class-string|string>>
      */
     protected $middlewareGroups = [
-        'web' => [],
+        'web' => [
+            \ReadMe\Middleware::class,
+        ],
 
         'api' => [
             \ReadMe\Middleware::class,

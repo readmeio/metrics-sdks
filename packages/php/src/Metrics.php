@@ -196,7 +196,7 @@ class Metrics
                     'entries' => [
                         [
                             'pageref' => $request->url(),
-                            'startedDateTime' => date('c', (int) $request_start),
+                            'startedDateTime' => date('Y-m-d\TH:i:sp', (int) $request_start),
                             'time' => (int) ((microtime(true) - $request_start) * 1000),
                             'request' => $this->processRequest($request),
                             'response' => $this->processResponse($response)
@@ -265,11 +265,22 @@ class Metrics
                 $body = $this->excludeDataNotInAllowlist($body);
             }
         } else {
-            /** @psalm-suppress ReservedWord */
             $body = $response->getContent();
         }
 
         $status_code = $response->getStatusCode();
+
+        /**
+         * The webserver is what sets the `Content-Length` header so incase we don't have one here
+         * yet let's compute our own based off of our response.
+         *
+         * @see {@link https://github.com/laravel/framework/issues/29227}
+         */
+        if ($response->headers->has('Content-Length')) {
+            $content_size = $response->headers->get('Content-Length');
+        } else {
+            $content_size = strlen((string)$response->getContent());
+        }
 
         return [
             'status' => $status_code,
@@ -279,7 +290,7 @@ class Metrics
             'headers' => static::convertHeaderBagToArray($response->headers),
             'content' => [
                 'text' => (is_scalar($body)) ? $body : json_encode($body),
-                'size' => $response->headers->get('Content-Length', '0'),
+                'size' => (int)$content_size,
                 'mimeType' => $response->headers->get('Content-Type')
             ]
         ];

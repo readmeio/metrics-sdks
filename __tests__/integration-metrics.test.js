@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-unsafe-regex */
 import { spawn } from 'child_process';
 import { once } from 'events';
 import http from 'http';
@@ -73,6 +74,11 @@ describe('Metrics SDK Integration Tests', () => {
     // Annoyingly this works under macOS, so it must be a platform
     // difference when running under docker/linux.
     const [command, ...args] = process.env.EXAMPLE_SERVER.split(' ');
+    if (command === 'php') {
+      // Laravel's `artisan serve` command doesn't pick up `PORT` environmental variables, instead
+      // requiring that they're supplied as a command line argument.
+      args.push(`--port=${PORT}`);
+    }
 
     httpServer = spawn(command, args, {
       cwd: cwd(),
@@ -85,8 +91,7 @@ describe('Metrics SDK Integration Tests', () => {
     });
     return new Promise((resolve, reject) => {
       httpServer.stderr.on('data', data => {
-        // For some reason Flask prints on stderr 🤷‍♂️
-        if (data.toString().match(/Running on/)) return resolve();
+        if (data.toString().match(/Running on/)) return resolve(); // For some reason Flask prints on stderr 🤷‍♂️
         // eslint-disable-next-line no-console
         console.error(`stderr: ${data}`);
         return reject(data.toString());
@@ -99,6 +104,7 @@ describe('Metrics SDK Integration Tests', () => {
       // eslint-disable-next-line consistent-return
       httpServer.stdout.on('data', data => {
         if (data.toString().match(/listening/)) return resolve();
+        if (data.toString().match(/Server running on/)) return resolve(); // Laravel
         // eslint-disable-next-line no-console
         console.log(`stdout: ${data}`);
       });
@@ -142,17 +148,20 @@ describe('Metrics SDK Integration Tests', () => {
 
     const { request, response, startedDateTime } = har.request.log.entries[0];
 
-    // It should look like this, with optional microseconds component:
-    // JavaScript: new Date.toISOString()
-    // - 2022-06-30T10:21:55.394Z
-    // Python: datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-    // - 2022-06-30T10:31:43Z
-    // TODO I'm not sure how to make this regex "safe", it has something to do
-    // with the optional non-capturing group at the end: (?:.\d{3})?
-    // eslint-disable-next-line unicorn/no-unsafe-regex
+    /**
+     * `startedDateTime` should look like the following, with optional microseconds component:
+     *
+     *  JavaScript: `new Date.toISOString()`
+     *    - 2022-06-30T10:21:55.394Z
+     *  PHP: `date('Y-m-d\TH:i:sp')`
+     *    - 2022-08-17T19:23:31Z
+     *  Python: `datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")`
+     *    - 2022-06-30T10:31:43Z
+     */
     expect(startedDateTime).toMatch(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:.\d{3})?Z/);
 
-    expect(request.url).toBe(`http://localhost:${PORT}/`);
+    // Some frameworks remove the trailing slash from the URL we get.
+    expect(request.url).toMatch(new RegExp(`http://localhost:${PORT}(/)?`));
     expect(request.method).toBe('GET');
     expect(request.httpVersion).toBe('HTTP/1.1');
 
@@ -167,9 +176,9 @@ describe('Metrics SDK Integration Tests', () => {
     expect(response.content.text.replace('\n', '')).toBe(JSON.stringify({ message: 'hello world' }));
     // The \n character above means we cannot compare to a fixed number
     expect(response.content.size).toStrictEqual(response.content.text.length);
-    expect(response.content.mimeType).toBe('application/json; charset=utf-8');
+    expect(response.content.mimeType).toMatch(/application\/json(;\s?charset=utf-8)?/);
 
     const responseHeaders = caseless(arrayToObject(response.headers));
-    expect(responseHeaders.get('content-type')).toBe('application/json; charset=utf-8');
+    expect(responseHeaders.get('content-type')).toMatch(/application\/json(;\s?charset=utf-8)?/);
   });
 });
