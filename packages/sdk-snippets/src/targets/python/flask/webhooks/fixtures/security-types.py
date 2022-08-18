@@ -30,8 +30,11 @@ def webhook():
 
     return (
         {
-            "petstore_auth": "default-key",
-            "basic_auth": {"user": "user", "pass": "pass"},
+            # OAS Security variables
+            "api_key": "default-api_key-key",
+            "http_basic": {"user": "user", "pass": "pass"},
+            "http_bearer": "default-http_bearer-key",
+            "oauth2": "default-oauth2-key",
         },
         200,
         {"Content-Type": "application/json; charset=utf-8"},
