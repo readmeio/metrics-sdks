@@ -71,6 +71,10 @@ describe('webhooks', () => {
             try {
               expectedOutput = readFileSync(fixturePath).toString();
             } catch (err) {
+              if (OVERWRITE_EVERYTHING) {
+                writeFileSync(fixturePath, '');
+                return;
+              }
               throw new Error(
                 `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${fixturePath}\``
               );
