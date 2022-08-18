@@ -1,12 +1,12 @@
 <?php
 
+// Your ReadMe secret
+$secret = 'my-readme-secret';
+
 // Add this code into your `routes/web.php` file.
-Route::post('/webhook', function (\Illuminate\Http\Request $request) {
+Route::post('/webhook', function (\Illuminate\Http\Request $request) use ($secret) {
     // Verify the request is legitimate and came from ReadMe.
     $signature = $request->headers->get('readme-signature', '');
-
-    // Your ReadMe secret
-    $secret = env('README_API_KEY', config('readme.api_key'));
 
     try {
         \ReadMe\Webhooks::verify($request->input(), $signature, $secret);

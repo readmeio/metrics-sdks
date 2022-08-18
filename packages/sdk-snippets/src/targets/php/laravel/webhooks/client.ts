@@ -9,7 +9,7 @@ export const laravel: Client = {
     link: 'https://laravel.com/',
     description: 'ReadMe Metrics Webhooks SDK usage on Laravel',
   },
-  convert: ({ security, server }, options) => {
+  convert: ({ secret, security, server }, options) => {
     const opts = {
       indent: '    ',
       ...options,
@@ -20,14 +20,14 @@ export const laravel: Client = {
     push('<?php');
     blank();
 
-    push('// Add this code into your `routes/web.php` file.');
-    push("Route::post('/webhook', function (\\Illuminate\\Http\\Request $request) {");
-    push('// Verify the request is legitimate and came from ReadMe.', 1);
-    push("$signature = $request->headers->get('readme-signature', '');", 1);
+    push('// Your ReadMe secret');
+    push(`$secret = '${secret}';`);
     blank();
 
-    push('// Your ReadMe secret', 1);
-    push("$secret = env('README_API_KEY', config('readme.api_key'));", 1);
+    push('// Add this code into your `routes/web.php` file.');
+    push("Route::post('/webhook', function (\\Illuminate\\Http\\Request $request) use ($secret) {");
+    push('// Verify the request is legitimate and came from ReadMe.', 1);
+    push("$signature = $request->headers->get('readme-signature', '');", 1);
     blank();
 
     push('try {', 1);

@@ -21,10 +21,18 @@ export interface SecurityVariable {
 export type Variables = (ServerVariable | SecurityVariable)[];
 
 export class MetricsSDKSnippet {
+  secret: string;
+
   variables: Variables = [];
 
-  constructor(input: Variables) {
+  constructor(
+    input: Variables,
+    data: {
+      secret?: string;
+    } = {}
+  ) {
     this.variables = input;
+    this.secret = data.secret ?? 'my-readme-secret';
   }
 
   convert = (snippetType: SnippetType, targetId: TargetId, clientId?: ClientId, options?: any) => {
@@ -49,6 +57,6 @@ export class MetricsSDKSnippet {
       { server: [], security: [] }
     );
 
-    return convert({ server, security }, options);
+    return convert({ secret: this.secret, server, security }, options);
   };
 }
