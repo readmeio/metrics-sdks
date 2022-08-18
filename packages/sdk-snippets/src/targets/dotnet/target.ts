@@ -1,6 +1,6 @@
 import type { Target } from '../targets';
 
-import { net6 } from './net6.0/webhooks/client';
+import { net6 } from './net6/webhooks/client';
 
 export const dotnet: Target = {
   info: {

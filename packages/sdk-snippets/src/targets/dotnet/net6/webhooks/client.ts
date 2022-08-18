@@ -4,7 +4,7 @@ import { CodeBuilder } from '../../../../helpers/code-builder';
 
 export const net6: Client = {
   info: {
-    key: 'net6.0',
+    key: 'net6',
     title: '.NET 6.0',
     link: 'https://docs.microsoft.com/en-us/dotnet/core/introduction',
     description: 'ReadMe Metrics Webhooks SDK usage on .NET 6.0',
@@ -51,8 +51,35 @@ export const net6: Client = {
 
     push('await context.Response.WriteAsJsonAsync(new', 1);
     push('{', 1);
-    push('petstore_auth = "default-key",', 2);
-    push('basic_auth = new { user = "user", pass = "pass" }', 2);
+    if (server.length) {
+      push('// OAS Server variables', 2);
+      server.forEach(data => {
+        push(`${data.name} = "${data.default || data.default === '' ? data.default : data.name}",`, 2);
+        variable('server', data.name);
+      });
+    }
+
+    if (server.length && security.length) {
+      blank();
+    }
+
+    if (security.length) {
+      push('// OAS Security variables', 2);
+      security.forEach(data => {
+        if (data.type === 'http') {
+          // Only HTTP Basic auth has any special handling for supplying auth.
+          if (data.scheme === 'basic') {
+            push(`${data.name} = new { user = "user", pass = "pass" },`, 2);
+            variable('security', data.name);
+            return;
+          }
+        }
+
+        push(`${data.name} = "${data.default || data.default === '' ? data.default : data.name}",`, 2);
+        variable('security', data.name);
+      });
+    }
+
     push('});', 1);
     push('});');
 
