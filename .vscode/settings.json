@@ -3,6 +3,8 @@
     // Hide generated output
     "**/package-lock.json": true,
     "**/composer.lock": true,
+    "packages/php/examples/laravel/bootstrap/cache/*.php": true,
+    "packages/php/examples/laravel/storage/**": true,
 
     // Hide test coverage directories
     "**/coverage": true,

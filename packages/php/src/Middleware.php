@@ -20,17 +20,18 @@ class Middleware
         );
     }
 
-    /**
-     * Handle an incoming request.
-     *
-     * @throws \ReadMe\MetricsException
-     */
     public function handle(\Illuminate\Http\Request $request, \Closure $next): mixed
     {
-        $response = $next($request);
+        return $next($request);
+    }
 
+    /**
+     * @throws \ReadMe\MetricsException
+     */
+    public function terminate(
+        \Illuminate\Http\Request $request,
+        \Symfony\Component\HttpFoundation\Response $response
+    ): void {
         $this->metrics->track($request, $response);
-
-        return $response;
     }
 }

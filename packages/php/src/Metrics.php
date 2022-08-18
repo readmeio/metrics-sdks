@@ -19,7 +19,7 @@ use Symfony\Component\Mime\MimeTypes;
 class Metrics
 {
     protected const PACKAGE_NAME = 'readme/metrics';
-    protected const METRICS_API = 'https://metrics.readme.io';
+    protected const METRICS_SERVER = 'https://metrics.readme.io';
     protected const README_API = 'https://dash.readme.io';
 
     private bool $development_mode = false;
@@ -73,7 +73,7 @@ class Metrics
         $this->curl_handler = new CurlMultiHandler();
         $this->client = (isset($options['client'])) ? $options['client'] : new Client([
             'handler' => HandlerStack::create($this->curl_handler),
-            'base_uri' => self::METRICS_API,
+            'base_uri' => env('METRICS_SERVER', self::METRICS_SERVER),
             'timeout' => $curl_timeout,
         ]);
 
@@ -196,7 +196,7 @@ class Metrics
                     'entries' => [
                         [
                             'pageref' => $request->url(),
-                            'startedDateTime' => date('c', (int) $request_start),
+                            'startedDateTime' => date('Y-m-d\TH:i:sp', (int) $request_start),
                             'time' => (int) ((microtime(true) - $request_start) * 1000),
                             'request' => $this->processRequest($request),
                             'response' => $this->processResponse($response)
@@ -265,11 +265,22 @@ class Metrics
                 $body = $this->excludeDataNotInAllowlist($body);
             }
         } else {
-            /** @psalm-suppress ReservedWord */
             $body = $response->getContent();
         }
 
         $status_code = $response->getStatusCode();
+
+        /**
+         * The webserver is what sets the `Content-Length` header so incase we don't have one here
+         * yet let's compute our own based off of our response.
+         *
+         * @see {@link https://github.com/laravel/framework/issues/29227}
+         */
+        if ($response->headers->has('Content-Length')) {
+            $content_size = $response->headers->get('Content-Length');
+        } else {
+            $content_size = strlen((string)$response->getContent());
+        }
 
         return [
             'status' => $status_code,
@@ -279,7 +290,7 @@ class Metrics
             'headers' => static::convertHeaderBagToArray($response->headers),
             'content' => [
                 'text' => (is_scalar($body)) ? $body : json_encode($body),
-                'size' => $response->headers->get('Content-Length', '0'),
+                'size' => (int)$content_size,
                 'mimeType' => $response->headers->get('Content-Type')
             ]
         ];

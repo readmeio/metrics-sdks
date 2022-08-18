@@ -1,4 +1,5 @@
-import { spawn } from 'child_process';
+/* eslint-disable unicorn/no-unsafe-regex */
+import { execSync, spawn } from 'child_process';
 import { once } from 'events';
 import http from 'http';
 import { cwd } from 'process';
@@ -73,9 +74,15 @@ describe('Metrics SDK Integration Tests', () => {
     // Annoyingly this works under macOS, so it must be a platform
     // difference when running under docker/linux.
     const [command, ...args] = process.env.EXAMPLE_SERVER.split(' ');
+    if (command === 'php') {
+      // Laravel's `artisan serve` command doesn't pick up `PORT` environmental variables, instead
+      // requiring that they're supplied as a command line argument.
+      args.push(`--port=${PORT}`);
+    }
 
     httpServer = spawn(command, args, {
       cwd: cwd(),
+      detached: true,
       env: {
         PORT,
         METRICS_SERVER: new URL(`http://${address}:${port}`).toString(),
@@ -83,30 +90,41 @@ describe('Metrics SDK Integration Tests', () => {
         ...process.env,
       },
     });
+
+    // Uncomment the console.log lines to see stdout/stderr output from the child process
     return new Promise((resolve, reject) => {
       httpServer.stderr.on('data', data => {
-        // For some reason Flask prints on stderr 🤷‍♂️
-        if (data.toString().match(/Running on/)) return resolve();
-        // eslint-disable-next-line no-console
-        console.error(`stderr: ${data}`);
+        if (data.toString().match(/Running on/)) return resolve(); // For some reason Flask prints on stderr 🤷‍♂️
+        // // eslint-disable-next-line no-console
+        // console.error(`stderr: ${data}`);
         return reject(data.toString());
       });
       httpServer.on('error', err => {
-        // eslint-disable-next-line no-console
-        console.error('error', err);
+        // // eslint-disable-next-line no-console
+        // console.error('error', err);
         return reject(err.toString());
       });
       // eslint-disable-next-line consistent-return
       httpServer.stdout.on('data', data => {
         if (data.toString().match(/listening/)) return resolve();
-        // eslint-disable-next-line no-console
-        console.log(`stdout: ${data}`);
+        if (data.toString().match(/Server running on/)) return resolve(); // Laravel
+        // // eslint-disable-next-line no-console
+        // console.log(`stdout: ${data}`);
       });
     });
   });
 
   afterAll(() => {
-    httpServer.kill();
+    /**
+     * Instead of running `httpServer.kill()` we need to dust the process group that was created
+     * because some languages and frameworks (like Laravel's Artisan server) fire off a sub-process
+     * that doesn't get normally cleaned up when we kill the original `php artisan serve` process.
+     *
+     * @see {@link https://stackoverflow.com/questions/56016550/node-js-cannot-kill-process-executed-with-child-process-exec/56016815#56016815}
+     * @see {@link https://www.baeldung.com/linux/kill-members-process-group#killing-a-process-using-the-pgid}
+     */
+    process.kill(-httpServer.pid);
+
     return new Promise((resolve, reject) => {
       metricsServer.close(err => {
         if (err) return reject(err);
@@ -142,17 +160,20 @@ describe('Metrics SDK Integration Tests', () => {
 
     const { request, response, startedDateTime } = har.request.log.entries[0];
 
-    // It should look like this, with optional microseconds component:
-    // JavaScript: new Date.toISOString()
-    // - 2022-06-30T10:21:55.394Z
-    // Python: datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-    // - 2022-06-30T10:31:43Z
-    // TODO I'm not sure how to make this regex "safe", it has something to do
-    // with the optional non-capturing group at the end: (?:.\d{3})?
-    // eslint-disable-next-line unicorn/no-unsafe-regex
+    /**
+     * `startedDateTime` should look like the following, with optional microseconds component:
+     *
+     *  JavaScript: `new Date.toISOString()`
+     *    - 2022-06-30T10:21:55.394Z
+     *  PHP: `date('Y-m-d\TH:i:sp')`
+     *    - 2022-08-17T19:23:31Z
+     *  Python: `datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")`
+     *    - 2022-06-30T10:31:43Z
+     */
     expect(startedDateTime).toMatch(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:.\d{3})?Z/);
 
-    expect(request.url).toBe(`http://localhost:${PORT}/`);
+    // Some frameworks remove the trailing slash from the URL we get.
+    expect(request.url).toMatch(new RegExp(`http://localhost:${PORT}(/)?`));
     expect(request.method).toBe('GET');
     expect(request.httpVersion).toBe('HTTP/1.1');
 
@@ -167,9 +188,9 @@ describe('Metrics SDK Integration Tests', () => {
     expect(response.content.text.replace('\n', '')).toBe(JSON.stringify({ message: 'hello world' }));
     // The \n character above means we cannot compare to a fixed number
     expect(response.content.size).toStrictEqual(response.content.text.length);
-    expect(response.content.mimeType).toBe('application/json; charset=utf-8');
+    expect(response.content.mimeType).toMatch(/application\/json(;\s?charset=utf-8)?/);
 
     const responseHeaders = caseless(arrayToObject(response.headers));
-    expect(responseHeaders.get('content-type')).toBe('application/json; charset=utf-8');
+    expect(responseHeaders.get('content-type')).toMatch(/application\/json(;\s?charset=utf-8)?/);
   });
 });

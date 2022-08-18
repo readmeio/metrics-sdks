@@ -4,6 +4,7 @@ import type { Merge } from 'type-fest';
 
 import { dotnet } from './dotnet/target';
 import { node } from './node/target';
+import { php } from './php/target';
 
 export type TargetId = keyof typeof targets;
 export type SnippetType = 'webhooks' | 'server';
@@ -56,6 +57,7 @@ export interface Target {
 }
 
 export const targets = {
-  node,
   dotnet,
+  node,
+  php,
 };
