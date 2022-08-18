@@ -1,33 +1,33 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace ReadMe.HarJsonObjectModels
 {
   class RequestProcessor
   {
-    private readonly HttpRequest _request;
-    private readonly ConfigValues _configValues;
+    private readonly HttpRequest request;
+    private readonly ConfigValues configValues;
 
     public RequestProcessor(HttpRequest request, ConfigValues configValues)
     {
-      _request = request;
-      _configValues = configValues;
+      this.request = request;
+      this.configValues = configValues;
     }
 
     public async Task<Request> ProcessRequest()
     {
       Request requestObj = new Request();
-      requestObj.headers = GetHeaders();
-      requestObj.headersSize = GetHeadersSize();
-      requestObj.queryString = GetQueryStrings();
-      requestObj.cookies = GetCookies();
-      requestObj.method = _request.Method;
-      requestObj.url = _request.Scheme + "://" + _request.Host.Host + ":" + _request.Host.Port + "" + _request.Path;
-      requestObj.httpVersion = _request.Protocol;
-      requestObj.postData = await GetPostData();
+      requestObj.headers = this.GetHeaders();
+      requestObj.headersSize = this.GetHeadersSize();
+      requestObj.queryString = this.GetQueryStrings();
+      requestObj.cookies = this.GetCookies();
+      requestObj.method = this.request.Method;
+      requestObj.url = this.request.Scheme + "://" + this.request.Host.Host + ":" + this.request.Host.Port + this.request.Path;
+      requestObj.httpVersion = this.request.Protocol;
+      requestObj.postData = await this.GetPostData();
 
       return requestObj;
     }
@@ -35,83 +35,92 @@ namespace ReadMe.HarJsonObjectModels
     private async Task<PostData> GetPostData()
     {
       PostData postData = new PostData();
-      postData.mimeType = _request.ContentType;
-      if (_request.ContentType == "application/x-www-form-urlencoded")
+      postData.mimeType = this.request.ContentType;
+      if (this.request.ContentType == "application/x-www-form-urlencoded")
       {
         List<Params> @params = new List<Params>();
-        if (_request.Form.Keys.Count > 0)
+        if (this.request.Form.Keys.Count > 0)
         {
-          foreach (string key in _request.Form.Keys)
+          foreach (string key in this.request.Form.Keys)
           {
-            if (!_configValues.options.isAllowListEmpty)
+            if (!this.configValues.options.isAllowListEmpty)
             {
-              if (CheckAllowList(key))
+              if (this.CheckAllowList(key))
               {
-                @params.Add(new Params { name = key, value = _request.Form[key] });
+                @params.Add(new Params { name = key, value = this.request.Form[key] });
               }
             }
-            else if (!_configValues.options.isDenyListEmpty)
+            else if (!this.configValues.options.isDenyListEmpty)
             {
-              if (!CheckDenyList(key))
+              if (!this.CheckDenyList(key))
               {
-                @params.Add(new Params { name = key, value = _request.Form[key] });
+                @params.Add(new Params { name = key, value = this.request.Form[key] });
               }
             }
             else
             {
-              @params.Add(new Params { name = key, value = _request.Form[key] });
+              @params.Add(new Params { name = key, value = this.request.Form[key] });
             }
           }
         }
+
         postData.@params = @params;
       }
-      else if (_request.HasFormContentType)
+      else if (this.request.HasFormContentType)
       {
         List<Params> @params = new List<Params>();
-        if (_request.Form.Keys.Count > 0)
+        if (this.request.Form.Keys.Count > 0)
         {
-          foreach (string key in _request.Form.Keys)
+          foreach (string key in this.request.Form.Keys)
           {
-            if (!_configValues.options.isAllowListEmpty)
+            if (!this.configValues.options.isAllowListEmpty)
             {
-              if (CheckAllowList(key))
+              if (this.CheckAllowList(key))
               {
-                @params.Add(new Params { name = key, value = _request.Form[key] });
+                @params.Add(new Params { name = key, value = this.request.Form[key] });
               }
             }
-            else if (!_configValues.options.isDenyListEmpty)
+            else if (!this.configValues.options.isDenyListEmpty)
             {
-              if (!CheckDenyList(key))
+              if (!this.CheckDenyList(key))
               {
-                @params.Add(new Params { name = key, value = _request.Form[key] });
+                @params.Add(new Params { name = key, value = this.request.Form[key] });
               }
             }
             else
             {
-              @params.Add(new Params { name = key, value = _request.Form[key] });
+              @params.Add(new Params { name = key, value = this.request.Form[key] });
             }
           }
         }
+
         postData.@params = @params;
       }
-      else if (_request.ContentType != null)
+      else if (this.request.ContentType != null)
       {
-        postData.text = await GetRequestBodyData();
+        postData.text = await this.GetRequestBodyData();
       }
+
       return postData;
     }
 
-    private bool CheckAllowList(string key) => (_configValues.options.allowList.Any(v => v.Trim().ToLower() == key.Trim().ToLower())) ? true : false;
-    private bool CheckDenyList(string key) => (_configValues.options.denyList.Any(v => v.Trim().ToLower() == key.Trim().ToLower())) ? true : false;
+    private bool CheckAllowList(string key)
+    {
+      return this.configValues.options.allowList.Any(v => v.Trim().ToLower() == key.Trim().ToLower()) ? true : false;
+    }
 
+    private bool CheckDenyList(string key)
+    {
+      return this.configValues.options.denyList.Any(v => v.Trim().ToLower() == key.Trim().ToLower()) ? true : false;
+    }
 
     private async Task<string> GetRequestBodyData()
     {
       try
       {
-        StreamReader requestBodyReader = new StreamReader(_request.Body);
+        StreamReader requestBodyReader = new StreamReader(this.request.Body);
         string requestBodyData = await requestBodyReader.ReadToEndAsync();
-        _request.Body.Position = 0;
+        this.request.Body.Position = 0;
         return requestBodyData;
       }
       catch (System.Exception)
@@ -119,17 +128,17 @@ namespace ReadMe.HarJsonObjectModels
         return null;
       }
     }
+
     private List<Headers> GetHeaders()
     {
       List<Headers> headers = new List<Headers>();
-      if (_request.Headers.Count > 0)
+      if (this.request.Headers.Count > 0)
       {
-        foreach (var reqHeader in _request.Headers)
+        foreach (var reqHeader in this.request.Headers)
         {
-
-          if (!_configValues.options.isAllowListEmpty)
+          if (!this.configValues.options.isAllowListEmpty)
           {
-            if (CheckAllowList(reqHeader.Key))
+            if (this.CheckAllowList(reqHeader.Key))
             {
               Headers header = new Headers();
               header.name = reqHeader.Key;
@@ -137,9 +146,9 @@ namespace ReadMe.HarJsonObjectModels
               headers.Add(header);
             }
           }
-          else if (!_configValues.options.isDenyListEmpty)
+          else if (!this.configValues.options.isDenyListEmpty)
           {
-            if (!CheckDenyList(reqHeader.Key))
+            if (!this.CheckDenyList(reqHeader.Key))
             {
               Headers header = new Headers();
               header.name = reqHeader.Key;
@@ -156,31 +165,35 @@ namespace ReadMe.HarJsonObjectModels
           }
         }
       }
+
       return headers;
     }
+
     private long GetHeadersSize()
     {
       long headersSize = 0;
-      if (_request.Headers.Count > 0)
+      if (this.request.Headers.Count > 0)
       {
-        foreach (var reqHeader in _request.Headers)
+        foreach (var reqHeader in this.request.Headers)
         {
           headersSize += reqHeader.Value.ToString().Length;
         }
       }
+
       return headersSize;
     }
+
     private List<QueryStrings> GetQueryStrings()
     {
       List<QueryStrings> queryStrings = new List<QueryStrings>();
-      if (_request.Query.Count > 0)
+      if (this.request.Query.Count > 0)
       {
-        var queryStings = _request.Query;
+        var queryStings = this.request.Query;
         foreach (var qs in queryStings)
         {
-          if (!_configValues.options.isAllowListEmpty)
+          if (!this.configValues.options.isAllowListEmpty)
           {
-            if (CheckAllowList(qs.Key))
+            if (this.CheckAllowList(qs.Key))
             {
               QueryStrings qString = new QueryStrings();
               qString.name = qs.Key;
@@ -188,9 +201,9 @@ namespace ReadMe.HarJsonObjectModels
               queryStrings.Add(qString);
             }
           }
-          else if (!_configValues.options.isDenyListEmpty)
+          else if (!this.configValues.options.isDenyListEmpty)
           {
-            if (!CheckDenyList(qs.Key))
+            if (!this.CheckDenyList(qs.Key))
             {
               QueryStrings qString = new QueryStrings();
               qString.name = qs.Key;
@@ -207,14 +220,16 @@ namespace ReadMe.HarJsonObjectModels
           }
         }
       }
+
       return queryStrings;
     }
+
     private List<Cookies> GetCookies()
     {
       List<Cookies> cookies = new List<Cookies>();
-      if (_request.Cookies.Count > 0)
+      if (this.request.Cookies.Count > 0)
       {
-        foreach (var reqCookie in _request.Cookies)
+        foreach (var reqCookie in this.request.Cookies)
         {
           Cookies cookie = new Cookies();
           cookie.name = reqCookie.Key;
@@ -222,8 +237,8 @@ namespace ReadMe.HarJsonObjectModels
           cookies.Add(cookie);
         }
       }
+
       return cookies;
     }
-
   }
 }

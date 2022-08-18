@@ -1,26 +1,14 @@
 import type { LogOptions, PayloadData } from '../../src/lib/construct-payload';
 
 import * as http from 'http';
+import os from 'os';
 import * as qs from 'querystring';
 
 import { isValidUUIDV4 } from 'is-valid-uuid-v4';
 import request from 'supertest';
 
-import packageJson from '../../package.json';
+import pkg from '../../package.json';
 import { constructPayload } from '../../src/lib/construct-payload';
-
-function fixPlatform(platform: string): 'mac' | 'windows' | 'linux' | 'unknown' {
-  switch (platform) {
-    case 'darwin':
-      return 'mac';
-    case 'win32':
-      return 'windows';
-    case 'linux':
-      return 'linux';
-    default:
-      return 'unknown';
-  }
-}
 
 function createApp(options?: LogOptions, payloadData?: PayloadData) {
   const requestListener = function (req: http.IncomingMessage, res: http.ServerResponse) {
@@ -105,9 +93,9 @@ describe('constructPayload()', () => {
       .post('/')
       .expect(({ body }) => {
         expect(body.request.log.creator).toStrictEqual({
-          name: packageJson.name,
-          version: packageJson.version,
-          comment: `${fixPlatform(process.platform)}/${process.version}`,
+          name: 'readme-metrics (node)',
+          version: pkg.version,
+          comment: `${os.arch()}-${os.platform()}${os.release()}/${process.versions.node}`,
         });
       }));
 

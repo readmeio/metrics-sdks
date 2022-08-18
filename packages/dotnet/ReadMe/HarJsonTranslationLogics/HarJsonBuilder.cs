@@ -1,42 +1,42 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using ReadMe.HarJsonObjectModels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using ReadMe.HarJsonObjectModels;
 
 namespace ReadMe.HarJsonTranslationLogics
 {
   public class HarJsonBuilder
   {
-    private readonly RequestDelegate _next;
-    private readonly HttpContext _context;
-    private readonly DateTime _startDateTime;
-    private readonly IConfiguration _configuration;
-    ConfigValues _configValues;
+    private readonly RequestDelegate next;
+    private readonly HttpContext context;
+    private readonly DateTime startDateTime;
+    private readonly IConfiguration configuration;
+    ConfigValues configValues;
     string guid = null;
 
     public HarJsonBuilder(RequestDelegate next, HttpContext context, IConfiguration configuration, ConfigValues configValues)
     {
-      _next = next;
-      _context = context;
-      _startDateTime = DateTime.UtcNow;
-      _configuration = configuration;
-      _configValues = configValues;
+      this.next = next;
+      this.context = context;
+      this.startDateTime = DateTime.UtcNow;
+      this.configuration = configuration;
+      this.configValues = configValues;
     }
 
     public async Task<string> BuildHar()
     {
       Root harObj = new Root();
       harObj._id = Guid.NewGuid().ToString();
-      guid = harObj._id;
-      harObj.development = _configValues.options.development;
-      harObj.clientIPAddress = _context.Connection.RemoteIpAddress.ToString();
-      harObj.group = BuildGroup();
-      harObj.request = new RequestMain(await BuildLog());
+      this.guid = harObj._id;
+      harObj.development = this.configValues.options.development;
+      harObj.clientIPAddress = this.context.Connection.RemoteIpAddress.ToString();
+      harObj.group = this.BuildGroup();
+      harObj.request = new RequestMain(await this.BuildLog());
       string harJsonObj = JsonConvert.SerializeObject(new List<Root>() { harObj });
       return harJsonObj;
     }
@@ -44,17 +44,17 @@ namespace ReadMe.HarJsonTranslationLogics
     private Group BuildGroup()
     {
       Group group = new Group();
-      group.id = _configValues.group.id;
-      group.label = _configValues.group.label;
-      group.email = _configValues.group.email;
+      group.id = this.configValues.group.id;
+      group.label = this.configValues.group.label;
+      group.email = this.configValues.group.email;
       return group;
     }
 
     private async Task<Log> BuildLog()
     {
       Log log = new Log();
-      log.creator = BuildCreator();
-      log.entries = await BuildEntries();
+      log.creator = this.BuildCreator();
+      log.entries = await this.BuildEntries();
       return log;
     }
 
@@ -63,15 +63,15 @@ namespace ReadMe.HarJsonTranslationLogics
       List<Entries> entries = new List<Entries>();
 
       Entries entry = new Entries();
-      //entry.pageref = _configValues.options.baseLogUrl + "/users/" + guid;
-      entry.pageref = _context.Request.Scheme + "://" + _context.Request.Host.Host + ":" + _context.Request.Host.Port + "" + _context.Request.Path;
-      entry.startedDateTime = _startDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
+      entry.pageref = this.context.Request.Scheme + "://" + this.context.Request.Host.Host + ":" + this.context.Request.Host.Port + this.context.Request.Path;
+      entry.startedDateTime = this.startDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
       entry.cache = null;
-      entry.timing = new Timing { wait = ConstValues.wait, receive = ConstValues.receive };
-      RequestProcessor requestProcessor = new RequestProcessor(_context.Request, _configValues);
+      entry.timing = new Timing { wait = ConstValues.Wait, receive = ConstValues.Receive };
+
+      RequestProcessor requestProcessor = new RequestProcessor(this.context.Request, this.configValues);
       entry.request = await requestProcessor.ProcessRequest();
-      entry.response = await BuildResponse();
-      entry.time = (int)DateTime.UtcNow.Subtract(_startDateTime).TotalMilliseconds;
+      entry.response = await this.BuildResponse();
+      entry.time = (int)DateTime.UtcNow.Subtract(this.startDateTime).TotalMilliseconds;
 
       entries.Add(entry);
       return entries;
@@ -81,54 +81,40 @@ namespace ReadMe.HarJsonTranslationLogics
     {
       Response response = null;
 
-      var originalBodyStream = _context.Response.Body;
+      var originalBodyStream = this.context.Response.Body;
       using (var responseBody = new MemoryStream())
       {
-        _context.Response.Body = responseBody;
+        this.context.Response.Body = responseBody;
 
-        await _next.Invoke(_context);
+        await this.next.Invoke(this.context);
 
-        string responseBodyData = await ProcessResponseBody(_context);
-        _context.Response.Headers.Add("x-documentation-url", _configValues.options.baseLogUrl + "/logs/" + guid);
-        ResponseProcessor responseProcessor = new ResponseProcessor(_context.Response, responseBodyData, _configValues);
+        string responseBodyData = await this.ProcessResponseBody(this.context);
+        this.context.Response.Headers.Add("x-documentation-url", this.configValues.options.baseLogUrl + "/logs/" + this.guid);
+        ResponseProcessor responseProcessor = new ResponseProcessor(this.context.Response, responseBodyData, this.configValues);
         response = responseProcessor.ProcessResponse();
 
         await responseBody.CopyToAsync(originalBodyStream);
       }
+
       return response;
     }
 
     private Creator BuildCreator()
     {
       Creator creator = new Creator();
-      creator.name = ConstValues.name;
-      creator.version = ConstValues.version;
-      creator.comment = GetOS();
+      creator.name = "readme-metrics (dotnet)";
+      creator.version = ConstValues.Version;
+      creator.comment = this.GetCreatorVersion();
       return creator;
     }
-    private string GetOS()
-    {
-      string os = null;
-      if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-      {
-        os = "windows";
-      }
-      else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-      {
-        os = "mac";
-      }
-      else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-      {
-        os = "linux";
-      }
-      else
-      {
-        os = "unknown";
-      }
-      os = os + "/" + Environment.OSVersion.Version;
-      return os;
-    }
 
+    /**
+     * @example x86-win32nt/6.2.9200.0
+     */
+    private string GetCreatorVersion()
+    {
+      return RuntimeInformation.OSArchitecture + "-" + Environment.OSVersion.Platform + "/" + Environment.OSVersion.Version;
+    }
 
     private async Task<string> ProcessResponseBody(HttpContext context)
     {
@@ -145,9 +131,5 @@ namespace ReadMe.HarJsonTranslationLogics
         return null;
       }
     }
-
-
   }
-
-
 }

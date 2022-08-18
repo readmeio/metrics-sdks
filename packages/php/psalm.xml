@@ -8,7 +8,10 @@
 >
     <projectFiles>
         <directory name="src" />
-        <ignoreFiles>
+        <ignoreFiles allowMissingFiles="true">
+            <directory name="examples/laravel/bootstrap/cache" />
+            <directory name="examples/laravel/storage" />
+            <directory name="examples/laravel/vendor" />
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>

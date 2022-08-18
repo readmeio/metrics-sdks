@@ -1,9 +1,9 @@
-using Microsoft.Extensions.Primitives;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
-using static System.Text.Encoding;
 using System.Text;
+using Microsoft.Extensions.Primitives;
+using static System.Text.Encoding;
 
 namespace ReadMe
 {

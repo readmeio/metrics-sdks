@@ -3,6 +3,7 @@ import type { CodeBuilder } from '../helpers/code-builder';
 import type { Merge } from 'type-fest';
 
 import { node } from './node/target';
+import { php } from './php/target';
 
 export type TargetId = keyof typeof targets;
 export type SnippetType = 'webhooks' | 'server';
@@ -56,4 +57,5 @@ export interface Target {
 
 export const targets = {
   node,
+  php,
 };
