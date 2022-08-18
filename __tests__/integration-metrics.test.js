@@ -94,8 +94,7 @@ describe('Metrics SDK Integration Tests', () => {
     // Uncomment the console.log lines to see stdout/stderr output from the child process
     return new Promise((resolve, reject) => {
       httpServer.stderr.on('data', data => {
-        // For some reason Flask prints on stderr 🤷‍♂️
-        if (data.toString().match(/Running on/)) return resolve();
+        if (data.toString().match(/Running on/)) return resolve(); // For some reason Flask prints on stderr 🤷‍♂️
         // // eslint-disable-next-line no-console
         // console.error(`stderr: ${data}`);
         return reject(data.toString());
