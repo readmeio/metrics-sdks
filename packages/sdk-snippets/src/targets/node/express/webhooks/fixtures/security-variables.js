@@ -7,7 +7,7 @@ const app = express();
 const secret = 'my-readme-secret';
 
 app.post('/webhook', express.json({ type: 'application/json' }), async (req, res) => {
-  // Verify the request is legitimate and came from ReadMe
+  // Verify the request is legitimate and came from ReadMe.
   const signature = req.headers['readme-signature'];
 
   try {

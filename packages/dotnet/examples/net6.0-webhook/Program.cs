@@ -2,8 +2,9 @@ var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
 var port = Environment.GetEnvironmentVariable("PORT") ?? "4000";
-var secret = Environment.GetEnvironmentVariable("README_API_KEY");
 
+// Your ReadMe secret
+var secret = Environment.GetEnvironmentVariable("README_API_KEY");
 if (secret == null)
 {
   Console.Error.WriteLine("Missing `README_API_KEY` environment variable");
@@ -12,6 +13,7 @@ if (secret == null)
 
 app.MapPost("/webhook", async context =>
 {
+  // Verify the request is legitimate and came from ReadMe.
   var signature = context.Request.Headers["readme-signature"];
   var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
 
@@ -28,6 +30,9 @@ app.MapPost("/webhook", async context =>
     });
     return;
   }
+
+  // Fetch the user from the database and return their data for use with OpenAPI variables.
+  // @todo Write your own query logic to fetch a user by `body["email"]`.
 
   await context.Response.WriteAsJsonAsync(new
   {

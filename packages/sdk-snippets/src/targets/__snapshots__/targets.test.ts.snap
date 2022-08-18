@@ -6,12 +6,12 @@ exports[`webhooks .NET snippet generation net6 request should match fixture for 
 Object {
   "security": Object {
     "petstore_auth": Object {
-      "line": 31,
+      "line": 36,
     },
   },
   "server": Object {
     "name": Object {
-      "line": 28,
+      "line": 33,
     },
   },
 }
@@ -21,18 +21,18 @@ exports[`webhooks .NET snippet generation net6 request should match fixture for 
 Object {
   "security": Object {
     "basic_auth": Object {
-      "line": 33,
+      "line": 38,
     },
     "petstore_auth": Object {
-      "line": 32,
+      "line": 37,
     },
   },
   "server": Object {
     "name": Object {
-      "line": 28,
+      "line": 33,
     },
     "port": Object {
-      "line": 29,
+      "line": 34,
     },
   },
 }
@@ -42,16 +42,16 @@ exports[`webhooks .NET snippet generation net6 request should match fixture for 
 Object {
   "security": Object {
     "api_key": Object {
-      "line": 28,
+      "line": 33,
     },
     "http_basic": Object {
-      "line": 29,
+      "line": 34,
     },
     "http_bearer": Object {
-      "line": 30,
+      "line": 35,
     },
     "oauth2": Object {
-      "line": 31,
+      "line": 36,
     },
   },
 }
@@ -61,10 +61,10 @@ exports[`webhooks .NET snippet generation net6 request should match fixture for 
 Object {
   "security": Object {
     "basic_auth": Object {
-      "line": 29,
+      "line": 34,
     },
     "petstore_auth": Object {
-      "line": 28,
+      "line": 33,
     },
   },
 }
@@ -74,10 +74,10 @@ exports[`webhooks .NET snippet generation net6 request should match fixture for 
 Object {
   "server": Object {
     "name": Object {
-      "line": 28,
+      "line": 33,
     },
     "port": Object {
-      "line": 29,
+      "line": 34,
     },
   },
 }

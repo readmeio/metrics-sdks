@@ -16,7 +16,7 @@ secret = "my-readme-secret"
 
 @app.post("/webhook")
 def webhook():
-    # Verify the request is legitimate and came from ReadMe
+    # Verify the request is legitimate and came from ReadMe.
     signature = request.headers.get("readme-signature", None)
 
     try:

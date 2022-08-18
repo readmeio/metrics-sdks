@@ -30,7 +30,7 @@ export const express: Client = {
     blank();
 
     push("app.post('/webhook', express.json({ type: 'application/json' }), async (req, res) => {");
-    push('// Verify the request is legitimate and came from ReadMe', 1);
+    push('// Verify the request is legitimate and came from ReadMe.', 1);
     push("const signature = req.headers['readme-signature'];", 1);
     blank();
 
