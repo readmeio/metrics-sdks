@@ -55,6 +55,7 @@ describe('Metrics SDK Webhook Integration Tests', () => {
 
     httpServer = spawn(command, args, {
       cwd: cwd(),
+      detached: true,
       env: {
         README_API_KEY: randomApiKey,
         PORT,
@@ -87,24 +88,14 @@ describe('Metrics SDK Webhook Integration Tests', () => {
 
   afterAll(() => {
     /**
-     * There's a fun quirk with Laravel's Artisan web server where when you spawn it it also spawns
-     * another thread that components of the web server. When we kill the main Artisan process
-     * we've created here that kills the main Artisan process, and frees up the address:port it was
-     * bound to but it unfortunately doesn't clean up the sub-thread.
+     * Instead of running `httpServer.kill()` we need to dust the process group that was created
+     * because some languages and frameworks (like Laravel's Artisan server) fire off a sub-process
+     * that doesn't get normally cleaned up when we kill the original `php artisan serve` process.
      *
-     * Annoyingly sending CTRL+C when you run `php artisan serve` by itself cleans up this process
-     * but sending `proc.kill('SIGINT')` (and neither `SIGTERM`) doesn't. The only way we can clean
-     * up this orphan process is to look for the process by querying the system for its parent
-     * thread and then manually invoking a `kill` command to dust it.
+     * @see {@link https://stackoverflow.com/questions/56016550/node-js-cannot-kill-process-executed-with-child-process-exec/56016815#56016815}
+     * @see {@link https://www.baeldung.com/linux/kill-members-process-group#killing-a-process-using-the-pgid}
      */
-    if (httpServer.spawnargs.includes('php')) {
-      const pid = execSync(`pgrep -P ${httpServer.pid}`);
-      if (pid) {
-        execSync(`kill -9 ${pid}`);
-      }
-    }
-
-    return httpServer.kill();
+    process.kill(-httpServer.pid);
   });
 
   it('should return with a user object if the signature is correct', async () => {
