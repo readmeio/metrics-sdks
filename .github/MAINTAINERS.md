@@ -125,6 +125,7 @@ To build a Metrics integration test server, you must write an HTTP server that d
 
 - The HTTP server should use the `README_API_KEY` environment variable as the API key to authenticate against Metrics.
 - The Metrics SDK you are using should accept a `METRICS_SERVER` environment variable which controls where the request data gets sent to.
+- When the HTTP server is up and ready to accept connections, your server must output a message to stdout including the word "listening". If this is not configurable, you can add another match to the test (Examples: [here](https://github.com/readmeio/metrics-sdks/blob/14448d8a36622fa15309a79b3889f9d804bd98bc/__tests__/integration-metrics.test.js#L89) (Flask prints "Running on" to stderr) and [here](https://github.com/readmeio/metrics-sdks/blob/14448d8a36622fa15309a79b3889f9d804bd98bc/__tests__/integration-metrics.test.js#L101) (Express outputs "Listening" on stdout))
 
 You can view the Node.js/Express example server here for additional guidance and example: [packages/node/examples/express/index.js](https://github.com/readmeio/metrics-sdks/blob/main/packages/node/examples/express/index.js)
 
@@ -168,6 +169,7 @@ To build a Webhooks integration test server, you must write an HTTP server that 
   - If the signature passes validation, it should respond with a 200 status code, and a JSON response body of `{ "petstore_auth": "default-key", "basic_auth": { user: "user", pass: "pass" } }`
 
 - The HTTP server should use the `README_API_KEY` environment variable as the secret to validate the Webhook signature.
+- When the HTTP server is up and ready to accept connections, your server must output a message to stdout including the word "listening". If this is not configurable, you can add another match to the test (Examples: [here](https://github.com/readmeio/metrics-sdks/blob/14448d8a36622fa15309a79b3889f9d804bd98bc/__tests__/integration-webhooks.test.js#L62) (Flask prints "Running on" to stderr) and [here](https://github.com/readmeio/metrics-sdks/blob/14448d8a36622fa15309a79b3889f9d804bd98bc/__tests__/integration-webhooks.test.js#L74) (Express outputs "Listening" on stdout))
 
 You can view the Node.js/Express example server here for additional guidance and example: [packages/node/examples/express/webhook.js](https://github.com/readmeio/metrics-sdks/blob/main/packages/node/examples/express/webhook.js)
 
