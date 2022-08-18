@@ -255,12 +255,12 @@ exports[`webhooks Python snippet generation flask request should match fixture f
 Object {
   "security": Object {
     "petstore_auth": Object {
-      "line": 37,
+      "line": 39,
     },
   },
   "server": Object {
     "name": Object {
-      "line": 34,
+      "line": 36,
     },
   },
 }
@@ -270,18 +270,18 @@ exports[`webhooks Python snippet generation flask request should match fixture f
 Object {
   "security": Object {
     "basic_auth": Object {
-      "line": 39,
+      "line": 41,
     },
     "petstore_auth": Object {
-      "line": 38,
+      "line": 40,
     },
   },
   "server": Object {
     "name": Object {
-      "line": 34,
+      "line": 36,
     },
     "port": Object {
-      "line": 35,
+      "line": 37,
     },
   },
 }
@@ -291,16 +291,16 @@ exports[`webhooks Python snippet generation flask request should match fixture f
 Object {
   "security": Object {
     "api_key": Object {
-      "line": 34,
-    },
-    "http_basic": Object {
-      "line": 35,
-    },
-    "http_bearer": Object {
       "line": 36,
     },
-    "oauth2": Object {
+    "http_basic": Object {
       "line": 37,
+    },
+    "http_bearer": Object {
+      "line": 38,
+    },
+    "oauth2": Object {
+      "line": 39,
     },
   },
 }
@@ -310,10 +310,10 @@ exports[`webhooks Python snippet generation flask request should match fixture f
 Object {
   "security": Object {
     "basic_auth": Object {
-      "line": 35,
+      "line": 37,
     },
     "petstore_auth": Object {
-      "line": 34,
+      "line": 36,
     },
   },
 }
@@ -323,10 +323,10 @@ exports[`webhooks Python snippet generation flask request should match fixture f
 Object {
   "server": Object {
     "name": Object {
-      "line": 34,
+      "line": 36,
     },
     "port": Object {
-      "line": 35,
+      "line": 37,
     },
   },
 }
