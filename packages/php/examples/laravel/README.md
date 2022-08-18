@@ -9,13 +9,13 @@ composer install
 ### Run
 
 ```sh
-README_API_KEY=<Your ReadMe API Key here> npm run start:metrics
+README_API_KEY=<Your ReadMe API Key here> php artisan serve
 ```
 
 ### Test
 
 ```sh
-curl http://localhost:4000
+curl http://localhost:8000
 ```
 
 ## 📞 Webhooks
@@ -23,7 +23,7 @@ curl http://localhost:4000
 ### Run
 
 ```sh
-README_API_KEY=<Your ReadMe API Key here> npm run start:webhook
+README_API_KEY=<Your ReadMe API Key here> php artisan serve
 ```
 
 ### Test
@@ -37,7 +37,7 @@ UNSIGNED=$TIME.{\"email\":\"test@example.com\"}
 HMAC=$(echo -n $UNSIGNED | openssl dgst -sha256 -hmac $README_API_KEY -hex)
 SIGNATURE="t=$TIME,v0=$HMAC"
 
-curl http://localhost:4000/webhook \
+curl http://localhost:8000/webhook \
   -H "readme-signature: $SIGNATURE" \
   -H "content-type: application/json" \
   -d '{"email":"test@example.com"}'
