@@ -65,6 +65,14 @@ services:
     environment:
       - EXAMPLE_SERVER=php packages/php/examples/laravel/artisan serve
 
+  integration_webhooks_php_laravel:
+    build:
+      context: .
+      dockerfile: ./__tests__/integrations/php.Dockerfile
+    command: npm run test:integration-webhooks
+    environment:
+      - EXAMPLE_SERVER=php packages/php/examples/laravel/artisan serve
+
   #
   # Python
   #

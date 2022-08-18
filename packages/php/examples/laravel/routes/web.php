@@ -27,7 +27,7 @@ Route::post('/webhook', function (\Illuminate\Http\Request $request) {
     $secret = env('README_API_KEY', config('readme.api_key'));
 
     try {
-        \ReadMe\Metrics::verifyWebhook($request->input(), $signature, $secret);
+        \ReadMe\Webhooks::verify($request->input(), $signature, $secret);
     } catch (\Exception $e) {
         // Handle invalid requests
         return response()->json([
