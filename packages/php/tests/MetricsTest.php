@@ -258,6 +258,70 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @group verifyWebhook
+     */
+    public function testVerifyWebhook(): void
+    {
+        $body = ['email' => 'marc@readme.io'];
+        $secret = 'docs4dayz';
+        $time = time();
+        $unsigned = $time . json_encode($body);
+        $signature = 't=' . $time . ',v0=' . hash_hmac('sha256', $unsigned, $secret);
+
+        $verifiedBody = Metrics::verifyWebhook($body, $signature, $secret);
+        $this->assertSame($body, $verifiedBody);
+    }
+
+    /**
+     * @group verifyWebhook
+     */
+    public function testVerifyWebhookFailsIfSignatureIsInvalid(): void
+    {
+        $this->expectException(MetricsException::class);
+        $this->expectExceptionMessage('Invalid Signature');
+
+        $body = ['email' => 'marc@readme.io'];
+        $secret = 'docs4dayz';
+        $time = time();
+        $unsigned = $time . json_encode($body);
+        $signature = 't=' . $time . ',v0=' . hash_hmac('sha256', $unsigned, 'invalidsecret');
+
+        Metrics::verifyWebhook($body, $signature, $secret);
+    }
+
+    /**
+     * @group verifyWebhook
+     */
+    public function testVerifyWEbhookFailsIfTimestampIsTooOld(): void
+    {
+        $this->expectException(MetricsException::class);
+        $this->expectExceptionMessage('Expired Signature');
+
+        $body = ['email' => 'marc@readme.io'];
+        $secret = 'docs4dayz';
+        $time = strtotime('-1 hour');
+        $unsigned = $time . json_encode($body);
+        $signature = 't=' . $time . ',v0=' . hash_hmac('sha256', $unsigned, $secret);
+
+        Metrics::verifyWebhook($body, $signature, $secret);
+    }
+
+    /**
+     * @group verifyWebhook
+     */
+    public function testVerifyWebhookFailsIfSignatureIsMissing(): void
+    {
+        $this->expectException(MetricsException::class);
+        $this->expectExceptionMessage('Missing Signature');
+
+        $body = ['email' => 'marc@readme.io'];
+        $secret = 'docs4dayz';
+        $signature = '';
+
+        Metrics::verifyWebhook($body, $signature, $secret);
+    }
+
+    /**
      * @group constructPayload
      */
     public function testConstructPayload(): void
