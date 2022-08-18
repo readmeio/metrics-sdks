@@ -58,7 +58,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
     private Metrics $metrics;
 
-    /** @var string|class-string */
+    /** @var class-string|string */
     private $group_handler = TestHandler::class;
 
     private array $api_calls = [];
@@ -161,8 +161,8 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             ]
         ], $actual_payload['request']['log']['entries'][0]['request']);
 
-        // Make sure that our x-readme-log header ended up being logged as a response header in the
-        // metrics request.
+        // Make sure that our `x-readme-log` header ended up being logged as a response header in
+        // the metrics request.
         $response_headers = $actual_payload['request']['log']['entries'][0]['response']['headers'];
         $readme_log_header = array_filter($response_headers, function ($header) {
             return $header['name'] === 'x-documentation-url';
