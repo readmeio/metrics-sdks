@@ -1,4 +1,4 @@
-import { execSync, spawn } from 'child_process';
+import { spawn } from 'child_process';
 import crypto from 'crypto';
 import http from 'http';
 import { cwd } from 'process';

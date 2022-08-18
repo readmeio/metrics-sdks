@@ -71,6 +71,10 @@ describe('webhooks', () => {
             try {
               expectedOutput = readFileSync(fixturePath).toString();
             } catch (err) {
+              if (OVERWRITE_EVERYTHING) {
+                writeFileSync(fixturePath, '');
+                return;
+              }
               throw new Error(
                 `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${fixturePath}\``
               );
@@ -88,6 +92,16 @@ describe('webhooks', () => {
               // eslint-disable-next-line jest/no-if
               if (!result) {
                 throw new Error(`Generated ${fixture} snippet for ${clientId} was \`false\``);
+              }
+
+              /*
+               * This test is to make sure that our generated snippets
+               * actually do any variable outputting vs being static
+               */
+              // eslint-disable-next-line jest/no-if
+              if (fixture !== 'empty') {
+                // eslint-disable-next-line jest/no-conditional-expect
+                expect(Object.keys(result.ranges).length).toBeGreaterThan(0);
               }
 
               expect(result.ranges).toMatchSnapshot();

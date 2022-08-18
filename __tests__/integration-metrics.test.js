@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/no-unsafe-regex */
-import { execSync, spawn } from 'child_process';
+import { spawn } from 'child_process';
 import { once } from 'events';
 import http from 'http';
 import { cwd } from 'process';

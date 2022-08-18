@@ -1,14 +1,7 @@
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "4000";
 var secret = Environment.GetEnvironmentVariable("README_API_KEY");
-
-if (secret == null)
-{
-  Console.Error.WriteLine("Missing `README_API_KEY` environment variable");
-  System.Environment.Exit(1);
-}
 
 app.MapPost("/webhook", async context =>
 {
@@ -31,9 +24,12 @@ app.MapPost("/webhook", async context =>
 
   await context.Response.WriteAsJsonAsync(new
   {
-    petstore_auth = "default-key",
-    basic_auth = new { user = "user", pass = "pass" },
+    // OAS Security variables
+    api_key = "default-api_key-key",
+    http_basic = new { user = "user", pass = "pass" },
+    http_bearer = "default-http_bearer-key",
+    oauth2 = "default-oauth2-key",
   });
 });
 
-app.Run($"http://localhost:{port}");
+app.Run($"http://localhost:4000");
