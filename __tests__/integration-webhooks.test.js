@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { execSync, spawn } from 'child_process';
 import crypto from 'crypto';
 import http from 'http';
 import { cwd } from 'process';
@@ -47,19 +47,26 @@ describe('Metrics SDK Webhook Integration Tests', () => {
     const [command, ...args] = process.env.EXAMPLE_SERVER.split(' ');
     PORT = await getPort();
 
+    if (command === 'php') {
+      // Laravel's `artisan serve` command doesn't pick up `PORT` environmental variables, instead
+      // requiring that they're supplied as a command line argument.
+      args.push(`--port=${PORT}`);
+    }
+
     httpServer = spawn(command, args, {
       cwd: cwd(),
+      detached: true,
       env: {
         README_API_KEY: randomApiKey,
         PORT,
         ...process.env,
       },
     });
+
     // Uncomment the console.log lines to see stdout/stderr output from the child process
     return new Promise((resolve, reject) => {
       httpServer.stderr.on('data', data => {
-        // For some reason Flask prints on stderr 🤷‍♂️
-        if (data.toString().match(/Running on/)) return resolve();
+        if (data.toString().match(/Running on/)) return resolve(); // For some reason Flask prints on stderr 🤷‍♂️
         // // eslint-disable-next-line no-console
         // console.error(`stderr: ${data}`);
         return reject(data.toString());
@@ -72,6 +79,7 @@ describe('Metrics SDK Webhook Integration Tests', () => {
       // eslint-disable-next-line consistent-return
       httpServer.stdout.on('data', data => {
         if (data.toString().match(/listening/)) return resolve();
+        if (data.toString().match(/Server running on/)) return resolve(); // Laravel
         // // eslint-disable-next-line no-console
         // console.log(`stdout: ${data}`);
       });
@@ -79,7 +87,15 @@ describe('Metrics SDK Webhook Integration Tests', () => {
   });
 
   afterAll(() => {
-    return httpServer.kill();
+    /**
+     * Instead of running `httpServer.kill()` we need to dust the process group that was created
+     * because some languages and frameworks (like Laravel's Artisan server) fire off a sub-process
+     * that doesn't get normally cleaned up when we kill the original `php artisan serve` process.
+     *
+     * @see {@link https://stackoverflow.com/questions/56016550/node-js-cannot-kill-process-executed-with-child-process-exec/56016815#56016815}
+     * @see {@link https://www.baeldung.com/linux/kill-members-process-group#killing-a-process-using-the-pgid}
+     */
+    process.kill(-httpServer.pid);
   });
 
   it('should return with a user object if the signature is correct', async () => {

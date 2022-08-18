@@ -2,10 +2,10 @@ install: # Install all dependencies
 	composer install
 
 lint: ## Run code standard checks
-	./vendor/bin/phpcs --colors -p -s src/ tests/
+	./vendor/bin/phpcs -p -s src/ tests/ examples/
 
 lint-fix: ## Attempt to automatically fix any code standard violations
-	./vendor/bin/phpcbf src/ tests/
+	./vendor/bin/phpcbf src/ tests/ examples/
 
 static-analysis: ## Run static analysis checks
 	./vendor/bin/psalm
