@@ -2,6 +2,7 @@ import type { SecurityVariable, ServerVariable } from '..';
 import type { CodeBuilder } from '../helpers/code-builder';
 import type { Merge } from 'type-fest';
 
+import { dotnet } from './dotnet/target';
 import { node } from './node/target';
 
 export type TargetId = keyof typeof targets;
@@ -56,4 +57,5 @@ export interface Target {
 
 export const targets = {
   node,
+  dotnet,
 };
