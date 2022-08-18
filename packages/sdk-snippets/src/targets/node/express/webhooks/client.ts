@@ -17,35 +17,28 @@ export const express: Client = {
 
     const { blank, join, push, ranges, variable } = new CodeBuilder({ indent: opts.indent });
 
-    push('// Save this code as `server.js`');
-    push('// Run the server with `node server.js`');
-    push("const readme = require('readmeio');");
-    push("const express = require('express');");
+    push("import express from 'express';");
+    push("import readme from 'readmeio';");
 
     blank();
 
     push('const app = express();');
+
     blank();
 
-    push("app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {");
+    push("app.post('/webhook', express.json({ type: 'application/json' }), (req, res) => {");
     push('// Verify the request is legitimate and came from ReadMe', 1);
     push("const signature = req.headers['readme-signature'];", 1);
-    blank();
-
     push('// Your ReadMe secret', 1);
-    push("const secret = 'rdme_xxxx';", 1); // TODO should pass in JWT secret here
-    blank();
-
+    push('const secret = process.env.README_API_KEY;', 1);
     push('try {', 1);
-    push('readme.verify(req.body, signature, secret);', 2);
+    push('readme.verifyWebhook(req.body, signature, secret);', 2);
     push('} catch (e) {', 1);
     push('// Handle invalid requests', 2);
-    push('return res.sendStatus(401);', 2);
+    push('return res.status(401).json({ error: e.message });', 2);
     push('}', 1);
-
-    blank();
     push('// Fetch the user from the db', 1);
-    push('db.find({ email: req.body.email }).then(user => {', 1);
+    push('return db.find({ email: req.body.email }).then(user => {', 1);
     push('return res.json({', 2);
 
     if (server.length) {
@@ -80,6 +73,12 @@ export const express: Client = {
     push('});', 2);
     push('});', 1);
     push('});');
+
+    blank();
+
+    push('app.listen(4000);');
+
+    blank();
 
     return {
       ranges: ranges(),
