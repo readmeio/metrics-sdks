@@ -94,6 +94,16 @@ describe('webhooks', () => {
                 throw new Error(`Generated ${fixture} snippet for ${clientId} was \`false\``);
               }
 
+              /*
+               * This test is to make sure that our generated snippets
+               * actually do any variable outputting vs being static
+               */
+              // eslint-disable-next-line jest/no-if
+              if (fixture !== 'empty') {
+                // eslint-disable-next-line jest/no-conditional-expect
+                expect(Object.keys(result.ranges).length).toBeGreaterThan(0);
+              }
+
               expect(result.ranges).toMatchSnapshot();
               expect(result.snippet).toStrictEqual(expectedOutput);
             });
