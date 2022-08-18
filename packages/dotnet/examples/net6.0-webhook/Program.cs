@@ -1,7 +1,3 @@
-using System.Text;
-using static System.Text.Encoding;
-using System.Security.Cryptography;
-
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
@@ -36,7 +32,7 @@ app.MapPost("/webhook", async context =>
   await context.Response.WriteAsJsonAsync(new
   {
     petstore_auth = "default-key",
-    basic_auth = new { user = "user", pass = "pass" }
+    basic_auth = new { user = "user", pass = "pass" },
   });
 });
 
