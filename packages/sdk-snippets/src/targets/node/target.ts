@@ -7,7 +7,7 @@ export const node: Target = {
     key: 'node',
     title: 'Node.js',
     extname: '.js',
-    default: 'native',
+    default: 'express',
     cli: 'node %s',
   },
   services: {
