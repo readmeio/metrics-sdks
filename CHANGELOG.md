@@ -1,3 +1,37 @@
+##  (2022-08-19)
+
+* ci: allowing commitlint to ignore lerna publish commits ([4e8d129](https://github.com/readmeio/metrics-sdks/commit/4e8d129))
+* ci: revert lerna change ([c15f7c1](https://github.com/readmeio/metrics-sdks/commit/c15f7c1))
+* ci: working to get lerna working again ([9e84e81](https://github.com/readmeio/metrics-sdks/commit/9e84e81))
+* feat: making the Node HAR creator object more consistent (#543) ([c28999b](https://github.com/readmeio/metrics-sdks/commit/c28999b)), closes [#543](https://github.com/readmeio/metrics-sdks/issues/543)
+* feat: splitting out the python dev deps into a separate requirements file (#541) ([de19b75](https://github.com/readmeio/metrics-sdks/commit/de19b75)), closes [#541](https://github.com/readmeio/metrics-sdks/issues/541)
+* feat(dotnet): HAR consistency (#544) ([1279133](https://github.com/readmeio/metrics-sdks/commit/1279133)), closes [#544](https://github.com/readmeio/metrics-sdks/issues/544)
+* feat(dotnet): overall cleanup (#545) ([723e87a](https://github.com/readmeio/metrics-sdks/commit/723e87a)), closes [#545](https://github.com/readmeio/metrics-sdks/issues/545)
+* feat(dotnet): v2.0.0 ([6336c76](https://github.com/readmeio/metrics-sdks/commit/6336c76))
+* feat(php): HAR consistency and overall cleanup (#538) ([027b372](https://github.com/readmeio/metrics-sdks/commit/027b372)), closes [#538](https://github.com/readmeio/metrics-sdks/issues/538)
+* feat(php): webhooks support and integration tests (#547) ([fcf42e2](https://github.com/readmeio/metrics-sdks/commit/fcf42e2)), closes [#547](https://github.com/readmeio/metrics-sdks/issues/547)
+* feat(python): add python webhook integration test (take 2) (#546) ([ea1a6a9](https://github.com/readmeio/metrics-sdks/commit/ea1a6a9)), closes [#546](https://github.com/readmeio/metrics-sdks/issues/546)
+* feat(python): HAR consistency and overall cleanup (#540) ([455f08e](https://github.com/readmeio/metrics-sdks/commit/455f08e)), closes [#540](https://github.com/readmeio/metrics-sdks/issues/540)
+* feat(ruby): HAR consistency and overall cleanup (#537) ([1cc8780](https://github.com/readmeio/metrics-sdks/commit/1cc8780)), closes [#537](https://github.com/readmeio/metrics-sdks/issues/537)
+* feat(sdk-snippets): add .net and updated express webhooks snippets (#548) ([52a0bea](https://github.com/readmeio/metrics-sdks/commit/52a0bea)), closes [#548](https://github.com/readmeio/metrics-sdks/issues/548)
+* feat(snippets): allowing webhook secrets to be injected into snippets (#550) ([15f55fa](https://github.com/readmeio/metrics-sdks/commit/15f55fa)), closes [#550](https://github.com/readmeio/metrics-sdks/issues/550)
+* feat(snippets): python webhook snippets (#549) ([cc10694](https://github.com/readmeio/metrics-sdks/commit/cc10694)), closes [#549](https://github.com/readmeio/metrics-sdks/issues/549)
+* docs(integration-metrics): add documentation for setting up an integration test ([597abc9](https://github.com/readmeio/metrics-sdks/commit/597abc9))
+* docs(integration-metrics): add link to express example ([4544380](https://github.com/readmeio/metrics-sdks/commit/4544380))
+* docs(integration-webhooks): add documentation for setting up an integration test ([0d5c077](https://github.com/readmeio/metrics-sdks/commit/0d5c077))
+* docs(integration): add note about adding a "listening" message ([55fa6ac](https://github.com/readmeio/metrics-sdks/commit/55fa6ac))
+* chore: add other npm packages to lerna.json ([01a71a4](https://github.com/readmeio/metrics-sdks/commit/01a71a4))
+* chore: switch lerna to independent mode ([684c745](https://github.com/readmeio/metrics-sdks/commit/684c745))
+* chore(deps): bump django from 3.2.14 to 3.2.15 in /packages/python (#536) ([7ebde0b](https://github.com/readmeio/metrics-sdks/commit/7ebde0b)), closes [#536](https://github.com/readmeio/metrics-sdks/issues/536)
+* chore(docs): lint ([14448d8](https://github.com/readmeio/metrics-sdks/commit/14448d8))
+* chore(dotnet): v2.1.0 ([1158f3c](https://github.com/readmeio/metrics-sdks/commit/1158f3c))
+* chore(python): v2.1.0 ([8495237](https://github.com/readmeio/metrics-sdks/commit/8495237))
+* chore(ruby): v2.1.0 ([911e972](https://github.com/readmeio/metrics-sdks/commit/911e972))
+* fix: nuget rendering of dotnet sdk readme (#542) ([ea7aa2f](https://github.com/readmeio/metrics-sdks/commit/ea7aa2f)), closes [#542](https://github.com/readmeio/metrics-sdks/issues/542)
+* fix(php): mishandling of file loading in $_POST payloads (#539) ([e346c07](https://github.com/readmeio/metrics-sdks/commit/e346c07)), closes [#539](https://github.com/readmeio/metrics-sdks/issues/539)
+
+
+
 ## <small>5.2.1 (2022-08-11)</small>
 
 * Update metrics-log.ts (#535) ([e9c5f17](https://github.com/readmeio/metrics-sdks/commit/e9c5f17)), closes [#535](https://github.com/readmeio/metrics-sdks/issues/535)

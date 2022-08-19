@@ -1,7 +1,7 @@
 {
   "name": "readmeio",
   "description": "Track your API metrics within ReadMe.",
-  "version": "5.2.1",
+  "version": "5.2.2",
   "license": "ISC",
   "homepage": "https://readme.com/metrics",
   "bugs": {
