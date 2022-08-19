@@ -1,16 +1,4 @@
 {
-  "command": {
-    "publish": {
-      "conventionalCommits": true,
-      "ignoreChanges": ["*.md"],
-      "message": "chore(release): publish"
-    },
-    "version": {
-      "conventionalCommits": true,
-      "ignoreChanges": ["*.md"],
-      "message": "chore(release): publish"
-    }
-  },
   "version": "independent",
   "useWorkspaces": true
 }
