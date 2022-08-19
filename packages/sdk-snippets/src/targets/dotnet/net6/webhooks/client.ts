@@ -9,7 +9,7 @@ export const net6: Client = {
     link: 'https://docs.microsoft.com/en-us/dotnet/core/introduction',
     description: 'ReadMe Metrics Webhooks SDK usage on .NET 6.0',
   },
-  convert: ({ security, server }, options) => {
+  convert: ({ secret, security, server }, options) => {
     const opts = {
       indent: '  ',
       ...options,
@@ -22,12 +22,14 @@ export const net6: Client = {
 
     blank();
 
-    push('var secret = Environment.GetEnvironmentVariable("README_API_KEY");');
+    push('// Your ReadMe secret');
+    push(`var secret = "${secret}";`);
 
     blank();
 
     push('app.MapPost("/webhook", async context =>');
     push('{');
+    push('// Verify the request is legitimate and came from ReadMe.', 1);
     push('var signature = context.Request.Headers["readme-signature"];', 1);
     push('var body = await new StreamReader(context.Request.Body).ReadToEndAsync();', 1);
 
@@ -46,7 +48,10 @@ export const net6: Client = {
     push('});', 2);
     push('return;', 2);
     push('}', 1);
+    blank();
 
+    push('// Fetch the user from the database and return their data for use with OpenAPI variables.', 1);
+    push('// @todo Write your own query logic to fetch a user by `body["email"]`.', 1);
     blank();
 
     push('await context.Response.WriteAsJsonAsync(new', 1);
@@ -86,8 +91,6 @@ export const net6: Client = {
     blank();
 
     push('app.Run($"http://localhost:4000");');
-
-    blank();
 
     return {
       ranges: ranges(),

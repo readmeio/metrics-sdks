@@ -13,18 +13,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Your ReadMe secret
+$secret = env('README_API_KEY');
+
 Route::get('/', function () {
     return response()->json([
         'message' => 'hello world'
     ]);
 });
 
-Route::post('/webhook', function (\Illuminate\Http\Request $request) {
+Route::post('/webhook', function (\Illuminate\Http\Request $request) use ($secret) {
     // Verify the request is legitimate and came from ReadMe.
     $signature = $request->headers->get('readme-signature', '');
-
-    // Your ReadMe secret
-    $secret = env('README_API_KEY', config('readme.api_key'));
 
     try {
         \ReadMe\Webhooks::verify($request->input(), $signature, $secret);

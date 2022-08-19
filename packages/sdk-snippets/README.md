@@ -19,20 +19,23 @@ npm install --save @readme/metrics-sdk-snippets
 ```js
 import { MetricsSDKSnippet } from '@readme/metrics-sdk-snippets';
 
-const { convert } = new MetricsSDKSnippet([
-  {
-    name: 'petstore_auth',
-    default: 'default-key',
-    source: 'security',
-    type: 'oauth2',
-  },
-  {
-    name: 'basic_auth',
-    default: 'default',
-    source: 'security',
-    type: 'http',
-  },
-]);
+const { convert } = new MetricsSDKSnippet(
+  [
+    {
+      name: 'petstore_auth',
+      default: 'default-key',
+      source: 'security',
+      type: 'oauth2',
+    },
+    {
+      name: 'basic_auth',
+      default: 'default',
+      source: 'security',
+      type: 'http',
+    },
+  ],
+  { secret: 'my-readme-secret' }
+);
 
 console.log(convert('webhooks', 'node', 'express'));
 ```
@@ -54,34 +57,33 @@ This generates the following object:
 The generated snippet for this results in a [ReadMe Node Metrics SDK](https://npm.im/readmeio) webhooks example:
 
 ```js
-// Save this code as `server.js`
-// Run the server with `node server.js`
-const readme = require('readmeio');
-const express = require('express');
+import express from 'express';
+import readme from 'readmeio';
 
 const app = express();
 
-app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+// Your ReadMe secret
+const secret = 'my-readme-secret';
+
+app.post('/webhook', express.json({ type: 'application/json' }), async (req, res) => {
   // Verify the request is legitimate and came from ReadMe
   const signature = req.headers['readme-signature'];
 
-  // Your ReadMe secret
-  const secret = 'rdme_xxxx';
-
   try {
-    readme.verify(req.body, signature, secret);
+    readme.verifyWebhook(req.body, signature, secret);
   } catch (e) {
     // Handle invalid requests
-    return res.sendStatus(401);
+    return res.status(401).json({ error: e.message });
   }
 
-  // Fetch the user from the db
-  db.find({ email: req.body.email }).then(user => {
-    return res.json({
-      // OAS Security variables
-      petstore_auth: 'default-key',
-      basic_auth: { user: 'user', pass: 'pass' },
-    });
+  // Fetch the user from the database and return their data for use with OpenAPI variables.
+  // const user = await db.find({ email: req.body.email })
+  return res.json({
+    // OAS Security variables
+    petstore_auth: 'default-key',
+    basic_auth: { user: 'user', pass: 'pass' },
   });
 });
+
+app.listen(4000);
 ```

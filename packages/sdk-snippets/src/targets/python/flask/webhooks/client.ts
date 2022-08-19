@@ -9,7 +9,7 @@ export const flask: Client = {
     link: 'https://flask.palletsprojects.com',
     description: 'ReadMe Metrics Webhooks SDK usage on Flask',
   },
-  convert: ({ security, server }, options) => {
+  convert: ({ secret, security, server }, options) => {
     const opts = {
       indent: '    ',
       ...options,
@@ -31,16 +31,16 @@ export const flask: Client = {
 
     push('app = Flask(__name__)');
     blank();
+
+    push('# Your ReadMe secret');
+    push(`secret = "${secret}"`);
+    blank();
     blank();
 
     push('@app.post("/webhook")');
     push('def webhook():');
-    push('# Verify the request is legitimate and came from ReadMe', 1);
+    push('# Verify the request is legitimate and came from ReadMe.', 1);
     push('signature = request.headers.get("readme-signature", None)', 1);
-    blank();
-
-    push('# Your ReadMe secret', 1);
-    push('secret = os.getenv("README_API_KEY").encode("utf8")', 1);
     blank();
 
     push('try:', 1);
@@ -53,6 +53,8 @@ export const flask: Client = {
     push(')', 2);
     blank();
 
+    push('# Fetch the user from the database and return their data for use with OpenAPI variables.', 1);
+    push('# user = User.objects.get(email__exact=request.values.get("email"))', 1);
     push('return (', 1);
     push('{', 2);
 

@@ -25,6 +25,7 @@ export interface ClientRanges {
 
 export type Converter<T extends Record<string, any>> = (
   params: {
+    secret?: string;
     security: SecurityVariable[];
     server: ServerVariable[];
   },

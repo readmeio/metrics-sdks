@@ -10,14 +10,14 @@ if os.getenv("README_API_KEY") is None:
 
 app = Flask(__name__)
 
+# Your ReadMe secret
+secret = os.getenv("README_API_KEY").encode("utf8")
+
 
 @app.post("/webhook")
 def webhook():
-    # Verify the request is legitimate and came from ReadMe
+    # Verify the request is legitimate and came from ReadMe.
     signature = request.headers.get("readme-signature", None)
-
-    # Your ReadMe secret
-    secret = os.getenv("README_API_KEY").encode("utf8")
 
     try:
         VerifyWebhook(request.get_json(), signature, secret)
@@ -28,6 +28,8 @@ def webhook():
             {"Content-Type": "application/json; charset=utf-8"},
         )
 
+    # Fetch the user from the database and return their data for use with OpenAPI variables.
+    # user = User.objects.get(email__exact=request.values.get("email"))
     return (
         {
             "petstore_auth": "default-key",
