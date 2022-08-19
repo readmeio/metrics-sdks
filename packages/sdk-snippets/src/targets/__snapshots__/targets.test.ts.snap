@@ -248,3 +248,86 @@ Object {
   },
 }
 `;
+
+exports[`webhooks Python snippet generation flask request should match fixture for "empty" 1`] = `Object {}`;
+
+exports[`webhooks Python snippet generation flask request should match fixture for "empty-default" 1`] = `
+Object {
+  "security": Object {
+    "petstore_auth": Object {
+      "line": 37,
+    },
+  },
+  "server": Object {
+    "name": Object {
+      "line": 34,
+    },
+  },
+}
+`;
+
+exports[`webhooks Python snippet generation flask request should match fixture for "security-and-server-variables" 1`] = `
+Object {
+  "security": Object {
+    "basic_auth": Object {
+      "line": 39,
+    },
+    "petstore_auth": Object {
+      "line": 38,
+    },
+  },
+  "server": Object {
+    "name": Object {
+      "line": 34,
+    },
+    "port": Object {
+      "line": 35,
+    },
+  },
+}
+`;
+
+exports[`webhooks Python snippet generation flask request should match fixture for "security-types" 1`] = `
+Object {
+  "security": Object {
+    "api_key": Object {
+      "line": 34,
+    },
+    "http_basic": Object {
+      "line": 35,
+    },
+    "http_bearer": Object {
+      "line": 36,
+    },
+    "oauth2": Object {
+      "line": 37,
+    },
+  },
+}
+`;
+
+exports[`webhooks Python snippet generation flask request should match fixture for "security-variables" 1`] = `
+Object {
+  "security": Object {
+    "basic_auth": Object {
+      "line": 35,
+    },
+    "petstore_auth": Object {
+      "line": 34,
+    },
+  },
+}
+`;
+
+exports[`webhooks Python snippet generation flask request should match fixture for "server-variables" 1`] = `
+Object {
+  "server": Object {
+    "name": Object {
+      "line": 34,
+    },
+    "port": Object {
+      "line": 35,
+    },
+  },
+}
+`;

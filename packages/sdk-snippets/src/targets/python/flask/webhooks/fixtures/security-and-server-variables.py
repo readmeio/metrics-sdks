@@ -30,6 +30,11 @@ def webhook():
 
     return (
         {
+            # OAS Server variables
+            "name": "default-name",
+            "port": "",
+
+            # OAS Security variables
             "petstore_auth": "default-key",
             "basic_auth": {"user": "user", "pass": "pass"},
         },

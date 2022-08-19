@@ -30,8 +30,6 @@ def webhook():
 
     return (
         {
-            "petstore_auth": "default-key",
-            "basic_auth": {"user": "user", "pass": "pass"},
         },
         200,
         {"Content-Type": "application/json; charset=utf-8"},
