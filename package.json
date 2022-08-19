@@ -38,11 +38,6 @@
     "jest": "^28.1.3",
     "prettier": "^2.7.1"
   },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
-  },
   "jest": {
     "transform": {},
     "testMatch": [
