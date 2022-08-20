@@ -1,6 +1,7 @@
 import type { Client } from '../../../targets';
 
 import { CodeBuilder } from '../../../../helpers/code-builder';
+import { escapeForSingleQuotes } from '../../../../helpers/escape';
 
 export const laravel: Client = {
   info: {
@@ -47,7 +48,12 @@ export const laravel: Client = {
     if (server.length) {
       push('// OAS Server variables', 2);
       server.forEach(data => {
-        push(`'${data.name}' => '${data.default || data.default === '' ? data.default : data.name}',`, 2);
+        push(
+          `'${escapeForSingleQuotes(data.name)}' => '${escapeForSingleQuotes(
+            data.default || data.default === '' ? data.default : data.name
+          )}',`,
+          2
+        );
         variable('server', data.name);
       });
     }
@@ -62,13 +68,18 @@ export const laravel: Client = {
         if (data.type === 'http') {
           // Only HTTP Basic auth has any special handling for supplying auth.
           if (data.scheme === 'basic') {
-            push(`'${data.name}' => ['user' => 'user', 'pass' => 'pass'],`, 2);
+            push(`'${escapeForSingleQuotes(data.name)}' => ['user' => 'user', 'pass' => 'pass'],`, 2);
             variable('security', data.name);
             return;
           }
         }
 
-        push(`'${data.name}' => '${data.default || data.default === '' ? data.default : data.name}',`, 2);
+        push(
+          `'${escapeForSingleQuotes(data.name)}' => '${escapeForSingleQuotes(
+            data.default || data.default === '' ? data.default : data.name
+          )}',`,
+          2
+        );
         variable('security', data.name);
       });
     }

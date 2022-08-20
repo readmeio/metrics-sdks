@@ -1,6 +1,7 @@
 import type { Client } from '../../../targets';
 
 import { CodeBuilder } from '../../../../helpers/code-builder';
+import { escapeForDoubleQuotes } from '../../../../helpers/escape';
 
 export const flask: Client = {
   info: {
@@ -61,7 +62,12 @@ export const flask: Client = {
     if (server.length) {
       push('# OAS Server variables', 3);
       server.forEach(data => {
-        push(`"${data.name}": "${data.default || data.default === '' ? data.default : data.name}",`, 3);
+        push(
+          `"${escapeForDoubleQuotes(data.name)}": "${escapeForDoubleQuotes(
+            data.default || data.default === '' ? data.default : data.name
+          )}",`,
+          3
+        );
         variable('server', data.name);
       });
     }
@@ -76,13 +82,18 @@ export const flask: Client = {
         if (data.type === 'http') {
           // Only HTTP Basic auth has any special handling for supplying auth.
           if (data.scheme === 'basic') {
-            push(`"${data.name}": {"user": "user", "pass": "pass"},`, 3);
+            push(`"${escapeForDoubleQuotes(data.name)}": {"user": "user", "pass": "pass"},`, 3);
             variable('security', data.name);
             return;
           }
         }
 
-        push(`"${data.name}": "${data.default || data.default === '' ? data.default : data.name}",`, 3);
+        push(
+          `"${escapeForDoubleQuotes(data.name)}": "${escapeForDoubleQuotes(
+            data.default || data.default === '' ? data.default : data.name
+          )}",`,
+          3
+        );
         variable('security', data.name);
       });
     }
