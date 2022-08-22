@@ -1,6 +1,6 @@
 import type { LogOptions } from './construct-payload';
 import type { GroupingObject, OutgoingLogBody } from './metrics-log';
-import type { Request, Response } from 'express';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 
 import * as url from 'url';
 
@@ -28,7 +28,24 @@ function doSend(readmeApiKey, options) {
 // Make sure we flush the queue if the process is exited
 process.on('exit', doSend);
 
-interface ExtendedResponse extends Response {
+export interface ExtendedIncomingMessage extends IncomingMessage {
+  /*
+   * This is where most body-parsers put the parsed HTTP body
+   * but it is not part of Node's builtin. We expect the body
+   * to be parsed by the time it gets passed to us
+   */
+  body?: Record<string, unknown>;
+  // These are all express additions to Node's builtin type
+  route?: {
+    path: string;
+  };
+  protocol?: string;
+  baseUrl?: string;
+  hostname?: string;
+  originalUrl?: string;
+}
+
+interface ExtendedResponse extends ServerResponse {
   _body?: string;
 }
 
@@ -70,7 +87,7 @@ export interface Options extends LogOptions {
  */
 export function log(
   readmeApiKey: string,
-  req: Request,
+  req: ExtendedIncomingMessage,
   res: ExtendedResponse,
   group: GroupingObject,
   options: Options = {}
@@ -88,16 +105,16 @@ export function log(
 
   patchResponse(res);
 
+  // @todo we should remove this and put this in the code samples
   if (baseLogUrl !== undefined && typeof baseLogUrl === 'string') {
     res.setHeader('x-documentation-url', `${baseLogUrl}/logs/${logId}`);
   }
 
+  /*
+   * This should in future become more sophisticated, with flush timeouts and more error checking but
+   * this is fine for now
+   */
   function startSend() {
-    // This should in future become more sophisticated,
-    // with flush timeouts and more error checking but
-    // this is fine for now
-    const groupData = group;
-
     const payload = constructPayload(
       req,
       // {
@@ -113,7 +130,7 @@ export function log(
       // },
       res,
       {
-        ...groupData,
+        ...group,
         logId,
         startedDateTime,
         responseEndDateTime: new Date(),

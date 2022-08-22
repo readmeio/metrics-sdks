@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { LogOptions } from 'src/lib/construct-payload';
 
 import { createServer } from 'http';
@@ -9,7 +9,7 @@ import request from 'supertest';
 import processRequest from '../../src/lib/process-request';
 
 function createApp(reqOptions?: LogOptions, shouldPreParse = false, bodyOverride?) {
-  const requestListener = function (req: Request, res: Response) {
+  const requestListener = function (req: IncomingMessage, res: ServerResponse) {
     let body = '';
 
     req.on('readable', function () {

@@ -1,5 +1,5 @@
 import type { LogOptions } from './construct-payload';
-import type { Request } from 'express';
+import type { ExtendedIncomingMessage } from './log';
 import type { Entry } from 'har-format';
 
 import * as qs from 'querystring';
@@ -122,7 +122,7 @@ function parseRequestBody(body: string, mimeType: string): Record<string, unknow
  * @returns The proper request structure following the HAR format
  */
 export default function processRequest(
-  req: Request,
+  req: ExtendedIncomingMessage,
   requestBody?: Record<string, unknown> | string,
   options?: LogOptions
 ): Entry['request'] {

@@ -1,6 +1,5 @@
 import type { OutgoingLogBody } from './metrics-log';
-import type { Request, Response } from 'express';
-import type { IncomingMessage } from 'http';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { TLSSocket } from 'tls';
 
 import os from 'os';
@@ -98,8 +97,8 @@ export interface PayloadData {
 }
 
 export function constructPayload(
-  req: Request,
-  res: Response,
+  req: IncomingMessage,
+  res: ServerResponse,
   payloadData: PayloadData,
   logOptions: LogOptions
 ): OutgoingLogBody {
@@ -126,7 +125,7 @@ export function constructPayload(
         entries: [
           {
             pageref: payloadData.routePath
-              ? new URL(payloadData.routePath, `${getProto(req)}://${req.headers.host}`).toString()
+              ? payloadData.routePath
               : new URL(req.url, `${getProto(req)}://${req.headers.host}`).toString(),
             startedDateTime: payloadData.startedDateTime.toISOString(),
             time: serverTime,

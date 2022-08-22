@@ -1,4 +1,5 @@
 import * as crypto from 'crypto';
+import { createServer } from 'http';
 
 import express from 'express';
 import FormData from 'form-data';
@@ -165,6 +166,38 @@ describe('#metrics', () => {
       return next();
     });
     app.get('/test/:id', (req, res) => res.sendStatus(200));
+
+    return request(app)
+      .get('/test/hello')
+      .expect(200)
+      .then(() => {
+        mock.done();
+      });
+  });
+
+  // There's a slight inconsistency here between express and non-express.
+  // When not in express, pageref contains the port but in express it does not.
+  // This is due to us using `req.hostname` to construct the URL vs just
+  // req.headers.host which has not been parsed.
+  it('should set `pageref` without express', () => {
+    const mock = nock(config.host, {
+      reqheaders: {
+        'Content-Type': 'application/json',
+        'User-Agent': `${pkg.name}/${pkg.version}`,
+      },
+    })
+      .post('/v1/request', ([body]) => {
+        expect(body.request.log.entries[0].pageref).toMatch(/http:\/\/127.0.0.1:\d.*\/test\/hello/);
+        return true;
+      })
+      .basicAuth({ user: apiKey })
+      .reply(200);
+
+    const app = createServer((req, res) => {
+      readmeio.log(apiKey, req, res, incomingGroup);
+      res.statusCode = 200;
+      res.end();
+    });
 
     return request(app)
       .get('/test/hello')

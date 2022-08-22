@@ -1,5 +1,5 @@
 import type { LogOptions, PayloadData } from '../../src/lib/construct-payload';
-import type { Request, Response } from 'express';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 
 import { createServer } from 'http';
 import os from 'os';
@@ -12,7 +12,7 @@ import pkg from '../../package.json';
 import { constructPayload } from '../../src/lib/construct-payload';
 
 function createApp(options?: LogOptions, payloadData?: PayloadData) {
-  const requestListener = function (req: Request, res: Response) {
+  const requestListener = function (req: IncomingMessage, res: ServerResponse) {
     let body = '';
     let parsedBody: Record<string, unknown> | undefined;
 
