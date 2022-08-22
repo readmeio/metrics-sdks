@@ -117,17 +117,6 @@ export function log(
   function startSend() {
     const payload = constructPayload(
       req,
-      // {
-      //   ...req,
-
-      //   // Shallow copying `req` destroys `req.headers` on Node 16 so we're re-adding it.
-      //   headers: req.headers,
-
-      //   // If you're using route nesting with `express.use()` then `req.url` is contextual to that route. So say
-      //   // you have an `/api` route that loads `/v1/upload`, `req.url` within the `/v1/upload` controller will be
-      //   // `/v1/upload`. Calling `req.originalUrl` ensures that we also capture the `/api` prefix.
-      //   url: req.originalUrl,
-      // },
       res,
       {
         ...group,
