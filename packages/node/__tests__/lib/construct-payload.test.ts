@@ -2,6 +2,7 @@ import type { LogOptions, PayloadData } from '../../src/lib/construct-payload';
 import type { Request, Response } from 'express';
 
 import { createServer } from 'http';
+import os from 'os';
 import * as qs from 'querystring';
 
 import { isValidUUIDV4 } from 'is-valid-uuid-v4';

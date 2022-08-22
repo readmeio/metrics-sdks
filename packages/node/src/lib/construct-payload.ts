@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import type { IncomingMessage } from 'http';
 import type { TLSSocket } from 'tls';
 
+import os from 'os';
 import { URL } from 'url';
 
 import { v4 as uuidv4 } from 'uuid';
