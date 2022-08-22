@@ -17,6 +17,36 @@ Object {
 }
 `;
 
+exports[`webhooks .NET snippet generation net6 request should match fixture for "quirky-escaping" 1`] = `
+Object {
+  "security": Object {
+    "\\"petstore\\" auth": Object {
+      "line": 39,
+    },
+    "basic-auth": Object {
+      "line": 40,
+    },
+    "normal_security_var": Object {
+      "line": 41,
+    },
+  },
+  "server": Object {
+    "*port": Object {
+      "line": 34,
+    },
+    "2name": Object {
+      "line": 33,
+    },
+    "normal_server_var": Object {
+      "line": 36,
+    },
+    "p*o?r*t": Object {
+      "line": 35,
+    },
+  },
+}
+`;
+
 exports[`webhooks .NET snippet generation net6 request should match fixture for "security-and-server-variables" 1`] = `
 Object {
   "security": Object {
@@ -95,6 +125,36 @@ Object {
   "server": Object {
     "name": Object {
       "line": 24,
+    },
+  },
+}
+`;
+
+exports[`webhooks Node.js snippet generation express request should match fixture for "quirky-escaping" 1`] = `
+Object {
+  "security": Object {
+    "\\"petstore\\" auth": Object {
+      "line": 30,
+    },
+    "basic-auth": Object {
+      "line": 31,
+    },
+    "normal_security_var": Object {
+      "line": 32,
+    },
+  },
+  "server": Object {
+    "*port": Object {
+      "line": 25,
+    },
+    "2name": Object {
+      "line": 24,
+    },
+    "normal_server_var": Object {
+      "line": 27,
+    },
+    "p*o?r*t": Object {
+      "line": 26,
     },
   },
 }
@@ -183,6 +243,36 @@ Object {
 }
 `;
 
+exports[`webhooks PHP snippet generation laravel request should match fixture for "quirky-escaping" 1`] = `
+Object {
+  "security": Object {
+    "\\"petstore\\" auth": Object {
+      "line": 30,
+    },
+    "basic-auth": Object {
+      "line": 31,
+    },
+    "normal_security_var": Object {
+      "line": 32,
+    },
+  },
+  "server": Object {
+    "*port": Object {
+      "line": 25,
+    },
+    "2name": Object {
+      "line": 24,
+    },
+    "normal_server_var": Object {
+      "line": 27,
+    },
+    "p*o?r*t": Object {
+      "line": 26,
+    },
+  },
+}
+`;
+
 exports[`webhooks PHP snippet generation laravel request should match fixture for "security-and-server-variables" 1`] = `
 Object {
   "security": Object {
@@ -261,6 +351,36 @@ Object {
   "server": Object {
     "name": Object {
       "line": 36,
+    },
+  },
+}
+`;
+
+exports[`webhooks Python snippet generation flask request should match fixture for "quirky-escaping" 1`] = `
+Object {
+  "security": Object {
+    "\\"petstore\\" auth": Object {
+      "line": 42,
+    },
+    "basic-auth": Object {
+      "line": 43,
+    },
+    "normal_security_var": Object {
+      "line": 44,
+    },
+  },
+  "server": Object {
+    "*port": Object {
+      "line": 37,
+    },
+    "2name": Object {
+      "line": 36,
+    },
+    "normal_server_var": Object {
+      "line": 39,
+    },
+    "p*o?r*t": Object {
+      "line": 38,
     },
   },
 }
