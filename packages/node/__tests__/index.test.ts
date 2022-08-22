@@ -11,8 +11,6 @@ import pkg from '../package.json';
 import * as readmeio from '../src';
 import config from '../src/config';
 
-import { getReadMeApiMock } from './lib/get-project-base-url.test';
-
 const upload = multer();
 
 const apiKey = 'mockReadMeApiKey';
@@ -359,38 +357,6 @@ describe('#metrics', () => {
         .expect(200)
         .expect(res => expect(res).toHaveDocumentationHeader(baseLogUrl));
 
-      mock.done();
-    });
-
-    it('should work to call `getProjectBaseUrl()` first', async () => {
-      const baseLogUrl = 'https://docs.readme.com';
-      const readmeApiMock = getReadMeApiMock(1, baseLogUrl);
-
-      const mock = nock(config.host, {
-        reqheaders: {
-          'Content-Type': 'application/json',
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .post('/v1/request')
-        .basicAuth({ user: apiKey })
-        .reply(200);
-
-      const app = express();
-      app.use(async (req, res, next) => {
-        const logUrl = await readmeio.getProjectBaseUrl(apiKey);
-
-        readmeio.log(apiKey, req, res, incomingGroup, { baseLogUrl: logUrl });
-        return next();
-      });
-      app.get('/test', (req, res) => res.sendStatus(200));
-
-      await request(app)
-        .get('/test')
-        .expect(200)
-        .expect(res => expect(res).toHaveDocumentationHeader(baseLogUrl));
-
-      readmeApiMock.done();
       mock.done();
     });
   });
