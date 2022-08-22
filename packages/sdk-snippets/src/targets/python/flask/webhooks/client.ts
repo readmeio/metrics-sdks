@@ -16,7 +16,7 @@ export const flask: Client = {
       ...options,
     };
 
-    const { blank, join, push, ranges, variable } = new CodeBuilder({ indent: opts.indent });
+    const { blank, join, push, pushVariable, ranges } = new CodeBuilder({ indent: opts.indent });
 
     push('import os');
     push('import sys');
@@ -62,13 +62,16 @@ export const flask: Client = {
     if (server.length) {
       push('# OAS Server variables', 3);
       server.forEach(data => {
-        push(
+        pushVariable(
           `"${escapeForDoubleQuotes(data.name)}": "${escapeForDoubleQuotes(
             data.default || data.default === '' ? data.default : data.name
           )}",`,
-          3
+          {
+            type: 'server',
+            name: data.name,
+            indentationLevel: 3,
+          }
         );
-        variable('server', data.name);
       });
     }
 
@@ -82,19 +85,25 @@ export const flask: Client = {
         if (data.type === 'http') {
           // Only HTTP Basic auth has any special handling for supplying auth.
           if (data.scheme === 'basic') {
-            push(`"${escapeForDoubleQuotes(data.name)}": {"user": "user", "pass": "pass"},`, 3);
-            variable('security', data.name);
+            pushVariable(`"${escapeForDoubleQuotes(data.name)}": {"user": "user", "pass": "pass"},`, {
+              type: 'security',
+              name: data.name,
+              indentationLevel: 3,
+            });
             return;
           }
         }
 
-        push(
+        pushVariable(
           `"${escapeForDoubleQuotes(data.name)}": "${escapeForDoubleQuotes(
             data.default || data.default === '' ? data.default : data.name
           )}",`,
-          3
+          {
+            type: 'security',
+            name: data.name,
+            indentationLevel: 3,
+          }
         );
-        variable('security', data.name);
       });
     }
 
