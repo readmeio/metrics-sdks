@@ -1,12 +1,13 @@
-import nock from 'nock';
-import findCacheDir from 'find-cache-dir';
-import rimraf from 'rimraf';
-import flatCache from 'flat-cache';
 import { createHash } from 'crypto';
 
-import config from '../../src/config';
+import findCacheDir from 'find-cache-dir';
+import flatCache from 'flat-cache';
+import nock from 'nock';
+import rimraf from 'rimraf';
+
 import pkg from '../../package.json';
 import { getProjectBaseUrl } from '../../src';
+import config from '../../src/config';
 
 const apiKey = 'mockReadMeApiKey';
 const baseLogUrl = 'https://docs.example.com';

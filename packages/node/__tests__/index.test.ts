@@ -1,13 +1,16 @@
-import express from 'express';
-import request from 'supertest';
-import nock from 'nock';
 import * as crypto from 'crypto';
+
+import express from 'express';
+import FormData from 'form-data';
 import { isValidUUIDV4 } from 'is-valid-uuid-v4';
-import config from '../src/config';
+import multer from 'multer';
+import nock from 'nock';
+import request from 'supertest';
+
 import pkg from '../package.json';
 import * as readmeio from '../src';
-import FormData from 'form-data';
-import multer from 'multer';
+import config from '../src/config';
+
 import { getReadMeApiMock } from './lib/get-project-base-url.test';
 
 const upload = multer();

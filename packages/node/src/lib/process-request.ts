@@ -1,7 +1,6 @@
 import type { LogOptions } from './construct-payload';
 import type { Request } from 'express';
 import type { Entry } from 'har-format';
-import type { IncomingMessage } from 'http';
 
 import * as qs from 'querystring';
 import url, { URL } from 'url';

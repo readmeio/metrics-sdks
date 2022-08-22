@@ -1,25 +1,14 @@
 import type { LogOptions, PayloadData } from '../../src/lib/construct-payload';
-import { createServer } from 'http';
 import type { Request, Response } from 'express';
-import request from 'supertest';
-import { isValidUUIDV4 } from 'is-valid-uuid-v4';
-import packageJson from '../../package.json';
+
+import { createServer } from 'http';
 import * as qs from 'querystring';
 
-import { constructPayload } from '../../src/lib/construct-payload';
+import { isValidUUIDV4 } from 'is-valid-uuid-v4';
+import request from 'supertest';
 
-function fixPlatform(platform: string): 'mac' | 'windows' | 'linux' | 'unknown' {
-  switch (platform) {
-    case 'darwin':
-      return 'mac';
-    case 'win32':
-      return 'windows';
-    case 'linux':
-      return 'linux';
-    default:
-      return 'unknown';
-  }
-}
+import pkg from '../../package.json';
+import { constructPayload } from '../../src/lib/construct-payload';
 
 function createApp(options?: LogOptions, payloadData?: PayloadData) {
   const requestListener = function (req: Request, res: Response) {

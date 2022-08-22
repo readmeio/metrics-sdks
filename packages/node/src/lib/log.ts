@@ -1,10 +1,14 @@
 import type { LogOptions } from './construct-payload';
 import type { GroupingObject, OutgoingLogBody } from './metrics-log';
 import type { Request, Response } from 'express';
-import config from '../config';
-import clamp from 'lodash/clamp';
+
 import * as url from 'url';
+
+import clamp from 'lodash/clamp';
 import { v4 as uuidv4 } from 'uuid';
+
+import config from '../config';
+
 import { constructPayload } from './construct-payload';
 import { metricsAPICall } from './metrics-log';
 
