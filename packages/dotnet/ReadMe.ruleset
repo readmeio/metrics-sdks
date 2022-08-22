@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="Rules for the ReadMe .NET SDK" ToolsVersion="10.0">
+  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+    <!--
+      SA0001XmlCommentAnalysisDisabled
+      https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA0001.md
+    -->
+    <Rule Id="SA0001" Action="None" />
+
+    <!--
+      SA1200UsingDirectivesMustBePlacedCorrectly
+      https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1200.md
+    -->
+    <Rule Id="SA1200" Action="None" />
+
+    <!--
+      SA1300ElementMustBeginWithUpperCaseLetter
+      https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1300.md
+    -->
+    <Rule Id="SA1300" Action="None" />
+
+    <!--
+      SA1400AccessModifierMustBeDeclared
+      https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1400.md
+    -->
+    <Rule Id="SA1400" Action="None" />
+
+    <!--
+      SA1402FileMayOnlyContainASingleType
+      https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1402.md
+    -->
+    <Rule Id="SA1402" Action="None" />
+
+    <!--
+      SA1633FileMustHaveHeader
+      https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1633.md
+    -->
+    <Rule Id="SA1633" Action="None" />
+  </Rules>
+</RuleSet>

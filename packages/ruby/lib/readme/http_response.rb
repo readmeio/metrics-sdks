@@ -1,6 +1,6 @@
-require "rack"
-require "rack/response"
-require_relative "content_type_helper"
+require 'rack'
+require 'rack/response'
+require_relative 'content_type_helper'
 
 module Readme
   class HttpResponse < SimpleDelegator
@@ -13,22 +13,22 @@ module Readme
     def body
       if raw_body.respond_to?(:rewind)
         raw_body.rewind
-        content = raw_body.each.reduce("", :+)
+        content = raw_body.each.reduce('', :+)
         raw_body.rewind
 
         content
       else
-        raw_body.each.reduce("", :+)
+        raw_body.each.reduce('', :+)
       end
     end
 
     def content_length
       if empty_body_status?
         0
-      elsif !headers["Content-Length"]
+      elsif !headers['Content-Length']
         body.bytesize
       else
-        headers["Content-Length"].to_i
+        headers['Content-Length'].to_i
       end
     end
 

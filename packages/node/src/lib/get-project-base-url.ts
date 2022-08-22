@@ -1,9 +1,11 @@
-import flatCache from 'flat-cache';
-import findCacheDir from 'find-cache-dir';
 import crypto from 'crypto';
-import pkg from '../../package.json';
-import timeoutSignal from 'timeout-signal';
+
+import findCacheDir from 'find-cache-dir';
+import flatCache from 'flat-cache';
 import fetch from 'node-fetch';
+import timeoutSignal from 'timeout-signal';
+
+import pkg from '../../package.json';
 import config from '../config';
 
 export async function getProjectBaseUrl(readmeApiKey: string, requestTimeout = config.timeout) {

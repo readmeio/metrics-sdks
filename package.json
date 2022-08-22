@@ -3,11 +3,15 @@
   "private": true,
   "scripts": {
     "clean": "npx lerna clean",
-    "lint": "eslint . && npm run lint --workspaces",
+    "lint": "eslint __tests__ && npm run lint --workspaces",
+    "lint:docs": "alex .",
     "prepare": "husky install",
+    "prettier": "prettier --list-different \"./**/**.{js,ts,md}\"",
+    "prettier:write": "prettier --list-different --write \"./**/**.{js,ts,md}\"",
     "publish": "npx lerna publish",
     "test": "npm test --workspaces",
-    "test:integration": "NODE_OPTIONS=--experimental-vm-modules npx jest",
+    "test:integration-metrics": "NODE_OPTIONS=--experimental-vm-modules npx jest __tests__/integration-metrics.test.js",
+    "test:integration-webhooks": "NODE_OPTIONS=--experimental-vm-modules npx jest __tests__/integration-webhooks.test.js",
     "version": "npx conventional-changelog-cli --pkg lerna.json -i CHANGELOG.md -s && git add CHANGELOG.md"
   },
   "repository": {
@@ -18,23 +22,21 @@
     "node": ">=14"
   },
   "workspaces": [
-    "./packages/node"
+    "./packages/cloudflare-worker",
+    "./packages/node",
+    "./packages/sdk-snippets"
   ],
   "devDependencies": {
     "@commitlint/cli": "^17.0.2",
     "@commitlint/config-conventional": "^17.0.2",
-    "@readme/eslint-config": "^8.7.3",
+    "@readme/eslint-config": "^10.0.0",
+    "alex": "^10.0.0",
     "caseless": "^0.12.0",
-    "eslint": "^8.14.0",
+    "eslint": "^8.21.0",
     "get-port": "^6.1.2",
-    "husky": "^7.0.2",
-    "jest": "^27.5.1",
-    "prettier": "^2.6.2"
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
+    "husky": "^8.0.1",
+    "jest": "^28.1.3",
+    "prettier": "^2.7.1"
   },
   "jest": {
     "transform": {},

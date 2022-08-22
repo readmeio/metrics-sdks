@@ -104,9 +104,9 @@ describe('constructPayload()', () => {
       .post('/')
       .expect(({ body }) => {
         expect(body.request.log.creator).toStrictEqual({
-          name: packageJson.name,
-          version: packageJson.version,
-          comment: `${fixPlatform(process.platform)}/${process.version}`,
+          name: 'readme-metrics (node)',
+          version: pkg.version,
+          comment: `${os.arch()}-${os.platform()}${os.release()}/${process.versions.node}`,
         });
       }));
 

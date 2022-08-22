@@ -1,33 +1,85 @@
 version: '3'
 services:
-  integration_node_express:
-    build:
-      context: .
-      dockerfile: ./__tests__/integrations/node.Dockerfile
-    command: npm run test:integration
-    environment:
-      - EXAMPLE_SERVER=node ./packages/node/examples/express/index.js
-
-  integration_node_hapi:
-    build:
-      context: .
-      dockerfile: ./__tests__/integrations/node.Dockerfile
-    command: npm run test:integration
-    environment:
-      - EXAMPLE_SERVER=node ./packages/node/examples/hapi/index.js
-
-  integration_dotnet_v6.0:
+  #
+  # .NET
+  #
+  integration_metrics_dotnet_v6.0:
     build:
       context: .
       dockerfile: ./__tests__/integrations/dotnet.Dockerfile
-    command: npm run test:integration
+    command: npm run test:integration-metrics
     environment:
       - EXAMPLE_SERVER=dotnet examples/net6.0/out/net6.0.dll
 
-  integration_python_flask:
+  integration_webhooks_dotnet_v6.0:
+    build:
+      context: .
+      dockerfile: ./__tests__/integrations/dotnet.Dockerfile
+    command: npm run test:integration-webhooks
+    environment:
+      - EXAMPLE_SERVER=dotnet examples/net6.0-webhook/out/net6.0-webhook.dll
+
+  #
+  # Node
+  #
+  integration_metrics_node_express:
+    build:
+      context: .
+      dockerfile: ./__tests__/integrations/node.Dockerfile
+    command: npm run test:integration-metrics
+    environment:
+      - EXAMPLE_SERVER=node ./packages/node/examples/express/index.js
+
+  integration_webhooks_node_express:
+    build:
+      context: .
+      dockerfile: ./__tests__/integrations/node.Dockerfile
+    command: npm run test:integration-webhooks
+    environment:
+      - EXAMPLE_SERVER=node ./packages/node/examples/express/webhook.js
+
+  integration_metrics_node_fastify:
+    build:
+      context: .
+      dockerfile: ./__tests__/integrations/node.Dockerfile
+    command: npm run test:integration-metrics
+    environment:
+      - EXAMPLE_SERVER=node ./packages/node/examples/fastify/index.js
+
+  integration_metrics_node_hapi:
+    build:
+      context: .
+      dockerfile: ./__tests__/integrations/node.Dockerfile
+    command: npm run test:integration-metrics
+    environment:
+      - EXAMPLE_SERVER=node ./packages/node/examples/hapi/index.js
+
+  #
+  # PHP
+  #
+  integration_metrics_php_laravel:
+    build:
+      context: .
+      dockerfile: ./__tests__/integrations/php.Dockerfile
+    command: npm run test:integration-metrics
+    environment:
+      - EXAMPLE_SERVER=php packages/php/examples/laravel/artisan serve
+
+  integration_webhooks_php_laravel:
+    build:
+      context: .
+      dockerfile: ./__tests__/integrations/php.Dockerfile
+    command: npm run test:integration-webhooks
+    environment:
+      - EXAMPLE_SERVER=php packages/php/examples/laravel/artisan serve
+
+  #
+  # Python
+  #
+  integration_metrics_python_flask:
     build:
       context: .
       dockerfile: ./__tests__/integrations/python.Dockerfile
-    command: npm run test:integration
+    command: npm run test:integration-metrics
     environment:
       - EXAMPLE_SERVER=python examples/flask/app.py

@@ -92,25 +92,6 @@ export interface PayloadData {
   responseBody?: string;
 }
 
-/**
- * Translates Nodes platform strings into the allowed metrics platform strings
- *
- * @param platform
- * @returns
- */
-function fixPlatform(platform: string): 'mac' | 'windows' | 'linux' | 'unknown' {
-  switch (platform) {
-    case 'darwin':
-      return 'mac';
-    case 'win32':
-      return 'windows';
-    case 'linux':
-      return 'linux';
-    default:
-      return 'unknown';
-  }
-}
-
 export function constructPayload(
   req: Request,
   res: Response,
@@ -130,13 +111,18 @@ export function constructPayload(
     development: !!logOptions?.development,
     request: {
       log: {
-        creator: { name, version, comment: `${fixPlatform(process.platform)}/${process.version}` },
+        version: '1.2',
+        creator: {
+          name: 'readme-metrics (node)',
+          version,
+          // x64-darwin21.3.0/14.19.3
+          comment: `${os.arch()}-${os.platform()}${os.release()}/${process.versions.node}`,
+        },
         entries: [
           {
             pageref: payloadData.routePath
               ? new URL(payloadData.routePath, `${getProto(req)}://${req.headers.host}`).toString()
-              : // req.originalUrl is express specific, req.url is node.js
-                new URL(req.originalUrl || req.url, `${getProto(req)}://${req.headers.host}`).toString(),
+              : new URL(req.url, `${getProto(req)}://${req.headers.host}`).toString(),
             startedDateTime: payloadData.startedDateTime.toISOString(),
             time: serverTime,
             request: processRequest(req, payloadData.requestBody, logOptions),
@@ -149,7 +135,6 @@ export function constructPayload(
             },
           },
         ],
-        version: '', // what har version are we using? does it matter?
       },
     },
   };

@@ -1,16 +1,19 @@
 import type { LogOptions } from './construct-payload';
 import type { Request } from 'express';
 import type { Entry } from 'har-format';
-import url, { URL } from 'url';
-import get from 'lodash/get';
-import set from 'lodash/set';
-import pick from 'lodash/pick';
-import merge from 'lodash/merge';
-import * as contentType from 'content-type';
-import * as qs from 'querystring';
+import type { IncomingMessage } from 'http';
 
-import { objectToArray, searchToArray } from './object-to-array';
+import * as qs from 'querystring';
+import url, { URL } from 'url';
+
+import * as contentType from 'content-type';
+import get from 'lodash/get';
+import merge from 'lodash/merge';
+import pick from 'lodash/pick';
+import set from 'lodash/set';
+
 import { getProto } from './construct-payload';
+import { objectToArray, searchToArray } from './object-to-array';
 
 /**
  * Ensure we have a string or undefined response for any header.

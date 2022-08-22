@@ -3,7 +3,6 @@ PATH
   specs:
     readme-metrics (2.0.1)
       httparty (~> 0.18)
-      os (~> 1.1.4)
       uuid (~> 2.3.8)
 
 GEM
@@ -27,7 +26,6 @@ GEM
       mime-types-data (~> 3.2015)
     mime-types-data (3.2022.0105)
     multi_xml (0.6.0)
-    os (1.1.4)
     parallel (1.19.2)
     parser (2.7.1.4)
       ast (~> 2.4.1)
@@ -63,13 +61,12 @@ GEM
       unicode-display_width (>= 1.4.0, < 2.0)
     rubocop-ast (0.3.0)
       parser (>= 2.7.1.4)
-    rubocop-performance (1.6.1)
-      rubocop (>= 0.71.0)
+    rubocop-performance (1.7.1)
+      rubocop (>= 0.82.0)
+    rubocop-rspec (1.41.0)
+      rubocop (>= 0.68.1)
     ruby-progressbar (1.10.1)
     safe_yaml (1.0.5)
-    standard (0.4.7)
-      rubocop (~> 0.85.0)
-      rubocop-performance (~> 1.6.0)
     systemu (2.6.5)
     unicode-display_width (1.7.0)
     uuid (2.3.9)
@@ -84,12 +81,13 @@ PLATFORMS
 
 DEPENDENCIES
   json-schema
-  os
   rack-test
   rake (~> 12.0)
   readme-metrics!
   rspec (~> 3.0)
-  standard
+  rubocop
+  rubocop-performance
+  rubocop-rspec
   uuid
   webmock
 

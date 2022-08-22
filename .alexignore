@@ -1,0 +1,4 @@
+CHANGELOG.md
+packages/php/vendor/
+packages/python/requirements.txt
+packages/python/requirements.dev.txt

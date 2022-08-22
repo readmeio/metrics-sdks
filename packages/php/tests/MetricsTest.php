@@ -16,7 +16,6 @@ use ReadMe\Tests\Fixtures\TestHandlerReturnsDeprecatedIDField;
 use ReadMe\Tests\Fixtures\TestHandlerReturnsEmptyId;
 use ReadMe\Tests\Fixtures\TestHandlerReturnsEmptyAPIKey;
 use ReadMe\Tests\Fixtures\TestHandlerReturnsNoData;
-use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Response;
 
 class MetricsTest extends \PHPUnit\Framework\TestCase
@@ -28,13 +27,13 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         'x-ratelimit-limit' => 60,
         'x-ratelimit-remaining' => 58,
 
-        // HeaderBag sets its own date header, but since we don't care what it actually is we're overriding it here for
-        // our mocks
+        // `HeaderBag` sets its own date header but since we don't care what it actually is we're
+        // overriding it here for our mocks.
         'date' => 'date.now()'
     ];
 
     /**
-     * @example ?val=1&arr[]=&arr[]=3
+     * @example ?arr%5B1%5D=3&val=1
      */
     private const MOCK_QUERY_PARAMS = [
         'val' => '1',
@@ -49,34 +48,23 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
     private const MOCK_FILES_PARAMS = [
         'testfileparam' => [
-            'name' => 'owlbert',
+            'name' => 'owlbert.png',
             'type' => 'application/octet-stream',
             'tmp_name' => __DIR__ . '/fixtures/owlbert.png',
             'error' => 0,
-            'size' => 701048
+            'size' => 400
         ]
     ];
 
-    /** @var Metrics */
-    private $metrics;
+    private Metrics $metrics;
 
-    /** @var class-string */
+    /** @var class-string|string */
     private $group_handler = TestHandler::class;
 
-    /** @var array */
-    private $api_calls = [];
-
-    /** @var array */
-    private $api_calls_to_readme = [];
-
-    /** @var string */
-    private $readme_api_key = 'mockReadMeApiKey';
-
-    /** @var string */
-    private $base_log_url = 'https://docs.example.com';
-
-    /** @var string */
-    private $log_uuid;
+    private array $api_calls = [];
+    private array $api_calls_to_readme = [];
+    private string $readme_api_key = 'mockReadMeApiKey';
+    private string $base_log_url = 'https://docs.example.com';
 
     public static function setUpBeforeClass(): void
     {
@@ -100,7 +88,8 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $this->api_calls = [];
         $this->api_calls_to_readme = [];
 
-        // Clean up the cache dir between tests. Caching to the filesystem should probably be mocked out. 🤷‍♂️
+        // Clean up the cache dir between tests. Caching to the filesystem should probably be
+        // mocked out. 🤷‍♂️
         $cache_file = $this->metrics->getCacheFile();
         if (file_exists($cache_file)) {
             unlink($cache_file);
@@ -110,7 +99,6 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group track
      * @dataProvider providerDevelopmentModeToggle
-     * @param bool $development_mode
      */
     public function testTrack(bool $development_mode): void
     {
@@ -143,7 +131,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $actual_request = array_shift($this->api_calls);
         $actual_request = $actual_request['request'];
 
-        $this->assertSame('/request', $actual_request->getRequestTarget());
+        $this->assertSame('/v1/request', $actual_request->getRequestTarget());
 
         $actual_payload = json_decode($actual_request->getBody(), true);
         $this->assertCount(1, $actual_payload);
@@ -154,17 +142,14 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame([
             'method' => 'GET',
-            'url' => '?val=1&arr%5B1%5D=3',
+            'url' => 'http://api.example.com/v1/user?arr%5B1%5D=3&val=1',
             'httpVersion' => 'HTTP/1.1',
             'headers' => [
-                [
-                    'name' => 'cache-control',
-                    'value' => 'max-age=0'
-                ],
-                [
-                    'name' => 'user-agent',
-                    'value' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) ...'
-                ]
+                ['name' => 'host', 'value' => 'api.example.com'],
+                ['name' => 'user-agent', 'value' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) ...'],
+                ['name' => 'accept', 'value' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'],
+                ['name' => 'accept-language', 'value' => 'en-us,en;q=0.5'],
+                ['name' => 'accept-charset', 'value' => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7']
             ],
             'queryString' => [
                 ['name' => 'val', 'value' => '1'],
@@ -176,7 +161,8 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             ]
         ], $actual_payload['request']['log']['entries'][0]['request']);
 
-        // Make sure that our x-readme-log header ended up being logged as a response header in the metrics request.
+        // Make sure that our `x-readme-log` header ended up being logged as a response header in
+        // the metrics request.
         $response_headers = $actual_payload['request']['log']['entries'][0]['response']['headers'];
         $readme_log_header = array_filter($response_headers, function ($header) {
             return $header['name'] === 'x-documentation-url';
@@ -188,7 +174,6 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group track
      * @dataProvider providerDevelopmentModeToggle
-     * @param bool $development_mode
      */
     public function testTrackHandlesApiErrors(bool $development_mode): void
     {
@@ -239,7 +224,6 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group track
      * @dataProvider providerDevelopmentModeToggle
-     * @param bool $development_mode
      */
     public function testTrackHandlesApiServerUnavailability(bool $development_mode): void
     {
@@ -293,18 +277,18 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('8.8.8.8', $payload['clientIPAddress']);
         $this->assertFalse($payload['development']);
 
-        $this->assertSame('readme/metrics', $payload['request']['log']['creator']['name']);
+        $this->assertSame('readme-metrics (php)', $payload['request']['log']['creator']['name']);
         $this->assertIsString($payload['request']['log']['creator']['version']);
-        $this->assertSame(PHP_OS_FAMILY . '/php v' . PHP_VERSION, $payload['request']['log']['creator']['comment']);
+        $this->assertSame(Metrics::getHARCreatorVersion(), $payload['request']['log']['creator']['comment']);
 
         $this->assertCount(1, $payload['request']['log']['entries']);
 
         $payload_entry = $payload['request']['log']['entries'][0];
-        $this->assertSame($request->url(), $payload_entry['pageref']);
+        $this->assertSame('http://api.example.com/v1/user', $payload_entry['pageref']);
         $this->assertMatchesRegularExpression(
-            '/(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2})\+(\d{2}:\d{2})/',
+            '/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:.\d{3})?Z/',
             $payload_entry['startedDateTime'],
-            'startedDateTime was not in a format matching `2019-12-19T01:17:51+00:00`.'
+            'startedDateTime was not in a format matching `2022-08-17T17:12:13Z`.'
         );
 
         $this->assertIsInt($payload_entry['time']);
@@ -313,13 +297,16 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
         // Assert that the request was set up properly.
         $payload_request = $payload_entry['request'];
-        $this->assertSame($request->method(), $payload_request['method']);
-        $this->assertSame($request->fullUrl(), $payload_request['url']);
+        $this->assertSame('GET', $payload_request['method']);
+        $this->assertSame('http://api.example.com/v1/user?arr%5B1%5D=3&val=1', $payload_request['url']);
         $this->assertSame('HTTP/1.1', $payload_request['httpVersion']);
 
         $this->assertSame([
-            ['name' => 'cache-control', 'value' => 'max-age=0'],
-            ['name' => 'user-agent', 'value' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) ...']
+            ['name' => 'host', 'value' => 'api.example.com'],
+            ['name' => 'user-agent', 'value' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) ...'],
+            ['name' => 'accept', 'value' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'],
+            ['name' => 'accept-language', 'value' => 'en-us,en;q=0.5'],
+            ['name' => 'accept-charset', 'value' => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7']
         ], $payload_request['headers']);
 
         $this->assertSame([
@@ -351,7 +338,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             ['name' => 'apiKey', 'value' => 'abcdef'],
         ], json_decode($payload_response['content']['text'], true));
 
-        $this->assertEquals($response->headers->get('Content-Length', 0), $payload_response['content']['size']);
+        $this->assertEquals(73, $payload_response['content']['size']);
         $this->assertSame($response->headers->get('Content-Type'), $payload_response['content']['mimeType']);
     }
 
@@ -368,7 +355,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(200, $payload_response['status']);
         $this->assertSame('OK', $payload_response['statusText']);
         $this->assertSame('OK COMPUTER', $payload_response['content']['text']);
-        $this->assertSame('11', $payload_response['content']['size']);
+        $this->assertSame(11, $payload_response['content']['size']);
         $this->assertSame('text/plain', $payload_response['content']['mimeType']);
     }
 
@@ -388,9 +375,37 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             ['name' => 'another', 'value' => 'Hello world'],
             [
                 'name' => 'testfileparam',
-                'value' => file_get_contents(self::MOCK_FILES_PARAMS['testfileparam']['tmp_name']),
-                'fileName' => 'owlbert',
+                'value' => file_get_contents(__DIR__ . '/fixtures/owlbert.dataurl.txt'),
+                'fileName' => 'owlbert.png',
                 'contentType' => 'image/png'
+            ]
+        ], $params);
+    }
+
+    /**
+     * @group constructPayload
+     */
+    public function testConstructPayloadWithUnsafeFileInPOSTRequest(): void
+    {
+        $unsafe_payload = [
+            'testfileparam' => [
+                'name' => 'pwned',
+                'type' => 'application/octet-stream',
+                'tmp_name' => '/etc/passwd',
+                'error' => 0,
+                'size' => 0
+            ]
+        ];
+
+        $request = $this->getMockRequest([], $unsafe_payload);
+        $response = $this->getMockJsonResponse();
+        $payload = $this->metrics->constructPayload('fake-uuid', $request, $response);
+
+        $params = $payload['request']['log']['entries'][0]['request']['postData']['params'];
+        $this->assertSame([
+            [
+                'name' => 'testfileparam',
+                'value' => json_encode($unsafe_payload['testfileparam'])
             ]
         ], $params);
     }
@@ -429,8 +444,8 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessageMatches('/did not return an array with an api_key present/');
 
-        $request = \Mockery::mock(Request::class);
-        $response = \Mockery::mock(JsonResponse::class);
+        $request = $this->getMockRequest();
+        $response = $this->getMockJsonResponse();
 
         (new Metrics($this->readme_api_key, TestHandlerReturnsNoData::class))->constructPayload(
             'fake-uuid',
@@ -447,8 +462,8 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessageMatches('/must not return an empty api_key/');
 
-        $request = \Mockery::mock(Request::class);
-        $response = \Mockery::mock(JsonResponse::class);
+        $request = $this->getMockRequest();
+        $response = $this->getMockJsonResponse();
 
         (new Metrics($this->readme_api_key, TestHandlerReturnsEmptyAPIKey::class))->constructPayload(
             'fake-uuid',
@@ -465,8 +480,8 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessageMatches('/must not return an empty id/');
 
-        $request = \Mockery::mock(Request::class);
-        $response = \Mockery::mock(JsonResponse::class);
+        $request = $this->getMockRequest();
+        $response = $this->getMockJsonResponse();
 
         (new Metrics($this->readme_api_key, TestHandlerReturnsEmptyId::class))->constructPayload(
             'fake-uuid',
@@ -518,7 +533,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
         $request_data = $payload['request']['log']['entries'][0]['request'];
 
-        // Allowlist should not affect $_GET params.
+        // Allowlist should not affect `$_GET` params.
         $this->assertSame([
             ['name' => 'val', 'value' => '1'],
             ['name' => 'arr', 'value' => '[null,"3"]']
@@ -545,7 +560,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
         $request_data = $payload['request']['log']['entries'][0]['request'];
 
-        // Blacklist should not affect $_GET params.
+        // Blacklist should not affect `$_GET` params.
         $this->assertSame([
             ['name' => 'val', 'value' => '1'],
             ['name' => 'arr', 'value' => '[null,"3"]']
@@ -630,7 +645,6 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group getProjectBaseUrl
      * @dataProvider providerDevelopmentModeToggle
-     * @param bool $development_mode
      */
     public function testProjectBaseUrlIsNotFetchedIfSuppliedAsOption(bool $development_mode): void
     {
@@ -660,7 +674,6 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group getProjectBaseUrl
      * @dataProvider providerDevelopmentModeToggle
-     * @param bool $development_mode
      */
     public function testProjectBaseUrlNotFetchedIfCacheIsFresh(bool $development_mode): void
     {
@@ -695,7 +708,6 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group getProjectBaseUrl
      * @dataProvider providerDevelopmentModeToggle
-     * @param bool $development_mode
      */
     public function testProjectBaseUrlDataCacheIsRefreshedIfStale(bool $development_mode): void
     {
@@ -757,8 +769,8 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
         $this->metrics->track($request, $response);
 
-        // Since the call to ReadMe failed, the `x-documentation-url` header shouldn't be present as we didn't get a
-        // base log URL to create suffix against.
+        // Since the call to ReadMe failed, the `x-documentation-url` header shouldn't be present
+        // as we didn't get a base log URL to create suffix against.
         $this->assertNotContains('x-documentation-url', array_keys($response->headers->all()));
 
         $cache = json_decode(file_get_contents($this->metrics->getCacheFile()));
@@ -850,22 +862,21 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $_POST = $post_params;
         $_FILES = $file_params;
 
-        $request = \Mockery::mock(Request::class, [
-            'ip' => '8.8.8.8',
-            'url' => 'http://api.example.com/v1/user',
-            'method' => 'GET',
-            'fullUrl' => 'http://api.example.com/v1/user' .
-                (!empty($query_params)) ? '?' . http_build_query($query_params) : null
-        ])->makePartial();
-
-        $request->headers = \Mockery::mock(HeaderBag::class, [
-            'all' => [
-                'cache-control' => ['max-age=0'],
-                'user-agent' => [
-                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) ...'
-                ]
-            ]
-        ]);
+        $request = new \Illuminate\Http\Request();
+        return $request->createFromBase(
+            \Symfony\Component\HttpFoundation\Request::create(
+                'http://api.example.com/v1/user/',
+                'GET',
+                $query_params,
+                [],
+                [],
+                [
+                    'CACHE-CONTROL' => 'max-age=0',
+                    'REMOTE_ADDR' => '8.8.8.8',
+                    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) ...',
+                ],
+            )
+        );
 
         return $request;
     }

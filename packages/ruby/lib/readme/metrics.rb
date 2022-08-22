@@ -1,33 +1,21 @@
-require "readme/metrics/version"
-require "readme/har/serializer"
-require "readme/filter"
-require "readme/payload"
-require "readme/request_queue"
-require "readme/errors"
-require "readme/http_request"
-require "readme/http_response"
-require "httparty"
-require "logger"
-require "os"
+# frozen-string-literal: true
+
+require 'readme/metrics/version'
+require 'readme/har/serializer'
+require 'readme/filter'
+require 'readme/payload'
+require 'readme/request_queue'
+require 'readme/errors'
+require 'readme/http_request'
+require 'readme/http_response'
+require 'httparty'
+require 'logger'
 
 module Readme
   class Metrics
-    def self.platform
-      if OS.windows?
-        "windows"
-      elsif OS.mac?
-        "mac"
-      elsif OS.linux?
-        "linux"
-      else
-        "unknown"
-      end
-    end
-
-    SDK_NAME = "Readme.io Ruby SDK"
-    PLATFORM = platform
+    SDK_NAME = 'readme-metrics'
     DEFAULT_BUFFER_LENGTH = 1
-    ENDPOINT = "https://metrics.readme.io/v1/request"
+    ENDPOINT = 'https://metrics.readme.io/v1/request'
 
     def self.logger
       @@logger
@@ -77,15 +65,16 @@ module Readme
       request = HttpRequest.new(env)
       har = Har::Serializer.new(request, response, start_time, end_time, @filter)
       user_info = @get_user_info.call(env)
+      ip = env['REMOTE_ADDR']
 
       if !user_info_valid?(user_info)
         Readme::Metrics.logger.warn Errors.bad_block_message(user_info)
       elsif request.options?
-        Readme::Metrics.logger.info "OPTIONS request omitted from ReadMe API logging"
+        Readme::Metrics.logger.info 'OPTIONS request omitted from ReadMe API logging'
       elsif !can_filter? request, response
         Readme::Metrics.logger.warn "Request or response body MIME type isn't supported for filtering. Omitting request from ReadMe API logging"
       else
-        payload = Payload.new(har, user_info, development: @development)
+        payload = Payload.new(har, user_info, ip, development: @development)
         @@request_queue.push(payload.to_json) unless payload.ignore
       end
     end
@@ -121,34 +110,36 @@ module Readme
         raise Errors::ConfigurationError, Errors::BUFFER_LENGTH_ERROR
       end
 
-      if options[:development] && !is_a_boolean?(options[:development])
+      if options[:development] && !a_boolean?(options[:development])
         raise Errors::ConfigurationError, Errors::DEVELOPMENT_ERROR
       end
 
-      if options[:logger] && has_logger_inferface?(options[:logger])
+      if options[:logger] && logger_inferface?(options[:logger])
         raise Errors::ConfigurationError, Errors::LOGGER_ERROR
       end
     end
 
-    def has_logger_inferface?(logger)
-      [
-        :unknown,
-        :fatal,
-        :error,
-        :warn,
-        :info,
-        :debug
+    def logger_inferface?(logger)
+      %i[
+        unknown
+        fatal
+        error
+        warn
+        info
+        debug
       ].any? { |message| !logger.respond_to? message }
     end
 
-    def is_a_boolean?(arg)
-      arg == true || arg == false
+    def a_boolean?(arg)
+      [true, false].include?(arg)
     end
 
+    # rubocop:disable Style/InverseMethods
     def user_info_valid?(user_info)
       !user_info.nil? &&
         !user_info.values.any?(&:nil?) &&
-        user_info.has_key?(:api_key) || user_info.has_key?(:id)
+        user_info.key?(:api_key) || user_info.key?(:id)
     end
+    # rubocop:enable Style/InverseMethods
   end
 end

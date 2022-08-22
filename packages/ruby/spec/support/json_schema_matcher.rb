@@ -1,4 +1,4 @@
-require "json-schema"
+require 'json-schema'
 
 RSpec::Matchers.define :match_json_schema do |schema|
   match do |json_body|

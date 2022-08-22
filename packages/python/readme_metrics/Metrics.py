@@ -2,9 +2,6 @@ import atexit
 import math
 import queue
 import threading
-import requests
-import json
-import importlib
 
 from readme_metrics import MetricsApiConfig
 from readme_metrics.publisher import publish_batch
@@ -14,8 +11,8 @@ from readme_metrics.ResponseInfoWrapper import ResponseInfoWrapper
 
 class Metrics:
     """
-    This is the internal central controller class invoked by the ReadMe middleware. It
-    queues requests for submission. The submission is processed by readme_metrics.publisher.publish_batch().
+    This is the internal central controller class invoked by the ReadMe middleware. It queues
+    requests for submission for processing by `readme_metrics.publisher.publish_batch()`.
     """
 
     PACKAGE_NAME: str = "readme/metrics"
@@ -49,6 +46,7 @@ class Metrics:
             response (ResponseInfoWrapper): Response object
         """
         if not self.host_allowed(request.environ["HTTP_HOST"]):
+            # pylint: disable=C0301
             self.config.LOGGER.debug(
                 f"Not enqueueing request, host {request.environ['HTTP_HOST']} not in ALLOWED_HTTP_HOSTS"
             )
@@ -59,7 +57,7 @@ class Metrics:
             # PayloadBuilder returns None when the grouping function returns
             # None (an indication that the request should not be logged.)
             self.config.LOGGER.debug(
-                f"Not enqueueing request, grouping function returned None"
+                "Not enqueueing request, grouping function returned None"
             )
             return
 
@@ -88,6 +86,7 @@ class Metrics:
     def host_allowed(self, host):
         if self.config.ALLOWED_HTTP_HOSTS:
             return host in self.config.ALLOWED_HTTP_HOSTS
-        else:
-            # If the allowed_http_hosts has not been set (None by default), send off the data to be queued
-            return True
+
+        # If `allowed_http_hosts`` has not been set (None by default), send off the data to be
+        # queued.
+        return True

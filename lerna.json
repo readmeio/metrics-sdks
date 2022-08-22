@@ -1,6 +1,4 @@
 {
-  "packages": [
-    "packages/node"
-  ],
-  "version": "5.1.4"
+  "version": "independent",
+  "useWorkspaces": true
 }

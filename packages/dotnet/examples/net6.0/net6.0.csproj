@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Readme\Readme.csproj" />
+    <ProjectReference Include="..\..\ReadMe\ReadMe.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

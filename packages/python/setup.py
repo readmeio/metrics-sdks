@@ -11,11 +11,11 @@ setup(
     version=version,
     author="ReadMe",
     author_email="support@readme.io",
-    description="ReadMe API Metrics WSGI SDK",
+    description="ReadMe API Metrics SDK",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/readmeio/metrics-sdks/tree/main/packages/python",
     packages=["readme_metrics"],
-    install_requires=["requests"],
+    install_requires=["requests", "Werkzeug"],
     extras_require={"Flask": ["Flask"], "Django": ["Django"]},
 )

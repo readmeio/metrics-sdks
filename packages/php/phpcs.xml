@@ -1,8 +1,16 @@
 <?xml version="1.0"?>
 <ruleset>
     <description>ReadMe coding standards</description>
-    <rule ref="PSR12"/>
+    <arg name="colors" />
 
-    <!-- Require that strings be single quoted. -->
+    <exclude-pattern>examples/*/bootstrap/cache</exclude-pattern>
+    <exclude-pattern>examples/*/storage</exclude-pattern>
+    <exclude-pattern>examples/*/vendor</exclude-pattern>
+
+    <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
+        <exclude-pattern>examples/laravel/public/index.php</exclude-pattern>
+    </rule>
+
+    <rule ref="PSR12" />
     <rule ref="Squiz.Strings.DoubleQuoteUsage" />
 </ruleset>

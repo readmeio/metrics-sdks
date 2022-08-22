@@ -1,11 +1,18 @@
 import os
+import sys
 from flask import Flask
 from readme_metrics import MetricsApiConfig
 from readme_metrics.flask_readme import ReadMeMetrics
 
+if os.getenv("README_API_KEY") is None:
+    sys.stderr.write("Missing `README_API_KEY` environment variable")
+    sys.stderr.flush()
+    sys.exit(1)
+
 app = Flask(__name__)
 
 
+# pylint: disable=W0613
 def grouping_function(request):
     return {
         # User's API Key
@@ -37,4 +44,4 @@ def hello_world():
 
 
 if __name__ == "__main__":
-    app.run(debug=False, host="127.0.0.1", port=os.getenv("PORT", 4000))
+    app.run(debug=False, host="127.0.0.1", port=os.getenv("PORT", "4000"))

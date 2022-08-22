@@ -3,6 +3,19 @@ name: php
 on: [push]
 
 jobs:
+  integration:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: docker-compose run integration_metrics_php_laravel
+      - run: docker-compose run integration_webhooks_php_laravel
+
+      - name: Cleanup
+        if: always()
+        run: docker-compose down
+
   test:
     runs-on: ubuntu-latest
     defaults:
@@ -12,8 +25,14 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.0, 8.1]
-        laravel: [6.*, 7.*, 8.*, 9.*]
+        # https://endoflife.date/php
+        php:
+          - 8.0 # EOL: November 26, 2023
+          - 8.1 # EOL: November 25, 2024
+        # https://endoflife.date/laravel
+        laravel:
+          - 8.* # EOL: January 24th, 2023
+          - 9.* # EOL: February 8th, 2024
 
     name: build (${{ matrix.php }} w/ Laravel ${{ matrix.laravel }}
 
@@ -21,7 +40,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Cache dependencies
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.0.5
         with:
           path: ~/.composer/cache/files
           key: dependencies-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
@@ -40,55 +59,12 @@ jobs:
           composer update --prefer-stable --prefer-dist --no-interaction --no-suggest
 
       - name: Check code standards
-        run: composer run-script lint
+        run: make lint
 
-      # - name: Execute static analysis
-      #   run: composer run-script psalm
-
-      - name: Run tests
-        run: composer run-script phpunit
-
-  test-php74:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/php
-
-    strategy:
-      fail-fast: true
-      matrix:
-        php: [7.4]
-        laravel: [6.*, 7.*, 8.*]
-
-    name: build (${{ matrix.php }} w/ Laravel ${{ matrix.laravel }}
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Cache dependencies
-        uses: actions/cache@v3.0.4
-        with:
-          path: ~/.composer/cache/files
-          key: dependencies-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-
-      # Installing a specific version of Laravel will force us to use compatible versions of
-      # `illuminate/http` and `illuminate/support`. If we didn't do this step then we'd always only
-      # ever test on the latest versions of those two packages.
-      - name: Install dependencies
+      - name: Run static analysis
         run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
-          composer update --prefer-stable --prefer-dist --no-interaction --no-suggest
-
-      - name: Check code standards
-        run: composer run-script lint
-
-      # - name: Execute static analysis
-      #   run: composer run-script psalm
+          make static-analysis
+          make taint-analysis
 
       - name: Run tests
-        run: composer run-script phpunit
+        run: make test
