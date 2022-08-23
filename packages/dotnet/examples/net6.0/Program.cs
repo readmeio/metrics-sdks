@@ -16,7 +16,7 @@ builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
 
 var app = builder.Build();
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "4000";
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8000";
 
 app.Use(async (context, next) =>
 {

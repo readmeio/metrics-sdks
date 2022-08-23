@@ -1,7 +1,7 @@
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "4000";
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8000";
 
 // Your ReadMe secret
 var secret = Environment.GetEnvironmentVariable("README_API_KEY");

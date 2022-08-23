@@ -100,7 +100,7 @@ export const express: Client = {
 
     blank();
 
-    push('app.listen(4000);');
+    push('app.listen(8000);');
 
     return {
       ranges: ranges(),

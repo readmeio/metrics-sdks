@@ -110,7 +110,7 @@ export const net6: Client = {
 
     blank();
 
-    push('app.Run($"http://localhost:4000");');
+    push('app.Run($"http://localhost:8000");');
 
     return {
       ranges: ranges(),

@@ -15,5 +15,5 @@ README_API_KEY=<Your ReadMe API Key here> npm start
 ## Test
 
 ```sh
-curl http://localhost:4000
+curl http://localhost:8000
 ```
