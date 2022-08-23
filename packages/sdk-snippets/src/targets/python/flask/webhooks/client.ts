@@ -59,6 +59,10 @@ export const flask: Client = {
     push('return (', 1);
     push('{', 2);
 
+    if (!server.length && !security.length) {
+      push('# Add custom data to return in your webhook call here.', 3);
+    }
+
     if (server.length) {
       push('# OAS Server variables', 3);
       server.forEach(data => {
@@ -115,7 +119,7 @@ export const flask: Client = {
     blank();
 
     push('if __name__ == "__main__":');
-    push('app.run(debug=False, host="127.0.0.1", port=os.getenv("PORT", "4000"))', 1);
+    push('app.run(debug=False, host="127.0.0.1", port=os.getenv("PORT", "8000"))', 1);
 
     return {
       ranges: ranges(),

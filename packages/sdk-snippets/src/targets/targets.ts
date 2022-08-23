@@ -2,7 +2,7 @@ import type { SecurityVariable, ServerVariable } from '..';
 import type { CodeBuilder } from '../helpers/code-builder';
 import type { Merge } from 'type-fest';
 
-import { dotnet } from './dotnet/target';
+import { csharp } from './csharp/target';
 import { node } from './node/target';
 import { php } from './php/target';
 import { python } from './python/target';
@@ -59,7 +59,7 @@ export interface Target {
 }
 
 export const targets = {
-  dotnet,
+  csharp,
   node,
   php,
   python,
