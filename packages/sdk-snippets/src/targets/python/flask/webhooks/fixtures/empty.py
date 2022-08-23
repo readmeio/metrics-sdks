@@ -32,6 +32,7 @@ def webhook():
     # user = User.objects.get(email__exact=request.values.get("email"))
     return (
         {
+            # Add custom data to return in your webhook call here.
         },
         200,
         {"Content-Type": "application/json; charset=utf-8"},

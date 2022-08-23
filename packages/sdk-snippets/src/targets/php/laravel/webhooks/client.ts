@@ -45,6 +45,10 @@ export const laravel: Client = {
     push("// $user = DB::table('users')->where('email', $request->input('email'))->limit(1)->get();", 1);
     push('return response()->json([', 1);
 
+    if (!server.length && !security.length) {
+      push('// Add custom data to return in your webhook call here.', 2);
+    }
+
     if (server.length) {
       push('// OAS Server variables', 2);
       server.forEach(data => {

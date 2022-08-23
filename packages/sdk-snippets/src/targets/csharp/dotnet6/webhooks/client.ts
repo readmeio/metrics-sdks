@@ -57,6 +57,11 @@ export const dotnet6: Client = {
 
     push('await context.Response.WriteAsJsonAsync(new', 1);
     push('{', 1);
+
+    if (!server.length && !security.length) {
+      push('// Add custom data to return in your webhook call here.', 2);
+    }
+
     if (server.length) {
       push('// OAS Server variables', 2);
       server.forEach(data => {

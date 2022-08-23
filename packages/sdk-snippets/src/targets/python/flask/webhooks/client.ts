@@ -59,6 +59,10 @@ export const flask: Client = {
     push('return (', 1);
     push('{', 2);
 
+    if (!server.length && !security.length) {
+      push('# Add custom data to return in your webhook call here.', 3);
+    }
+
     if (server.length) {
       push('# OAS Server variables', 3);
       server.forEach(data => {

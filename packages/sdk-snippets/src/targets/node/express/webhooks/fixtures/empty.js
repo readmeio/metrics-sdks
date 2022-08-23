@@ -20,6 +20,7 @@ app.post('/webhook', express.json({ type: 'application/json' }), async (req, res
   // Fetch the user from the database and return their data for use with OpenAPI variables.
   // const user = await db.find({ email: req.body.email })
   return res.json({
+    // Add custom data to return in your webhook call here.
   });
 });
 

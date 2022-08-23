@@ -29,6 +29,7 @@ app.MapPost("/webhook", async context =>
 
   await context.Response.WriteAsJsonAsync(new
   {
+    // Add custom data to return in your webhook call here.
   });
 });
 
