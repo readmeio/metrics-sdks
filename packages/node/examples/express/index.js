@@ -28,6 +28,10 @@ app.get('/', (req, res) => {
   res.json({ message: 'hello world' });
 });
 
+app.post('/', express.json(), (req, res) => {
+  res.sendStatus(200);
+});
+
 const server = app.listen(port, 'localhost', function () {
   // eslint-disable-next-line no-console
   console.log('Example app listening at http://%s:%s', server.address().address, port);
