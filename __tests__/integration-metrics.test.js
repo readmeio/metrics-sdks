@@ -14,6 +14,16 @@ if (!process.env.EXAMPLE_SERVER) {
   process.exit(1);
 }
 
+async function getBody(response) {
+  let responseBody = '';
+  // eslint-disable-next-line no-restricted-syntax
+  for await (const chunk of response) {
+    responseBody += chunk;
+  }
+  expect(responseBody).not.toBe('');
+  return JSON.parse(responseBody);
+}
+
 // https://gist.github.com/krnlde/797e5e0a6f12cc9bd563123756fc101f
 http.get[promisify.custom] = function getAsync(options) {
   return new Promise((resolve, reject) => {
@@ -27,6 +37,22 @@ http.get[promisify.custom] = function getAsync(options) {
       .on('error', reject);
   });
 };
+
+function post(url, body, options) {
+  return new Promise((resolve, reject) => {
+    const request = http
+      .request(url, { method: 'post', ...options }, response => {
+        response.end = new Promise(res => {
+          response.on('end', res);
+        });
+        resolve(response);
+      })
+      .on('error', reject);
+
+    request.write(body);
+    request.end();
+  });
+}
 
 const get = promisify(http.get);
 
@@ -142,12 +168,7 @@ describe('Metrics SDK Integration Tests', () => {
     expect(req.url).toBe('/v1/request');
     expect(req.headers.authorization).toBe('Basic YS1yYW5kb20tcmVhZG1lLWFwaS1rZXk6');
 
-    let body = '';
-    // eslint-disable-next-line no-restricted-syntax
-    for await (const chunk of req) {
-      body += chunk;
-    }
-    body = JSON.parse(body);
+    const body = await getBody(req);
     const [har] = body;
 
     // Check for a uuid
@@ -192,5 +213,27 @@ describe('Metrics SDK Integration Tests', () => {
 
     const responseHeaders = caseless(arrayToObject(response.headers));
     expect(responseHeaders.get('content-type')).toMatch(/application\/json(;\s?charset=utf-8)?/);
+  });
+
+  it('should process the http POST body', async () => {
+    const postData = JSON.stringify({ user: { email: 'dom@readme.io' } });
+    await post(`http://localhost:${PORT}/`, postData, {
+      headers: {
+        'content-type': 'application/json',
+      },
+    });
+
+    const [req] = await once(metricsServer, 'request');
+
+    const body = await getBody(req);
+    const [har] = body;
+
+    const { request, response } = har.request.log.entries[0];
+    expect(request.method).toBe('POST');
+    expect(response.status).toBe(200);
+    expect(request.postData).toStrictEqual({
+      mimeType: 'application/json',
+      text: postData,
+    });
   });
 });
