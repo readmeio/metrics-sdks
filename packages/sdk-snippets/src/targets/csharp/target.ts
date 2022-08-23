@@ -1,19 +1,19 @@
 import type { Target } from '../targets';
 
-import { net6 } from './net6/webhooks/client';
+import { dotnet6 } from './dotnet6/webhooks/client';
 
-export const dotnet: Target = {
+export const csharp: Target = {
   info: {
-    key: 'dotnet',
-    title: '.NET',
+    key: 'csharp',
+    title: 'C#',
     extname: '.cs',
-    default: 'net6',
+    default: 'dotnet6',
     cli: 'dotnet %s',
   },
   services: {
     server: {},
     webhooks: {
-      net6,
+      dotnet6,
     },
   },
 };

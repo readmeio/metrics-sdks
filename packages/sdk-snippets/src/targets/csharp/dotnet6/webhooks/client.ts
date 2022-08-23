@@ -3,9 +3,9 @@ import type { Client } from '../../../targets';
 import { CodeBuilder } from '../../../../helpers/code-builder';
 import { escapeForObjectKey, escapeForDoubleQuotes } from '../../../../helpers/escape';
 
-export const net6: Client = {
+export const dotnet6: Client = {
   info: {
-    key: 'net6',
+    key: 'dotnet6',
     title: '.NET 6.0',
     link: 'https://docs.microsoft.com/en-us/dotnet/core/introduction',
     description: 'ReadMe Metrics Webhooks SDK usage on .NET 6.0',
