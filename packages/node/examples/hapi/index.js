@@ -24,6 +24,7 @@ const init = async () => {
       email: 'owlbert@example.com',
     };
 
+    req.body = request.payload;
     readmeio.log(process.env.README_API_KEY, req, res, payloadData);
 
     return h.continue;
@@ -34,6 +35,14 @@ const init = async () => {
     path: '/',
     handler: () => {
       return { message: 'hello world' };
+    },
+  });
+
+  server.route({
+    method: 'POST',
+    path: '/',
+    handler: () => {
+      return { statusCode: 200 };
     },
   });
 
