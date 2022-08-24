@@ -227,10 +227,7 @@ class Metrics
             'queryString' => static::convertObjectToArray($_GET),
             'postData' => [
                 'mimeType' => 'application/json',
-                'params' => array_merge(
-                    static::convertObjectToArray($this->sanitizeInputPerConfig($_POST)),
-                    static::convertFileObjectForArray($this->sanitizeInputPerConfig($_FILES))
-                )
+                'text' => json_encode($this->sanitizeInputPerConfig($request->all()))
             ]
         ];
     }
