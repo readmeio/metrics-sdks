@@ -1,7 +1,6 @@
 import type { Client } from '../../../targets';
 
-import { CodeBuilder } from '../../../../helpers/code-builder';
-import { escapeForObjectKey, escapeForDoubleQuotes } from '../../../../helpers/escape';
+import { CodeWriter } from '../../../../helpers/code-writer';
 
 export const dotnet6: Client = {
   info: {
@@ -10,116 +9,116 @@ export const dotnet6: Client = {
     link: 'https://docs.microsoft.com/en-us/dotnet/core/introduction',
     description: 'ReadMe Metrics Webhooks SDK usage on .NET 6.0',
   },
-  convert: ({ secret, security, server }, options) => {
-    const opts = {
-      indent: '  ',
-      ...options,
-    };
+  convert: ({ secret, security, server }) => {
+    const writer = new CodeWriter({
+      indentNumberOfSpaces: 2,
+      useSingleQuote: false,
+    });
 
-    const { blank, join, push, pushVariable, ranges } = new CodeBuilder({ indent: opts.indent });
+    writer.writeLine('var builder = WebApplication.CreateBuilder(args);');
+    writer.writeLine('var app = builder.Build();');
+    writer.blankLine();
 
-    push('var builder = WebApplication.CreateBuilder(args);');
-    push('var app = builder.Build();');
+    writer.writeLine('// Your ReadMe secret');
+    writer.write('var secret = ').quote(secret).write(';').newLine();
+    writer.blankLine();
 
-    blank();
+    writer.writeLine('app.MapPost("/webhook", async context =>');
+    writer.writeLine('{').indent(() => {
+      writer.writeLine('// Verify the request is legitimate and came from ReadMe.');
+      writer.writeLine('var signature = context.Request.Headers["readme-signature"];');
+      writer.writeLine('var body = await new StreamReader(context.Request.Body).ReadToEndAsync();');
+      writer.blankLine();
 
-    push('// Your ReadMe secret');
-    push(`var secret = "${secret}";`);
+      writer
+        .writeLine('try')
+        .writeLine('{')
+        .indent(() => {
+          writer.writeLine('ReadMe.Webhook.Verify(body, signature, secret);');
+        })
+        .writeLine('}')
+        .writeLine('catch (Exception e)')
+        .writeLine('{')
+        .indent(() => {
+          writer.writeLine('context.Response.StatusCode = StatusCodes.Status401Unauthorized;');
+          writer.writeLine('await context.Response.WriteAsJsonAsync(new');
+          writer.writeLine('{').indent(() => {
+            writer.writeLine('error = e.Message,');
+          });
+          writer.writeLine('});');
+          writer.writeLine('return;');
+        })
+        .writeLine('}')
+        .blankLine();
 
-    blank();
+      writer.writeLine('// Fetch the user from the database and return their data for use with OpenAPI variables.');
+      writer.writeLine('// @todo Write your own query logic to fetch a user by `body["email"]`.');
+      writer.blankLine();
 
-    push('app.MapPost("/webhook", async context =>');
-    push('{');
-    push('// Verify the request is legitimate and came from ReadMe.', 1);
-    push('var signature = context.Request.Headers["readme-signature"];', 1);
-    push('var body = await new StreamReader(context.Request.Body).ReadToEndAsync();', 1);
-
-    blank();
-
-    push('try', 1);
-    push('{', 1);
-    push('ReadMe.Webhook.Verify(body, signature, secret);', 2);
-    push('}', 1);
-    push('catch (Exception e)', 1);
-    push('{', 1);
-    push('context.Response.StatusCode = StatusCodes.Status401Unauthorized;', 2);
-    push('await context.Response.WriteAsJsonAsync(new', 2);
-    push('{', 2);
-    push('error = e.Message,', 3);
-    push('});', 2);
-    push('return;', 2);
-    push('}', 1);
-    blank();
-
-    push('// Fetch the user from the database and return their data for use with OpenAPI variables.', 1);
-    push('// @todo Write your own query logic to fetch a user by `body["email"]`.', 1);
-    blank();
-
-    push('await context.Response.WriteAsJsonAsync(new', 1);
-    push('{', 1);
-
-    if (!server.length && !security.length) {
-      push('// Add custom data to return in your webhook call here.', 2);
-    }
-
-    if (server.length) {
-      push('// OAS Server variables', 2);
-      server.forEach(data => {
-        pushVariable(
-          `${escapeForObjectKey(data.name, true)} = "${escapeForDoubleQuotes(
-            data.default || data.default === '' ? data.default : data.name
-          )}",`,
-          {
-            type: 'server',
-            name: data.name,
-            indentationLevel: 2,
-          }
-        );
-      });
-    }
-
-    if (server.length && security.length) {
-      blank();
-    }
-
-    if (security.length) {
-      push('// OAS Security variables', 2);
-      security.forEach(data => {
-        if (data.type === 'http') {
-          // Only HTTP Basic auth has any special handling for supplying auth.
-          if (data.scheme === 'basic') {
-            pushVariable(`${escapeForObjectKey(data.name, true)} = new { user = "user", pass = "pass" },`, {
-              type: 'security',
-              name: data.name,
-              indentationLevel: 2,
-            });
+      writer.writeLine('await context.Response.WriteAsJsonAsync(new');
+      writer
+        .writeLine('{')
+        .indent(() => {
+          if (!server.length && !security.length) {
+            writer.writeLine('// Add custom data to return in your webhook call here.');
             return;
           }
-        }
 
-        pushVariable(
-          `${escapeForObjectKey(data.name, true)} = "${escapeForDoubleQuotes(
-            data.default || data.default === '' ? data.default : data.name
-          )}",`,
-          {
-            type: 'security',
-            name: data.name,
-            indentationLevel: 2,
+          if (server.length) {
+            writer.writeLine('// OAS Server variables');
+            server.forEach(data => {
+              writer
+                .writeObjectKey(data.name)
+                .write(' = ')
+                .writeEscapedString(data.default || data.default === '' ? data.default : data.name)
+                .write(',')
+                .newLine()
+                .recordRange('server', data.name);
+            });
           }
-        );
-      });
-    }
 
-    push('});', 1);
-    push('});');
+          if (server.length && security.length) {
+            writer.blankLine();
+          }
 
-    blank();
+          if (security.length) {
+            writer.writeLine('// OAS Security variables');
+            security.forEach(data => {
+              if (data.type === 'http') {
+                // Only HTTP Basic auth has any special handling for supplying auth.
+                if (data.scheme === 'basic') {
+                  writer
+                    .writeObjectKey(data.name)
+                    .write(' = new { user = "user", pass = "pass" },')
+                    .newLine()
+                    .recordRange('security', data.name);
 
-    push('app.Run($"http://localhost:8000");');
+                  return;
+                }
+              }
+
+              writer
+                .writeObjectKey(data.name)
+                .write(' = ')
+                .writeEscapedString(data.default || data.default === '' ? data.default : data.name)
+                .write(',')
+                .newLine()
+                .recordRange('security', data.name);
+            });
+          }
+        })
+        .write('});')
+        .newLine();
+    });
+
+    writer.writeLine('});');
+    writer.blankLine();
+
+    writer.write('app.Run($"http://localhost:8000");');
 
     return {
-      ranges: ranges(),
-      snippet: join(),
+      ranges: writer.getRanges(),
+      snippet: writer.toString(),
     };
   },
 };
