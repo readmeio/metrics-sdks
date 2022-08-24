@@ -1,7 +1,6 @@
 import type { Client } from '../../../targets';
 
-import { CodeBuilder } from '../../../../helpers/code-builder';
-import { escapeForDoubleQuotes } from '../../../../helpers/escape';
+import { CodeWriter } from '../../../../helpers/code-writer';
 
 export const flask: Client = {
   info: {
@@ -10,120 +9,132 @@ export const flask: Client = {
     link: 'https://flask.palletsprojects.com',
     description: 'ReadMe Metrics Webhooks SDK usage on Flask',
   },
-  convert: ({ secret, security, server }, options) => {
-    const opts = {
-      indent: '    ',
-      ...options,
-    };
+  convert: ({ secret, security, server }) => {
+    const writer = new CodeWriter({
+      indentNumberOfSpaces: 4,
+      useSingleQuote: false,
+    });
 
-    const { blank, join, push, pushVariable, ranges } = new CodeBuilder({ indent: opts.indent });
+    writer.writeLine('import os');
+    writer.writeLine('import sys');
+    writer.writeLine('from flask import Flask, request');
+    writer.writeLine('from readme_metrics.VerifyWebhook import VerifyWebhook');
+    writer.blankLine();
 
-    push('import os');
-    push('import sys');
-    push('from flask import Flask, request');
-    push('from readme_metrics.VerifyWebhook import VerifyWebhook');
-    blank();
+    writer
+      .writeLine('if os.getenv("README_API_KEY") is None:')
+      .indent(() => {
+        writer.writeLine('sys.stderr.write("Missing `README_API_KEY` environment variable")');
+        writer.writeLine('sys.stderr.flush()');
+        writer.writeLine('sys.exit(1)');
+      })
+      .blankLine();
 
-    push('if os.getenv("README_API_KEY") is None:');
-    push('sys.stderr.write("Missing `README_API_KEY` environment variable")', 1);
-    push('sys.stderr.flush()', 1);
-    push('sys.exit(1)', 1);
-    blank();
+    writer.writeLine('app = Flask(__name__)');
+    writer.blankLine();
 
-    push('app = Flask(__name__)');
-    blank();
+    writer.writeLine('# Your ReadMe secret');
+    writer.write('secret = ').quote(secret).newLine();
+    writer.blankLine();
+    writer.blankLine();
 
-    push('# Your ReadMe secret');
-    push(`secret = "${secret}"`);
-    blank();
-    blank();
+    writer.writeLine('@app.post("/webhook")');
+    writer.writeLine('def webhook():').indent(() => {
+      writer.writeLine('# Verify the request is legitimate and came from ReadMe.');
+      writer.writeLine('signature = request.headers.get("readme-signature", None)');
+      writer.blankLine();
 
-    push('@app.post("/webhook")');
-    push('def webhook():');
-    push('# Verify the request is legitimate and came from ReadMe.', 1);
-    push('signature = request.headers.get("readme-signature", None)', 1);
-    blank();
+      writer
+        .writeLine('try:')
+        .indent(() => {
+          writer.writeLine('VerifyWebhook(request.get_json(), signature, secret)');
+        })
+        .writeLine('except Exception as error:')
+        .indent(() => {
+          writer
+            .writeLine('return (')
+            .indent(() => {
+              writer.writeLine('{"error": str(error)},');
+              writer.writeLine('401,');
+              writer.writeLine('{"Content-Type": "application/json; charset=utf-8"},');
+            })
+            .writeLine(')');
+        })
+        .blankLine();
 
-    push('try:', 1);
-    push('VerifyWebhook(request.get_json(), signature, secret)', 2);
-    push('except Exception as error:', 1);
-    push('return (', 2);
-    push('{"error": str(error)},', 3);
-    push('401,', 3);
-    push('{"Content-Type": "application/json; charset=utf-8"},', 3);
-    push(')', 2);
-    blank();
+      writer.writeLine('# Fetch the user from the database and return their data for use with OpenAPI variables.');
+      writer.writeLine('# user = User.objects.get(email__exact=request.values.get("email"))');
+      writer
+        .writeLine('return (')
+        .indent(() => {
+          writer
+            .writeLine('{')
+            .indent(() => {
+              if (!server.length && !security.length) {
+                writer.writeLine('# Add custom data to return in your webhook call here.');
+                return;
+              }
 
-    push('# Fetch the user from the database and return their data for use with OpenAPI variables.', 1);
-    push('# user = User.objects.get(email__exact=request.values.get("email"))', 1);
-    push('return (', 1);
-    push('{', 2);
+              if (server.length) {
+                writer.writeLine('# OAS Server variables');
+                server.forEach(data => {
+                  writer
+                    .writeEscapedString(data.name)
+                    .write(': ')
+                    .writeEscapedString(data.default || data.default === '' ? data.default : data.name)
+                    .write(',')
+                    .newLine()
+                    .recordRange('server', data.name);
+                });
+              }
 
-    if (!server.length && !security.length) {
-      push('# Add custom data to return in your webhook call here.', 3);
-    }
+              if (server.length && security.length) {
+                writer.blankLine();
+              }
 
-    if (server.length) {
-      push('# OAS Server variables', 3);
-      server.forEach(data => {
-        pushVariable(
-          `"${escapeForDoubleQuotes(data.name)}": "${escapeForDoubleQuotes(
-            data.default || data.default === '' ? data.default : data.name
-          )}",`,
-          {
-            type: 'server',
-            name: data.name,
-            indentationLevel: 3,
-          }
-        );
-      });
-    }
+              if (security.length) {
+                writer.writeLine('# OAS Security variables');
+                security.forEach(data => {
+                  if (data.type === 'http') {
+                    // Only HTTP Basic auth has any special handling for supplying auth.
+                    if (data.scheme === 'basic') {
+                      writer
+                        .writeEscapedString(data.name)
+                        .write(': {"user": "user", "pass": "pass"},')
+                        .newLine()
+                        .recordRange('security', data.name);
 
-    if (server.length && security.length) {
-      blank();
-    }
+                      return;
+                    }
+                  }
 
-    if (security.length) {
-      push('# OAS Security variables', 3);
-      security.forEach(data => {
-        if (data.type === 'http') {
-          // Only HTTP Basic auth has any special handling for supplying auth.
-          if (data.scheme === 'basic') {
-            pushVariable(`"${escapeForDoubleQuotes(data.name)}": {"user": "user", "pass": "pass"},`, {
-              type: 'security',
-              name: data.name,
-              indentationLevel: 3,
-            });
-            return;
-          }
-        }
+                  writer
+                    .writeEscapedString(data.name)
+                    .write(': ')
+                    .writeEscapedString(data.default || data.default === '' ? data.default : data.name)
+                    .write(',')
+                    .newLine()
+                    .recordRange('security', data.name);
+                });
+              }
+            })
+            .writeLine('},')
+            .writeLine('200,')
+            .writeLine('{"Content-Type": "application/json; charset=utf-8"},');
+        })
+        .writeLine(')');
+    });
 
-        pushVariable(
-          `"${escapeForDoubleQuotes(data.name)}": "${escapeForDoubleQuotes(
-            data.default || data.default === '' ? data.default : data.name
-          )}",`,
-          {
-            type: 'security',
-            name: data.name,
-            indentationLevel: 3,
-          }
-        );
-      });
-    }
+    writer.blankLine();
+    writer.blankLine();
 
-    push('},', 2);
-    push('200,', 2);
-    push('{"Content-Type": "application/json; charset=utf-8"},', 2);
-    push(')', 1);
-    blank();
-    blank();
-
-    push('if __name__ == "__main__":');
-    push('app.run(debug=False, host="127.0.0.1", port=os.getenv("PORT", "8000"))', 1);
+    writer.writeLine('if __name__ == "__main__":').indent(() => {
+      writer.write('app.run(debug=False, host="127.0.0.1", port=os.getenv("PORT", "8000"))');
+    });
 
     return {
-      ranges: ranges(),
-      snippet: join(),
+      ranges: writer.getRanges(),
+      snippet: writer.toString(),
     };
   },
 };

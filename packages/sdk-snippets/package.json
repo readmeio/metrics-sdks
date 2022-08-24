@@ -29,7 +29,7 @@
     "test": "jest --coverage"
   },
   "dependencies": {
-    "@readme/httpsnippet": "^4.0.5"
+    "code-block-writer": "^11.0.3"
   },
   "devDependencies": {
     "@readme/eslint-config": "^10.0.0",

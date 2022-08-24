@@ -1,7 +1,6 @@
 import type { Client } from '../../../targets';
 
-import { CodeBuilder } from '../../../../helpers/code-builder';
-import { escapeForObjectKey, escapeForSingleQuotes } from '../../../../helpers/escape';
+import { CodeWriter } from '../../../../helpers/code-writer';
 
 export const express: Client = {
   info: {
@@ -10,105 +9,107 @@ export const express: Client = {
     link: 'https://expressjs.com/',
     description: 'ReadMe Metrics Webhooks SDK usage on Express',
   },
-  convert: ({ secret, security, server }, options) => {
-    const opts = {
-      indent: '  ',
-      ...options,
-    };
+  convert: ({ secret, security, server }) => {
+    const writer = new CodeWriter({
+      indentNumberOfSpaces: 2,
+      useSingleQuote: true,
+    });
 
-    const { blank, join, push, pushVariable, ranges } = new CodeBuilder({ indent: opts.indent });
+    writer.writeLine("import express from 'express';");
+    writer.writeLine("import readme from 'readmeio';");
+    writer.blankLine();
 
-    push("import express from 'express';");
-    push("import readme from 'readmeio';");
+    writer.writeLine('const app = express();');
+    writer.blankLine();
 
-    blank();
+    writer.writeLine('// Your ReadMe secret');
+    writer.write('const secret = ').quote(secret).write(';').newLine();
+    writer.blankLine();
 
-    push('const app = express();');
-    blank();
+    writer
+      .writeLine("app.post('/webhook', express.json({ type: 'application/json' }), async (req, res) => {")
+      .indent(() => {
+        writer.writeLine('// Verify the request is legitimate and came from ReadMe.');
+        writer.writeLine("const signature = req.headers['readme-signature'];");
+        writer.blankLine();
 
-    push('// Your ReadMe secret');
-    push(`const secret = '${secret}';`);
-    blank();
+        writer
+          .writeLine('try {')
+          .indent(() => {
+            writer.writeLine('readme.verifyWebhook(req.body, signature, secret);');
+          })
+          .writeLine('} catch (e) {')
+          .indent(() => {
+            writer.writeLine('// Handle invalid requests');
+            writer.writeLine('return res.status(401).json({ error: e.message });');
+          })
+          .writeLine('}')
+          .blankLine();
 
-    push("app.post('/webhook', express.json({ type: 'application/json' }), async (req, res) => {");
-    push('// Verify the request is legitimate and came from ReadMe.', 1);
-    push("const signature = req.headers['readme-signature'];", 1);
-    blank();
+        writer.writeLine('// Fetch the user from the database and return their data for use with OpenAPI variables.');
+        writer.writeLine('// const user = await db.find({ email: req.body.email })');
+        writer
+          .writeLine('return res.json({')
+          .indent(() => {
+            if (!server.length && !security.length) {
+              writer.writeLine('// Add custom data to return in your webhook call here.');
+              return;
+            }
 
-    push('try {', 1);
-    push('readme.verifyWebhook(req.body, signature, secret);', 2);
-    push('} catch (e) {', 1);
-    push('// Handle invalid requests', 2);
-    push('return res.status(401).json({ error: e.message });', 2);
-    push('}', 1);
-    blank();
+            if (server.length) {
+              writer.writeLine('// OAS Server variables');
+              server.forEach(data => {
+                writer
+                  .writeObjectKey(data.name)
+                  .write(': ')
+                  .writeEscapedString(data.default || data.default === '' ? data.default : data.name)
+                  .write(',')
+                  .newLine()
+                  .recordRange('server', data.name);
+              });
+            }
 
-    push('// Fetch the user from the database and return their data for use with OpenAPI variables.', 1);
-    push('// const user = await db.find({ email: req.body.email })', 1);
-    push('return res.json({', 1);
+            if (server.length && security.length) {
+              writer.blankLine();
+            }
 
-    if (!server.length && !security.length) {
-      push('// Add custom data to return in your webhook call here.', 2);
-    }
+            if (security.length) {
+              writer.writeLine('// OAS Security variables');
+              security.forEach(data => {
+                if (data.type === 'http') {
+                  // Only HTTP Basic auth has any special handling for supplying auth.
+                  if (data.scheme === 'basic') {
+                    writer
+                      .writeObjectKey(data.name)
+                      .write(": { user: 'user', pass: 'pass' },")
+                      .newLine()
+                      .recordRange('security', data.name);
 
-    if (server.length) {
-      push('// OAS Server variables', 2);
-      server.forEach(data => {
-        pushVariable(
-          `${escapeForObjectKey(data.name)}: '${escapeForSingleQuotes(
-            data.default || data.default === '' ? data.default : data.name
-          )}',`,
-          {
-            type: 'server',
-            name: data.name,
-            indentationLevel: 2,
-          }
-        );
-      });
-    }
+                    return;
+                  }
+                }
 
-    if (server.length && security.length) {
-      blank();
-    }
+                writer
+                  .writeObjectKey(data.name)
+                  .write(': ')
+                  .writeEscapedString(data.default || data.default === '' ? data.default : data.name)
+                  .write(',')
+                  .newLine()
+                  .recordRange('security', data.name);
+              });
+            }
+          })
+          .writeLine('});');
+      })
+      .writeLine('});');
 
-    if (security.length) {
-      push('// OAS Security variables', 2);
-      security.forEach(data => {
-        if (data.type === 'http') {
-          // Only HTTP Basic auth has any special handling for supplying auth.
-          if (data.scheme === 'basic') {
-            pushVariable(`${escapeForObjectKey(data.name)}: { user: 'user', pass: 'pass' },`, {
-              type: 'security',
-              name: data.name,
-              indentationLevel: 2,
-            });
-            return;
-          }
-        }
+    writer.blankLine();
 
-        pushVariable(
-          `${escapeForObjectKey(data.name)}: '${escapeForSingleQuotes(
-            data.default || data.default === '' ? data.default : data.name
-          )}',`,
-          {
-            type: 'security',
-            name: data.name,
-            indentationLevel: 2,
-          }
-        );
-      });
-    }
-
-    push('});', 1);
-    push('});');
-
-    blank();
-
-    push('app.listen(8000);');
+    writer.write('app.listen(8000);');
 
     return {
-      ranges: ranges(),
-      snippet: join(),
+      ranges: writer.getRanges(),
+      snippet: writer.toString(),
     };
   },
 };

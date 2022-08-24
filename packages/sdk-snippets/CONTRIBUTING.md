@@ -78,7 +78,9 @@ OVERWRITE_EVERYTHING=true npx jest src/targets/targets.test.ts
 
 ```ts
 import type { Client } from '../../../targets';
-import { CodeBuilder } from '@readme/httpsnippet/dist/helpers/code-builder';
+
+// For documentation how to use the `CodeWriter` see https://npm.im/code-block-writer.
+import { CodeWriter } from '../../../../helpers/code-writer';
 
 export const express: Client = {
   info: {
@@ -89,17 +91,20 @@ export const express: Client = {
   },
   convert: ({ security, server }, options) => {
     const opts = {
-      indent: '  ',
+      indent: 2,
       ...options,
     };
 
-    const { blank, join, push } = new CodeBuilder({ indent: opts.indent });
+    const writer = new CodeWriter({
+      indentNumberOfSpaces: opts.indent,
+      useSingleQuote: true,
+    });
 
-    push('// This is an example client snippet generator');
+    writer.writeLine('// This is an example client snippet generator');
 
     return {
-      ranges: ranges(),
-      snippet: join(),
+      ranges: writer.getRanges(),
+      snippet: writer.toString(),
     };
   },
 };
