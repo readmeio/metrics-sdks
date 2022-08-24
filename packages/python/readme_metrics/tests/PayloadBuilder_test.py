@@ -92,7 +92,7 @@ class TestPayloadBuilder:
 
         payload = self.createPayload(config)
         data = payload(metrics.req, metrics.res)
-        text = data["request"]["log"]["entries"][0]["request"]["text"]
+        text = data["request"]["log"]["entries"][0]["request"]["postData"]["text"]
 
         assert text == '{"ok": 123, "password": "[REDACTED]"}'
 
@@ -111,7 +111,7 @@ class TestPayloadBuilder:
 
         payload = self.createPayload(config)
         data = payload(metrics.req, metrics.res)
-        text = data["request"]["log"]["entries"][0]["request"]["text"]
+        text = data["request"]["log"]["entries"][0]["request"]["postData"]["text"]
 
         assert text == '{"ok": 123, "password": "[REDACTED]"}'
 
@@ -130,7 +130,7 @@ class TestPayloadBuilder:
 
         payload = self.createPayload(config)
         data = payload(metrics.req, metrics.res)
-        text = data["request"]["log"]["entries"][0]["request"]["text"]
+        text = data["request"]["log"]["entries"][0]["request"]["postData"]["text"]
 
         assert "ok" in text
         assert "123" in text
@@ -153,7 +153,7 @@ class TestPayloadBuilder:
 
         payload = self.createPayload(config)
         data = payload(metrics.req, metrics.res)
-        text = data["request"]["log"]["entries"][0]["request"]["text"]
+        text = data["request"]["log"]["entries"][0]["request"]["postData"]["text"]
 
         assert "ok" in text
         assert "123" in text
@@ -315,7 +315,8 @@ class TestPayloadBuilder:
 
     def test_har_creator(self):
         config = self.mockMiddlewareConfig(development_mode=True)
-        environ = Environ.MockEnviron().getEnvironForRequest(b"", "POST")
+        req = json.dumps({"ok": 123, "password": 456}).encode()
+        environ = Environ.MockEnviron().getEnvironForRequest(req, "POST")
         app = MockApplication("{ 'responseObject': 'value' }")
 
         metrics = MetricsCoreMock()
@@ -331,3 +332,8 @@ class TestPayloadBuilder:
         assert creator["name"] == "readme-metrics (python)"
         assert isinstance(creator["version"], str)
         assert isinstance(creator["comment"], str)
+
+        post_data = data["request"]["log"]["entries"][0]["request"]["postData"]
+
+        assert post_data["text"] == json.dumps({"ok": 123, "password": 456})
+        assert post_data["mimeType"] == "application/json"
