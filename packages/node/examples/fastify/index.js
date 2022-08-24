@@ -12,18 +12,9 @@ const fastify = Fastify({
 });
 const port = process.env.PORT || 4000;
 
-fastify.decorateRequest('readmeStartTime', null);
-fastify.decorateReply('payload', null);
-fastify.addHook('onRequest', async request => {
-  request.readmeStartTime = new Date();
-});
-
 fastify.addHook('onSend', async (request, reply, payload) => {
-  // eslint-disable-next-line no-param-reassign
-  reply.payload = payload;
-});
-
-fastify.addHook('onResponse', async (request, reply) => {
+  const { raw: req } = request;
+  const { raw: res } = reply;
   const payloadData = {
     // User's API Key
     apiKey: 'owlbert-api-key',
@@ -31,17 +22,20 @@ fastify.addHook('onResponse', async (request, reply) => {
     label: 'Owlbert',
     // User's email address
     email: 'owlbert@example.com',
-
-    startedDateTime: new Date(request.readmeStartTime),
-    responseEndDateTime: new Date(),
-    responseBody: reply.payload,
   };
-
-  readmeio.log(process.env.README_API_KEY, request.raw, reply, payloadData, { fireAndForget: true });
+  // We have to patch the req/res objects with the params required for the sdk
+  req.body = request.body;
+  Object.entries(reply.getHeaders()).forEach(([name, val]) => reply.raw.setHeader(name, val));
+  readmeio.log(process.env.README_API_KEY, req, res, payloadData);
+  return payload;
 });
 
 fastify.get('/', (request, reply) => {
   reply.send({ message: 'hello world' });
+});
+
+fastify.post('/', (request, reply) => {
+  reply.code(200).send();
 });
 
 fastify.listen({ port }, err => {

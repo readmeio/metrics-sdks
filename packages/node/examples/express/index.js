@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/', express.json(), (req, res) => {
-  res.sendStatus(200);
+  res.status(200).send();
 });
 
 const server = app.listen(port, 'localhost', function () {

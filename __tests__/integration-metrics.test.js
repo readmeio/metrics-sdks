@@ -159,8 +159,6 @@ describe('Metrics SDK Integration Tests', () => {
     });
   });
 
-  // TODO this needs fleshing out more with more assertions and complex
-  // test cases, along with more servers in different languages too!
   it('should make a request to a metrics backend with a har file', async () => {
     await get(`http://localhost:${PORT}`);
 
@@ -207,7 +205,6 @@ describe('Metrics SDK Integration Tests', () => {
     // Flask prints a \n character after the JSON response
     // https://github.com/pallets/flask/issues/4635
     expect(response.content.text.replace('\n', '')).toBe(JSON.stringify({ message: 'hello world' }));
-    // The \n character above means we cannot compare to a fixed number
     expect(response.content.size).toStrictEqual(response.content.text.length);
     expect(response.content.mimeType).toMatch(/application\/json(;\s?charset=utf-8)?/);
 
@@ -235,5 +232,7 @@ describe('Metrics SDK Integration Tests', () => {
       mimeType: 'application/json',
       text: postData,
     });
+    expect(response.content.text).toMatch('');
+    expect(response.content.size).toBe(0);
   });
 });

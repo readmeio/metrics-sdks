@@ -41,8 +41,8 @@ const init = async () => {
   server.route({
     method: 'POST',
     path: '/',
-    handler: () => {
-      return { statusCode: 200 };
+    handler: (request, h) => {
+      return h.response().code(200);
     },
   });
 
