@@ -217,6 +217,8 @@ describe('Metrics SDK Integration Tests', () => {
     await post(`http://localhost:${PORT}/`, postData, {
       headers: {
         'content-type': 'application/json',
+        // Explicit content-length is required for Python/Flask
+        'content-length': Buffer.byteLength(postData),
       },
     });
 
