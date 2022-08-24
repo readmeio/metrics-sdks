@@ -25,6 +25,10 @@ fastify.addHook('onSend', async (request, reply, payload) => {
   };
   // We have to patch the req/res objects with the params required for the sdk
   req.body = request.body;
+  // Modified approach taken from here:
+  // https://github.com/fastify/fastify-nextjs/pull/112
+  // Fastify uses `writeHead` for performance reasons, which means those header values
+  // are not accessible via `reply.raw`
   Object.entries(reply.getHeaders()).forEach(([name, val]) => reply.raw.setHeader(name, val));
   readmeio.log(process.env.README_API_KEY, req, res, payloadData);
   return payload;
