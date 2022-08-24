@@ -42,10 +42,11 @@ def hello_world():
         {"Content-Type": "application/json; charset=utf-8"},
     )
 
+
 @app.post("/")
 def post():
     return (
-        '',
+        "",
         200,
     )
 
