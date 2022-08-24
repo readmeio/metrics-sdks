@@ -14,18 +14,10 @@ async function getStdin() {
 }
 
 function processLine(line) {
-  if (line === '') {
-    return '\nwriter.blankLine();\n';
-  }
-
+  if (line === '') return '\nblank()\n';
   const indentation = line.search(/\S|$/) / 2;
   const quote = line.match(/'/) ? '"' : "'";
-
-  if (indentation === 0) {
-    return `writer.writeLine(${quote}${line.trimLeft()}${quote});`;
-  }
-
-  return `writer.indent(${indentation}).writeLine(${quote}${line.trimLeft()}${quote});`;
+  return `push(${quote}${line.trimLeft()}${quote}${indentation !== 0 ? `, ${indentation}` : ''});`;
 }
 
 export default function main(input) {

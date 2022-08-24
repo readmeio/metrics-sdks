@@ -15,25 +15,25 @@ app.listen(8000);
 test('should convert code to a CodeBuilder instance', () => {
   expect(codeConverter(codeSample)).toMatchInlineSnapshot(`
     "
-    writer.blankLine();
+    blank()
 
-    writer.writeLine(\\"import express from 'express';\\");
+    push(\\"import express from 'express';\\");
 
-    writer.blankLine();
+    blank()
 
-    writer.writeLine('const app = express();');
+    push('const app = express();');
 
-    writer.blankLine();
+    blank()
 
-    writer.writeLine(\\"app.get('/', (req, res) => {\\");
-    writer.indent(1).writeLine('res.sendStatus(200);');
-    writer.writeLine('});');
+    push(\\"app.get('/', (req, res) => {\\");
+    push('res.sendStatus(200);', 1);
+    push('});');
 
-    writer.blankLine();
+    blank()
 
-    writer.writeLine('app.listen(8000);');
+    push('app.listen(8000);');
 
-    writer.blankLine();
+    blank()
     "
   `);
 });

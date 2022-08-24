@@ -35,7 +35,12 @@ export class MetricsSDKSnippet {
     this.secret = data.secret ?? 'my-readme-secret';
   }
 
-  convert = (snippetType: SnippetType, targetId: TargetId, clientId?: ClientId) => {
+  convert = (snippetType: SnippetType, targetId: TargetId, clientId?: ClientId, options?: any) => {
+    if (!options && clientId) {
+      // eslint-disable-next-line no-param-reassign
+      options = clientId;
+    }
+
     const target = targets[targetId];
     if (!target || !target.services.webhooks) {
       return false;
@@ -52,6 +57,6 @@ export class MetricsSDKSnippet {
       { server: [], security: [] }
     );
 
-    return convert({ secret: this.secret, server, security });
+    return convert({ secret: this.secret, server, security }, options);
   };
 }
