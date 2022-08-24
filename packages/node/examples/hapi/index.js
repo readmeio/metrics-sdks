@@ -7,7 +7,7 @@ if (!process.env.README_API_KEY) {
   process.exit(1);
 }
 
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 8000;
 
 const init = async () => {
   const server = Hapi.server({ host: 'localhost', port });

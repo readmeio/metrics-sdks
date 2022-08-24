@@ -10,7 +10,7 @@ if (!process.env.README_API_KEY) {
 const fastify = Fastify({
   logger: true,
 });
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 8000;
 
 fastify.addHook('onSend', async (request, reply, payload) => {
   const { raw: req } = request;

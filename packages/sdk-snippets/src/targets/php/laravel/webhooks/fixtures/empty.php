@@ -20,5 +20,6 @@ Route::post('/webhook', function (\Illuminate\Http\Request $request) use ($secre
     // Fetch the user from the database and return their data for use with OpenAPI variables.
     // $user = DB::table('users')->where('email', $request->input('email'))->limit(1)->get();
     return response()->json([
+        // Add custom data to return in your webhook call here.
     ]);
 });

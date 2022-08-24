@@ -9,7 +9,7 @@ app.get('/', (req, res) => {
   res.sendStatus(200);
 });
 
-app.listen(3000);
+app.listen(8000);
 `;
 
 test('should convert code to a CodeBuilder instance', () => {
@@ -31,7 +31,7 @@ test('should convert code to a CodeBuilder instance', () => {
 
     blank()
 
-    push('app.listen(3000);');
+    push('app.listen(8000);');
 
     blank()
     "

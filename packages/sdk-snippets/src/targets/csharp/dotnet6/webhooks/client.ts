@@ -3,9 +3,9 @@ import type { Client } from '../../../targets';
 import { CodeBuilder } from '../../../../helpers/code-builder';
 import { escapeForObjectKey, escapeForDoubleQuotes } from '../../../../helpers/escape';
 
-export const net6: Client = {
+export const dotnet6: Client = {
   info: {
-    key: 'net6',
+    key: 'dotnet6',
     title: '.NET 6.0',
     link: 'https://docs.microsoft.com/en-us/dotnet/core/introduction',
     description: 'ReadMe Metrics Webhooks SDK usage on .NET 6.0',
@@ -57,6 +57,11 @@ export const net6: Client = {
 
     push('await context.Response.WriteAsJsonAsync(new', 1);
     push('{', 1);
+
+    if (!server.length && !security.length) {
+      push('// Add custom data to return in your webhook call here.', 2);
+    }
+
     if (server.length) {
       push('// OAS Server variables', 2);
       server.forEach(data => {
@@ -110,7 +115,7 @@ export const net6: Client = {
 
     blank();
 
-    push('app.Run($"http://localhost:4000");');
+    push('app.Run($"http://localhost:8000");');
 
     return {
       ranges: ranges(),

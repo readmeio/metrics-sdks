@@ -15,5 +15,5 @@ README_API_KEY=<Your ReadMe API Key here> dotnet run
 ## Test
 
 ```sh
-curl http://localhost:4000
+curl http://localhost:8000
 ```

@@ -6,7 +6,7 @@ For general contributing and commit guidelines for this project check out https:
 
 Much like in [HTTPSnippet](https://npm.im/httpsnippet) targets are programming languages. If you wish to create a new snippet generator for a new language follow these steps:
 
-1. Create a new directory in `src/targets/` and name it the language you're targeting. (eg. for PHP it'd be `php`, .NET `dotnet`).
+1. Create a new directory in `src/targets/` and name it the language you're targeting. (eg. for PHP it'd be `php`, C# would be `csharp`, etc.).
 2. Create a `target.ts` file in this new directory with code similar to the following:
 
 ```ts

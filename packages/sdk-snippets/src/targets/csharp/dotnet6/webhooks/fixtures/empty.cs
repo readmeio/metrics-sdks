@@ -29,12 +29,8 @@ app.MapPost("/webhook", async context =>
 
   await context.Response.WriteAsJsonAsync(new
   {
-    // OAS Server variables
-    name = "",
-
-    // OAS Security variables
-    petstore_auth = "",
+    // Add custom data to return in your webhook call here.
   });
 });
 
-app.Run($"http://localhost:4000");
+app.Run($"http://localhost:8000");

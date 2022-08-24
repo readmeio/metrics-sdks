@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`webhooks .NET snippet generation net6 request should match fixture for "empty" 1`] = `Object {}`;
+exports[`webhooks C# snippet generation dotnet6 request should match fixture for "empty" 1`] = `Object {}`;
 
-exports[`webhooks .NET snippet generation net6 request should match fixture for "empty-default" 1`] = `
+exports[`webhooks C# snippet generation dotnet6 request should match fixture for "empty-default" 1`] = `
 Object {
   "security": Object {
     "petstore_auth": Object {
@@ -17,7 +17,7 @@ Object {
 }
 `;
 
-exports[`webhooks .NET snippet generation net6 request should match fixture for "quirky-escaping" 1`] = `
+exports[`webhooks C# snippet generation dotnet6 request should match fixture for "quirky-escaping" 1`] = `
 Object {
   "security": Object {
     "\\"petstore\\" auth": Object {
@@ -47,7 +47,7 @@ Object {
 }
 `;
 
-exports[`webhooks .NET snippet generation net6 request should match fixture for "security-and-server-variables" 1`] = `
+exports[`webhooks C# snippet generation dotnet6 request should match fixture for "security-and-server-variables" 1`] = `
 Object {
   "security": Object {
     "basic_auth": Object {
@@ -68,7 +68,7 @@ Object {
 }
 `;
 
-exports[`webhooks .NET snippet generation net6 request should match fixture for "security-types" 1`] = `
+exports[`webhooks C# snippet generation dotnet6 request should match fixture for "security-types" 1`] = `
 Object {
   "security": Object {
     "api_key": Object {
@@ -87,7 +87,7 @@ Object {
 }
 `;
 
-exports[`webhooks .NET snippet generation net6 request should match fixture for "security-variables" 1`] = `
+exports[`webhooks C# snippet generation dotnet6 request should match fixture for "security-variables" 1`] = `
 Object {
   "security": Object {
     "basic_auth": Object {
@@ -100,7 +100,7 @@ Object {
 }
 `;
 
-exports[`webhooks .NET snippet generation net6 request should match fixture for "server-variables" 1`] = `
+exports[`webhooks C# snippet generation dotnet6 request should match fixture for "server-variables" 1`] = `
 Object {
   "server": Object {
     "name": Object {

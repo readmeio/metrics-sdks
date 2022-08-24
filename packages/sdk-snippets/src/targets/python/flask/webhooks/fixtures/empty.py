@@ -32,6 +32,7 @@ def webhook():
     # user = User.objects.get(email__exact=request.values.get("email"))
     return (
         {
+            # Add custom data to return in your webhook call here.
         },
         200,
         {"Content-Type": "application/json; charset=utf-8"},
@@ -39,4 +40,4 @@ def webhook():
 
 
 if __name__ == "__main__":
-    app.run(debug=False, host="127.0.0.1", port=os.getenv("PORT", "4000"))
+    app.run(debug=False, host="127.0.0.1", port=os.getenv("PORT", "8000"))

@@ -9,7 +9,7 @@ if (!process.env.README_API_KEY) {
 }
 
 const app = express();
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 8000;
 
 // Your ReadMe secret
 const secret = process.env.README_API_KEY;
