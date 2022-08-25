@@ -230,10 +230,17 @@ describe('Metrics SDK Integration Tests', () => {
     const { request, response } = har.request.log.entries[0];
     expect(request.method).toBe('POST');
     expect(response.status).toBe(200);
-    expect(request.postData).toStrictEqual({
-      mimeType: 'application/json',
-      text: postData,
-    });
+    expect(request.postData).toStrictEqual(
+      process.env.EXAMPLE_SERVER.startsWith('php')
+        ? {
+            mimeType: 'application/json',
+            params: [],
+          }
+        : {
+            mimeType: 'application/json',
+            text: postData,
+          }
+    );
     expect(response.content.text).toMatch('');
     expect(response.content.size).toBe(0);
   });
