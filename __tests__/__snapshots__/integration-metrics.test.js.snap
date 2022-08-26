@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Metrics SDK Integration Tests should make a request to a metrics backend with a har file 1`] = `
+exports[`Metrics SDK Integration Tests should make a request to a Metrics backend with a HAR file 1`] = `
 Object {
   "email": "owlbert@example.com",
   "id": "owlbert-api-key",
