@@ -23,7 +23,7 @@ Route::get('/', function () {
 });
 
 Route::post('/', function () {
-    return '';
+    return response()->noContent(200);
 });
 
 Route::post('/webhook', function (\Illuminate\Http\Request $request) use ($secret) {
