@@ -83,7 +83,7 @@ test('should work with *+json', () => {
 
   return request(app)
     .post('/')
-    .set('Content-Type', 'application/custom+json')
+    .set('Content-Type', 'application/vnd.api+json')
     .send(JSON.stringify({ password: '123456', apiKey: 'abc', another: 'Hello world' }))
     .expect(({ body }) => {
       expect(body.postData.text).toBe('{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}');

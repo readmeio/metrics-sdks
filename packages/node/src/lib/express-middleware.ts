@@ -1,6 +1,7 @@
 import type { LogOptions } from './construct-payload';
 import type { GroupingObject, OutgoingLogBody } from './metrics-log';
 
+import { StringDecoder } from 'string_decoder';
 import * as url from 'url';
 
 import clamp from 'lodash/clamp';
@@ -53,7 +54,11 @@ function patchResponse(res) {
  * we need to do our own check to look if it's got `+json` and then surface that potential JSON
  * payload accordingly.
  *
+ * And if you can believe it or not, Express also doesn't process `x-www-form-urlencoded` payloads
+ * into `req.body` for us without the `body-parser` middleware.
+ *
  * @see {@link https://stackoverflow.com/a/12497793}
+ * @see {@link https://stackoverflow.com/a/58568473}
  * @param {IncomingMessage} req
  */
 function patchRequest(req) {
@@ -68,6 +73,17 @@ function patchRequest(req) {
     req.setEncoding('utf8');
     req.on('data', function (chunk) {
       if (chunk) req._json += chunk;
+    });
+  } else if (req.is('application/x-www-form-urlencoded')) {
+    const decoder = new StringDecoder('utf-8');
+    req._form_encoded = '';
+
+    req.on('data', chunk => {
+      req._form_encoded += decoder.write(chunk);
+    });
+
+    req.on('end', () => {
+      req._form_encoded += decoder.end();
     });
   }
 }
@@ -135,6 +151,8 @@ export function expressMiddleware(readmeApiKey: string, group: GroupingFunction,
         requestBody = req._text;
       } else if (req.is('+json')) {
         requestBody = req._json;
+      } else if (req.is('application/x-www-form-urlencoded')) {
+        requestBody = req._form_encoded;
       }
 
       const payload = constructPayload(
