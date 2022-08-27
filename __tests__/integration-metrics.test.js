@@ -21,6 +21,18 @@ if (!process.env.EXAMPLE_SERVER) {
 
 expect.extend({ toHaveHeader });
 
+function itif(envVar) {
+  if (!(envVar in process.env)) {
+    throw new Error(
+      `This test run does not specify a ${envVar} environment variable. It must be configured for us to run or skip tests that require it.`
+    );
+  } else if (process.env[envVar] === 'false') {
+    return it.skip;
+  }
+
+  return it;
+}
+
 async function getBody(response) {
   let responseBody = '';
   // eslint-disable-next-line no-restricted-syntax
@@ -144,8 +156,8 @@ describe('Metrics SDK Integration Tests', () => {
 
     const { creator } = har.request.log;
     expect(creator.name).toMatch(/readme-metrics \((dotnet|node|php|python|ruby)\)/);
-    expect(creator.version.length).toBeGreaterThan(0);
-    expect(creator.comment.length).toBeGreaterThan(0);
+    expect(creator.version).not.toBeEmpty();
+    expect(creator.comment).not.toBeEmpty();
 
     const { request, response, startedDateTime } = har.request.log.entries[0];
 
@@ -193,12 +205,19 @@ describe('Metrics SDK Integration Tests', () => {
     // Some frameworks remove the trailing slash from the URL we get.
     expect(request.url).toMatch(new RegExp(`http://localhost:${PORT}(/)?\\?arr%5B1%5D=3&val=1`));
 
-    expect(request.queryString).toStrictEqual([
-      { name: 'arr', value: '{"1":"3"}' },
-      { name: 'val', value: '1' },
+    // Some frameworks handle query string arrays slightly differently.
+    expect(JSON.stringify(request.queryString)).toBeOneOf([
+      JSON.stringify([
+        { name: 'arr[1]', value: '3' },
+        { name: 'val', value: '1' },
+      ]),
+      JSON.stringify([
+        { name: 'arr', value: '{"1":"3"}' },
+        { name: 'val', value: '1' },
+      ]),
     ]);
 
-    expect(request.postData).toBeNull();
+    expect(request.postData).toBeUndefined();
   });
 
   it('should capture query strings that maybe supplied in a POST request', async () => {
@@ -223,9 +242,17 @@ describe('Metrics SDK Integration Tests', () => {
     expect(request.url).toMatch(new RegExp(`http://localhost:${PORT}(/)?\\?arr%5B1%5D=3&val=1`));
 
     expect(request.headers).toHaveHeader('content-type', 'application/json');
-    expect(request.queryString).toStrictEqual([
-      { name: 'arr', value: '{"1":"3"}' },
-      { name: 'val', value: '1' },
+
+    // Some frameworks handle query string arrays slightly differently.
+    expect(JSON.stringify(request.queryString)).toBeOneOf([
+      JSON.stringify([
+        { name: 'arr[1]', value: '3' },
+        { name: 'val', value: '1' },
+      ]),
+      JSON.stringify([
+        { name: 'arr', value: '{"1":"3"}' },
+        { name: 'val', value: '1' },
+      ]),
     ]);
 
     expect(request.postData).toStrictEqual({
@@ -252,11 +279,9 @@ describe('Metrics SDK Integration Tests', () => {
     expect(request.method).toBe('POST');
     expect(request.headers).toHaveHeader('content-type', 'text/plain;charset=UTF-8');
     expect(request.postData).toStrictEqual({
-      mimeType: 'text/plain;charset=UTF-8',
+      mimeType: expect.stringMatching(/text\/plain(;charset=UTF-8)?/),
       text: payload,
     });
-
-    // expect(response.status).toBe(200);
   });
 
   it('should process an `application/json` POST payload', async () => {
@@ -290,7 +315,7 @@ describe('Metrics SDK Integration Tests', () => {
     await fetch(`http://localhost:${PORT}/`, {
       method: 'post',
       headers: {
-        'content-type': 'application/custom+json',
+        'content-type': 'application/vnd.api+json',
       },
       body: payload,
     });
@@ -302,9 +327,9 @@ describe('Metrics SDK Integration Tests', () => {
     const { request, response } = har.request.log.entries[0];
 
     expect(request.method).toBe('POST');
-    expect(request.headers).toHaveHeader('content-type', 'application/custom+json');
+    expect(request.headers).toHaveHeader('content-type', 'application/vnd.api+json');
     expect(request.postData).toStrictEqual({
-      mimeType: 'application/custom+json',
+      mimeType: 'application/vnd.api+json',
       text: payload,
     });
 
@@ -340,7 +365,7 @@ describe('Metrics SDK Integration Tests', () => {
     expect(response.status).toBe(200);
   });
 
-  it('should process a `multipart/form-data` POST payload', async () => {
+  itif('SUPPORTS_MULTIPART')('should process a `multipart/form-data` POST payload', async () => {
     const formData = new FormData();
     formData.append('password', 123456);
     formData.append('apiKey', 'abcdef');
@@ -374,7 +399,7 @@ describe('Metrics SDK Integration Tests', () => {
     expect(request.postData.text).toBeNull();
   });
 
-  it('should process a `multipart/form-data` POST payload containing files', async () => {
+  itif('SUPPORTS_MULTIPART')('should process a `multipart/form-data` POST payload containing files', async () => {
     const owlbert = await fs.readFile('./__tests__/__datasets__/owlbert.png');
 
     const payload = new FormData();
