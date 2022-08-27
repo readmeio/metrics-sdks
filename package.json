@@ -39,9 +39,11 @@
     "husky": "^8.0.1",
     "isomorphic-fetch": "^3.0.0",
     "jest": "^28.1.3",
+    "jest-extended": "^3.0.2",
     "prettier": "^2.7.1"
   },
   "jest": {
+    "setupFilesAfterEnv": ["jest-extended/all"],
     "transform": {},
     "testMatch": [
       "<rootDir>/__tests__/**/*.[jt]s?(x)",

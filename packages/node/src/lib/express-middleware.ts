@@ -43,6 +43,35 @@ function patchResponse(res) {
   };
 }
 
+/**
+ * For `text/*` requests Express doesn't give us a native way to retrieve data out of the payload
+ * without using the `body-parser` middleware so we need to workaround it and access that obtain
+ * that data ourselves.
+ *
+ * For `application/vnd.api+json` types of requests, Express doesn't recognize them as being JSON,
+ * resulting in `req.body` being empty. Frustratingly enough `req.is('json')` also doesn't work so
+ * we need to do our own check to look if it's got `+json` and then surface that potential JSON
+ * payload accordingly.
+ *
+ * @see {@link https://stackoverflow.com/a/12497793}
+ * @param {IncomingMessage} req
+ */
+function patchRequest(req) {
+  if (req.is('text/*')) {
+    req._text = '';
+    req.setEncoding('utf8');
+    req.on('data', function (chunk) {
+      if (chunk) req._text += chunk;
+    });
+  } else if (req.is('+json')) {
+    req._json = '';
+    req.setEncoding('utf8');
+    req.on('data', function (chunk) {
+      if (chunk) req._json += chunk;
+    });
+  }
+}
+
 export interface Options extends LogOptions {
   bufferLength?: number;
   baseLogUrl?: string;
@@ -79,6 +108,7 @@ export function expressMiddleware(readmeApiKey: string, group: GroupingFunction,
       res.setHeader('x-documentation-url', `${baseLogUrl}/logs/${logId}`);
     }
 
+    patchRequest(req);
     patchResponse(res);
 
     doSend = () => {
@@ -99,6 +129,13 @@ export function expressMiddleware(readmeApiKey: string, group: GroupingFunction,
       // with flush timeouts and more error checking but
       // this is fine for now
       const groupData = group(req, res);
+
+      let requestBody = req.body;
+      if (req.is('text/*')) {
+        requestBody = req._text;
+      } else if (req.is('+json')) {
+        requestBody = req._json;
+      }
 
       const payload = constructPayload(
         {
@@ -126,7 +163,7 @@ export function expressMiddleware(readmeApiKey: string, group: GroupingFunction,
               })
             : '',
           responseBody: res._body,
-          requestBody: req.body,
+          requestBody,
         },
         options
       );
