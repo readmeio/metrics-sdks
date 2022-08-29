@@ -15,7 +15,7 @@ import { metricsAPICall } from './metrics-log';
 let queue: OutgoingLogBody[] = [];
 function doSend(readmeApiKey, options) {
   // Copy the queue so we can send all the requests in one batch
-  const json = queue.slice();
+  const json = [...queue];
   // Clear out the queue so we don't resend any data in the future
   queue = [];
 
