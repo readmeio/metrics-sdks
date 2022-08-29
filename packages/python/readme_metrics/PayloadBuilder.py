@@ -146,6 +146,9 @@ class PayloadBuilder:
 
         return group
 
+    def _get_content_type(self, headers):
+        return headers.get('content-type', 'text/plain')
+
     def _build_request_payload(self, request) -> dict:
         """Wraps the request portion of the payload
 
@@ -159,9 +162,17 @@ class PayloadBuilder:
         headers = self.redact_dict(request.headers)
         params = parse.parse_qsl(self._get_query_string(request))
 
+        content_type = self._get_content_type(headers)
         post_data = False
         if getattr(request, "content_length", None):
-            post_data = self._process_body(request.rm_body)
+            if content_type == 'application/x-www-form-urlencoded':
+                post_data = {
+                    "mimeType": content_type,
+                    "params": [{"name": k, "value": v} for (k, v) in request.form.items()],
+                    "text": None,
+                }
+            else:
+                post_data = self._process_body(content_type, request.rm_body)
 
         payload = {
             "method": request.method,
@@ -171,7 +182,7 @@ class PayloadBuilder:
             "queryString": [{"name": k, "value": v} for (k, v) in params],
         }
 
-        if not post_data == False:
+        if not post_data is False:
             payload["postData"] = post_data
 
         return payload
@@ -186,7 +197,8 @@ class PayloadBuilder:
             dict: Wrapped response payload
         """
         headers = self.redact_dict(response.headers)
-        body = self._process_body(response.body).get("text")
+        content_type = self._get_content_type(response.headers)
+        body = self._process_body(content_type, response.body).get("text")
 
         headers = [{"name": k, "value": v} for (k, v) in headers.items()]
 
@@ -197,7 +209,7 @@ class PayloadBuilder:
         return {
             "status": status_code,
             "statusText": status_text or "",
-            "headers": headers,  # headers.items(),
+            "headers": headers,
             "content": {
                 "text": body,
                 "size": int(response.content_length),
@@ -275,7 +287,7 @@ class PayloadBuilder:
         raise Exception("Don't know how to build URL from this type of request")
 
     # always returns a dict with some of these fields: text, mimeType, params
-    def _process_body(self, body):
+    def _process_body(self, content_type, body):
         if isinstance(body, bytes):
             # Non-unicode bytes cannot be directly serialized as a JSON
             # payload to send to the ReadMe API, so we need to convert this to a
@@ -287,35 +299,42 @@ class PayloadBuilder:
             try:
                 body = body.decode("utf-8")
             except UnicodeDecodeError:
-                return {"text": "[NOT VALID UTF-8]"}
+                return {
+                    "mimeType": content_type,
+                    "text": "[NOT VALID UTF-8]"
+                }
 
         if not isinstance(body, str):
             # We don't know how to process this body. If it's safe to encode as
             # JSON, return it unchanged; otherwise return an error.
             try:
                 json.dumps(body)
-                return {"text": body}
+                return {
+                    "mimeType": content_type,
+                    "text": body
+                }
             except TypeError:
-                return {"text": "[ERROR: NOT SERIALIZABLE]"}
+                return {
+                    "mimeType": content_type,
+                    "text": "[ERROR: NOT SERIALIZABLE]"
+                }
 
         try:
             body_data = json.loads(body)
         except JSONDecodeError:
-            params = parse.parse_qsl(body)
-            if params:
-                return {
-                    "text": body,
-                    "mimeType": "multipart/form-data",
-                    "params": [{"name": k, "value": v} for (k, v) in params],
-                }
-
-            return {"text": body}
+            return {
+                "mimeType": content_type,
+                "text": body
+            }
 
         if (self.denylist or self.allowlist) and isinstance(body_data, dict):
             redacted_data = self.redact_dict(body_data)
             body = json.dumps(redacted_data)
 
-        return {"text": body, "mimeType": "application/json"}
+        return {
+            "mimeType": content_type,
+            "text": body
+        }
 
     def redact_dict(self, mapping: Mapping):
         def _redact_value(val):
