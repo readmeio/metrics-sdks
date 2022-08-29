@@ -42,6 +42,13 @@ def hello_world():
         {"Content-Type": "application/json; charset=utf-8"},
     )
 
+@app.post("/")
+def post():
+    return (
+        "",
+        200,
+    )
+
 
 if __name__ == "__main__":
     app.run(debug=False, host="127.0.0.1", port=os.getenv("PORT", "8000"))

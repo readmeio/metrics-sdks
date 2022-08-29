@@ -44,7 +44,7 @@ class PayloadBuilder:
             development_mode (bool): Development mode flag passed to ReadMe
             grouping_function ([type]): Grouping function to generate an identity
                 payload
-            logger (Logger): Loggiing
+            logger (Logger): Logging
         """
         self.denylist = denylist
         self.allowlist = allowlist
@@ -159,19 +159,22 @@ class PayloadBuilder:
         headers = self.redact_dict(request.headers)
         params = parse.parse_qsl(self._get_query_string(request))
 
+        post_data = False
         if getattr(request, "content_length", None):
             post_data = self._process_body(request.rm_body)
-        else:
-            post_data = {}
 
-        return {
+        payload = {
             "method": request.method,
             "url": self._build_base_url(request),
             "httpVersion": request.environ["SERVER_PROTOCOL"],
             "headers": [{"name": k, "value": v} for (k, v) in headers.items()],
             "queryString": [{"name": k, "value": v} for (k, v) in params],
-            "postData": post_data,
         }
+
+        if not post_data == False:
+            payload["postData"] = post_data
+
+        return payload
 
     def _build_response_payload(self, response: ResponseInfoWrapper) -> dict:
         """Wraps the response portion of the payload
@@ -241,9 +244,13 @@ class PayloadBuilder:
         Returns:
             str: Query string, for example "https://api.example.local:8080/v1/userinfo"
         """
+        query_string = self._get_query_string(request)
         if hasattr(request, "base_url"):
             # Werkzeug request objects already have exactly what we need
-            return request.base_url
+            base_url = request.base_url
+            if len(query_string) > 0:
+                base_url += f"?{query_string}"
+            return base_url
 
         scheme, host, path = None, None, None
 
@@ -261,6 +268,8 @@ class PayloadBuilder:
             path = request.environ["PATH_INFO"]
 
         if scheme and path and host:
+            if len(query_string) > 0:
+                return f"{scheme}://{host}{path}?{query_string}"
             return f"{scheme}://{host}{path}"
 
         raise Exception("Don't know how to build URL from this type of request")
