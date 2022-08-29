@@ -9,6 +9,7 @@ services:
       dockerfile: ./__tests__/integrations/dotnet.Dockerfile
     command: npm run test:integration-metrics
     environment:
+      - SUPPORTS_MULTIPART=false
       - EXAMPLE_SERVER=dotnet examples/net6.0/out/net6.0.dll
 
   integration_webhooks_dotnet_v6.0:
@@ -28,6 +29,7 @@ services:
       dockerfile: ./__tests__/integrations/node.Dockerfile
     command: npm run test:integration-metrics
     environment:
+      - SUPPORTS_MULTIPART=false
       - EXAMPLE_SERVER=node ./packages/node/examples/express/index.js
 
   integration_webhooks_node_express:
@@ -44,6 +46,7 @@ services:
       dockerfile: ./__tests__/integrations/node.Dockerfile
     command: npm run test:integration-metrics
     environment:
+      - SUPPORTS_MULTIPART=false
       - EXAMPLE_SERVER=node ./packages/node/examples/fastify/index.js
 
   integration_metrics_node_hapi:
@@ -52,6 +55,7 @@ services:
       dockerfile: ./__tests__/integrations/node.Dockerfile
     command: npm run test:integration-metrics
     environment:
+      - SUPPORTS_MULTIPART=false
       - EXAMPLE_SERVER=node ./packages/node/examples/hapi/index.js
 
   #
@@ -63,6 +67,7 @@ services:
       dockerfile: ./__tests__/integrations/php.Dockerfile
     command: npm run test:integration-metrics
     environment:
+      - SUPPORTS_MULTIPART=true
       - EXAMPLE_SERVER=php packages/php/examples/laravel/artisan serve
 
   integration_webhooks_php_laravel:
@@ -82,6 +87,7 @@ services:
       dockerfile: ./__tests__/integrations/python.Dockerfile
     command: npm run test:integration-metrics
     environment:
+      - SUPPORTS_MULTIPART=false
       - EXAMPLE_SERVER=python examples/flask/app.py
 
   integration_webhooks_python_flask:
