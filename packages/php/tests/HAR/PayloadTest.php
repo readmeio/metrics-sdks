@@ -171,8 +171,9 @@ class PayloadTest extends \PHPUnit\Framework\TestCase
             ['name' => 'arr', 'value' => json_encode([1 => '3'])]
         ], $har_request['queryString']);
 
-        $this->assertNull(
-            $har_request['postData'],
+        $this->assertArrayNotHasKey(
+            'postData',
+            $har_request,
             'postData should not be here because there is none for this GET request'
         );
 

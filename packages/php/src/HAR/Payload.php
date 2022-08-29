@@ -82,7 +82,7 @@ class Payload
      */
     private function processRequest(Request $request): array
     {
-        $post_data = null;
+        $post_data = false;
         $content_type = $request->headers->get('content-type', '');
         $is_file_upload_request = !!count($request->allFiles());
 
@@ -120,14 +120,19 @@ class Payload
             }
         }
 
-        return [
+        $res = [
             'method' => $request->method(),
             'url' => $request->fullUrl(),
             'httpVersion' => $request->server('SERVER_PROTOCOL', 'HTTP/1.1'),
             'headers' => static::convertHeaderBagToArray($request->headers),
             'queryString' => static::convertObjectToArray($request->query()),
-            'postData' => $post_data,
         ];
+
+        if ($post_data) {
+            $res['postData'] = $post_data;
+        }
+
+        return $res;
     }
 
     private function processResponse(Response $response): array
