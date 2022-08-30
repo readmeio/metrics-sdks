@@ -1,19 +1,34 @@
-/* eslint-disable unicorn/no-unsafe-regex */
-import { spawn } from 'child_process';
-import { once } from 'events';
-import http from 'http';
-import net from 'net';
-import { Transform } from 'node:stream';
-import { cwd } from 'process';
-import { promisify } from 'util';
+import 'isomorphic-fetch';
+import { spawn } from 'node:child_process';
+import { once } from 'node:events';
+import fs from 'node:fs/promises';
+import http from 'node:http';
+import net from 'node:net';
+import { cwd } from 'node:process';
+import { Readable, Transform } from 'node:stream';
 
 import caseless from 'caseless';
+import { FormDataEncoder } from 'form-data-encoder';
+import { File, FormData } from 'formdata-node';
 import getPort from 'get-port';
+
+import owlbertDataURL from './__datasets__/owlbert.dataurl.json';
+import { toHaveHeader } from './helpers/jest.matchers';
 
 if (!process.env.EXAMPLE_SERVER) {
   // eslint-disable-next-line no-console
   console.error('Missing `EXAMPLE_SERVER` environment variable');
   process.exit(1);
+}
+
+expect.extend({ toHaveHeader });
+
+function itif(envVar) {
+  if (envVar in process.env && process.env[envVar] === 'true') {
+    return it;
+  }
+
+  return it.skip;
 }
 
 function isListening(port, attempt = 0) {
@@ -44,38 +59,6 @@ async function getBody(response) {
   expect(responseBody).not.toBe('');
   return JSON.parse(responseBody);
 }
-
-// https://gist.github.com/krnlde/797e5e0a6f12cc9bd563123756fc101f
-http.get[promisify.custom] = function getAsync(options) {
-  return new Promise((resolve, reject) => {
-    http
-      .get(options, response => {
-        response.end = new Promise(res => {
-          response.on('end', res);
-        });
-        resolve(response);
-      })
-      .on('error', reject);
-  });
-};
-
-function post(url, body, options) {
-  return new Promise((resolve, reject) => {
-    const request = http
-      .request(url, { method: 'post', ...options }, response => {
-        response.end = new Promise(res => {
-          response.on('end', res);
-        });
-        resolve(response);
-      })
-      .on('error', reject);
-
-    request.write(body);
-    request.end();
-  });
-}
-
-const get = promisify(http.get);
 
 const randomApiKey = 'a-random-readme-api-key';
 
@@ -178,8 +161,8 @@ describe('Metrics SDK Integration Tests', () => {
     });
   });
 
-  it('should make a request to a metrics backend with a har file', async () => {
-    await get(`http://localhost:${PORT}`);
+  it('should make a request to a Metrics backend with a HAR file', async () => {
+    await fetch(`http://localhost:${PORT}`, { method: 'get' });
 
     const [req] = await once(metricsServer, 'request');
     expect(req.url).toBe('/v1/request');
@@ -188,13 +171,16 @@ describe('Metrics SDK Integration Tests', () => {
     const body = await getBody(req);
     const [har] = body;
 
-    // Check for a uuid
     // https://uibakery.io/regex-library/uuid
-    // eslint-disable-next-line no-underscore-dangle
     expect(har._id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
     expect(har.group).toMatchSnapshot();
     expect(har.clientIPAddress).toBe('127.0.0.1');
     expect(har.development).toBe(false);
+
+    const { creator } = har.request.log;
+    expect(creator.name).toMatch(/readme-metrics \((dotnet|node|php|python|ruby)\)/);
+    expect(creator.version).not.toBeEmpty();
+    expect(creator.comment).not.toBeEmpty();
 
     const { request, response, startedDateTime } = har.request.log.entries[0];
 
@@ -215,12 +201,13 @@ describe('Metrics SDK Integration Tests', () => {
     expect(request.method).toBe('GET');
     expect(request.httpVersion).toBe('HTTP/1.1');
 
-    const requestHeaders = caseless(arrayToObject(request.headers));
-    expect(requestHeaders.get('connection')).toBe('close');
-    expect(requestHeaders.get('host')).toBe(`localhost:${PORT}`);
+    expect(request.headers).toHaveHeader('connection', 'close');
+    expect(request.headers).toHaveHeader('host', `localhost:${PORT}`);
 
     expect(response.status).toBe(200);
     expect(response.statusText).toBe('OK');
+    expect(response.headers).toHaveHeader('content-type', /application\/json(;\s?charset=utf-8)?/);
+
     // Flask prints a \n character after the JSON response
     // https://github.com/pallets/flask/issues/4635
     expect(response.content.text.replace('\n', '')).toBe(JSON.stringify({ message: 'hello world' }));
@@ -231,36 +218,287 @@ describe('Metrics SDK Integration Tests', () => {
     expect(responseHeaders.get('content-type')).toMatch(/application\/json(;\s?charset=utf-8)?/);
   });
 
-  it('should process the http POST body', async () => {
-    const postData = JSON.stringify({ user: { email: 'dom@readme.io' } });
-    await post(`http://localhost:${PORT}/`, postData, {
+  it('should capture query strings in a GET request', async () => {
+    await fetch(`http://localhost:${PORT}?arr%5B1%5D=3&val=1`, { method: 'get' });
+
+    const [req] = await once(metricsServer, 'request');
+    const body = await getBody(req);
+    const [har] = body;
+
+    const { request } = har.request.log.entries[0];
+
+    // Some frameworks remove the trailing slash from the URL we get.
+    expect(request.url).toMatch(new RegExp(`http://localhost:${PORT}(/)?\\?arr%5B1%5D=3&val=1`));
+
+    // Some frameworks handle query string arrays slightly differently.
+    expect(JSON.stringify(request.queryString)).toBeOneOf([
+      JSON.stringify([
+        { name: 'arr[1]', value: '3' },
+        { name: 'val', value: '1' },
+      ]),
+      JSON.stringify([
+        { name: 'arr', value: '{"1":"3"}' },
+        { name: 'val', value: '1' },
+      ]),
+    ]);
+
+    expect(request.postData).toBeUndefined();
+  });
+
+  it('should capture query strings that may be supplied in a POST request', async () => {
+    const payload = JSON.stringify({ user: { email: 'dom@readme.io' } });
+    await fetch(`http://localhost:${PORT}/?arr%5B1%5D=3&val=1`, {
+      method: 'post',
       headers: {
         'content-type': 'application/json',
-        // Explicit content-length is required for Python/Flask
-        'content-length': Buffer.byteLength(postData),
       },
+      body: payload,
     });
 
     const [req] = await once(metricsServer, 'request');
-
     const body = await getBody(req);
     const [har] = body;
 
     const { request, response } = har.request.log.entries[0];
+
     expect(request.method).toBe('POST');
+
+    // Some frameworks remove the trailing slash from the URL we get.
+    expect(request.url).toMatch(new RegExp(`http://localhost:${PORT}(/)?\\?arr%5B1%5D=3&val=1`));
+
+    expect(request.headers).toHaveHeader('content-type', 'application/json');
+
+    // Some frameworks handle query string arrays slightly differently.
+    expect(JSON.stringify(request.queryString)).toBeOneOf([
+      JSON.stringify([
+        { name: 'arr[1]', value: '3' },
+        { name: 'val', value: '1' },
+      ]),
+      JSON.stringify([
+        { name: 'arr', value: '{"1":"3"}' },
+        { name: 'val', value: '1' },
+      ]),
+    ]);
+
+    expect(request.postData).toStrictEqual({
+      mimeType: 'application/json',
+      text: payload,
+    });
+
     expect(response.status).toBe(200);
-    expect(request.postData).toStrictEqual(
-      process.env.EXAMPLE_SERVER.startsWith('php')
-        ? {
-            mimeType: 'application/json',
-            params: [],
-          }
-        : {
-            mimeType: 'application/json',
-            text: postData,
-          }
-    );
-    expect(response.content.text).toMatch('');
-    expect(response.content.size).toBe(0);
+  });
+
+  it('should process a POST payload with no explicit `Content-Type` header', async () => {
+    const payload = JSON.stringify({ user: { email: 'dom@readme.io' } });
+    await fetch(`http://localhost:${PORT}/`, {
+      method: 'post',
+      body: payload,
+    });
+
+    const [req] = await once(metricsServer, 'request');
+    const body = await getBody(req);
+    const [har] = body;
+
+    const { request } = har.request.log.entries[0];
+
+    expect(request.method).toBe('POST');
+    expect(request.headers).toHaveHeader('content-type', 'text/plain;charset=UTF-8');
+    expect(request.postData).toStrictEqual({
+      mimeType: expect.stringMatching(/text\/plain(;charset=UTF-8)?/),
+      text: payload,
+    });
+  });
+
+  it('should process an `application/json` POST payload', async () => {
+    const payload = JSON.stringify({ user: { email: 'dom@readme.io' } });
+    await fetch(`http://localhost:${PORT}/`, {
+      method: 'post',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: payload,
+    });
+
+    const [req] = await once(metricsServer, 'request');
+    const body = await getBody(req);
+    const [har] = body;
+
+    const { request, response } = har.request.log.entries[0];
+
+    expect(request.method).toBe('POST');
+    expect(request.headers).toHaveHeader('content-type', 'application/json');
+    expect(request.postData).toStrictEqual({
+      mimeType: 'application/json',
+      text: payload,
+    });
+
+    expect(response.status).toBe(200);
+  });
+
+  /**
+   * We should eventually support returning the raw POST payload to Metrics in this case but Express
+   * has a fun quirk where if you declare the `express.json()` middleware on a route to identify
+   * that that route accepts a JSON payload, if that JSON payload is corrupted then it completely
+   * wipes out `req.body` and replaces it with an empty JSON object -- eliminating all access for
+   * us to the what the original payload was.
+   */
+  it.todo('should process an `application/JSON POST payload containing unparseable JSON');
+
+  it('should process a vendored `+json` POST payload', async () => {
+    const payload = JSON.stringify({ user: { email: 'dom@readme.io' } });
+    await fetch(`http://localhost:${PORT}/`, {
+      method: 'post',
+      headers: {
+        'content-type': 'application/vnd.api+json',
+      },
+      body: payload,
+    });
+
+    const [req] = await once(metricsServer, 'request');
+    const body = await getBody(req);
+    const [har] = body;
+
+    const { request, response } = har.request.log.entries[0];
+
+    expect(request.method).toBe('POST');
+    expect(request.headers).toHaveHeader('content-type', 'application/vnd.api+json');
+    expect(request.postData).toStrictEqual({
+      mimeType: 'application/vnd.api+json',
+      text: payload,
+    });
+
+    expect(response.status).toBe(200);
+  });
+
+  it('should process an `application/x-www-url-formencoded` POST payload', async () => {
+    const payload = new URLSearchParams();
+    payload.append('email', 'dom@readme.io');
+
+    await fetch(`http://localhost:${PORT}/`, {
+      method: 'post',
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+      },
+      body: payload,
+    });
+
+    const [req] = await once(metricsServer, 'request');
+    const body = await getBody(req);
+    const [har] = body;
+
+    const { request, response } = har.request.log.entries[0];
+
+    expect(request.method).toBe('POST');
+    expect(request.headers).toHaveHeader('content-type', 'application/x-www-form-urlencoded');
+    expect(request.postData).toStrictEqual({
+      mimeType: 'application/x-www-form-urlencoded',
+      params: [{ name: 'email', value: 'dom@readme.io' }],
+      text: null,
+    });
+
+    expect(response.status).toBe(200);
+  });
+
+  itif('SUPPORTS_MULTIPART')('should process a `multipart/form-data` POST payload', async () => {
+    const formData = new FormData();
+    formData.append('password', 123456);
+    formData.append('apiKey', 'abcdef');
+    formData.append('another', 'Hello world');
+    formData.append('buster', [1234, 5678]);
+
+    const encoder = new FormDataEncoder(formData);
+
+    await fetch(`http://localhost:${PORT}/`, {
+      method: 'post',
+      headers: encoder.headers,
+      body: Readable.from(encoder),
+    });
+
+    const [req] = await once(metricsServer, 'request');
+    const body = await getBody(req);
+    const [har] = body;
+
+    const { request } = har.request.log.entries[0];
+
+    expect(request.method).toBe('POST');
+    expect(request.headers).toHaveHeader('content-type', /multipart\/form-data; boundary=(.*)/);
+    expect(request.postData.mimeType).toMatch(/multipart\/form-data; boundary=(.*)/);
+    expect(request.postData.params).toStrictEqual([
+      { name: 'password', value: '123456' },
+      { name: 'apiKey', value: 'abcdef' },
+      { name: 'another', value: 'Hello world' },
+      { name: 'buster', value: '1234,5678' },
+    ]);
+
+    expect(request.postData.text).toBeNull();
+  });
+
+  itif('SUPPORTS_MULTIPART')('should process a `multipart/form-data` POST payload containing files', async () => {
+    const owlbert = await fs.readFile('./__tests__/__datasets__/owlbert.png');
+
+    const payload = new FormData();
+    payload.append('password', 123456);
+    payload.append('apiKey', 'abcdef');
+    payload.append('another', 'Hello world');
+    payload.append('buster', [1234, 5678]);
+    payload.append('owlbert.png', new File([owlbert], 'owlbert.png', { type: 'image/png' }), 'owlbert.png');
+
+    const encoder = new FormDataEncoder(payload);
+
+    await fetch(`http://localhost:${PORT}/`, {
+      method: 'post',
+      headers: encoder.headers,
+      body: Readable.from(encoder),
+    });
+
+    const [req] = await once(metricsServer, 'request');
+    const body = await getBody(req);
+    const [har] = body;
+
+    const { request } = har.request.log.entries[0];
+
+    expect(request.method).toBe('POST');
+    expect(request.headers).toHaveHeader('content-type', /multipart\/form-data; boundary=(.*)/);
+    expect(request.headers).toHaveHeader('content-length', 982);
+    expect(request.postData.mimeType).toMatch(/multipart\/form-data; boundary=(.*)/);
+    expect(request.postData.params).toStrictEqual([
+      { name: 'password', value: '123456' },
+      { name: 'apiKey', value: 'abcdef' },
+      { name: 'another', value: 'Hello world' },
+      { name: 'buster', value: '1234,5678' },
+      {
+        name: 'owlbert_png',
+        value: owlbertDataURL,
+        fileName: 'owlbert.png',
+        contentType: 'image/png',
+      },
+    ]);
+
+    expect(request.postData.text).toBeNull();
+  });
+
+  it('should process a `text/plain` payload', async () => {
+    await fetch(`http://localhost:${PORT}/`, {
+      method: 'post',
+      headers: {
+        'content-type': 'text/plain',
+      },
+      body: 'Hello world',
+    });
+
+    const [req] = await once(metricsServer, 'request');
+    const body = await getBody(req);
+    const [har] = body;
+
+    const { request, response } = har.request.log.entries[0];
+
+    expect(request.method).toBe('POST');
+    expect(request.headers).toHaveHeader('content-type', 'text/plain');
+    expect(request.postData).toStrictEqual({
+      mimeType: 'text/plain',
+      text: 'Hello world',
+    });
+
+    expect(response.status).toBe(200);
   });
 });
