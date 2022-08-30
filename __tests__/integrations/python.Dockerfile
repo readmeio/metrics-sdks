@@ -9,7 +9,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Build runtime image
 # TODO add this to base.Dockerfile?
-FROM node:18
+FROM node:16
 WORKDIR /src
 ADD package*.json /src/
 RUN npm ci
