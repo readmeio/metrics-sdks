@@ -7,6 +7,9 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 WORKDIR /src/examples/flask
 RUN pip3 install --no-cache-dir -r requirements.txt
 
+WORKDIR /src/examples/metrics_django
+RUN pip3 install --no-cache-dir -r requirements.txt
+
 # Build runtime image
 # TODO add this to base.Dockerfile?
 FROM node:18

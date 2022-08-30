@@ -91,3 +91,11 @@ services:
     command: npm run test:integration-webhooks
     environment:
       - EXAMPLE_SERVER=python examples/flask/webhook.py
+
+  integration_metrics_python_django:
+    build:
+      context: .
+      dockerfile: ./__tests__/integrations/python.Dockerfile
+    command: npm run test:integration-metrics
+    environment:
+      - EXAMPLE_SERVER=python examples/metrics_django/manage.py runserver
