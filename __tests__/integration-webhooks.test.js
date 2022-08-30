@@ -1,10 +1,10 @@
 import 'isomorphic-fetch';
-import { spawn } from 'child_process';
-import crypto from 'crypto';
-import http from 'http';
-import net from 'net';
+import { spawn } from 'node:child_process';
+import crypto from 'node:crypto';
+import http from 'node:http';
+import net from 'node:net';
+import { cwd } from 'node:process';
 import { Transform } from 'node:stream';
-import { cwd } from 'process';
 
 import getPort from 'get-port';
 
