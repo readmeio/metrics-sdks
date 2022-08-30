@@ -207,7 +207,6 @@ export default function processRequest(
     bodySize: 0,
   };
 
-  // At the moment the server doesn't accept null for request bodies. We're opening up support soon, but getting this fix out will be faster.
   if (requestData.postData === null) {
     delete requestData.postData;
   }

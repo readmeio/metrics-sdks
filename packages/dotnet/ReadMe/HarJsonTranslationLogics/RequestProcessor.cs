@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,6 +26,8 @@ namespace ReadMe.HarJsonObjectModels
       requestObj.cookies = this.GetCookies();
       requestObj.method = this.request.Method;
       requestObj.url = this.request.Scheme + "://" + this.request.Host.Host + ":" + this.request.Host.Port + this.request.Path;
+      requestObj.url += this.request.QueryString.ToString();
+
       requestObj.httpVersion = this.request.Protocol;
       requestObj.postData = await this.GetPostData();
 
@@ -191,33 +193,10 @@ namespace ReadMe.HarJsonObjectModels
         var queryStings = this.request.Query;
         foreach (var qs in queryStings)
         {
-          if (!this.configValues.options.isAllowListEmpty)
-          {
-            if (this.CheckAllowList(qs.Key))
-            {
-              QueryStrings qString = new QueryStrings();
-              qString.name = qs.Key;
-              qString.value = qs.Value;
-              queryStrings.Add(qString);
-            }
-          }
-          else if (!this.configValues.options.isDenyListEmpty)
-          {
-            if (!this.CheckDenyList(qs.Key))
-            {
-              QueryStrings qString = new QueryStrings();
-              qString.name = qs.Key;
-              qString.value = qs.Value;
-              queryStrings.Add(qString);
-            }
-          }
-          else
-          {
-            QueryStrings qString = new QueryStrings();
-            qString.name = qs.Key;
-            qString.value = qs.Value;
-            queryStrings.Add(qString);
-          }
+          QueryStrings qString = new QueryStrings();
+          qString.name = qs.Key;
+          qString.value = qs.Value;
+          queryStrings.Add(qString);
         }
       }
 
