@@ -82,7 +82,7 @@ describe('#metrics', () => {
     });
     app.get('/test', (req, res) => res.sendStatus(200));
 
-    // This silences console.errors from express internals
+    // This silences console.errors from default express errorhandler
     app.set('env', 'test');
 
     return request(app)
@@ -103,7 +103,7 @@ describe('#metrics', () => {
     });
     app.get('/test', (req, res) => res.sendStatus(200));
 
-    // This silences console.errors from express internals
+    // This silences console.errors from default express errorhandler
     app.set('env', 'test');
 
     return request(app)
