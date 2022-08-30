@@ -98,7 +98,13 @@ function patchResponse(res) {
  * @see {@link https://stackoverflow.com/a/58568473}
  * @param {IncomingMessage} req
  */
-function patchRequest(req) {
+function patchRequest(req: ExtendedIncomingMessage) {
+  // If we already have a body then whatever framework we're being run inside of is able to
+  // handle these requests and we can rely on `req.body` instead hacky workarounds.
+  if (req.body !== undefined) {
+    return;
+  }
+
   if (isRequest(req, 'text/*')) {
     req._text = '';
     req.setEncoding('utf8');
@@ -171,11 +177,17 @@ export function log(
   function startSend() {
     let requestBody = req.body;
     if (isRequest(req, 'text/*')) {
-      requestBody = req._text;
+      if ('_text' in req) {
+        requestBody = req._text;
+      }
     } else if (isRequest(req, '+json')) {
-      requestBody = req._json;
+      if ('_json' in req) {
+        requestBody = req._json;
+      }
     } else if (isRequest(req, 'application/x-www-form-urlencoded')) {
-      requestBody = req._form_encoded;
+      if ('_form_encoded' in req) {
+        requestBody = req._form_encoded;
+      }
     }
 
     const payload = constructPayload(

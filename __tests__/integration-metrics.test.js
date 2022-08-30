@@ -367,7 +367,13 @@ describe('Metrics SDK Integration Tests', () => {
       text: payload,
     });
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBeOneOf([
+      200,
+      // Fastify doesn't support vendored JSON content types out of the box and will return a
+      // `FST_ERR_CTP_INVALID_MEDIA_TYPE` error but thankfully we're still able to capture and
+      // process the payload into Metrics.
+      415,
+    ]);
   });
 
   it('should process an `application/x-www-url-formencoded` POST payload', async () => {
@@ -396,7 +402,14 @@ describe('Metrics SDK Integration Tests', () => {
       text: null,
     });
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBeOneOf([
+      200,
+      // Fastify, without the `@fastify/formbody` package out of the box doesn't support
+      // `x-www-form-urlencoded` and will return a `FST_ERR_CTP_INVALID_MEDIA_TYPE` error.
+      // Thankfully our middleware is still able to capture the payload from the request and send
+      // that to Metrics regardless if Fastify supports it or not.
+      415,
+    ]);
   });
 
   itif('SUPPORTS_MULTIPART')('should process a `multipart/form-data` POST payload', async () => {
