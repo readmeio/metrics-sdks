@@ -1,11 +1,12 @@
-from django.http import HttpResponse
+import json
+from django.http import JsonResponse
 
 def grouping_function(request):
     return {
-        "api_key": "unique api_key of the user",
-        "label": "label for us to show for this user (account name, user name, email, etc)",
-        "email": "email address for user"
+        "api_key": "owlbert-api-key",
+        "label": "Owlbert",
+        "email": "owlbert@example.com"
     }
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the metrics index.")
+    return JsonResponse({ "message": "hello world" }, json_dumps_params={'separators': (',', ':')})

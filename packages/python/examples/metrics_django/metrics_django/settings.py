@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 from readme_metrics import MetricsApiConfig
 
@@ -43,12 +44,12 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'readme_metrics.django.MetricsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'readme_metrics.django.MetricsMiddleware',
 ]
 
 ROOT_URLCONF = 'metrics_django.urls'
@@ -126,8 +127,7 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 README_METRICS_CONFIG = MetricsApiConfig(
-    api_key='xxx',
+    api_key=os.getenv("README_API_KEY"),
     grouping_function='metrics.views.grouping_function'
 )
