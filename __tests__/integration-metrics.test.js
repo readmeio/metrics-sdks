@@ -2,6 +2,7 @@
 import { spawn } from 'child_process';
 import { once } from 'events';
 import http from 'http';
+import net from 'net';
 import { Transform } from 'node:stream';
 import { cwd } from 'process';
 import { promisify } from 'util';
@@ -15,19 +16,22 @@ if (!process.env.EXAMPLE_SERVER) {
   process.exit(1);
 }
 
-// eslint-disable-next-line no-unused-vars
-function prefixStream(prefix) {
-  return new Transform({
-    transform(chunk, encoding, cb) {
-      return cb(
-        null,
-        chunk
-          .toString()
-          .split('\n')
-          .map(line => `[${prefix}]: ${line}`)
-          .join('\n')
-      );
-    },
+function isListening(port, attempt = 0) {
+  if (attempt > 5) throw new Error(`Cannot connect on port: ${port}`);
+  return new Promise((resolve, reject) => {
+    const socket = net.connect(port, 'localhost');
+    socket.once('error', err => {
+      if (err.code !== 'ECONNREFUSED') {
+        throw err;
+      }
+      return setTimeout(() => {
+        return isListening(port, attempt + 1).then(resolve, reject);
+      }, 300 * attempt);
+    });
+
+    socket.once('connect', () => {
+      return resolve();
+    });
   });
 }
 
@@ -108,25 +112,25 @@ describe('Metrics SDK Integration Tests', () => {
       },
     });
 
-    return new Promise((resolve, reject) => {
-      // Uncomment these to get stdout/stderr from the child process
-      // httpServer.stdout.pipe(prefixStream('stdout')).pipe(process.stdout);
-      // httpServer.stderr.pipe(prefixStream('stderr')).pipe(process.stderr);
+    // Uncomment these to get stdout/stderr from the child process
+    // function prefixStream(prefix) {
+    //   return new Transform({
+    //     transform(chunk, encoding, cb) {
+    //       return cb(
+    //         null,
+    //         chunk
+    //           .toString()
+    //           .split('\n')
+    //           .map(line => `[${prefix}]: ${line}`)
+    //           .join('\n')
+    //       );
+    //     },
+    //   });
+    // }
+    // httpServer.stdout.pipe(prefixStream('stdout')).pipe(process.stdout);
+    // httpServer.stderr.pipe(prefixStream('stderr')).pipe(process.stderr);
 
-      httpServer.stderr.on('data', data => {
-        if (data.toString().match(/Running on/)) return resolve(); // For some reason Flask prints on stderr 🤷‍♂️
-        return reject(data.toString());
-      });
-
-      httpServer.on('error', err => {
-        return reject(err.toString());
-      });
-      // eslint-disable-next-line consistent-return
-      httpServer.stdout.on('data', data => {
-        if (data.toString().match(/listening/)) return resolve();
-        if (data.toString().match(/Server running on/)) return resolve(); // Laravel
-      });
-    });
+    return isListening(PORT);
   });
 
   afterAll(() => {
