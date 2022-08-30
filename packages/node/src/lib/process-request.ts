@@ -106,7 +106,11 @@ function parseRequestBody(body: string, mimeType: string): Record<string, unknow
   }
 
   if (isApplicationJson(mimeType)) {
-    return JSON.parse(body);
+    try {
+      return JSON.parse(body);
+    } catch (err) {
+      // no-op
+    }
   }
 
   return body;
@@ -158,7 +162,7 @@ export default function processRequest(
   } else if (isApplicationJson(mimeType)) {
     postData = {
       mimeType,
-      text: JSON.stringify(reqBody),
+      text: typeof reqBody === 'object' || Array.isArray(reqBody) ? JSON.stringify(reqBody) : reqBody,
     };
   } else if (mimeType) {
     let stringBody = '';

@@ -310,6 +310,15 @@ describe('Metrics SDK Integration Tests', () => {
     expect(response.status).toBe(200);
   });
 
+  /**
+   * We should eventually support returning the raw POST payload to Metrics in this case but Express
+   * has a fun quirk where if you declare the `express.json()` middleware on a route to identify
+   * that that route accepts a JSON payload, if that JSON payload is corrupted then it completely
+   * wipes out `req.body` and replaces it with an empty JSON object -- eliminating all access for
+   * us to the what the original payload was.
+   */
+  it.todo('should process an `application/JSON POST payload containing unparseable JSON');
+
   it('should process a vendored `+json` POST payload', async () => {
     const payload = JSON.stringify({ user: { email: 'dom@readme.io' } });
     await fetch(`http://localhost:${PORT}/`, {

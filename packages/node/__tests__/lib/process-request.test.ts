@@ -500,6 +500,18 @@ test('#text should contain stringified body', () => {
     });
 });
 
+test('#text should contain stringified body if corrupted json', () => {
+  const body = '{"a":1,"b":2';
+
+  return request(createApp())
+    .post('/')
+    .set('Content-Type', 'application/json')
+    .send(body)
+    .expect(res => {
+      expect(res.body.postData.text).toBe(body);
+    });
+});
+
 test('#text should contain stringified body with an unknown format', () => {
   const body = 'hellloooo';
   return request(createApp())
