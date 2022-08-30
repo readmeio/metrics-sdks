@@ -91,4 +91,4 @@ services:
       dockerfile: ./__tests__/integrations/python.Dockerfile
     command: npm run test:integration-webhooks
     environment:
-      - EXAMPLE_SERVER=python examples/flask/webhook.py
+      - EXAMPLE_SERVER=python examples/flask/webhooks.py
