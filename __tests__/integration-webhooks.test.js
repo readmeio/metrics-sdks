@@ -1,7 +1,6 @@
 import 'isomorphic-fetch';
 import { spawn } from 'node:child_process';
 import crypto from 'node:crypto';
-import http from 'node:http';
 import net from 'node:net';
 import { cwd } from 'node:process';
 import { Transform } from 'node:stream';
@@ -30,22 +29,6 @@ function isListening(port, attempt = 0) {
     socket.once('connect', () => {
       return resolve();
     });
-  });
-}
-
-function post(url, body, options) {
-  return new Promise((resolve, reject) => {
-    const request = http
-      .request(url, { method: 'post', ...options }, response => {
-        response.end = new Promise(res => {
-          response.on('end', res);
-        });
-        resolve(response);
-      })
-      .on('error', reject);
-
-    request.write(body);
-    request.end();
   });
 }
 
