@@ -2,6 +2,8 @@
 import { spawn } from 'child_process';
 import { once } from 'events';
 import http from 'http';
+import net from 'net';
+import { Transform } from 'node:stream';
 import { cwd } from 'process';
 import { promisify } from 'util';
 
@@ -12,6 +14,35 @@ if (!process.env.EXAMPLE_SERVER) {
   // eslint-disable-next-line no-console
   console.error('Missing `EXAMPLE_SERVER` environment variable');
   process.exit(1);
+}
+
+function isListening(port, attempt = 0) {
+  if (attempt > 5) throw new Error(`Cannot connect on port: ${port}`);
+  return new Promise((resolve, reject) => {
+    const socket = net.connect(port, 'localhost');
+    socket.once('error', err => {
+      if (err.code !== 'ECONNREFUSED') {
+        throw err;
+      }
+      return setTimeout(() => {
+        return isListening(port, attempt + 1).then(resolve, reject);
+      }, 300 * attempt);
+    });
+
+    socket.once('connect', () => {
+      return resolve();
+    });
+  });
+}
+
+async function getBody(response) {
+  let responseBody = '';
+  // eslint-disable-next-line no-restricted-syntax
+  for await (const chunk of response) {
+    responseBody += chunk;
+  }
+  expect(responseBody).not.toBe('');
+  return JSON.parse(responseBody);
 }
 
 // https://gist.github.com/krnlde/797e5e0a6f12cc9bd563123756fc101f
@@ -27,6 +58,22 @@ http.get[promisify.custom] = function getAsync(options) {
       .on('error', reject);
   });
 };
+
+function post(url, body, options) {
+  return new Promise((resolve, reject) => {
+    const request = http
+      .request(url, { method: 'post', ...options }, response => {
+        response.end = new Promise(res => {
+          response.on('end', res);
+        });
+        resolve(response);
+      })
+      .on('error', reject);
+
+    request.write(body);
+    request.end();
+  });
+}
 
 const get = promisify(http.get);
 
@@ -91,27 +138,25 @@ describe('Metrics SDK Integration Tests', () => {
       },
     });
 
-    // Uncomment the console.log lines to see stdout/stderr output from the child process
-    return new Promise((resolve, reject) => {
-      httpServer.stderr.on('data', data => {
-        if (data.toString().match(/Running on/)) return resolve(); // For some reason Flask prints on stderr 🤷‍♂️
-        // // eslint-disable-next-line no-console
-        // console.error(`stderr: ${data}`);
-        return reject(data.toString());
+    function prefixStream(prefix) {
+      return new Transform({
+        transform(chunk, encoding, cb) {
+          return cb(
+            null,
+            chunk
+              .toString()
+              .split('\n')
+              .map(line => `[${prefix}]: ${line}`)
+              .join('\n')
+          );
+        },
       });
-      httpServer.on('error', err => {
-        // // eslint-disable-next-line no-console
-        // console.error('error', err);
-        return reject(err.toString());
-      });
-      // eslint-disable-next-line consistent-return
-      httpServer.stdout.on('data', data => {
-        if (data.toString().match(/listening/)) return resolve();
-        if (data.toString().match(/Server running on/)) return resolve(); // Laravel
-        // // eslint-disable-next-line no-console
-        // console.log(`stdout: ${data}`);
-      });
-    });
+    }
+    if (process.env.DEBUG) {
+      httpServer.stdout.pipe(prefixStream('stdout')).pipe(process.stdout);
+      httpServer.stderr.pipe(prefixStream('stderr')).pipe(process.stderr);
+    }
+    return isListening(PORT);
   });
 
   afterAll(() => {
@@ -133,8 +178,6 @@ describe('Metrics SDK Integration Tests', () => {
     });
   });
 
-  // TODO this needs fleshing out more with more assertions and complex
-  // test cases, along with more servers in different languages too!
   it('should make a request to a metrics backend with a har file', async () => {
     await get(`http://localhost:${PORT}`);
 
@@ -142,12 +185,7 @@ describe('Metrics SDK Integration Tests', () => {
     expect(req.url).toBe('/v1/request');
     expect(req.headers.authorization).toBe('Basic YS1yYW5kb20tcmVhZG1lLWFwaS1rZXk6');
 
-    let body = '';
-    // eslint-disable-next-line no-restricted-syntax
-    for await (const chunk of req) {
-      body += chunk;
-    }
-    body = JSON.parse(body);
+    const body = await getBody(req);
     const [har] = body;
 
     // Check for a uuid
@@ -187,11 +225,43 @@ describe('Metrics SDK Integration Tests', () => {
     // Flask prints a \n character after the JSON response
     // https://github.com/pallets/flask/issues/4635
     expect(response.content.text.replace('\n', '')).toBe(JSON.stringify({ message: 'hello world' }));
-    // The \n character above means we cannot compare to a fixed number
     expect(response.content.size).toStrictEqual(response.content.text.length);
     expect(response.content.mimeType).toMatch(/application\/json(;\s?charset=utf-8)?/);
 
     const responseHeaders = caseless(arrayToObject(response.headers));
     expect(responseHeaders.get('content-type')).toMatch(/application\/json(;\s?charset=utf-8)?/);
+  });
+
+  it('should process the http POST body', async () => {
+    const postData = JSON.stringify({ user: { email: 'dom@readme.io' } });
+    await post(`http://localhost:${PORT}/`, postData, {
+      headers: {
+        'content-type': 'application/json',
+        // Explicit content-length is required for Python/Flask
+        'content-length': Buffer.byteLength(postData),
+      },
+    });
+
+    const [req] = await once(metricsServer, 'request');
+
+    const body = await getBody(req);
+    const [har] = body;
+
+    const { request, response } = har.request.log.entries[0];
+    expect(request.method).toBe('POST');
+    expect(response.status).toBe(200);
+    expect(request.postData).toStrictEqual(
+      process.env.EXAMPLE_SERVER.startsWith('php')
+        ? {
+            mimeType: 'application/json',
+            params: [],
+          }
+        : {
+            mimeType: 'application/json',
+            text: postData,
+          }
+    );
+    expect(response.content.text).toMatch('');
+    expect(response.content.size).toBe(0);
   });
 });

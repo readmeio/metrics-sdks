@@ -1,19 +1,15 @@
-import type { ServerResponse } from 'http';
-
 import * as crypto from 'crypto';
+import { createServer } from 'http';
 
 import express from 'express';
-import findCacheDir from 'find-cache-dir';
-import flatCache from 'flat-cache';
 import FormData from 'form-data';
 import { isValidUUIDV4 } from 'is-valid-uuid-v4';
 import multer from 'multer';
 import nock from 'nock';
-import rimraf from 'rimraf';
 import request from 'supertest';
 
 import pkg from '../package.json';
-import { expressMiddleware } from '../src';
+import * as readmeio from '../src';
 import config from '../src/config';
 
 const upload = multer();
@@ -31,49 +27,17 @@ const outgoingGroup = {
   email: 'test@example.com',
 };
 
-const baseLogUrl = 'https://docs.example.com';
-const cacheDir = findCacheDir({ name: pkg.name });
-
-function getReadMeApiMock(numberOfTimes) {
-  return nock(config.readmeApiUrl, {
-    reqheaders: {
-      'User-Agent': `${pkg.name}/${pkg.version}`,
-    },
-  })
-    .get('/v1/')
-    .basicAuth({ user: apiKey })
-    .times(numberOfTimes)
-    .reply(200, { baseUrl: baseLogUrl });
-}
-
-function getCache() {
-  const encodedApiKey = Buffer.from(`${apiKey}:`).toString('base64');
-  const fsSafeApikey = crypto.createHash('md5').update(encodedApiKey).digest('hex');
-  const cacheKey = [pkg.name, pkg.version, fsSafeApikey].join('-');
-
-  return flatCache.load(cacheKey, cacheDir);
-}
-
-function hydrateCache(lastUpdated) {
-  const cache = getCache();
-
-  // Postdate the cache to two days ago so it'll bee seen as stale.
-  cache.setKey('lastUpdated', lastUpdated);
-  cache.setKey('baseUrl', baseLogUrl);
-  cache.save();
-}
-
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jest {
     interface Matchers<R> {
-      toHaveDocumentationHeader(res?: ServerResponse): R;
+      toHaveDocumentationHeader(baseLogUrl: string): R;
     }
   }
 }
 
 expect.extend({
-  toHaveDocumentationHeader(res) {
+  toHaveDocumentationHeader(res, baseLogUrl) {
     const { matcherHint, printExpected, printReceived } = this.utils;
     const message = (pass, actual) => () => {
       return (
@@ -106,13 +70,51 @@ describe('#metrics', () => {
 
   afterEach(() => {
     nock.cleanAll();
+  });
 
-    // Clean up the cache dir between tests.
-    rimraf.sync(cacheDir);
+  it('should throw an error if `apiKey` is missing', () => {
+    const app = express();
+    app.use((req, res, next) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      readmeio.log('', req, res, {});
+      return next();
+    });
+    app.get('/test', (req, res) => res.sendStatus(200));
+
+    // This silences console.errors from default express errorhandler
+    app.set('env', 'test');
+
+    return request(app)
+      .get('/test')
+      .expect(500)
+      .then(res => {
+        expect(res.text).toMatch(/Error: You must provide your ReadMe API key/);
+      });
+  });
+
+  it('should throw an error if `group` is missing', () => {
+    const app = express();
+    app.use((req, res, next) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      readmeio.log(apiKey, req, res);
+      return next();
+    });
+    app.get('/test', (req, res) => res.sendStatus(200));
+
+    // This silences console.errors from default express errorhandler
+    app.set('env', 'test');
+
+    return request(app)
+      .get('/test')
+      .expect(500)
+      .then(res => {
+        expect(res.text).toMatch(/Error: You must provide a group/);
+      });
   });
 
   it('should send a request to the metrics server', () => {
-    const apiMock = getReadMeApiMock(1);
     const mock = nock(config.host, {
       reqheaders: {
         'Content-Type': 'application/json',
@@ -128,21 +130,84 @@ describe('#metrics', () => {
       .reply(200);
 
     const app = express();
-    app.use(expressMiddleware(apiKey, () => incomingGroup));
+    app.use((req, res, next) => {
+      const logId = readmeio.log(apiKey, req, res, incomingGroup);
+      res.setHeader('x-log-id', logId);
+      return next();
+    });
     app.get('/test', (req, res) => res.sendStatus(200));
 
     return request(app)
       .get('/test')
       .expect(200)
-      .expect(res => expect(res).toHaveDocumentationHeader())
+      .expect('x-log-id', /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
       .then(() => {
-        apiMock.done();
+        mock.done();
+      });
+  });
+
+  it('should set `pageref` correctly based on `req.route`', () => {
+    const mock = nock(config.host, {
+      reqheaders: {
+        'Content-Type': 'application/json',
+        'User-Agent': `${pkg.name}/${pkg.version}`,
+      },
+    })
+      .post('/v1/request', ([body]) => {
+        expect(body.request.log.entries[0].pageref).toBe('http://127.0.0.1/test/:id');
+        return true;
+      })
+      .basicAuth({ user: apiKey })
+      .reply(200);
+
+    const app = express();
+    app.use((req, res, next) => {
+      readmeio.log(apiKey, req, res, incomingGroup);
+      return next();
+    });
+    app.get('/test/:id', (req, res) => res.sendStatus(200));
+
+    return request(app)
+      .get('/test/hello')
+      .expect(200)
+      .then(() => {
+        mock.done();
+      });
+  });
+
+  // There's a slight inconsistency here between express and non-express.
+  // When not in express, pageref contains the port but in express it does not.
+  // This is due to us using `req.hostname` to construct the URL vs just
+  // req.headers.host which has not been parsed.
+  it('should set `pageref` without express', () => {
+    const mock = nock(config.host, {
+      reqheaders: {
+        'Content-Type': 'application/json',
+        'User-Agent': `${pkg.name}/${pkg.version}`,
+      },
+    })
+      .post('/v1/request', ([body]) => {
+        expect(body.request.log.entries[0].pageref).toMatch(/http:\/\/127.0.0.1:\d.*\/test\/hello/);
+        return true;
+      })
+      .basicAuth({ user: apiKey })
+      .reply(200);
+
+    const app = createServer((req, res) => {
+      readmeio.log(apiKey, req, res, incomingGroup);
+      res.statusCode = 200;
+      res.end();
+    });
+
+    return request(app)
+      .get('/test/hello')
+      .expect(200)
+      .then(() => {
         mock.done();
       });
   });
 
   it('express should log the full request url with nested express apps', () => {
-    const apiMock = getReadMeApiMock(1);
     const mock = nock(config.host, {
       reqheaders: {
         'Content-Type': 'application/json',
@@ -160,7 +225,10 @@ describe('#metrics', () => {
     const app = express();
     const appNest = express();
 
-    appNest.use(expressMiddleware(apiKey, () => incomingGroup));
+    app.use((req, res, next) => {
+      readmeio.log(apiKey, req, res, incomingGroup);
+      return next();
+    });
     appNest.get('/nested', (req, res) => {
       // We're asserting `req.url` to be `/nested` here because the way that Express does contextual route loading
       // `req.url` won't include the `/test`. The `/test` is only added later internally in Express with `req.originalUrl`.
@@ -173,46 +241,7 @@ describe('#metrics', () => {
     return request(app)
       .get('/test/nested')
       .expect(200)
-      .expect(res => expect(res).toHaveDocumentationHeader())
       .then(() => {
-        apiMock.done();
-        mock.done();
-      });
-  });
-
-  it('should have access to group(req,res) objects', () => {
-    const apiMock = getReadMeApiMock(1);
-    const mock = nock(config.host, {
-      reqheaders: {
-        'Content-Type': 'application/json',
-        'User-Agent': `${pkg.name}/${pkg.version}`,
-      },
-    })
-      .post('/v1/request', ([body]) => {
-        expect(body.group.id).toBe('a');
-        expect(body.group.label).toBe('b');
-        expect(body.group.email).toBe('c');
-        return true;
-      })
-      .basicAuth({ user: apiKey })
-      .reply(200);
-
-    const app = express();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    app.use((req: any, res: any, next) => {
-      req.a = 'a';
-      res.b = 'b';
-      res.c = 'c';
-      next();
-    });
-    app.use(expressMiddleware(apiKey, (req, res) => ({ apiKey: req.a, label: res.b, email: res.c })));
-    app.get('/test', (req, res) => res.sendStatus(200));
-
-    return request(app)
-      .get('/test')
-      .expect(200)
-      .then(() => {
-        apiMock.done();
         mock.done();
       });
   });
@@ -225,7 +254,7 @@ describe('#metrics', () => {
 
   describe('#bufferLength', () => {
     it('should send requests when number hits `bufferLength` size', async function test() {
-      const apiMock = getReadMeApiMock(1);
+      const baseLogUrl = 'https://docs.example.com';
       const mock = nock(config.host, {
         reqheaders: {
           'Content-Type': 'application/json',
@@ -239,7 +268,10 @@ describe('#metrics', () => {
         .reply(200);
 
       const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup, { bufferLength: 3 }));
+      app.use((req, res, next) => {
+        readmeio.log(apiKey, req, res, incomingGroup, { bufferLength: 3, baseLogUrl });
+        return next();
+      });
       app.get('/test', (req, res) => res.sendStatus(200));
 
       // We need to make sure that the logId isn't being preserved between buffered requests.
@@ -249,20 +281,9 @@ describe('#metrics', () => {
         .get('/test')
         .expect(200)
         .expect(res => {
-          expect(res).toHaveDocumentationHeader();
+          expect(res).toHaveDocumentationHeader(baseLogUrl);
           logUrl = res.headers['x-documentation-url'];
-        });
-
-      expect(apiMock.isDone()).toBe(true);
-      expect(mock.isDone()).toBe(false);
-
-      await request(app)
-        .get('/test')
-        .expect(200)
-        .expect(res => {
-          expect(res).toHaveDocumentationHeader();
-          expect(res.headers['x-documentation-url']).not.toBe(logUrl);
-          logUrl = res.headers['x-documentation-url'];
+          expect(logUrl).toBeDefined();
         });
 
       expect(mock.isDone()).toBe(false);
@@ -271,19 +292,29 @@ describe('#metrics', () => {
         .get('/test')
         .expect(200)
         .expect(res => {
-          expect(res).toHaveDocumentationHeader();
+          expect(res).toHaveDocumentationHeader(baseLogUrl);
           expect(res.headers['x-documentation-url']).not.toBe(logUrl);
+          logUrl = res.headers['x-documentation-url'];
+          expect(logUrl).toBeDefined();
+        });
+
+      expect(mock.isDone()).toBe(false);
+
+      await request(app)
+        .get('/test')
+        .expect(200)
+        .expect(res => {
+          expect(res).toHaveDocumentationHeader(baseLogUrl);
+          expect(res.headers['x-documentation-url']).not.toBe(logUrl);
+          logUrl = res.headers['x-documentation-url'];
+          expect(logUrl).toBeDefined();
         });
 
       expect(mock.isDone()).toBe(true);
-      apiMock.done();
       mock.done();
     });
 
     it('should clear out the queue when sent', () => {
-      // Hydrate the cache so we don't need to mess with mocking out the API.
-      hydrateCache(Math.round(Date.now() / 1000));
-
       const numberOfLogs = 20;
       const numberOfMocks = 4;
       const bufferLength = numberOfLogs / numberOfMocks;
@@ -317,7 +348,10 @@ describe('#metrics', () => {
       );
 
       const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup, { bufferLength }));
+      app.use((req, res, next) => {
+        readmeio.log(apiKey, req, res, incomingGroup, { bufferLength });
+        return next();
+      });
       app.get('/test', (req, res) => res.sendStatus(200));
 
       return Promise.all(
@@ -331,7 +365,9 @@ describe('#metrics', () => {
   });
 
   describe('#baseLogUrl', () => {
-    it('should not call the API if the baseLogUrl supplied as a middleware option', async () => {
+    it('should set x-documentation-url if `baseLogUrl` is passed', async () => {
+      const baseLogUrl = 'https://docs.example.com';
+
       const mock = nock(config.host, {
         reqheaders: {
           'Content-Type': 'application/json',
@@ -343,156 +379,22 @@ describe('#metrics', () => {
         .reply(200);
 
       const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup, { baseLogUrl }));
+      app.use((req, res, next) => {
+        readmeio.log(apiKey, req, res, incomingGroup, { baseLogUrl });
+        return next();
+      });
       app.get('/test', (req, res) => res.sendStatus(200));
 
       await request(app)
         .get('/test')
         .expect(200)
-        .expect(res => expect(res).toHaveDocumentationHeader());
+        .expect(res => expect(res).toHaveDocumentationHeader(baseLogUrl));
 
       mock.done();
-    });
-
-    it('should not call the API for project data if the cache is fresh', async () => {
-      const apiMock = getReadMeApiMock(1);
-      const metricsMock = nock(config.host, {
-        reqheaders: {
-          'Content-Type': 'application/json',
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .post('/v1/request')
-        .basicAuth({ user: apiKey })
-        .reply(200);
-
-      const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup));
-      app.get('/test', (req, res) => res.sendStatus(200));
-
-      // Cache will be populated with this call as the cache doesn't exist yet.
-      await request(app)
-        .get('/test')
-        .expect(200)
-        .expect(res => expect(res).toHaveDocumentationHeader());
-
-      // Spin up a new app so we're forced to look for the baseUrl in the cache instead of what's saved in-memory
-      // within the middleware.
-      const app2 = express();
-      app2.use(expressMiddleware(apiKey, () => incomingGroup));
-      app2.get('/test', (req, res) => res.sendStatus(200));
-
-      // Cache will be hit with this request and shouldn't make another call to the API for data it already has.
-      await request(app2)
-        .get('/test')
-        .expect(200)
-        .expect(res => expect(res).toHaveDocumentationHeader());
-
-      apiMock.done();
-      metricsMock.done();
-    });
-
-    it('should populate the cache if not present', async () => {
-      const apiMock = getReadMeApiMock(1);
-      const metricsMock = nock(config.host, {
-        reqheaders: {
-          'Content-Type': 'application/json',
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .post('/v1/request')
-        .basicAuth({ user: apiKey })
-        .reply(200);
-
-      const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup));
-      app.get('/test', (req, res) => res.sendStatus(200));
-
-      await request(app)
-        .get('/test')
-        .expect(200)
-        .expect(res => expect(res).toHaveDocumentationHeader());
-
-      apiMock.done();
-      metricsMock.done();
-    });
-
-    it('should refresh the cache if stale', async () => {
-      // Hydate and postdate the cache to two days ago so it'll bee seen as stale.
-      hydrateCache(Math.round(Date.now() / 1000 - 86400 * 2));
-
-      const apiMock = getReadMeApiMock(1);
-      const metricsMock = nock(config.host, {
-        reqheaders: {
-          'Content-Type': 'application/json',
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .post('/v1/request')
-        .basicAuth({ user: apiKey })
-        .reply(200);
-
-      const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup));
-      app.get('/test', (req, res) => res.sendStatus(200));
-
-      await request(app)
-        .get('/test')
-        .expect(200)
-        .expect(res => expect(res).toHaveDocumentationHeader());
-
-      apiMock.done();
-      metricsMock.done();
-    });
-
-    it('should temporarily set baseUrl to null if the call to the ReadMe API fails for whatever reason', async () => {
-      const apiMock = nock(config.readmeApiUrl, {
-        reqheaders: {
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .get('/v1/')
-        .basicAuth({ user: apiKey })
-        .reply(401, {
-          error: 'APIKEY_NOTFOUNDD',
-          message: "We couldn't find your API key",
-          suggestion:
-            "The API key you passed in (moc··········Key) doesn't match any keys we have in our system. API keys must be passed in as the username part of basic auth. You can get your API key in Configuration > API Key, or in the docs.",
-          docs: 'https://docs.readme.com/developers/logs/fake-uuid',
-          help: "If you need help, email support@readme.io and mention log 'fake-uuid'.",
-        });
-
-      const metricsMock = nock(config.host, {
-        reqheaders: {
-          'Content-Type': 'application/json',
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .post('/v1/request')
-        .basicAuth({ user: apiKey })
-        .reply(200);
-
-      const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup));
-      app.get('/test', (req, res) => res.sendStatus(200));
-
-      await request(app)
-        .get('/test')
-        .expect(200)
-        .expect(res => {
-          expect(getCache().getKey('baseUrl')).toBeNull();
-
-          // `x-documentation-url` header should not be present since we couldn't get the base URL!
-          expect(Object.keys(res.headers)).not.toContain('x-documentation-url');
-        });
-
-      apiMock.done();
-      metricsMock.done();
     });
   });
 
   describe('`res._body`', () => {
-    let apiMock;
     const responseBody = { a: 1, b: 2, c: 3 };
     function createMock() {
       return nock(config.host, {
@@ -508,18 +410,13 @@ describe('#metrics', () => {
         .reply(200);
     }
 
-    beforeEach(() => {
-      apiMock = getReadMeApiMock(1);
-    });
-
-    afterEach(() => {
-      apiMock.done();
-    });
-
     it('should buffer up res.write() calls', async () => {
       const mock = createMock();
       const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup));
+      app.use((req, res, next) => {
+        readmeio.log(apiKey, req, res, incomingGroup);
+        return next();
+      });
       app.get('/test', (req, res) => {
         res.write('{"a":1,');
         res.write('"b":2,');
@@ -535,13 +432,13 @@ describe('#metrics', () => {
     it('should buffer up res.end() calls', async () => {
       const mock = createMock();
       const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup));
+      app.use((req, res, next) => {
+        readmeio.log(apiKey, req, res, incomingGroup);
+        return next();
+      });
       app.get('/test', (req, res) => res.end(JSON.stringify(responseBody)));
 
-      await request(app)
-        .get('/test')
-        .expect(200)
-        .expect(res => expect(res).toHaveDocumentationHeader());
+      await request(app).get('/test').expect(200);
 
       mock.done();
     });
@@ -549,21 +446,19 @@ describe('#metrics', () => {
     it('should work for res.send() calls', async () => {
       const mock = createMock();
       const app = express();
-      app.use(expressMiddleware(apiKey, () => incomingGroup));
+      app.use((req, res, next) => {
+        readmeio.log(apiKey, req, res, incomingGroup);
+        return next();
+      });
       app.get('/test', (req, res) => res.send(responseBody));
 
-      await request(app)
-        .get('/test')
-        .expect(200)
-        .expect(res => expect(res).toHaveDocumentationHeader());
+      await request(app).get('/test').expect(200);
 
       mock.done();
     });
   });
 
   describe('`req.body`', () => {
-    let apiMock;
-
     function createMock(checkLocation: 'text' | 'params', requestBody: unknown) {
       return nock(config.host, {
         reqheaders: {
@@ -578,14 +473,6 @@ describe('#metrics', () => {
         .reply(200);
     }
 
-    beforeEach(() => {
-      apiMock = getReadMeApiMock(1);
-    });
-
-    afterEach(() => {
-      apiMock.done();
-    });
-
     it('should accept multipart/form-data', async () => {
       const form = new FormData();
       form.append('password', '123456');
@@ -597,7 +484,10 @@ describe('#metrics', () => {
       const mock = createMock('text', JSON.stringify({ password: '123456', apiKey: 'abc', another: 'Hello world' }));
       const app = express();
       app.use(upload.none());
-      app.use(expressMiddleware(apiKey, () => incomingGroup));
+      app.use((req, res, next) => {
+        readmeio.log(apiKey, req, res, incomingGroup);
+        return next();
+      });
       app.post('/test', (req, res) => {
         res.status(200).end();
       });

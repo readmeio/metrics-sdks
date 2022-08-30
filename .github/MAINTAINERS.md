@@ -113,6 +113,7 @@ To build a Metrics integration test server, you must write an HTTP server that d
 - Looks for an `README_API_KEY` environment variable, and exits with an exit code of 1 if it does not exist.
 - Spawns an HTTP server that listens on the `PORT` environment variable, or 4000 if no environment variable exists.
 - The HTTP server should have a listener on `GET /` that responds with a 200 status code, and a JSON response body of `{ "message": "hello world" }`
+- The HTTP server should have a listener on `POST /` that will be provided with a JSON body of `{ "user": { "email": "dom@readme.io" } }` which should be included in the Metrics payload. This should respond with a 200 status code and an empty body.
 - The HTTP server should have a Metrics SDK installed, that responds with the following identification object for the user making the request:
 
 ```json

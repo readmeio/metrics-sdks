@@ -22,6 +22,10 @@ Route::get('/', function () {
     ]);
 });
 
+Route::post('/', function () {
+    return response(null, 200);
+});
+
 Route::post('/webhook', function (\Illuminate\Http\Request $request) use ($secret) {
     // Verify the request is legitimate and came from ReadMe.
     $signature = $request->headers->get('readme-signature', '');
