@@ -399,7 +399,6 @@ describe('Metrics SDK Integration Tests', () => {
     expect(request.postData).toStrictEqual({
       mimeType: 'application/x-www-form-urlencoded',
       params: [{ name: 'email', value: 'dom@readme.io' }],
-      text: null,
     });
 
     expect(response.status).toBeOneOf([

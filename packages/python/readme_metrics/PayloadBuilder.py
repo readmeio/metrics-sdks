@@ -171,7 +171,6 @@ class PayloadBuilder:
                     "params": [
                         {"name": k, "value": v} for (k, v) in request.form.items()
                     ],
-                    "text": None,
                 }
             else:
                 post_data = self._process_body(content_type, request.rm_body)

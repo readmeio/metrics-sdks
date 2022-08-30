@@ -286,7 +286,7 @@ class PayloadTest extends \PHPUnit\Framework\TestCase
             ['name' => 'buster', 'value' => '[1234,5678]']
         ], $har_request['postData']['params']);
 
-        $this->assertNull($har_request['postData']['text']);
+        $this->assertArrayNotHasKey('text', $har_request['postData']);
     }
 
     /**
@@ -321,7 +321,7 @@ class PayloadTest extends \PHPUnit\Framework\TestCase
             ['name' => 'buster', 'value' => '[1234,5678]']
         ], $har_request['postData']['params']);
 
-        $this->assertNull($har_request['postData']['text']);
+        $this->assertArrayNotHasKey('text', $har_request['postData']);
     }
 
     /**
@@ -363,7 +363,7 @@ class PayloadTest extends \PHPUnit\Framework\TestCase
             ]
         ], $har_request['postData']['params']);
 
-        $this->assertNull($har_request['postData']['text']);
+        $this->assertArrayNotHasKey('text', $har_request['postData']);
     }
 
     /**

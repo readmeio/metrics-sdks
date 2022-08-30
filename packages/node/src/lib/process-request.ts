@@ -154,10 +154,8 @@ export default function processRequest(
   if (mimeType === 'application/x-www-form-urlencoded') {
     postData = {
       mimeType,
-      // There might be a better way to type this, but this works for now.
-      // If the mimeType is application/x-www-form-urlencoded, then the body is always going to be an object here.
+      // By being an `application/x-www-form-urlencoded` request `reqBody` will always be an object.
       params: objectToArray(reqBody as Record<string, unknown>),
-      text: null,
     };
   } else if (isApplicationJson(mimeType)) {
     postData = {

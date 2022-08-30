@@ -93,7 +93,6 @@ class Payload
                     static::convertObjectToArray($this->sanitizeInputPerConfig($request->post())),
                     static::convertFileObjectForArray($this->sanitizeInputPerConfig($request->allFiles()))
                 ),
-                'text' => null
             ];
         } elseif ($request->getContentType() === 'form') {
             $post_data = [
@@ -101,7 +100,6 @@ class Payload
                 'params' => static::convertObjectToArray(
                     $this->sanitizeInputPerConfig($request->post())
                 ),
-                'text' => null,
             ];
         } elseif (!$request->isMethod('get')) {
             if (

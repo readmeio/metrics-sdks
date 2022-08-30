@@ -152,7 +152,7 @@ describe('options', () => {
         .send('password=123456&apiKey=abc&another=Hello world')
         .set('Content-Type', 'application/x-www-form-urlencoded')
         .expect(({ body }) => {
-          expect(body.postData.text).toBeNull();
+          expect(body.postData.text).toBeUndefined();
           expect(body.postData.params).toStrictEqual([
             {
               name: 'password',
@@ -199,7 +199,7 @@ describe('options', () => {
         .post('/')
         .send('password=123456&apiKey=abc&another=Hello world')
         .expect(({ body }) => {
-          expect(body.postData.text).toBeNull();
+          expect(body.postData.text).toBeUndefined();
           expect(body.postData.params).toStrictEqual([
             {
               name: 'password',
