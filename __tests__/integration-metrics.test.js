@@ -112,24 +112,24 @@ describe('Metrics SDK Integration Tests', () => {
       },
     });
 
-    // Uncomment these to get stdout/stderr from the child process
-    // function prefixStream(prefix) {
-    //   return new Transform({
-    //     transform(chunk, encoding, cb) {
-    //       return cb(
-    //         null,
-    //         chunk
-    //           .toString()
-    //           .split('\n')
-    //           .map(line => `[${prefix}]: ${line}`)
-    //           .join('\n')
-    //       );
-    //     },
-    //   });
-    // }
-    // httpServer.stdout.pipe(prefixStream('stdout')).pipe(process.stdout);
-    // httpServer.stderr.pipe(prefixStream('stderr')).pipe(process.stderr);
-
+    function prefixStream(prefix) {
+      return new Transform({
+        transform(chunk, encoding, cb) {
+          return cb(
+            null,
+            chunk
+              .toString()
+              .split('\n')
+              .map(line => `[${prefix}]: ${line}`)
+              .join('\n')
+          );
+        },
+      });
+    }
+    if (process.env.DEBUG) {
+      httpServer.stdout.pipe(prefixStream('stdout')).pipe(process.stdout);
+      httpServer.stderr.pipe(prefixStream('stderr')).pipe(process.stderr);
+    }
     return isListening(PORT);
   });
 
