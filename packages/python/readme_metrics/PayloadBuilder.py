@@ -147,7 +147,7 @@ class PayloadBuilder:
         return group
 
     def _get_content_type(self, headers):
-        return headers.get('content-type', 'text/plain')
+        return headers.get("content-type", "text/plain")
 
     def _build_request_payload(self, request) -> dict:
         """Wraps the request portion of the payload
@@ -165,10 +165,12 @@ class PayloadBuilder:
         content_type = self._get_content_type(headers)
         post_data = False
         if getattr(request, "content_length", None):
-            if content_type == 'application/x-www-form-urlencoded':
+            if content_type == "application/x-www-form-urlencoded":
                 post_data = {
                     "mimeType": content_type,
-                    "params": [{"name": k, "value": v} for (k, v) in request.form.items()],
+                    "params": [
+                        {"name": k, "value": v} for (k, v) in request.form.items()
+                    ],
                     "text": None,
                 }
             else:
@@ -299,42 +301,27 @@ class PayloadBuilder:
             try:
                 body = body.decode("utf-8")
             except UnicodeDecodeError:
-                return {
-                    "mimeType": content_type,
-                    "text": "[NOT VALID UTF-8]"
-                }
+                return {"mimeType": content_type, "text": "[NOT VALID UTF-8]"}
 
         if not isinstance(body, str):
             # We don't know how to process this body. If it's safe to encode as
             # JSON, return it unchanged; otherwise return an error.
             try:
                 json.dumps(body)
-                return {
-                    "mimeType": content_type,
-                    "text": body
-                }
+                return {"mimeType": content_type, "text": body}
             except TypeError:
-                return {
-                    "mimeType": content_type,
-                    "text": "[ERROR: NOT SERIALIZABLE]"
-                }
+                return {"mimeType": content_type, "text": "[ERROR: NOT SERIALIZABLE]"}
 
         try:
             body_data = json.loads(body)
         except JSONDecodeError:
-            return {
-                "mimeType": content_type,
-                "text": body
-            }
+            return {"mimeType": content_type, "text": body}
 
         if (self.denylist or self.allowlist) and isinstance(body_data, dict):
             redacted_data = self.redact_dict(body_data)
             body = json.dumps(redacted_data)
 
-        return {
-            "mimeType": content_type,
-            "text": body
-        }
+        return {"mimeType": content_type, "text": body}
 
     def redact_dict(self, mapping: Mapping):
         def _redact_value(val):
