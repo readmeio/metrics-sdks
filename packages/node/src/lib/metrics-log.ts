@@ -1,6 +1,4 @@
-import type { PayloadData, LogOptions } from './construct-payload';
 import type { Har } from 'har-format';
-import type { ServerResponse, IncomingMessage } from 'http';
 import type { Response } from 'node-fetch';
 
 import fetch from 'node-fetch';
@@ -8,8 +6,6 @@ import timeoutSignal from 'timeout-signal';
 
 import pkg from '../../package.json';
 import config from '../config';
-
-import { constructPayload } from './construct-payload';
 
 export interface GroupingObject {
   /**
@@ -88,28 +84,4 @@ export function metricsAPICall(
       ids: getLogIds(body),
     };
   });
-}
-
-/**
- * Log a request to the API Metrics Dashboard with the standard Node.js server data.
- *
- * @param readmeAPIKey The API key for your ReadMe project. This ensures your requests end up in your dashboard. You can read more about the API key in [our docs](https://docs.readme.com/reference/authentication).
- * @param req A Node.js `IncomingMessage` object, usually found in your server's request handler.
- * @param res A Node.js `ServerResponse` object, usually found in your server's request handler.
- * @param payloadData A collection of information that will be logged alongside this request. See [Payload Data](#payload-data) for more details.
- * @param logOptions Additional options. Check the documentation for more details.
- *
- * @returns A promise that resolves to an object containing your log ids and the server response
- */
-export function log(
-  readmeAPIKey: string,
-  req: IncomingMessage,
-  res: ServerResponse,
-  payloadData: PayloadData,
-  logOptions: LogOptions
-) {
-  if (!readmeAPIKey) throw new Error('You must provide your ReadMe API key');
-
-  const payload = constructPayload(req, res, payloadData, logOptions);
-  return metricsAPICall(readmeAPIKey, Array.isArray(payload) ? payload : [payload], logOptions.fireAndForget);
 }

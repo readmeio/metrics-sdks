@@ -1,6 +1,7 @@
 import type { LogOptions, PayloadData } from '../../src/lib/construct-payload';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 
-import * as http from 'http';
+import { createServer } from 'http';
 import os from 'os';
 import * as qs from 'querystring';
 
@@ -11,7 +12,7 @@ import pkg from '../../package.json';
 import { constructPayload } from '../../src/lib/construct-payload';
 
 function createApp(options?: LogOptions, payloadData?: PayloadData) {
-  const requestListener = function (req: http.IncomingMessage, res: http.ServerResponse) {
+  const requestListener = function (req: IncomingMessage, res: ServerResponse) {
     let body = '';
     let parsedBody: Record<string, unknown> | undefined;
 
@@ -35,7 +36,7 @@ function createApp(options?: LogOptions, payloadData?: PayloadData) {
     });
   };
 
-  return http.createServer(requestListener);
+  return createServer(requestListener);
 }
 
 describe('constructPayload()', () => {

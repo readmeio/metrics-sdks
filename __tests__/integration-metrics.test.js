@@ -35,6 +35,16 @@ function isListening(port, attempt = 0) {
   });
 }
 
+async function getBody(response) {
+  let responseBody = '';
+  // eslint-disable-next-line no-restricted-syntax
+  for await (const chunk of response) {
+    responseBody += chunk;
+  }
+  expect(responseBody).not.toBe('');
+  return JSON.parse(responseBody);
+}
+
 // https://gist.github.com/krnlde/797e5e0a6f12cc9bd563123756fc101f
 http.get[promisify.custom] = function getAsync(options) {
   return new Promise((resolve, reject) => {
@@ -48,6 +58,22 @@ http.get[promisify.custom] = function getAsync(options) {
       .on('error', reject);
   });
 };
+
+function post(url, body, options) {
+  return new Promise((resolve, reject) => {
+    const request = http
+      .request(url, { method: 'post', ...options }, response => {
+        response.end = new Promise(res => {
+          response.on('end', res);
+        });
+        resolve(response);
+      })
+      .on('error', reject);
+
+    request.write(body);
+    request.end();
+  });
+}
 
 const get = promisify(http.get);
 
@@ -152,8 +178,6 @@ describe('Metrics SDK Integration Tests', () => {
     });
   });
 
-  // TODO this needs fleshing out more with more assertions and complex
-  // test cases, along with more servers in different languages too!
   it('should make a request to a metrics backend with a har file', async () => {
     await get(`http://localhost:${PORT}`);
 
@@ -161,12 +185,7 @@ describe('Metrics SDK Integration Tests', () => {
     expect(req.url).toBe('/v1/request');
     expect(req.headers.authorization).toBe('Basic YS1yYW5kb20tcmVhZG1lLWFwaS1rZXk6');
 
-    let body = '';
-    // eslint-disable-next-line no-restricted-syntax
-    for await (const chunk of req) {
-      body += chunk;
-    }
-    body = JSON.parse(body);
+    const body = await getBody(req);
     const [har] = body;
 
     // Check for a uuid
@@ -205,11 +224,43 @@ describe('Metrics SDK Integration Tests', () => {
     // Flask prints a \n character after the JSON response
     // https://github.com/pallets/flask/issues/4635
     expect(response.content.text.replace('\n', '')).toBe(JSON.stringify({ message: 'hello world' }));
-    // The \n character above means we cannot compare to a fixed number
     expect(response.content.size).toStrictEqual(response.content.text.length);
     expect(response.content.mimeType).toMatch(/application\/json(;\s?charset=utf-8)?/);
 
     const responseHeaders = caseless(arrayToObject(response.headers));
     expect(responseHeaders.get('content-type')).toMatch(/application\/json(;\s?charset=utf-8)?/);
+  });
+
+  it('should process the http POST body', async () => {
+    const postData = JSON.stringify({ user: { email: 'dom@readme.io' } });
+    await post(`http://localhost:${PORT}/`, postData, {
+      headers: {
+        'content-type': 'application/json',
+        // Explicit content-length is required for Python/Flask
+        'content-length': Buffer.byteLength(postData),
+      },
+    });
+
+    const [req] = await once(metricsServer, 'request');
+
+    const body = await getBody(req);
+    const [har] = body;
+
+    const { request, response } = har.request.log.entries[0];
+    expect(request.method).toBe('POST');
+    expect(response.status).toBe(200);
+    expect(request.postData).toStrictEqual(
+      process.env.EXAMPLE_SERVER.startsWith('php')
+        ? {
+            mimeType: 'application/json',
+            params: [],
+          }
+        : {
+            mimeType: 'application/json',
+            text: postData,
+          }
+    );
+    expect(response.content.text).toMatch('');
+    expect(response.content.size).toBe(0);
   });
 });
