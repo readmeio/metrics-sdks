@@ -1,7 +1,12 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace ReadMe.HarJsonObjectModels
 {
+  // Because `PostData` can be nullified and ignored by JSON serialization we need to also ignore
+  // nullish data here as well otherwise if `PostData` is `null` then it'll be serialized here as
+  // null.
+  [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
   class Request
   {
     public List<Headers> headers { get; set; }

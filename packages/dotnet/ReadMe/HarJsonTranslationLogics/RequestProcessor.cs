@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,7 +29,13 @@ namespace ReadMe.HarJsonObjectModels
       requestObj.url += this.request.QueryString.ToString();
 
       requestObj.httpVersion = this.request.Protocol;
-      requestObj.postData = await this.GetPostData();
+
+      // We should ony add POST data into the HAR if we have it.
+      PostData postData = await this.GetPostData();
+      if (postData.mimeType != null)
+      {
+        requestObj.postData = postData;
+      }
 
       return requestObj;
     }
