@@ -2,6 +2,8 @@
 import { spawn } from 'child_process';
 import { once } from 'events';
 import http from 'http';
+import net from 'net';
+import { Transform } from 'node:stream';
 import { cwd } from 'process';
 import { promisify } from 'util';
 
@@ -12,6 +14,25 @@ if (!process.env.EXAMPLE_SERVER) {
   // eslint-disable-next-line no-console
   console.error('Missing `EXAMPLE_SERVER` environment variable');
   process.exit(1);
+}
+
+function isListening(port, attempt = 0) {
+  if (attempt > 5) throw new Error(`Cannot connect on port: ${port}`);
+  return new Promise((resolve, reject) => {
+    const socket = net.connect(port, 'localhost');
+    socket.once('error', err => {
+      if (err.code !== 'ECONNREFUSED') {
+        throw err;
+      }
+      return setTimeout(() => {
+        return isListening(port, attempt + 1).then(resolve, reject);
+      }, 300 * attempt);
+    });
+
+    socket.once('connect', () => {
+      return resolve();
+    });
+  });
 }
 
 async function getBody(response) {
@@ -117,27 +138,25 @@ describe('Metrics SDK Integration Tests', () => {
       },
     });
 
-    // Uncomment the console.log lines to see stdout/stderr output from the child process
-    return new Promise((resolve, reject) => {
-      httpServer.stderr.on('data', data => {
-        if (data.toString().match(/Running on/)) return resolve(); // For some reason Flask prints on stderr 🤷‍♂️
-        // // eslint-disable-next-line no-console
-        // console.error(`stderr: ${data}`);
-        return reject(data.toString());
+    function prefixStream(prefix) {
+      return new Transform({
+        transform(chunk, encoding, cb) {
+          return cb(
+            null,
+            chunk
+              .toString()
+              .split('\n')
+              .map(line => `[${prefix}]: ${line}`)
+              .join('\n')
+          );
+        },
       });
-      httpServer.on('error', err => {
-        // // eslint-disable-next-line no-console
-        // console.error('error', err);
-        return reject(err.toString());
-      });
-      // eslint-disable-next-line consistent-return
-      httpServer.stdout.on('data', data => {
-        if (data.toString().match(/listening/)) return resolve();
-        if (data.toString().match(/Server running on/)) return resolve(); // Laravel
-        // // eslint-disable-next-line no-console
-        // console.log(`stdout: ${data}`);
-      });
-    });
+    }
+    if (process.env.DEBUG) {
+      httpServer.stdout.pipe(prefixStream('stdout')).pipe(process.stdout);
+      httpServer.stderr.pipe(prefixStream('stderr')).pipe(process.stderr);
+    }
+    return isListening(PORT);
   });
 
   afterAll(() => {
