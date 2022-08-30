@@ -442,7 +442,7 @@ describe('Metrics SDK Integration Tests', () => {
       { name: 'buster', value: '1234,5678' },
     ]);
 
-    expect(request.postData.text).toBeNull();
+    expect(request.postData.text).toBeUndefined();
   });
 
   itif('SUPPORTS_MULTIPART')('should process a `multipart/form-data` POST payload containing files', async () => {
@@ -486,7 +486,7 @@ describe('Metrics SDK Integration Tests', () => {
       },
     ]);
 
-    expect(request.postData.text).toBeNull();
+    expect(request.postData.text).toBeUndefined();
   });
 
   it('should process a `text/plain` payload', async () => {
