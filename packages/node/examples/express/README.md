@@ -19,7 +19,7 @@ curl http://localhost:8000
 ## 📞 Webhooks
 
 ```sh
-make serve-metrics-webhooks
+make serve-webhooks-express
 ```
 
 We have to generate a valid HMAC to send through to the webhook, you can do that with the following shell commands:
