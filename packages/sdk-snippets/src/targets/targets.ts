@@ -1,4 +1,6 @@
 import type { SecurityVariable, ServerVariable } from '..';
+import type { CodeBuilder } from '../helpers/code-builder';
+import type { Merge } from 'type-fest';
 
 import { csharp } from './csharp/target';
 import { node } from './node/target';
@@ -21,15 +23,22 @@ export interface ClientRanges {
   server?: Record<string, { line: number }>;
 }
 
-export type Converter = (params: { secret?: string; security: SecurityVariable[]; server: ServerVariable[] }) => {
+export type Converter<T extends Record<string, any>> = (
+  params: {
+    secret?: string;
+    security: SecurityVariable[];
+    server: ServerVariable[];
+  },
+  options?: Merge<CodeBuilder, T>
+) => {
   ranges: ClientRanges;
   snippet: string;
 };
 
-export type Client = {
+export interface Client<T extends Record<string, any> = Record<string, any>> {
   info: ClientInfo;
-  convert: Converter;
-};
+  convert: Converter<T>;
+}
 
 export type Extension = `.${string}` | null;
 

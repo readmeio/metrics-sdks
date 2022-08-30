@@ -1,6 +1,6 @@
 {
   "name": "@readme/metrics-sdk-snippets",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Generate code snippets for ReadMe Metrics SDKs in multiple languages",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -29,7 +29,7 @@
     "test": "jest --coverage"
   },
   "dependencies": {
-    "code-block-writer": "^11.0.3"
+    "@readme/httpsnippet": "^4.0.5"
   },
   "devDependencies": {
     "@readme/eslint-config": "^10.0.0",

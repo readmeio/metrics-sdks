@@ -34,4 +34,10 @@ app.MapGet("/", async context =>
   await context.Response.WriteAsJsonAsync(new { message = "hello world" });
 });
 
+app.MapPost("/", async context =>
+{
+  context.Response.StatusCode = 200;
+  await context.Response.CompleteAsync();
+});
+
 app.Run($"http://localhost:{port}");

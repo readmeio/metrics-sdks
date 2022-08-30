@@ -1,6 +1,7 @@
 import type { Client } from '../../../targets';
 
-import { CodeWriter } from '../../../../helpers/code-writer';
+import { CodeBuilder } from '../../../../helpers/code-builder';
+import { escapeForSingleQuotes } from '../../../../helpers/escape';
 
 export const laravel: Client = {
   info: {
@@ -9,104 +10,99 @@ export const laravel: Client = {
     link: 'https://laravel.com/',
     description: 'ReadMe Metrics Webhooks SDK usage on Laravel',
   },
-  convert: ({ secret, security, server }) => {
-    const writer = new CodeWriter({
-      indentNumberOfSpaces: 4,
-      useSingleQuote: true,
-    });
+  convert: ({ secret, security, server }, options) => {
+    const opts = {
+      indent: '    ',
+      ...options,
+    };
 
-    writer.writeLine('<?php');
-    writer.blankLine();
+    const { blank, join, push, pushVariable, ranges } = new CodeBuilder({ indent: opts.indent });
 
-    writer.writeLine('// Your ReadMe secret');
-    writer.writeLine(`$secret = '${secret}';`);
-    writer.blankLine();
+    push('<?php');
+    blank();
 
-    writer.writeLine('// Add this code into your `routes/web.php` file.');
-    writer
-      .writeLine("Route::post('/webhook', function (\\Illuminate\\Http\\Request $request) use ($secret) {")
-      .indent(() => {
-        writer.writeLine('// Verify the request is legitimate and came from ReadMe.');
-        writer.writeLine("$signature = $request->headers->get('readme-signature', '');");
-        writer.blankLine();
+    push('// Your ReadMe secret');
+    push(`$secret = '${secret}';`);
+    blank();
 
-        writer
-          .writeLine('try {')
-          .indent(() => {
-            writer.writeLine('\\ReadMe\\Webhooks::verify($request->input(), $signature, $secret);');
-          })
-          .writeLine('} catch (\\Exception $e) {')
-          .indent(() => {
-            writer.writeLine('// Handle invalid requests');
-            writer
-              .writeLine('return response()->json([')
-              .indent(() => {
-                writer.writeLine("'error' => $e->getMessage()");
-              })
-              .writeLine('], 401);');
-          })
-          .writeLine('}')
-          .blankLine();
+    push('// Add this code into your `routes/web.php` file.');
+    push("Route::post('/webhook', function (\\Illuminate\\Http\\Request $request) use ($secret) {");
+    push('// Verify the request is legitimate and came from ReadMe.', 1);
+    push("$signature = $request->headers->get('readme-signature', '');", 1);
+    blank();
 
-        writer.writeLine('// Fetch the user from the database and return their data for use with OpenAPI variables.');
-        writer.writeLine("// $user = DB::table('users')->where('email', $request->input('email'))->limit(1)->get();");
-        writer.writeLine('return response()->json([').indent(() => {
-          if (!server.length && !security.length) {
-            writer.writeLine('// Add custom data to return in your webhook call here.');
+    push('try {', 1);
+    push('\\ReadMe\\Webhooks::verify($request->input(), $signature, $secret);', 2);
+    push('} catch (\\Exception $e) {', 1);
+    push('// Handle invalid requests', 2);
+    push('return response()->json([', 2);
+    push("'error' => $e->getMessage()", 3);
+    push('], 401);', 2);
+    push('}', 1);
+    blank();
+
+    push('// Fetch the user from the database and return their data for use with OpenAPI variables.', 1);
+    push("// $user = DB::table('users')->where('email', $request->input('email'))->limit(1)->get();", 1);
+    push('return response()->json([', 1);
+
+    if (!server.length && !security.length) {
+      push('// Add custom data to return in your webhook call here.', 2);
+    }
+
+    if (server.length) {
+      push('// OAS Server variables', 2);
+      server.forEach(data => {
+        pushVariable(
+          `'${escapeForSingleQuotes(data.name)}' => '${escapeForSingleQuotes(
+            data.default || data.default === '' ? data.default : data.name
+          )}',`,
+          {
+            type: 'server',
+            name: data.name,
+            indentationLevel: 2,
+          }
+        );
+      });
+    }
+
+    if (server.length && security.length) {
+      blank();
+    }
+
+    if (security.length) {
+      push('// OAS Security variables', 2);
+      security.forEach(data => {
+        if (data.type === 'http') {
+          // Only HTTP Basic auth has any special handling for supplying auth.
+          if (data.scheme === 'basic') {
+            pushVariable(`'${escapeForSingleQuotes(data.name)}' => ['user' => 'user', 'pass' => 'pass'],`, {
+              type: 'security',
+              name: data.name,
+              indentationLevel: 2,
+            });
             return;
           }
+        }
 
-          if (server.length) {
-            writer.writeLine('// OAS Server variables');
-            server.forEach(data => {
-              writer
-                .writeEscapedString(data.name)
-                .write(' => ')
-                .writeEscapedString(data.default || data.default === '' ? data.default : data.name)
-                .write(',')
-                .newLine()
-                .recordRange('server', data.name);
-            });
+        pushVariable(
+          `'${escapeForSingleQuotes(data.name)}' => '${escapeForSingleQuotes(
+            data.default || data.default === '' ? data.default : data.name
+          )}',`,
+          {
+            type: 'security',
+            name: data.name,
+            indentationLevel: 2,
           }
-
-          if (server.length && security.length) {
-            writer.blankLine();
-          }
-
-          if (security.length) {
-            writer.writeLine('// OAS Security variables');
-            security.forEach(data => {
-              if (data.type === 'http') {
-                // Only HTTP Basic auth has any special handling for supplying auth.
-                if (data.scheme === 'basic') {
-                  writer
-                    .writeEscapedString(data.name)
-                    .write(" => ['user' => 'user', 'pass' => 'pass'],")
-                    .newLine()
-                    .recordRange('security', data.name);
-                  return;
-                }
-              }
-
-              writer
-                .writeEscapedString(data.name)
-                .write(' => ')
-                .writeEscapedString(data.default || data.default === '' ? data.default : data.name)
-                .write(',')
-                .newLine()
-                .recordRange('security', data.name);
-            });
-          }
-        });
-
-        writer.writeLine(']);');
+        );
       });
+    }
 
-    writer.write('});');
+    push(']);', 1);
+    push('});');
 
     return {
-      ranges: writer.getRanges(),
-      snippet: writer.toString(),
+      ranges: ranges(),
+      snippet: join(),
     };
   },
 };

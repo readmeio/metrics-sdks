@@ -12,9 +12,8 @@ const port = process.env.PORT || 8000;
 const init = async () => {
   const server = Hapi.server({ host: 'localhost', port });
 
-  server.ext('onPostResponse', function (request, h) {
-    const { response, raw, info } = request;
-    const { req, res } = raw;
+  server.ext('onPreResponse', function (request, h) {
+    const { req, res } = request.raw;
 
     const payloadData = {
       // User's API Key
@@ -23,12 +22,10 @@ const init = async () => {
       label: 'Owlbert',
       // User's email address
       email: 'owlbert@example.com',
-      startedDateTime: new Date(info?.received),
-      responseEndDateTime: new Date(info?.responded),
-      responseBody: response?.source,
     };
 
-    readmeio.log(process.env.README_API_KEY, req, res, payloadData, { fireAndForget: true });
+    req.body = request.payload;
+    readmeio.log(process.env.README_API_KEY, req, res, payloadData);
 
     return h.continue;
   });
@@ -38,6 +35,14 @@ const init = async () => {
     path: '/',
     handler: () => {
       return { message: 'hello world' };
+    },
+  });
+
+  server.route({
+    method: 'POST',
+    path: '/',
+    handler: (request, h) => {
+      return h.response().code(200);
     },
   });
 

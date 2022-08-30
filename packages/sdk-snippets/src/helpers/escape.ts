@@ -86,3 +86,38 @@ export const escapeForSingleQuotes = (value: any) => escapeString(value, { delim
  * If value is not a string, it will be stringified with .toString() first.
  */
 export const escapeForDoubleQuotes = (value: any) => escapeString(value, { delimiter: '"' });
+
+function quotedString(str: string, doubleQuotes: boolean) {
+  if (doubleQuotes) {
+    return `"${str}"`;
+  }
+
+  return `'${str}'`;
+}
+
+/**
+ * Safely escape and prepare a string to be used as an object key.
+ *
+ */
+export function escapeForObjectKey(str: string, doubleQuotes = false) {
+  const escaped = doubleQuotes ? escapeForDoubleQuotes(str) : escapeForSingleQuotes(str);
+
+  // If this key doesn't start with an alpha character then we should always wrap it in quotes and
+  // then run it through some escaping logic to make sure that it doesn't contain anything that
+  // might break out of the quotes.
+  if (!/^([A-Za-z]{1})/.test(str)) {
+    return quotedString(escaped, doubleQuotes);
+  } else if (escaped === str) {
+    // If our key doesn't have any characters that might break out of quotes and requring escaping
+    // but might have any non-alphanumeric characters in it that might not be able to be used as
+    // a JS property key then we should wrap the key in quotes.
+    if (/([^A-Za-z_0-9])/.test(str)) {
+      return quotedString(str, doubleQuotes);
+    }
+
+    // If our key doesn't need to be escaped then we don't need to wrap it in quotes.
+    return str;
+  }
+
+  return quotedString(str, doubleQuotes);
+}
