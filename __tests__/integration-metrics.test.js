@@ -199,12 +199,9 @@ describe('Metrics SDK Integration Tests', function () {
     expect(request.headers).to.have.header('host', `localhost:${PORT}`);
 
     expect(response.status).to.equal(200);
-    expect(response.statusText).to.equal('OK');
+    expect(response.statusText).to.match(/OK|200/); // Django returns with "200"
     expect(response.headers).to.have.header('content-type', /application\/json(;\s?charset=utf-8)?/);
 
-    expect(response.status).toBe(200);
-    // Django returns with "200"
-    expect(response.statusText).to.match(/OK|200/);
     // Flask prints a \n character after the JSON response
     // https://github.com/pallets/flask/issues/4635
     expect(response.content.text.replace('\n', '')).to.equal(JSON.stringify({ message: 'hello world' }));

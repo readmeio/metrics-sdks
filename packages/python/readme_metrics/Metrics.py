@@ -2,6 +2,7 @@ import atexit
 import math
 import queue
 import threading
+import traceback
 
 from readme_metrics import MetricsApiConfig
 from readme_metrics.publisher import publish_batch
@@ -52,14 +53,18 @@ class Metrics:
             )
             return
 
-        payload = self.payload_builder(request, response)
-        if payload is None:
-            # PayloadBuilder returns None when the grouping function returns
-            # None (an indication that the request should not be logged.)
-            self.config.LOGGER.debug(
-                "Not enqueueing request, grouping function returned None"
-            )
-            return
+        try:
+            payload = self.payload_builder(request, response)
+            if payload is None:
+                # PayloadBuilder returns None when the grouping function returns
+                # None (an indication that the request should not be logged.)
+                self.config.LOGGER.debug("Not enqueueing request, payload is None")
+                return
+        except Exception:
+            self.config.LOGGER.debug("Not enqueueing request, payload construction failed")
+            if self.config.IS_DEVELOPMENT_MODE:
+                print(traceback.format_exc())
+
 
         self.queue.put(payload)
         if self.queue.qsize() >= self.config.BUFFER_LENGTH:

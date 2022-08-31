@@ -12,6 +12,9 @@ lint: ## Run code standard checks
 lint-fix: ## Run code formatting checks
 	black .
 
+serve-metrics-django: ## Start the local Django server to test Metrics
+	README_API_KEY=$(API_KEY) python3 examples/metrics_django/manage.py runserver
+
 serve-metrics-flask: ## Start the local Flask server to test Metrics
 	README_API_KEY=$(API_KEY) python3 examples/flask/app.py
 
