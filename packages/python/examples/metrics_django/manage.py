@@ -8,11 +8,12 @@ if os.getenv("README_API_KEY") is None:
     sys.stderr.flush()
     sys.exit(1)
 
-from django.core.management.commands.runserver import Command as runserver;
+from django.core.management.commands.runserver import Command as runserver
+
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'metrics_django.settings')
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "metrics_django.settings")
     runserver.default_port = os.getenv("PORT") or 8000
     try:
         from django.core.management import execute_from_command_line
@@ -25,5 +26,5 @@ def main():
     execute_from_command_line(sys.argv)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
