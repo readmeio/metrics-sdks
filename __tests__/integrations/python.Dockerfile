@@ -1,20 +1,20 @@
-FROM python:3 AS build-env
+FROM alpine:3.16
 
-ADD packages/python /src
+COPY packages/python /src
+
+RUN apk update
+RUN apk add python3 py3-pip nodejs npm
+
+# Set up the Python SDK
 WORKDIR /src
 RUN pip3 install --no-cache-dir -r requirements.txt
 
+# Install example dependencies
 WORKDIR /src/examples/flask
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-# Build runtime image
-# TODO add this to base.Dockerfile?
-FROM node:16
+# Install top level dependencies
 WORKDIR /src
-ADD package*.json /src/
+COPY __tests__ /src/__tests__
+COPY package*.json /src/
 RUN npm ci
-ADD __tests__ /src/__tests__
-
-COPY --from=build-env /src /src
-# Pip installs it's packages in some global location 🤷‍♂️
-COPY --from=build-env /usr/local/ /usr/local/

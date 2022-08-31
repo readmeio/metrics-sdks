@@ -40,7 +40,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - run: docker-compose run integration_metrics_python_flask
+    # This Flask suite is **extremely** flaky in Docker. Until we can figure out how to make it not
+    # you can run this locally with `make test-python-metrics-flask`.
+    # - run: docker-compose run integration_metrics_python_flask
     - run: docker-compose run integration_webhooks_python_flask
 
     - name: Cleanup
