@@ -5,6 +5,7 @@ import net from 'node:net';
 import { cwd } from 'node:process';
 import { Transform } from 'node:stream';
 
+import { expect } from 'chai';
 import getPort from 'get-port';
 
 if (!process.env.EXAMPLE_SERVER) {
@@ -34,11 +35,11 @@ function isListening(port, attempt = 0) {
 
 const randomApiKey = 'rdme_abcdefghijklmnopqrstuvwxyz';
 
-describe('Metrics SDK Webhook Integration Tests', () => {
+describe('Metrics SDK Webhook Integration Tests', function () {
   let httpServer;
   let PORT;
 
-  beforeAll(async () => {
+  before(async function () {
     const [command, ...args] = process.env.EXAMPLE_SERVER.split(' ');
     PORT = await getPort();
 
@@ -79,7 +80,7 @@ describe('Metrics SDK Webhook Integration Tests', () => {
     return isListening(PORT);
   });
 
-  afterAll(() => {
+  after(function () {
     /**
      * Instead of running `httpServer.kill()` we need to dust the process group that was created
      * because some languages and frameworks (like Laravel's Artisan server) fire off a sub-process
@@ -91,7 +92,7 @@ describe('Metrics SDK Webhook Integration Tests', () => {
     process.kill(-httpServer.pid);
   });
 
-  it('should return with a 401 if the signature is empty/missing', async () => {
+  it('should return with a 401 if the signature is empty/missing', async function () {
     const response = await fetch(`http://localhost:${PORT}/webhook`, {
       method: 'post',
       headers: {
@@ -100,13 +101,13 @@ describe('Metrics SDK Webhook Integration Tests', () => {
       body: JSON.stringify({ email: 'dom@readme.io' }),
     });
 
-    expect(response.status).toBe(401);
+    expect(response.status).to.equal(401);
 
     const responseBody = await response.json();
-    expect(responseBody.error).toBe('Missing Signature');
+    expect(responseBody.error).to.equal('Missing Signature');
   });
 
-  it('should return an error with an expired signature', async () => {
+  it('should return an error with an expired signature', async function () {
     // The expiry time for the HMAC is 30 mins, so here we're
     // creating an expired one which is 40 mins old
     const FORTY_MIN = 40 * 60 * 1000;
@@ -127,13 +128,13 @@ describe('Metrics SDK Webhook Integration Tests', () => {
       body: JSON.stringify(body),
     });
 
-    expect(response.status).toBe(401);
+    expect(response.status).to.equal(401);
 
     const responseBody = await response.json();
-    expect(responseBody.error).toBe('Expired Signature');
+    expect(responseBody.error).to.equal('Expired Signature');
   });
 
-  it('should return with a 401 if the signature is not correct', async () => {
+  it('should return with a 401 if the signature is not correct', async function () {
     const response = await fetch(`http://localhost:${PORT}/webhook`, {
       method: 'post',
       headers: {
@@ -143,13 +144,13 @@ describe('Metrics SDK Webhook Integration Tests', () => {
       body: JSON.stringify({ email: 'dom@readme.io' }),
     });
 
-    expect(response.status).toBe(401);
+    expect(response.status).to.equal(401);
 
     const responseBody = await response.json();
-    expect(responseBody.error).toBe('Invalid Signature');
+    expect(responseBody.error).to.equal('Invalid Signature');
   });
 
-  it('should return with a user object if the signature is correct', async () => {
+  it('should return with a user object if the signature is correct', async function () {
     const time = Date.now();
     const body = {
       email: 'dom@readme.io',
@@ -167,10 +168,10 @@ describe('Metrics SDK Webhook Integration Tests', () => {
       body: JSON.stringify(body),
     });
 
-    expect(response.status).toBe(200);
+    expect(response.status).to.equal(200);
 
     const responseBody = await response.json();
-    expect(responseBody).toMatchObject({
+    expect(responseBody).to.deep.equal({
       petstore_auth: 'default-key',
       basic_auth: { user: 'user', pass: 'pass' },
     });

@@ -1,9 +1,7 @@
 {
-  "extends": "@readme/eslint-config/testing",
+  "extends": "@readme/eslint-config/testing-mocha",
   "rules": {
-    "jest/no-standalone-expect": ["error", {
-      "additionalTestBlockFunctions": ["itif"]
-    } ],
+    "import/extensions": ["error", "ignorePackages"],
     "no-underscore-dangle": "off",
     "unicorn/no-unsafe-regex": "off"
   }
