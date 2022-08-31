@@ -31,16 +31,19 @@ function itif(envVar) {
   return it.skip;
 }
 
-function isListening(port, attempt = 0) {
-  if (attempt > 5) throw new Error(`Cannot connect on port: ${port}`);
+function isListening(childProcess, port, attempt = 0) {
   return new Promise((resolve, reject) => {
+    if (childProcess.exitCode !== null) {
+      throw new Error(`Unexpected exit code: ${childProcess.exitCode} from child process`);
+    }
+    if (attempt > 5) throw new Error(`Cannot connect on port: ${port}`);
     const socket = net.connect(port, 'localhost');
     socket.once('error', err => {
       if (err.code !== 'ECONNREFUSED') {
         throw err;
       }
       return setTimeout(() => {
-        return isListening(port, attempt + 1).then(resolve, reject);
+        return isListening(childProcess, port, attempt + 1).then(resolve, reject);
       }, 300 * attempt);
     });
 
@@ -139,7 +142,8 @@ describe('Metrics SDK Integration Tests', () => {
       httpServer.stdout.pipe(prefixStream('stdout')).pipe(process.stdout);
       httpServer.stderr.pipe(prefixStream('stderr')).pipe(process.stderr);
     }
-    return isListening(PORT);
+
+    return isListening(httpServer, PORT);
   });
 
   afterAll(() => {
@@ -148,10 +152,13 @@ describe('Metrics SDK Integration Tests', () => {
      * because some languages and frameworks (like Laravel's Artisan server) fire off a sub-process
      * that doesn't get normally cleaned up when we kill the original `php artisan serve` process.
      *
+     * Checking that `exitCode` is null before killing group to ensure it is still running
+     *
      * @see {@link https://stackoverflow.com/questions/56016550/node-js-cannot-kill-process-executed-with-child-process-exec/56016815#56016815}
      * @see {@link https://www.baeldung.com/linux/kill-members-process-group#killing-a-process-using-the-pgid}
+     * @see {@link https://nodejs.org/docs/latest/api/child_process.html#subprocessexitcode}
      */
-    process.kill(-httpServer.pid);
+    if (httpServer.exitCode === null) process.kill(-httpServer.pid);
 
     return new Promise((resolve, reject) => {
       metricsServer.close(err => {
