@@ -29,6 +29,7 @@ metrics_extension = ReadMeMetrics(
         api_key=os.getenv("README_API_KEY"),
         grouping_function=grouping_function,
         buffer_length=1,
+        timeout=5,
     )
 )
 metrics_extension.init_app(app)
