@@ -159,7 +159,7 @@ class PayloadBuilder:
         headers = self.redact_dict(request.headers)
         params = parse.parse_qsl(self._get_query_string(request))
 
-        if getattr(request, "content_length", None):
+        if getattr(request, "rm_content_length", None):
             post_data = self._process_body(request.rm_body)
         else:
             post_data = {}
