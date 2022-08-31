@@ -8,13 +8,10 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlMultiHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Exception\ClientException;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Ramsey\Uuid\Uuid;
-use Symfony\Component\HttpFoundation\HeaderBag;
+use ReadMe\HAR\Payload;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mime\MimeTypes;
 
 class Metrics
 {
@@ -105,7 +102,7 @@ class Metrics
             $response->headers->set('x-documentation-url', $this->base_log_url . '/logs/' . $log_id);
         }
 
-        $payload = $this->constructPayload($log_id, $request, $response);
+        $payload = (new Payload($this))->create($log_id, $request, $response);
 
         $headers = [
             'Authorization' => 'Basic ' . $this->api_key,
@@ -158,142 +155,6 @@ class Metrics
         $ex = new MetricsException(str_replace($json->_message, $json->name, $json->message));
         $ex->setErrors((array)$json->errors);
         throw $ex;
-    }
-
-    public function constructPayload(string $log_id, Request $request, Response $response): array
-    {
-        $request_start = defined('LARAVEL_START') ? LARAVEL_START : $_SERVER['REQUEST_TIME_FLOAT'];
-        $group = $this->group_handler::constructGroup($request);
-
-        $api_key_exists = array_key_exists('api_key', $group);
-        $id_key_exists = array_key_exists('id', $group);
-        if (!$api_key_exists and !$id_key_exists) {
-            throw new \TypeError('Metrics grouping function did not return an array with an api_key present.');
-        } elseif ($id_key_exists and empty($group['id'])) {
-            throw new \TypeError('Metrics grouping function must not return an empty id.');
-        } elseif ($api_key_exists and empty($group['api_key'])) {
-            throw new \TypeError('Metrics grouping function must not return an empty api_key.');
-        }
-
-        if ($api_key_exists) {
-            // Swap the externally documented `api_key` field into backwards compatible and internally used `id` field.
-            $group['id'] = $group['api_key'];
-            unset($group['api_key']);
-        }
-
-        return [
-            '_id' => $log_id,
-            'group' => $group,
-            'clientIPAddress' => $request->ip(),
-            'development' => $this->development_mode,
-            'request' => [
-                'log' => [
-                    'creator' => [
-                        'name' => 'readme-metrics (php)',
-                        'version' => $this->package_version,
-                        'comment' => self::getHARCreatorVersion(),
-                    ],
-                    'entries' => [
-                        [
-                            'pageref' => $request->url(),
-                            'startedDateTime' => date('Y-m-d\TH:i:sp', (int) $request_start),
-                            'time' => (int) ((microtime(true) - $request_start) * 1000),
-                            'request' => $this->processRequest($request),
-                            'response' => $this->processResponse($response)
-                        ]
-                    ]
-                ]
-            ]
-        ];
-    }
-
-    /**
-     * Process an incoming request into a HAR `request` object.
-     *
-     * Because Laravel (currently as of 6.8.0) dumps `$_GET` and `$_POST` into `->query` and
-     * `->request` instead of putting `$_GET` into only `->query` and `$_POST` into `->request`, we
-     * have no easy way way to dump only POST data into `postData`. So because of that, we're opting
-     * to instead use the `$_{METHOD}` global accessors instead of Laravel Request helper functions.
-     *
-     * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#request}
-     */
-    private function processRequest(Request $request): array
-    {
-        return [
-            'method' => $request->method(),
-            'url' => $request->fullUrl(),
-            'httpVersion' => $_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.1',
-            'headers' => static::convertHeaderBagToArray($request->headers),
-            'queryString' => static::convertObjectToArray($_GET),
-            'postData' => [
-                'mimeType' => 'application/json',
-                'params' => array_merge(
-                    static::convertObjectToArray($this->sanitizeInputPerConfig($_POST)),
-                    static::convertFileObjectForArray($this->sanitizeInputPerConfig($_FILES))
-                )
-            ]
-        ];
-    }
-
-    /**
-     * Sanitize a set of data per the configured `denylist` and `allowlist`.
-     *
-     * @psalm-taint-escape file Psalm's taint analysis thinks that `$_POST` and `$_FILES` are
-     *      unsafe because we're using `file_get_contents()` on `$data[]['tmp_name]` further down
-     *      the stack in `convertFileObjectForArray` but because we're only doing this if it's in
-     *      `$_FILES` it's safe.
-     */
-    private function sanitizeInputPerConfig(array $data): array
-    {
-        if (!empty($this->denylist)) {
-            return $this->excludeDataFromDenylist($data);
-        } elseif (!empty($this->allowlist)) {
-            return $this->excludeDataNotInAllowlist($data);
-        }
-
-        return $data;
-    }
-
-    private function processResponse(Response $response): array
-    {
-        if ($response instanceof JsonResponse) {
-            $body = $response->getData(true);
-
-            if (!empty($this->denylist)) {
-                $body = $this->excludeDataFromDenylist($body);
-            } elseif (!empty($this->allowlist)) {
-                $body = $this->excludeDataNotInAllowlist($body);
-            }
-        } else {
-            $body = $response->getContent();
-        }
-
-        $status_code = $response->getStatusCode();
-
-        /**
-         * The webserver is what sets the `Content-Length` header so incase we don't have one here
-         * yet let's compute our own based off of our response.
-         *
-         * @see {@link https://github.com/laravel/framework/issues/29227}
-         */
-        if ($response->headers->has('Content-Length')) {
-            $content_size = $response->headers->get('Content-Length');
-        } else {
-            $content_size = strlen((string)$response->getContent());
-        }
-
-        return [
-            'status' => $status_code,
-            'statusText' => isset(Response::$statusTexts[$status_code])
-                ? Response::$statusTexts[$status_code]
-                : 'Unknown status',
-            'headers' => static::convertHeaderBagToArray($response->headers),
-            'content' => [
-                'text' => (is_scalar($body)) ? $body : json_encode($body),
-                'size' => (int)$content_size,
-                'mimeType' => $response->headers->get('Content-Type')
-            ]
-        ];
     }
 
     /**
@@ -388,148 +249,23 @@ class Metrics
         return $this->cache_dir . DIRECTORY_SEPARATOR . $cache_key;
     }
 
-    /**
-     * Convert a Laravel `HeaderBag` into an acceptable nested headers array for the HAR payload.
-     *
-     * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#headers}
-     */
-    protected static function convertHeaderBagToArray(HeaderBag $headers): array
+    public function getPackageVersion(): ?string
     {
-        $output = [];
-        foreach ($headers->all() as $name => $values) {
-            /** @psalm-suppress PossiblyNullIterator */
-            foreach ($values as $value) {
-                // If the header is empty, don't worry about it.
-                if ($value === '') {
-                    continue; // @codeCoverageIgnore
-                }
-
-                $output[] = [
-                    'name' => $name,
-                    'value' => $value
-                ];
-            }
-        }
-
-        return $output;
+        return $this->package_version;
     }
 
-    /**
-     * Convert a `$_FILES` object-style array into an acceptable nested array for the HAR payload.
-     *
-     * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#params}
-     */
-    protected static function convertFileObjectForArray(array $input): array
+    public function isInDevelopmentMode(): bool
     {
-        return array_map(function ($key) use ($input) {
-            // In order to protect ourselves from loading files of the filesystem that didn't come
-            // from a real file upload and the `$_FILES` array we should only ever handle
-            // `tmp_name` in the incoming payload if we know it's from a `$_FILES` context.
-            //
-            // If we don't do this then we open ourselves up to having bad actor $_POST payloads
-            // mimicking themselves as a `$_FILES` payload in order to read and send something like
-            $file = $input[$key];
-
-            $mimeType = MimeTypes::getDefault()->guessMimeType($file['tmp_name']);
-            $base64 = base64_encode(file_get_contents($file['tmp_name']));
-            $dataURL = join(';', [
-                'data:' . $mimeType,
-                'name=' . $file['name'],
-                'base64,' . $base64
-            ]);
-
-            return [
-                'name' => $key,
-                'value' => $dataURL,
-                'fileName' => $file['name'],
-                'contentType' => $mimeType
-            ];
-        }, array_keys($input));
+        return $this->development_mode;
     }
 
-    /**
-     * Convert a key/value object-style array into an acceptable nested array for the HAR payload.
-     *
-     * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#querystring}
-     * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#params}
-     */
-    protected static function convertObjectToArray(array $input): array
+    public function getDenylist(): array
     {
-        return array_map(function ($key) use ($input) {
-            return [
-                'name' => $key,
-                'value' => (is_scalar($input[$key])) ? $input[$key] : json_encode($input[$key])
-            ];
-        }, array_keys($input));
+        return $this->denylist;
     }
 
-    /**
-     * Retrieve the version string that we'll use in the HAR `creator` object.
-     *
-     * @example arm64-darwin21.3.0/8.1.8
-     */
-    public static function getHARCreatorVersion(): string
+    public function getAllowlist(): array
     {
-        return php_uname('m') . '-' . strtolower(php_uname('s')) . php_uname('r') . '/' . PHP_VERSION;
-    }
-
-    /**
-     * Given an array, exclude data at the highest associative level of it based upon the configured allowlist.
-     *
-     */
-    private function excludeDataFromDenylist(array $data = []): array
-    {
-        // If `$data` is an array with associative keys, let's run the denylist against that, otherwise run the
-        // denylist against the keys inside the top-level array.
-        if ($this->isArrayAssoc($data)) {
-            Arr::forget($data, $this->denylist);
-            return $data;
-        }
-
-        foreach ($data as $k => $v) {
-            Arr::forget($data[$k], $this->denylist);
-        }
-
-        return $data;
-    }
-
-    /**
-     * Given an array, return only data at the highest level of it that matches the configured allowlist.
-     *
-     */
-    private function excludeDataNotInAllowlist(array $data = []): array
-    {
-        $ret = [];
-
-        // If `$data` is an array with associative keys, let's run the allowlist against that, otherwise run the
-        // allowlist against the keys inside the top-level array.
-        if ($this->isArrayAssoc($data)) {
-            foreach ($this->allowlist as $key) {
-                if (isset($data[$key])) {
-                    $ret[$key] = $data[$key];
-                }
-            }
-
-            return $ret;
-        }
-
-        foreach ($data as $idx => $v) {
-            foreach ($this->allowlist as $key) {
-                if (isset($v[$key])) {
-                    $ret[$idx][$key] = $data[$idx][$key];
-                }
-            }
-        }
-
-        return $ret;
-    }
-
-    /**
-     * Return whether or not a given array is associative.
-     *
-     */
-    private function isArrayAssoc(array $array = []): bool
-    {
-        return count(array_filter(array_keys($array), 'is_string')) > 0;
+        return $this->allowlist;
     }
 }

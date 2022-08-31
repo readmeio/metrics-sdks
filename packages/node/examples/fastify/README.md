@@ -1,18 +1,16 @@
 # ReadMe Metrics Fastify Demo
 
-## Install
-
 ```sh
 npm install
 ```
 
-## Run
+## 📊 Metrics
 
 ```sh
-README_API_KEY=<Your ReadMe API Key here> npm start
+make serve-metrics-express
 ```
 
-## Test
+Access your test server to demo Metrics by making a cURL request:
 
 ```sh
 curl http://localhost:8000

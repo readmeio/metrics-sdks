@@ -63,6 +63,7 @@ services:
       dockerfile: ./__tests__/integrations/php.Dockerfile
     command: npm run test:integration-metrics
     environment:
+      - SUPPORTS_MULTIPART=true
       - EXAMPLE_SERVER=php packages/php/examples/laravel/artisan serve
 
   integration_webhooks_php_laravel:
@@ -82,7 +83,8 @@ services:
       dockerfile: ./__tests__/integrations/python.Dockerfile
     command: npm run test:integration-metrics
     environment:
-      - EXAMPLE_SERVER=python examples/flask/app.py
+      EXAMPLE_SERVER: python3 examples/flask/app.py
+      DEBUG: 'true'
 
   integration_webhooks_python_flask:
     build:
@@ -90,4 +92,4 @@ services:
       dockerfile: ./__tests__/integrations/python.Dockerfile
     command: npm run test:integration-webhooks
     environment:
-      - EXAMPLE_SERVER=python examples/flask/webhook.py
+      - EXAMPLE_SERVER=python3 examples/flask/webhooks.py

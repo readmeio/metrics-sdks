@@ -32,7 +32,7 @@ WORKDIR /src/packages/php/examples/laravel
 ADD packages/php/examples/laravel/composer*.json ./
 RUN composer install
 
-# # Install top level dependencies
+# Install top level dependencies
 WORKDIR /src
 ADD __tests__ ./__tests__
 ADD package*.json ./

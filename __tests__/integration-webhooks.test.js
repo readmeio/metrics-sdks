@@ -1,10 +1,11 @@
-import { spawn } from 'child_process';
-import crypto from 'crypto';
-import http from 'http';
-import net from 'net';
+import 'isomorphic-fetch';
+import { spawn } from 'node:child_process';
+import crypto from 'node:crypto';
+import net from 'node:net';
+import { cwd } from 'node:process';
 import { Transform } from 'node:stream';
-import { cwd } from 'process';
 
+import { expect } from 'chai';
 import getPort from 'get-port';
 
 if (!process.env.EXAMPLE_SERVER) {
@@ -32,39 +33,13 @@ function isListening(port, attempt = 0) {
   });
 }
 
-function post(url, body, options) {
-  return new Promise((resolve, reject) => {
-    const request = http
-      .request(url, { method: 'post', ...options }, response => {
-        response.end = new Promise(res => {
-          response.on('end', res);
-        });
-        resolve(response);
-      })
-      .on('error', reject);
-
-    request.write(body);
-    request.end();
-  });
-}
-
 const randomApiKey = 'rdme_abcdefghijklmnopqrstuvwxyz';
 
-async function getResponseBody(response) {
-  let responseBody = '';
-  // eslint-disable-next-line no-restricted-syntax
-  for await (const chunk of response) {
-    responseBody += chunk;
-  }
-  expect(responseBody).not.toBe('');
-  return JSON.parse(responseBody);
-}
-
-describe('Metrics SDK Webhook Integration Tests', () => {
+describe('Metrics SDK Webhook Integration Tests', function () {
   let httpServer;
   let PORT;
 
-  beforeAll(async () => {
+  before(async function () {
     const [command, ...args] = process.env.EXAMPLE_SERVER.split(' ');
     PORT = await getPort();
 
@@ -105,7 +80,7 @@ describe('Metrics SDK Webhook Integration Tests', () => {
     return isListening(PORT);
   });
 
-  afterAll(() => {
+  after(function () {
     /**
      * Instead of running `httpServer.kill()` we need to dust the process group that was created
      * because some languages and frameworks (like Laravel's Artisan server) fire off a sub-process
@@ -117,19 +92,22 @@ describe('Metrics SDK Webhook Integration Tests', () => {
     process.kill(-httpServer.pid);
   });
 
-  it('should return with a 401 if the signature is empty/missing', async () => {
-    const response = await post(`http://localhost:${PORT}/webhook`, JSON.stringify({ email: 'dom@readme.io' }), {
+  it('should return with a 401 if the signature is empty/missing', async function () {
+    const response = await fetch(`http://localhost:${PORT}/webhook`, {
+      method: 'post',
       headers: {
         'content-type': 'application/json',
       },
+      body: JSON.stringify({ email: 'dom@readme.io' }),
     });
-    expect(response.statusCode).toBe(401);
 
-    const responseBody = await getResponseBody(response);
-    expect(responseBody.error).toBe('Missing Signature');
+    expect(response.status).to.equal(401);
+
+    const responseBody = await response.json();
+    expect(responseBody.error).to.equal('Missing Signature');
   });
 
-  it('should return an error with an expired signature', async () => {
+  it('should return an error with an expired signature', async function () {
     // The expiry time for the HMAC is 30 mins, so here we're
     // creating an expired one which is 40 mins old
     const FORTY_MIN = 40 * 60 * 1000;
@@ -141,32 +119,38 @@ describe('Metrics SDK Webhook Integration Tests', () => {
     const hmac = crypto.createHmac('sha256', randomApiKey);
     const output = `t=${time},v0=${hmac.update(unsigned).digest('hex')}`;
 
-    const response = await post(`http://localhost:${PORT}/webhook`, JSON.stringify(body), {
+    const response = await fetch(`http://localhost:${PORT}/webhook`, {
+      method: 'post',
       headers: {
         'readme-signature': output,
         'content-type': 'application/json',
       },
+      body: JSON.stringify(body),
     });
-    expect(response.statusCode).toBe(401);
 
-    const responseBody = await getResponseBody(response);
-    expect(responseBody.error).toBe('Expired Signature');
+    expect(response.status).to.equal(401);
+
+    const responseBody = await response.json();
+    expect(responseBody.error).to.equal('Expired Signature');
   });
 
-  it('should return with a 401 if the signature is not correct', async () => {
-    const response = await post(`http://localhost:${PORT}/webhook`, JSON.stringify({ email: 'dom@readme.io' }), {
+  it('should return with a 401 if the signature is not correct', async function () {
+    const response = await fetch(`http://localhost:${PORT}/webhook`, {
+      method: 'post',
       headers: {
         'readme-signature': `t=${Date.now()},v0=abcdefghjkl`,
         'content-type': 'application/json',
       },
+      body: JSON.stringify({ email: 'dom@readme.io' }),
     });
-    expect(response.statusCode).toBe(401);
 
-    const responseBody = await getResponseBody(response);
-    expect(responseBody.error).toBe('Invalid Signature');
+    expect(response.status).to.equal(401);
+
+    const responseBody = await response.json();
+    expect(responseBody.error).to.equal('Invalid Signature');
   });
 
-  it('should return with a user object if the signature is correct', async () => {
+  it('should return with a user object if the signature is correct', async function () {
     const time = Date.now();
     const body = {
       email: 'dom@readme.io',
@@ -175,16 +159,19 @@ describe('Metrics SDK Webhook Integration Tests', () => {
     const hmac = crypto.createHmac('sha256', randomApiKey);
     const output = `t=${time},v0=${hmac.update(unsigned).digest('hex')}`;
 
-    const response = await post(`http://localhost:${PORT}/webhook`, JSON.stringify(body), {
+    const response = await fetch(`http://localhost:${PORT}/webhook`, {
+      method: 'post',
       headers: {
         'readme-signature': output,
         'content-type': 'application/json',
       },
+      body: JSON.stringify(body),
     });
-    expect(response.statusCode).toBe(200);
 
-    const responseBody = await getResponseBody(response);
-    expect(responseBody).toMatchObject({
+    expect(response.status).to.equal(200);
+
+    const responseBody = await response.json();
+    expect(responseBody).to.deep.equal({
       petstore_auth: 'default-key',
       basic_auth: { user: 'user', pass: 'pass' },
     });

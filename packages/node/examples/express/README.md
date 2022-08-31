@@ -1,34 +1,26 @@
 # ReadMe Metrics/Webhooks Express Demo
 
-## Install
-
 ```sh
 npm install
 ```
 
-## Metrics
-
-### Run
+## 📊 Metrics
 
 ```sh
-README_API_KEY=<Your ReadMe API Key here> npm run start:metrics
+make serve-metrics-express
 ```
 
-### Test
+Access your test server to demo Metrics by making a cURL request:
 
 ```sh
 curl http://localhost:8000
 ```
 
-## Webhooks
-
-### Run
+## 📞 Webhooks
 
 ```sh
-README_API_KEY=<Your ReadMe API Key here> npm run start:webhook
+make serve-webhooks-express
 ```
-
-### Test
 
 We have to generate a valid HMAC to send through to the webhook, you can do that with the following shell commands:
 

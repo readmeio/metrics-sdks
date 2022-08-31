@@ -1,19 +1,16 @@
 {
+  "private": true,
   "name": "readme-metrics-express-demo",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start:metrics": "DEBUG=express:router npx node-dev index.js",
-    "start:webhook": "DEBUG=express:router npx node-dev webhook.js"
+    "start:webhooks": "DEBUG=express:router npx node-dev webhook.js"
   },
-  "keywords": [],
-  "author": "",
   "license": "ISC",
+  "type": "module",
   "dependencies": {
     "express": "^4.17.3",
     "readmeio": "file:../.."
-  },
-  "type": "module"
+  }
 }
