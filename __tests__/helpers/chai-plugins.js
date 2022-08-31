@@ -26,6 +26,15 @@ export default function chaiPlugins(_chai, utils) {
   /**
    * Determine if a given HAR `headers` array has a given header matching a specific value.
    *
+   * @example <caption>should match a value</caption>
+   * expect(request.headers).to.have.header('connection', 'close');
+   *
+   * @example <caption>should match a regex</caption>
+   * expect(response.headers).to.have.header('content-type', /application\/json(;\s?charset=utf-8)?/);
+   *
+   * @example <caption>should match one of many values</caption>
+   * expect(request.headers).to.have.header('connection', ['close', 'keep-alive']);
+   *
    * @param {array} headers
    * @param {string} header
    * @param {string|RegExp} expected
@@ -36,9 +45,9 @@ export default function chaiPlugins(_chai, utils) {
 
     if (expected.constructor.name === 'RegExp') {
       new chai.Assertion(headers.get(header)).to.match(expected);
+    } else if (Array.isArray(expected)) {
+      new chai.Assertion(headers.get(header)).to.oneOf(expected.map(e => e.toString()));
     } else {
-      // We're using `toString()` here because it's nice to assert a number in this matcher as
-      // `.to.have.header('header', 1234)` instead of `.to.have.header('header', '1234')`.
       new chai.Assertion(headers.get(header)).to.equal(expected.toString());
     }
   });

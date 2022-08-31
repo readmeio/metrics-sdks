@@ -83,9 +83,8 @@ services:
       dockerfile: ./__tests__/integrations/python.Dockerfile
     command: npm run test:integration-metrics
     environment:
-      EXAMPLE_SERVER: python examples/flask/app.py
+      EXAMPLE_SERVER: python3 examples/flask/app.py
       DEBUG: 'true'
-      NODE_OPTIONS: '--no-experimental-fetch'
 
   integration_webhooks_python_flask:
     build:
@@ -93,4 +92,4 @@ services:
       dockerfile: ./__tests__/integrations/python.Dockerfile
     command: npm run test:integration-webhooks
     environment:
-      - EXAMPLE_SERVER=python examples/flask/webhooks.py
+      - EXAMPLE_SERVER=python3 examples/flask/webhooks.py
