@@ -336,4 +336,4 @@ class TestPayloadBuilder:
         post_data = data["request"]["log"]["entries"][0]["request"]["postData"]
 
         assert post_data["text"] == json.dumps({"ok": 123, "password": 456})
-        assert post_data["mimeType"] == "application/json"
+        assert post_data["mimeType"] == "text/plain"

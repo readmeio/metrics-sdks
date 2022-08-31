@@ -106,7 +106,11 @@ function parseRequestBody(body: string, mimeType: string): Record<string, unknow
   }
 
   if (isApplicationJson(mimeType)) {
-    return JSON.parse(body);
+    try {
+      return JSON.parse(body);
+    } catch (err) {
+      // no-op
+    }
   }
 
   return body;
@@ -150,15 +154,13 @@ export default function processRequest(
   if (mimeType === 'application/x-www-form-urlencoded') {
     postData = {
       mimeType,
-      // There might be a better way to type this, but this works for now.
-      // If the mimeType is application/x-www-form-urlencoded, then the body is always going to be an object here.
+      // By being an `application/x-www-form-urlencoded` request `reqBody` will always be an object.
       params: objectToArray(reqBody as Record<string, unknown>),
-      text: null,
     };
   } else if (isApplicationJson(mimeType)) {
     postData = {
       mimeType,
-      text: JSON.stringify(reqBody),
+      text: typeof reqBody === 'object' || Array.isArray(reqBody) ? JSON.stringify(reqBody) : reqBody,
     };
   } else if (mimeType) {
     let stringBody = '';
@@ -205,7 +207,6 @@ export default function processRequest(
     bodySize: 0,
   };
 
-  // At the moment the server doesn't accept null for request bodies. We're opening up support soon, but getting this fix out will be faster.
   if (requestData.postData === null) {
     delete requestData.postData;
   }

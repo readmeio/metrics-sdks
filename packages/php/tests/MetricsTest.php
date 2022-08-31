@@ -12,49 +12,10 @@ use Illuminate\Http\Request;
 use ReadMe\Metrics;
 use ReadMe\MetricsException;
 use ReadMe\Tests\Fixtures\TestHandler;
-use ReadMe\Tests\Fixtures\TestHandlerReturnsDeprecatedIDField;
-use ReadMe\Tests\Fixtures\TestHandlerReturnsEmptyId;
-use ReadMe\Tests\Fixtures\TestHandlerReturnsEmptyAPIKey;
-use ReadMe\Tests\Fixtures\TestHandlerReturnsNoData;
-use Symfony\Component\HttpFoundation\Response;
 
 class MetricsTest extends \PHPUnit\Framework\TestCase
 {
     private const UUID_PATTERN = '/([a-z0-9\-]+)/';
-
-    private const MOCK_RESPONSE_HEADERS = [
-        'cache-control' => 'no-cache, private',
-        'x-ratelimit-limit' => 60,
-        'x-ratelimit-remaining' => 58,
-
-        // `HeaderBag` sets its own date header but since we don't care what it actually is we're
-        // overriding it here for our mocks.
-        'date' => 'date.now()'
-    ];
-
-    /**
-     * @example ?arr%5B1%5D=3&val=1
-     */
-    private const MOCK_QUERY_PARAMS = [
-        'val' => '1',
-        'arr' => [null, '3'],
-    ];
-
-    private const MOCK_POST_PARAMS = [
-        'password' => '123456',
-        'apiKey' => 'abcdef',
-        'another' => 'Hello world'
-    ];
-
-    private const MOCK_FILES_PARAMS = [
-        'testfileparam' => [
-            'name' => 'owlbert.png',
-            'type' => 'application/octet-stream',
-            'tmp_name' => __DIR__ . '/fixtures/owlbert.png',
-            'error' => 0,
-            'size' => 400
-        ]
-    ];
 
     private Metrics $metrics;
 
@@ -70,8 +31,9 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUpBeforeClass();
 
-        define('LARAVEL_START', microtime(true));
-        $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
+        if (!defined('LARAVEL_START')) {
+            define('LARAVEL_START', microtime(true));
+        }
     }
 
     protected function setUp(): void
@@ -114,7 +76,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             'client_readme' => new Client(['handler' => $handlers->readme])
         ]);
 
-        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
+        $request = $this->getMockRequest();
         $response = $this->getMockJsonResponse();
 
         $this->metrics->track($request, $response);
@@ -141,23 +103,28 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($log_id, $actual_payload['_id']);
 
         $this->assertSame([
-            'method' => 'GET',
-            'url' => 'http://api.example.com/v1/user?arr%5B1%5D=3&val=1',
+            'method' => 'POST',
+            'url' => 'https://api.example.com/v1/user?arr%5B1%5D=3&val=1',
             'httpVersion' => 'HTTP/1.1',
             'headers' => [
                 ['name' => 'host', 'value' => 'api.example.com'],
                 ['name' => 'user-agent', 'value' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) ...'],
                 ['name' => 'accept', 'value' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'],
                 ['name' => 'accept-language', 'value' => 'en-us,en;q=0.5'],
-                ['name' => 'accept-charset', 'value' => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7']
+                ['name' => 'accept-charset', 'value' => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7'],
+                ['name' => 'content-type', 'value' => 'application/json']
             ],
             'queryString' => [
+                ['name' => 'arr', 'value' => json_encode([1 => '3'])],
                 ['name' => 'val', 'value' => '1'],
-                ['name' => 'arr', 'value' => '[null,"3"]']
             ],
             'postData' => [
                 'mimeType' => 'application/json',
-                'params' => []
+                'text' => json_encode([
+                    'password' => '123456',
+                    'apiKey' => 'abcdef',
+                    'another' => 'Hello world'
+                ])
             ]
         ], $actual_payload['request']['log']['entries'][0]['request']);
 
@@ -208,7 +175,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             'client_readme' => new Client(['handler' => $handlers->readme])
         ]);
 
-        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
+        $request = $this->getMockRequest();
         $response = $this->getMockJsonResponse();
 
         $this->metrics->track($request, $response);
@@ -244,7 +211,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             'client_readme' => new Client(['handler' => $handlers->readme])
         ]);
 
-        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
+        $request = $this->getMockRequest();
         $response = $this->getMockJsonResponse();
 
         $this->metrics->track($request, $response);
@@ -255,391 +222,6 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
                 'When not in development mode, exceptions should not be thrown which means this assertion should pass.'
             );
         }
-    }
-
-    /**
-     * @group constructPayload
-     */
-    public function testConstructPayload(): void
-    {
-        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
-        $response = $this->getMockJsonResponse();
-        $payload = $this->metrics->constructPayload('fake-uuid', $request, $response);
-
-        $this->assertSame('fake-uuid', $payload['_id']);
-
-        $this->assertEqualsCanonicalizing([
-            'id' => '123457890',
-            'label' => 'username',
-            'email' => 'email@example.com'
-        ], $payload['group']);
-
-        $this->assertSame('8.8.8.8', $payload['clientIPAddress']);
-        $this->assertFalse($payload['development']);
-
-        $this->assertSame('readme-metrics (php)', $payload['request']['log']['creator']['name']);
-        $this->assertIsString($payload['request']['log']['creator']['version']);
-        $this->assertSame(Metrics::getHARCreatorVersion(), $payload['request']['log']['creator']['comment']);
-
-        $this->assertCount(1, $payload['request']['log']['entries']);
-
-        $payload_entry = $payload['request']['log']['entries'][0];
-        $this->assertSame('http://api.example.com/v1/user', $payload_entry['pageref']);
-        $this->assertMatchesRegularExpression(
-            '/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:.\d{3})?Z/',
-            $payload_entry['startedDateTime'],
-            'startedDateTime was not in a format matching `2022-08-17T17:12:13Z`.'
-        );
-
-        $this->assertIsInt($payload_entry['time']);
-        $this->assertIsNumeric($payload_entry['time']);
-        $this->assertGreaterThan(0, $payload_entry['time']);
-
-        // Assert that the request was set up properly.
-        $payload_request = $payload_entry['request'];
-        $this->assertSame('GET', $payload_request['method']);
-        $this->assertSame('http://api.example.com/v1/user?arr%5B1%5D=3&val=1', $payload_request['url']);
-        $this->assertSame('HTTP/1.1', $payload_request['httpVersion']);
-
-        $this->assertSame([
-            ['name' => 'host', 'value' => 'api.example.com'],
-            ['name' => 'user-agent', 'value' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) ...'],
-            ['name' => 'accept', 'value' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'],
-            ['name' => 'accept-language', 'value' => 'en-us,en;q=0.5'],
-            ['name' => 'accept-charset', 'value' => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7']
-        ], $payload_request['headers']);
-
-        $this->assertSame([
-            ['name' => 'val', 'value' => '1'],
-            ['name' => 'arr', 'value' => '[null,"3"]']
-        ], $payload_request['queryString']);
-
-        $this->assertSame('application/json', $payload_request['postData']['mimeType']);
-        $this->assertEmpty(
-            $payload_request['postData']['params'],
-            'postData should not have any data here because there is none for this GET request'
-        );
-
-        // Assert that the response was set as expected into the payload.
-        $payload_response = $payload_entry['response'];
-        $this->assertSame(200, $payload_response['status']);
-        $this->assertSame('OK', $payload_response['statusText']);
-
-        $this->assertEqualsCanonicalizing([
-            ['name' => 'cache-control', 'value' => 'no-cache, private'],
-            ['name' => 'content-type', 'value' => 'application/json'],
-            ['name' => 'x-ratelimit-limit', 'value' => 60],
-            ['name' => 'x-ratelimit-remaining', 'value' => 58],
-            ['name' => 'date', 'value' => 'date.now()']
-        ], $payload_response['headers']);
-
-        $this->assertSame([
-            ['name' => 'password', 'value' => '123456'],
-            ['name' => 'apiKey', 'value' => 'abcdef'],
-        ], json_decode($payload_response['content']['text'], true));
-
-        $this->assertEquals(73, $payload_response['content']['size']);
-        $this->assertSame($response->headers->get('Content-Type'), $payload_response['content']['mimeType']);
-    }
-
-    /**
-     * @group constructPayload
-     */
-    public function testConstructPayloadWithNonJsonResponse(): void
-    {
-        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
-        $response = $this->getMockTextResponse();
-        $payload = $this->metrics->constructPayload('fake-uuid', $request, $response);
-
-        $payload_response = $payload['request']['log']['entries'][0]['response'];
-        $this->assertSame(200, $payload_response['status']);
-        $this->assertSame('OK', $payload_response['statusText']);
-        $this->assertSame('OK COMPUTER', $payload_response['content']['text']);
-        $this->assertSame(11, $payload_response['content']['size']);
-        $this->assertSame('text/plain', $payload_response['content']['mimeType']);
-    }
-
-    /**
-     * @group constructPayload
-     */
-    public function testConstructPayloadWithUploadFileInRequest(): void
-    {
-        $request = $this->getMockRequest([], self::MOCK_POST_PARAMS, self::MOCK_FILES_PARAMS);
-        $response = $this->getMockJsonResponse();
-        $payload = $this->metrics->constructPayload('fake-uuid', $request, $response);
-
-        $params = $payload['request']['log']['entries'][0]['request']['postData']['params'];
-        $this->assertSame([
-            ['name' => 'password', 'value' => '123456'],
-            ['name' => 'apiKey', 'value' => 'abcdef'],
-            ['name' => 'another', 'value' => 'Hello world'],
-            [
-                'name' => 'testfileparam',
-                'value' => file_get_contents(__DIR__ . '/fixtures/owlbert.dataurl.txt'),
-                'fileName' => 'owlbert.png',
-                'contentType' => 'image/png'
-            ]
-        ], $params);
-    }
-
-    /**
-     * @group constructPayload
-     */
-    public function testConstructPayloadWithUnsafeFileInPOSTRequest(): void
-    {
-        $unsafe_payload = [
-            'testfileparam' => [
-                'name' => 'pwned',
-                'type' => 'application/octet-stream',
-                'tmp_name' => '/etc/passwd',
-                'error' => 0,
-                'size' => 0
-            ]
-        ];
-
-        $request = $this->getMockRequest([], $unsafe_payload);
-        $response = $this->getMockJsonResponse();
-        $payload = $this->metrics->constructPayload('fake-uuid', $request, $response);
-
-        $params = $payload['request']['log']['entries'][0]['request']['postData']['params'];
-        $this->assertSame([
-            [
-                'name' => 'testfileparam',
-                'value' => json_encode($unsafe_payload['testfileparam'])
-            ]
-        ], $params);
-    }
-
-    /**
-     * @group constructPayload
-     */
-    public function testConstructPayloadWithAPIKey(): void
-    {
-        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS, self::MOCK_POST_PARAMS);
-        $response = $this->getMockJsonResponse();
-        $metrics = new Metrics($this->readme_api_key, $this->group_handler);
-        $payload = $metrics->constructPayload('fake-uuid', $request, $response);
-
-        $this->assertArrayHasKey('id', $payload['group']);
-    }
-
-    /**
-     * @group constructPayload
-     */
-    public function testConstructPayloadWithDeprecatedIDField(): void
-    {
-        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS, self::MOCK_POST_PARAMS);
-        $response = $this->getMockJsonResponse();
-        $metrics = new Metrics($this->readme_api_key, TestHandlerReturnsDeprecatedIDField::class);
-        $payload = $metrics->constructPayload('fake-uuid', $request, $response);
-
-        $this->assertArrayHasKey('id', $payload['group']);
-    }
-
-    /**
-     * @group constructPayload
-     */
-    public function testConstructPayloadShouldThrowErrorIfGroupFunctionDoesNotReturnExpectedPayload(): void
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessageMatches('/did not return an array with an api_key present/');
-
-        $request = $this->getMockRequest();
-        $response = $this->getMockJsonResponse();
-
-        (new Metrics($this->readme_api_key, TestHandlerReturnsNoData::class))->constructPayload(
-            'fake-uuid',
-            $request,
-            $response
-        );
-    }
-
-    /**
-     * @group constructPayload
-     */
-    public function testConstructPayloadShouldThrowErrorIfGroupFunctionReturnsAnEmptyAPIKey(): void
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessageMatches('/must not return an empty api_key/');
-
-        $request = $this->getMockRequest();
-        $response = $this->getMockJsonResponse();
-
-        (new Metrics($this->readme_api_key, TestHandlerReturnsEmptyAPIKey::class))->constructPayload(
-            'fake-uuid',
-            $request,
-            $response
-        );
-    }
-
-    /**
-     * @group constructPayload
-     */
-    public function testConstructPayloadShouldThrowErrorIfGroupFunctionReturnsAnEmptyId(): void
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessageMatches('/must not return an empty id/');
-
-        $request = $this->getMockRequest();
-        $response = $this->getMockJsonResponse();
-
-        (new Metrics($this->readme_api_key, TestHandlerReturnsEmptyId::class))->constructPayload(
-            'fake-uuid',
-            $request,
-            $response
-        );
-    }
-
-    /**
-     * @group processRequest
-     */
-    public function testProcessRequestShouldFilterOutItemsInDenyList(): void
-    {
-        $metrics = new Metrics($this->readme_api_key, $this->group_handler, [
-            'denylist' => ['val', 'password']
-        ]);
-
-        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS, self::MOCK_POST_PARAMS);
-        $response = $this->getMockJsonResponse();
-        $payload = $metrics->constructPayload('fake-uuid', $request, $response);
-
-        $request_data = $payload['request']['log']['entries'][0]['request'];
-
-        // Denylist should not affect $_GET params.
-        $this->assertSame([
-            ['name' => 'val', 'value' => '1'],
-            ['name' => 'arr', 'value' => '[null,"3"]']
-        ], $request_data['queryString']);
-
-        $params = $request_data['postData']['params'];
-        $this->assertSame([
-            ['name' => 'apiKey', 'value' => 'abcdef'],
-            ['name' => 'another', 'value' => 'Hello world']
-        ], $params);
-    }
-
-    /**
-     * @group processRequest
-     */
-    public function testProcessRequestShouldFilterOnlyItemsInAllowlist(): void
-    {
-        $metrics = new Metrics($this->readme_api_key, $this->group_handler, [
-            'allowlist' => ['val', 'password']
-        ]);
-
-        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS, self::MOCK_POST_PARAMS);
-        $response = $this->getMockJsonResponse();
-        $payload = $metrics->constructPayload('fake-uuid', $request, $response);
-
-        $request_data = $payload['request']['log']['entries'][0]['request'];
-
-        // Allowlist should not affect `$_GET` params.
-        $this->assertSame([
-            ['name' => 'val', 'value' => '1'],
-            ['name' => 'arr', 'value' => '[null,"3"]']
-        ], $request_data['queryString']);
-
-        $params = $request_data['postData']['params'];
-        $this->assertSame([
-            ['name' => 'password', 'value' => '123456']
-        ], $params);
-    }
-
-    /**
-     * @group processRequest
-     */
-    public function testProcessRequestShouldFilterOutItemsInDeprecatedBlacklist(): void
-    {
-        $metrics = new Metrics($this->readme_api_key, $this->group_handler, [
-            'blacklist' => ['val', 'password']
-        ]);
-
-        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS, self::MOCK_POST_PARAMS);
-        $response = $this->getMockJsonResponse();
-        $payload = $metrics->constructPayload('fake-uuid', $request, $response);
-
-        $request_data = $payload['request']['log']['entries'][0]['request'];
-
-        // Blacklist should not affect `$_GET` params.
-        $this->assertSame([
-            ['name' => 'val', 'value' => '1'],
-            ['name' => 'arr', 'value' => '[null,"3"]']
-        ], $request_data['queryString']);
-
-        $params = $request_data['postData']['params'];
-        $this->assertSame([
-            ['name' => 'apiKey', 'value' => 'abcdef'],
-            ['name' => 'another', 'value' => 'Hello world']
-        ], $params);
-    }
-
-    /**
-     * @group processRequest
-     */
-    public function testProcessRequestShouldFilterOnlyItemsInDeprecatedWhitelist(): void
-    {
-        $metrics = new Metrics($this->readme_api_key, $this->group_handler, [
-            'whitelist' => ['val', 'password']
-        ]);
-
-        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS, self::MOCK_POST_PARAMS);
-        $response = $this->getMockJsonResponse();
-        $payload = $metrics->constructPayload('fake-uuid', $request, $response);
-
-        $request_data = $payload['request']['log']['entries'][0]['request'];
-
-        // Whitelist should not affect $_GET params.
-        $this->assertSame([
-            ['name' => 'val', 'value' => '1'],
-            ['name' => 'arr', 'value' => '[null,"3"]']
-        ], $request_data['queryString']);
-
-        $params = $request_data['postData']['params'];
-        $this->assertSame([
-            ['name' => 'password', 'value' => '123456']
-        ], $params);
-    }
-
-    /**
-     * @group processResponse
-     */
-    public function testProcessResponseShouldFilterOutItemsInBlacklist(): void
-    {
-        $metrics = new Metrics($this->readme_api_key, $this->group_handler, [
-            'blacklist' => ['value']
-        ]);
-
-        $request = $this->getMockRequest();
-        $response = $this->getMockJsonResponse();
-        $payload = $metrics->constructPayload('fake-uuid', $request, $response);
-
-        $content = $payload['request']['log']['entries'][0]['response']['content'];
-
-        $this->assertSame([
-            ['name' => 'password'],
-            ['name' => 'apiKey']
-        ], json_decode($content['text'], true));
-    }
-
-    /**
-     * @group processResponse
-     */
-    public function testProcessResponseShouldFilterOnlyItemsInWhitelist(): void
-    {
-        $metrics = new Metrics($this->readme_api_key, $this->group_handler, [
-            'whitelist' => ['value']
-        ]);
-
-        $request = $this->getMockRequest();
-        $response = $this->getMockJsonResponse();
-        $payload = $metrics->constructPayload('fake-uuid', $request, $response);
-
-        $content = $payload['request']['log']['entries'][0]['response']['content'];
-
-        $this->assertSame([
-            ['value' => '123456'],
-            ['value' => 'abcdef']
-        ], json_decode($content['text'], true));
     }
 
     /**
@@ -660,14 +242,14 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             'client_readme' => new Client(['handler' => $handlers->readme])
         ]);
 
-        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
+        $request = $this->getMockRequest();
         $response = $this->getMockJsonResponse();
 
         $this->metrics->track($request, $response);
 
         $this->assertEmpty(
             $this->api_calls_to_readme,
-            'A call was made to ReadMe to get the baseUrl even though it was supplied.'
+            'A call was made to ReadMe to get the `baseUrl` even though it was supplied in the middleware config.'
         );
     }
 
@@ -694,14 +276,14 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             'last_updated' => time()
         ]));
 
-        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
+        $request = $this->getMockRequest();
         $response = $this->getMockJsonResponse();
 
         $this->metrics->track($request, $response);
 
         $this->assertEmpty(
             $this->api_calls_to_readme,
-            'A call was made to ReadMe to get the baseUrl even though it was fresh in the cache.'
+            'A call was made to ReadMe to get the `baseUrl` even though it was fresh in the cache.'
         );
     }
 
@@ -728,7 +310,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             'last_updated' => time() - (86400 * 2)
         ]));
 
-        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
+        $request = $this->getMockRequest();
         $response = $this->getMockJsonResponse();
 
         $this->metrics->track($request, $response);
@@ -736,7 +318,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(
             1,
             $this->api_calls_to_readme,
-            'A call was not made to ReadMe to get the baseUrl when the cache is stale.'
+            'A call was not made to ReadMe to get the `baseUrl` when the cache is stale.'
         );
     }
 
@@ -764,7 +346,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             'client_readme' => new Client(['handler' => $handlers->readme])
         ]);
 
-        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
+        $request = $this->getMockRequest();
         $response = $this->getMockJsonResponse();
 
         $this->metrics->track($request, $response);
@@ -804,7 +386,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             'client_readme' => new Client(['handler' => $handlers->readme])
         ]);
 
-        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
+        $request = $this->getMockRequest();
         $response = $this->getMockJsonResponse();
 
         $this->metrics->track($request, $response);
@@ -829,7 +411,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
             'client_readme' => new Client(['handler' => $handlers->readme])
         ]);
 
-        $request = $this->getMockRequest(self::MOCK_QUERY_PARAMS);
+        $request = $this->getMockRequest();
         $response = $this->getMockJsonResponse();
 
         $this->metrics->track($request, $response);
@@ -856,25 +438,27 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         return $handlers;
     }
 
-    private function getMockRequest($query_params = [], $post_params = [], $file_params = []): Request
+    private function getMockRequest(): Request
     {
-        $_GET = $query_params;
-        $_POST = $post_params;
-        $_FILES = $file_params;
-
         $request = new \Illuminate\Http\Request();
         return $request->createFromBase(
             \Symfony\Component\HttpFoundation\Request::create(
-                'http://api.example.com/v1/user/',
-                'GET',
-                $query_params,
+                'https://api.example.com/v1/user/?arr%5B1%5D=3&val=1',
+                'post',
+                [],
                 [],
                 [],
                 [
+                    'CONTENT_TYPE' => 'application/json',
                     'CACHE-CONTROL' => 'max-age=0',
                     'REMOTE_ADDR' => '8.8.8.8',
                     'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) ...',
                 ],
+                json_encode([
+                    'password' => '123456',
+                    'apiKey' => 'abcdef',
+                    'another' => 'Hello world'
+                ])
             )
         );
 
@@ -883,28 +467,10 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
     private function getMockJsonResponse(): JsonResponse
     {
-        return new JsonResponse(
-            [
-                ['name' => 'password', 'value' => '123456'],
-                ['name' => 'apiKey', 'value' => 'abcdef'],
-            ],
-            200,
-            array_merge(self::MOCK_RESPONSE_HEADERS, [
-                'Content-Type' => 'application/json'
-            ])
-        );
-    }
-
-    private function getMockTextResponse(): Response
-    {
-        return new Response(
-            'OK COMPUTER',
-            200,
-            array_merge(self::MOCK_RESPONSE_HEADERS, [
-                'Content-Type' => 'text/plain',
-                'Content-Length' => 11
-            ])
-        );
+        return new JsonResponse([
+            ['name' => 'password', 'value' => '123456'],
+            ['name' => 'apiKey', 'value' => 'abcdef'],
+        ], 200);
     }
 
     private function getLogIdFromDocumentationHeader(string $header): string

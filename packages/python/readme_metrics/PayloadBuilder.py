@@ -44,7 +44,7 @@ class PayloadBuilder:
             development_mode (bool): Development mode flag passed to ReadMe
             grouping_function ([type]): Grouping function to generate an identity
                 payload
-            logger (Logger): Loggiing
+            logger (Logger): Logging
         """
         self.denylist = denylist
         self.allowlist = allowlist
@@ -146,6 +146,9 @@ class PayloadBuilder:
 
         return group
 
+    def _get_content_type(self, headers):
+        return headers.get("content-type", "text/plain")
+
     def _build_request_payload(self, request) -> dict:
         """Wraps the request portion of the payload
 
@@ -159,19 +162,31 @@ class PayloadBuilder:
         headers = self.redact_dict(request.headers)
         params = parse.parse_qsl(self._get_query_string(request))
 
-        if getattr(request, "rm_content_length", None):
-            post_data = self._process_body(request.rm_body)
-        else:
-            post_data = {}
+        content_type = self._get_content_type(headers)
+        post_data = False
+        if getattr(request, "content_length", None) or getattr(request, "rm_content_length", None):
+            if content_type == "application/x-www-form-urlencoded":
+                post_data = {
+                    "mimeType": content_type,
+                    "params": [
+                        {"name": k, "value": v} for (k, v) in request.form.items()
+                    ],
+                }
+            else:
+                post_data = self._process_body(content_type, request.rm_body)
 
-        return {
+        payload = {
             "method": request.method,
             "url": self._build_base_url(request),
             "httpVersion": request.environ["SERVER_PROTOCOL"],
             "headers": [{"name": k, "value": v} for (k, v) in headers.items()],
             "queryString": [{"name": k, "value": v} for (k, v) in params],
-            "postData": post_data,
         }
+
+        if not post_data is False:
+            payload["postData"] = post_data
+
+        return payload
 
     def _build_response_payload(self, response: ResponseInfoWrapper) -> dict:
         """Wraps the response portion of the payload
@@ -183,7 +198,8 @@ class PayloadBuilder:
             dict: Wrapped response payload
         """
         headers = self.redact_dict(response.headers)
-        body = self._process_body(response.body).get("text")
+        content_type = self._get_content_type(response.headers)
+        body = self._process_body(content_type, response.body).get("text")
 
         headers = [{"name": k, "value": v} for (k, v) in headers.items()]
 
@@ -194,7 +210,7 @@ class PayloadBuilder:
         return {
             "status": status_code,
             "statusText": status_text or "",
-            "headers": headers,  # headers.items(),
+            "headers": headers,
             "content": {
                 "text": body,
                 "size": int(response.content_length),
@@ -241,9 +257,13 @@ class PayloadBuilder:
         Returns:
             str: Query string, for example "https://api.example.local:8080/v1/userinfo"
         """
+        query_string = self._get_query_string(request)
         if hasattr(request, "base_url"):
             # Werkzeug request objects already have exactly what we need
-            return request.base_url
+            base_url = request.base_url
+            if len(query_string) > 0:
+                base_url += f"?{query_string}"
+            return base_url
 
         scheme, host, path = None, None, None
 
@@ -261,12 +281,14 @@ class PayloadBuilder:
             path = request.environ["PATH_INFO"]
 
         if scheme and path and host:
+            if len(query_string) > 0:
+                return f"{scheme}://{host}{path}?{query_string}"
             return f"{scheme}://{host}{path}"
 
         raise Exception("Don't know how to build URL from this type of request")
 
     # always returns a dict with some of these fields: text, mimeType, params
-    def _process_body(self, body):
+    def _process_body(self, content_type, body):
         if isinstance(body, bytes):
             # Non-unicode bytes cannot be directly serialized as a JSON
             # payload to send to the ReadMe API, so we need to convert this to a
@@ -278,35 +300,27 @@ class PayloadBuilder:
             try:
                 body = body.decode("utf-8")
             except UnicodeDecodeError:
-                return {"text": "[NOT VALID UTF-8]"}
+                return {"mimeType": content_type, "text": "[NOT VALID UTF-8]"}
 
         if not isinstance(body, str):
             # We don't know how to process this body. If it's safe to encode as
             # JSON, return it unchanged; otherwise return an error.
             try:
                 json.dumps(body)
-                return {"text": body}
+                return {"mimeType": content_type, "text": body}
             except TypeError:
-                return {"text": "[ERROR: NOT SERIALIZABLE]"}
+                return {"mimeType": content_type, "text": "[ERROR: NOT SERIALIZABLE]"}
 
         try:
             body_data = json.loads(body)
         except JSONDecodeError:
-            params = parse.parse_qsl(body)
-            if params:
-                return {
-                    "text": body,
-                    "mimeType": "multipart/form-data",
-                    "params": [{"name": k, "value": v} for (k, v) in params],
-                }
-
-            return {"text": body}
+            return {"mimeType": content_type, "text": body}
 
         if (self.denylist or self.allowlist) and isinstance(body_data, dict):
             redacted_data = self.redact_dict(body_data)
             body = json.dumps(redacted_data)
 
-        return {"text": body, "mimeType": "application/json"}
+        return {"mimeType": content_type, "text": body}
 
     def redact_dict(self, mapping: Mapping):
         def _redact_value(val):

@@ -1,33 +1,24 @@
 # ReadMe Metrics/Webhooks Flask Demo
 
-## Install
+To install the dependencies required for this application follow the instructions from [CONTRIBUTING.md](../CONTRIBUTING.md) for setting up dependencies in the parent folder then do the same thing in this directory to have deps in both places.
 
-Follow the instructions from CONTRIBUTING.md for setting up dependencies in the parent folder then do the same thing in this directory to have deps in both places.
-See the instructions [here](../CONTRIBUTING.md).
-
-## Metrics
-
-### Run
+## 📊 Metrics
 
 ```sh
-README_API_KEY=<Your ReadMe API Key here> python app.py
+make serve-metrics-flask
 ```
 
-### Test
+Access your test server to demo Metrics by making a cURL request:
 
 ```sh
 curl http://localhost:8000
 ```
 
-## Webhooks
-
-### Run
+## 📞 Webhooks
 
 ```sh
-README_API_KEY=<Your ReadMe API Key here> python webhook.py
+make serve-webhooks-flask
 ```
-
-### Test
 
 We have to generate a valid HMAC to send through to the webhook, you can do that with the following shell commands:
 

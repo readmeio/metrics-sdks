@@ -2,6 +2,7 @@ import type { LogOptions } from './construct-payload';
 import type { GroupingObject, OutgoingLogBody } from './metrics-log';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
+import { StringDecoder } from 'string_decoder';
 import * as url from 'url';
 
 import clamp from 'lodash/clamp';
@@ -10,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import config from '../config';
 
 import { constructPayload } from './construct-payload';
+import isRequest from './is-request';
 import { metricsAPICall } from './metrics-log';
 
 let queue: OutgoingLogBody[] = [];
@@ -34,7 +36,8 @@ export interface ExtendedIncomingMessage extends IncomingMessage {
    * but it is not part of Node's builtin. We expect the body
    * to be parsed by the time it gets passed to us
    */
-  body?: Record<string, unknown>;
+  body?: Record<string, unknown> | string;
+
   // These are all express additions to Node's builtin type
   route?: {
     path: string;
@@ -43,6 +46,12 @@ export interface ExtendedIncomingMessage extends IncomingMessage {
   baseUrl?: string;
   hostname?: string;
   originalUrl?: string;
+
+  // These are custom properties that we're adding to counter quirks with Express handling of
+  // certain types of payloads where they require the `body-parser` library to be present.
+  _text?: string;
+  _json?: string;
+  _form_encoded?: string;
 }
 
 interface ExtendedResponse extends ServerResponse {
@@ -70,6 +79,56 @@ function patchResponse(res) {
     if (chunk) res._body += chunk;
     end.call(res, chunk, encoding, cb);
   };
+}
+
+/**
+ * For `text/*` requests Express doesn't give us a native way to retrieve data out of the payload
+ * without using the `body-parser` middleware so we need to workaround it and access that obtain
+ * that data ourselves.
+ *
+ * For `application/vnd.api+json` types of requests, Express doesn't recognize them as being JSON,
+ * resulting in `req.body` being empty. Frustratingly enough `req.is('json')` also doesn't work so
+ * we need to do our own check to look if it's got `+json` and then surface that potential JSON
+ * payload accordingly.
+ *
+ * And if you can believe it or not, Express also doesn't process `x-www-form-urlencoded` payloads
+ * into `req.body` for us without the `body-parser` middleware.
+ *
+ * @see {@link https://stackoverflow.com/a/12497793}
+ * @see {@link https://stackoverflow.com/a/58568473}
+ * @param {IncomingMessage} req
+ */
+function patchRequest(req: ExtendedIncomingMessage) {
+  // If we already have a body then whatever framework we're being run inside of is able to
+  // handle these requests and we can rely on `req.body` instead hacky workarounds.
+  if (req.body !== undefined) {
+    return;
+  }
+
+  if (isRequest(req, 'text/*')) {
+    req._text = '';
+    req.setEncoding('utf8');
+    req.on('data', function (chunk) {
+      if (chunk) req._text += chunk;
+    });
+  } else if (isRequest(req, '+json')) {
+    req._json = '';
+    req.setEncoding('utf8');
+    req.on('data', function (chunk) {
+      if (chunk) req._json += chunk;
+    });
+  } else if (isRequest(req, 'application/x-www-form-urlencoded')) {
+    const decoder = new StringDecoder('utf-8');
+    req._form_encoded = '';
+
+    req.on('data', chunk => {
+      req._form_encoded += decoder.write(chunk);
+    });
+
+    req.on('end', () => {
+      req._form_encoded += decoder.end();
+    });
+  }
 }
 
 export interface Options extends LogOptions {
@@ -104,6 +163,7 @@ export function log(
   const logId = uuidv4();
 
   patchResponse(res);
+  patchRequest(req);
 
   // @todo we should remove this and put this in the code samples
   if (baseLogUrl !== undefined && typeof baseLogUrl === 'string') {
@@ -115,6 +175,21 @@ export function log(
    * this is fine for now
    */
   function startSend() {
+    let requestBody = req.body;
+    if (isRequest(req, 'text/*')) {
+      if ('_text' in req) {
+        requestBody = req._text;
+      }
+    } else if (isRequest(req, '+json')) {
+      if ('_json' in req) {
+        requestBody = req._json;
+      }
+    } else if (isRequest(req, 'application/x-www-form-urlencoded')) {
+      if ('_form_encoded' in req) {
+        requestBody = req._form_encoded;
+      }
+    }
+
     const payload = constructPayload(
       req,
       res,
@@ -131,7 +206,7 @@ export function log(
             })
           : '',
         responseBody: res._body,
-        requestBody: req.body,
+        requestBody,
       },
       options
     );

@@ -1,18 +1,14 @@
 # ReadMe Webhooks .NET 6.0 Demo
 
-## Install
-
 ```sh
-brew install dotnet
+make install
 ```
 
-## Run
+## 📞 Webhooks
 
 ```sh
-README_API_KEY=<Your ReadMe API Key here> dotnet run
+make serve-webhooks-dotnet
 ```
-
-## Test
 
 We have to generate a valid HMAC to send through to the webhook, you can do that with the following shell commands:
 

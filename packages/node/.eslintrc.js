@@ -18,7 +18,12 @@ module.exports = {
       },
     ],
 
-    'no-underscore-dangle': ['error', { allow: ['_id', '_body', '__bodyCache'] }],
+    'no-underscore-dangle': [
+      'error',
+      {
+        allow: ['_id', '_body', '__bodyCache', '_form_encoded', '_json', '_text'],
+      },
+    ],
 
     // We use `lodash` because it allows for more flexibility that we can't get with standard object accessors.
     'you-dont-need-lodash-underscore/get': 'off',
