@@ -85,7 +85,7 @@ services:
     environment:
       EXAMPLE_SERVER: python examples/flask/app.py
       DEBUG: 'true'
-      NODE_OPTIONS: '--no-experimental-fetch'
+      # NODE_OPTIONS: '--no-experimental-fetch'
 
   integration_webhooks_python_flask:
     build:
