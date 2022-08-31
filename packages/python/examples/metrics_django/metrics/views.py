@@ -1,7 +1,7 @@
-import json
 from django.http import JsonResponse, HttpResponse
 
 
+# pylint: disable=unused-argument
 def grouping_function(request):
     return {
         "api_key": "owlbert-api-key",
@@ -15,5 +15,5 @@ def index(request):
         return JsonResponse(
             {"message": "hello world"}, json_dumps_params={"separators": (",", ":")}
         )
-    else:
-        return HttpResponse(status=200)
+
+    return HttpResponse(status=200)
