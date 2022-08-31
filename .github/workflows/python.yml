@@ -42,6 +42,7 @@ jobs:
 
     - run: docker-compose run integration_metrics_python_flask
     - run: docker-compose run integration_webhooks_python_flask
+    - run: docker-compose run integration_metrics_python_django
 
     - name: Cleanup
       if: always()
