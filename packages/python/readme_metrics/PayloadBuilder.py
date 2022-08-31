@@ -164,24 +164,31 @@ class PayloadBuilder:
 
         content_type = self._get_content_type(headers)
         post_data = False
-        if getattr(request, "content_length", None) or getattr(request, "rm_content_length", None):
+        if getattr(request, "content_length", None) or getattr(
+            request, "rm_content_length", None
+        ):
             if content_type == "application/x-www-form-urlencoded":
                 # Flask creates `request.form` but Django puts that data in `request.body`, and
                 # then our `request.rm_body` store, instead.
-                if hasattr(request, 'form'):
+                if hasattr(request, "form"):
                     params = [
                         # Reason this is not mixed in with the `rm_body` parsing if we don't have
                         # `request.form` is that if we attempt to do `str(var, 'utf-8)` on data
                         # coming out of `request.form.items()` an "decoding str is not supported"
                         # exception will be raised as they're already strings.
-                        {"name": k, "value": v} for (k, v) in request.form.items()
+                        {"name": k, "value": v}
+                        for (k, v) in request.form.items()
                     ]
                 else:
                     params = [
                         # `request.form.items` will give us already decoded UTF-8 data but
                         # `parse_qsl` gives us bytes. If we don't do this we'll be creating an
                         # invalid JSON payload.
-                        {"name": str(k, 'utf-8'), "value": str(v, 'utf-8')} for (k, v) in parse.parse_qsl(request.rm_body)
+                        {
+                            "name": str(k, "utf-8"),
+                            "value": str(v, "utf-8"),
+                        }
+                        for (k, v) in parse.parse_qsl(request.rm_body)
                     ]
 
                 post_data = {

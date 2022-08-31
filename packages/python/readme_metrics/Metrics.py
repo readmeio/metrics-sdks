@@ -61,10 +61,11 @@ class Metrics:
                 self.config.LOGGER.debug("Not enqueueing request, payload is None")
                 return
         except Exception:
-            self.config.LOGGER.debug("Not enqueueing request, payload construction failed")
+            self.config.LOGGER.debug(
+                "Not enqueueing request, payload construction failed"
+            )
             if self.config.IS_DEVELOPMENT_MODE:
                 print(traceback.format_exc())
-
 
         self.queue.put(payload)
         if self.queue.qsize() >= self.config.BUFFER_LENGTH:
