@@ -1,5 +1,5 @@
 import json
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 
 def grouping_function(request):
     return {
@@ -9,4 +9,7 @@ def grouping_function(request):
     }
 
 def index(request):
-    return JsonResponse({ "message": "hello world" }, json_dumps_params={'separators': (',', ':')})
+    if request.method == "GET":
+        return JsonResponse({ "message": "hello world" }, json_dumps_params={'separators': (',', ':')})
+    else:
+        return HttpResponse(status=200)
