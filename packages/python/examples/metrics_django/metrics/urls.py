@@ -5,4 +5,5 @@ from . import views
 
 urlpatterns = [
     path("", csrf_exempt(views.index), name="index"),
+    path("webhook", csrf_exempt(views.webhook), name="webhook"),
 ]
