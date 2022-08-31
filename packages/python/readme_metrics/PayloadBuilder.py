@@ -184,8 +184,6 @@ class PayloadBuilder:
                         {"name": str(k, 'utf-8'), "value": str(v, 'utf-8')} for (k, v) in parse.parse_qsl(request.rm_body)
                     ]
 
-                print("%s" % params)
-
                 post_data = {
                     "mimeType": content_type,
                     "params": params,
@@ -203,8 +201,6 @@ class PayloadBuilder:
 
         if not post_data is False:
             payload["postData"] = post_data
-
-        print("%s" % payload)
 
         return payload
 
