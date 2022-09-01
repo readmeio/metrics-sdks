@@ -5,6 +5,8 @@
     "**/composer.lock": true,
     "packages/php/examples/laravel/bootstrap/cache/*.php": true,
     "packages/php/examples/laravel/storage/**": true,
+    "packages/python/build/**": true,
+    "packages/python/readme_metrics.egg*": true,
 
     // Hide test coverage directories
     "**/coverage": true,

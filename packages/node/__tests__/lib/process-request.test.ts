@@ -84,7 +84,7 @@ test('should work with *+json', () => {
 
   return request(app)
     .post('/')
-    .set('Content-Type', 'application/custom+json')
+    .set('Content-Type', 'application/vnd.api+json')
     .send(JSON.stringify({ password: '123456', apiKey: 'abc', another: 'Hello world' }))
     .expect(({ body }) => {
       expect(body.postData.text).toBe('{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}');
@@ -152,7 +152,7 @@ describe('options', () => {
         .send('password=123456&apiKey=abc&another=Hello world')
         .set('Content-Type', 'application/x-www-form-urlencoded')
         .expect(({ body }) => {
-          expect(body.postData.text).toBeNull();
+          expect(body.postData.text).toBeUndefined();
           expect(body.postData.params).toStrictEqual([
             {
               name: 'password',
@@ -199,7 +199,7 @@ describe('options', () => {
         .post('/')
         .send('password=123456&apiKey=abc&another=Hello world')
         .expect(({ body }) => {
-          expect(body.postData.text).toBeNull();
+          expect(body.postData.text).toBeUndefined();
           expect(body.postData.params).toStrictEqual([
             {
               name: 'password',
@@ -498,6 +498,18 @@ test('#text should contain stringified body', () => {
     .send(body)
     .expect(res => {
       expect(res.body.postData.text).toBe('{"a":1,"b":2}');
+    });
+});
+
+test('#text should contain stringified body if corrupted json', () => {
+  const body = '{"a":1,"b":2';
+
+  return request(createApp())
+    .post('/')
+    .set('Content-Type', 'application/json')
+    .send(body)
+    .expect(res => {
+      expect(res.body.postData.text).toBe(body);
     });
 });
 
