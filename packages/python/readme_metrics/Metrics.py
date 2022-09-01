@@ -3,6 +3,7 @@ import math
 import queue
 import threading
 import traceback
+import importlib
 
 from readme_metrics import MetricsApiConfig
 from readme_metrics.publisher import publish_batch
@@ -28,11 +29,19 @@ class Metrics:
         """
 
         self.config = config
+
+        if isinstance(self.config.GROUPING_FUNCTION, str):
+            module_name, function_name = self.config.GROUPING_FUNCTION.rsplit(".", 1)
+            module = importlib.import_module(module_name)
+            self.grouping_function = getattr(module, function_name)
+        else:
+            self.grouping_function = self.config.GROUPING_FUNCTION
+
         self.payload_builder = PayloadBuilder(
             config.DENYLIST,
             config.ALLOWLIST,
             config.IS_DEVELOPMENT_MODE,
-            config.GROUPING_FUNCTION,
+            self.grouping_function,
             config.LOGGER,
         )
         self.queue = queue.Queue()

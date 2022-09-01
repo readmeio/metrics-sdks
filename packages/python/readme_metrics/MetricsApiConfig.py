@@ -112,12 +112,7 @@ class MetricsApiConfig:
                 Default 3 seconds.
         """
         self.README_API_KEY = api_key
-        if isinstance(grouping_function, str):
-            module_name, function_name = grouping_function.rsplit(".", 1)
-            module = importlib.import_module(module_name)
-            self.GROUPING_FUNCTION = getattr(module, function_name)
-        else:
-            self.GROUPING_FUNCTION = grouping_function
+        self.GROUPING_FUNCTION = grouping_function
         self.BUFFER_LENGTH = buffer_length
         self.IS_DEVELOPMENT_MODE = development_mode
         self.IS_BACKGROUND_MODE = background_worker_mode
