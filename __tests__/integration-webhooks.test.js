@@ -1,4 +1,3 @@
-import 'isomorphic-fetch';
 import { spawn } from 'node:child_process';
 import crypto from 'node:crypto';
 import net from 'node:net';
@@ -7,6 +6,7 @@ import { Transform } from 'node:stream';
 
 import { expect } from 'chai';
 import getPort from 'get-port';
+import 'isomorphic-fetch';
 
 if (!process.env.EXAMPLE_SERVER) {
   // eslint-disable-next-line no-console

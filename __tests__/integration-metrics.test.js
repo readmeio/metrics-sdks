@@ -1,4 +1,3 @@
-import 'isomorphic-fetch';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import fs from 'node:fs/promises';
@@ -11,6 +10,7 @@ import chai, { expect } from 'chai';
 import { FormDataEncoder } from 'form-data-encoder';
 import { File, FormData } from 'formdata-node';
 import getPort from 'get-port';
+import 'isomorphic-fetch';
 
 import chaiPlugins from './helpers/chai-plugins.js';
 
