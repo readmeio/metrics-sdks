@@ -17,7 +17,7 @@ class MetricsMiddleware:
 
     def __call__(self, request):
         try:
-            request.rm_start_dt = str(datetime.utcnow())
+            request.rm_start_dt = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
             request.rm_start_ts = int(time.time() * 1000)
             if request.headers["Content-Length"] or request.body:
                 request.rm_content_length = request.headers["Content-Length"] or "0"

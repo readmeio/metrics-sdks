@@ -2,6 +2,8 @@ import atexit
 import math
 import queue
 import threading
+import traceback
+import importlib
 
 from readme_metrics import MetricsApiConfig
 from readme_metrics.publisher import publish_batch
@@ -27,11 +29,19 @@ class Metrics:
         """
 
         self.config = config
+
+        if isinstance(self.config.GROUPING_FUNCTION, str):
+            module_name, function_name = self.config.GROUPING_FUNCTION.rsplit(".", 1)
+            module = importlib.import_module(module_name)
+            self.grouping_function = getattr(module, function_name)
+        else:
+            self.grouping_function = self.config.GROUPING_FUNCTION
+
         self.payload_builder = PayloadBuilder(
             config.DENYLIST,
             config.ALLOWLIST,
             config.IS_DEVELOPMENT_MODE,
-            config.GROUPING_FUNCTION,
+            self.grouping_function,
             config.LOGGER,
         )
         self.queue = queue.Queue()
@@ -52,14 +62,19 @@ class Metrics:
             )
             return
 
-        payload = self.payload_builder(request, response)
-        if payload is None:
-            # PayloadBuilder returns None when the grouping function returns
-            # None (an indication that the request should not be logged.)
+        try:
+            payload = self.payload_builder(request, response)
+            if payload is None:
+                # PayloadBuilder returns None when the grouping function returns
+                # None (an indication that the request should not be logged.)
+                self.config.LOGGER.debug("Not enqueueing request, payload is None")
+                return
+        except Exception:
             self.config.LOGGER.debug(
-                "Not enqueueing request, grouping function returned None"
+                "Not enqueueing request, payload construction failed"
             )
-            return
+            if self.config.IS_DEVELOPMENT_MODE:
+                print(traceback.format_exc())
 
         self.queue.put(payload)
         if self.queue.qsize() >= self.config.BUFFER_LENGTH:

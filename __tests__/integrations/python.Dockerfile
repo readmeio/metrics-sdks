@@ -13,6 +13,9 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 WORKDIR /src/examples/flask
 RUN pip3 install --no-cache-dir -r requirements.txt
 
+WORKDIR /src/examples/metrics_django
+RUN pip3 install --no-cache-dir -r requirements.txt
+
 # Install top level dependencies
 WORKDIR /src
 COPY __tests__ /src/__tests__

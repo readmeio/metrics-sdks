@@ -44,6 +44,9 @@ jobs:
     # you can run this locally with `make test-python-metrics-flask`.
     # - run: docker-compose run integration_metrics_python_flask
     - run: docker-compose run integration_webhooks_python_flask
+    # This Django suite is **extremely** flaky in Docker. Until we can figure out how to make it not
+    # you can run this locally with `make test-python-metrics-django`.
+    # - run: docker-compose run integration_metrics_python_django
 
     - name: Cleanup
       if: always()

@@ -1,5 +1,4 @@
 # pylint: disable=too-many-instance-attributes
-import importlib
 from typing import List, Any, Callable
 
 from readme_metrics.util import util_build_logger
@@ -17,7 +16,7 @@ class MetricsApiConfig:
 
             The main purpose of the identity object is to identify the API's caller.
         BUFFER_LENGTH (int): Number of requests to buffer before sending data
-            to ReadMe. Defaults to 10.
+            to ReadMe. Defaults to 1.
         IS_DEVELOPMENT_MODE (bool): Determines whether you are running in
             development mode. Defaults to False.
         IS_BACKGROUND_MODE (bool):  Determines whether to issue the call to
@@ -43,7 +42,7 @@ class MetricsApiConfig:
     """
 
     README_API_KEY: str = None
-    BUFFER_LENGTH: int = 10
+    BUFFER_LENGTH: int = 1
     GROUPING_FUNCTION: Callable[[Any], None] = lambda req: None
     IS_DEVELOPMENT_MODE: bool = False
     IS_BACKGROUND_MODE: bool = True
@@ -57,7 +56,7 @@ class MetricsApiConfig:
         self,
         api_key: str,
         grouping_function,
-        buffer_length: int = 10,
+        buffer_length: int = 1,
         development_mode: bool = False,
         background_worker_mode: bool = True,
         allowlist: List[str] = None,
@@ -82,7 +81,7 @@ class MetricsApiConfig:
                 constructor, in which case it will automatically be resolved and imported
                 when this object is initialized.
             buffer_length (int, optional): Number of requests to buffer before sending
-                data to ReadMe. Defaults to 10.
+                data to ReadMe. Defaults to 1.
             development_mode (bool, optional): Determines whether you are running in
                 development mode. Defaults to False.
             background_worker_mode (bool, optional): Determines whether to issue the
@@ -112,12 +111,7 @@ class MetricsApiConfig:
                 Default 3 seconds.
         """
         self.README_API_KEY = api_key
-        if isinstance(grouping_function, str):
-            module_name, function_name = grouping_function.rsplit(".", 1)
-            module = importlib.import_module(module_name)
-            self.GROUPING_FUNCTION = getattr(module, function_name)
-        else:
-            self.GROUPING_FUNCTION = grouping_function
+        self.GROUPING_FUNCTION = grouping_function
         self.BUFFER_LENGTH = buffer_length
         self.IS_DEVELOPMENT_MODE = development_mode
         self.IS_BACKGROUND_MODE = background_worker_mode

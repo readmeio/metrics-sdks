@@ -11,7 +11,9 @@
     "publish": "npx lerna publish",
     "test": "npm test --workspaces",
     "test:integration-metrics": "NODE_OPTIONS=--experimental-vm-modules npx mocha __tests__/integration-metrics.test.js",
+    "test:integration-metrics-watch": "NODE_OPTIONS=--experimental-vm-modules npx nodemon --exec mocha __tests__/integration-metrics.test.js",
     "test:integration-webhooks": "NODE_OPTIONS=--experimental-vm-modules npx mocha __tests__/integration-webhooks.test.js",
+    "test:integration-webhooks-watch": "NODE_OPTIONS=--experimental-vm-modules npx nodemon --exec mocha __tests__/integration-webhooks.test.js",
     "version": "npx conventional-changelog-cli --pkg lerna.json -i CHANGELOG.md -s && git add CHANGELOG.md"
   },
   "repository": {

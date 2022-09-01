@@ -149,7 +149,7 @@ describe('Metrics SDK Integration Tests', function () {
   it('should make a request to a Metrics backend with a HAR file', async function () {
     await fetch(`http://localhost:${PORT}`, { method: 'get' });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     expect(req.url).to.equal('/v1/request');
     expect(req.headers.authorization).to.equal('Basic YS1yYW5kb20tcmVhZG1lLWFwaS1rZXk6');
 
@@ -199,7 +199,7 @@ describe('Metrics SDK Integration Tests', function () {
     expect(request.headers).to.have.header('host', `localhost:${PORT}`);
 
     expect(response.status).to.equal(200);
-    expect(response.statusText).to.equal('OK');
+    expect(response.statusText).to.match(/OK|200/); // Django returns with "200"
     expect(response.headers).to.have.header('content-type', /application\/json(;\s?charset=utf-8)?/);
 
     // Flask prints a \n character after the JSON response
@@ -207,15 +207,12 @@ describe('Metrics SDK Integration Tests', function () {
     expect(response.content.text.replace('\n', '')).to.equal(JSON.stringify({ message: 'hello world' }));
     expect(response.content.size).to.equal(response.content.text.length);
     expect(response.content.mimeType).to.match(/application\/json(;\s?charset=utf-8)?/);
-
-    res.end();
-    return once(res, 'finish');
   });
 
   it('should capture query strings in a GET request', async function () {
     await fetch(`http://localhost:${PORT}?arr%5B1%5D=3&val=1`, { method: 'get' });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -237,9 +234,6 @@ describe('Metrics SDK Integration Tests', function () {
     ]);
 
     expect(request.postData).to.be.undefined;
-
-    res.end();
-    return once(res, 'finish');
   });
 
   it('should capture query strings that may be supplied in a POST request', async function () {
@@ -252,7 +246,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -283,11 +277,7 @@ describe('Metrics SDK Integration Tests', function () {
     });
 
     expect(response.status).to.equal(200);
-
-    res.end();
-    return once(res, 'finish');
   });
-
   it('should process a POST payload with no explicit `Content-Type` header', async function () {
     const payload = JSON.stringify({ user: { email: 'dom@readme.io' } });
     await fetch(`http://localhost:${PORT}/`, {
@@ -295,7 +285,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -307,11 +297,7 @@ describe('Metrics SDK Integration Tests', function () {
     expect(request.postData.mimeType).to.match(/text\/plain(;charset=UTF-8)?/);
     expect(request.postData.params).to.be.undefined;
     expect(request.postData.text).to.equal(payload);
-
-    res.end();
-    return once(res, 'finish');
   });
-
   it('should process an `application/json` POST payload', async function () {
     const payload = JSON.stringify({ user: { email: 'dom@readme.io' } });
     await fetch(`http://localhost:${PORT}/`, {
@@ -322,7 +308,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -336,9 +322,6 @@ describe('Metrics SDK Integration Tests', function () {
     });
 
     expect(response.status).to.equal(200);
-
-    res.end();
-    return once(res, 'finish');
   });
 
   /**
@@ -361,7 +344,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -381,9 +364,6 @@ describe('Metrics SDK Integration Tests', function () {
       // process the payload into Metrics.
       415,
     ]);
-
-    res.end();
-    return once(res, 'finish');
   });
 
   it('should process an `application/x-www-url-formencoded` POST payload', async function () {
@@ -398,7 +378,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -419,9 +399,6 @@ describe('Metrics SDK Integration Tests', function () {
       // that to Metrics regardless if Fastify supports it or not.
       415,
     ]);
-
-    res.end();
-    return once(res, 'finish');
   });
 
   it('should process a `multipart/form-data` POST payload', async function () {
@@ -443,7 +420,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: Readable.from(encoder),
     });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -460,16 +437,12 @@ describe('Metrics SDK Integration Tests', function () {
     ]);
 
     expect(request.postData.text).to.be.undefined;
-
-    res.end();
-    return once(res, 'finish');
   });
 
   it('should process a `multipart/form-data` POST payload containing files', async function () {
     if (!supportsMultipart()) {
       this.skip();
     }
-
     const owlbert = await fs.readFile('./__tests__/__datasets__/owlbert.png');
 
     const payload = new FormData();
@@ -487,7 +460,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: Readable.from(encoder),
     });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -513,9 +486,6 @@ describe('Metrics SDK Integration Tests', function () {
     ]);
 
     expect(request.postData.text).to.be.undefined;
-
-    res.end();
-    return once(res, 'finish');
   });
 
   it('should process a `text/plain` payload', async function () {
@@ -527,7 +497,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: 'Hello world',
     });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -541,8 +511,5 @@ describe('Metrics SDK Integration Tests', function () {
     });
 
     expect(response.status).to.equal(200);
-
-    res.end();
-    return once(res, 'finish');
   });
 });
