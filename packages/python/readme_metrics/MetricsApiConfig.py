@@ -1,5 +1,4 @@
 # pylint: disable=too-many-instance-attributes
-import importlib
 from typing import List, Any, Callable
 
 from readme_metrics.util import util_build_logger
