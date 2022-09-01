@@ -5,7 +5,7 @@ import sys
 
 from django.core.management.commands.runserver import Command as runserver
 
-if os.getenv("README_API_KEY") is None:
+if os.getenv("README_API_KEY") is None and "runserver" in sys.argv:
     sys.stderr.write("Missing `README_API_KEY` environment variable")
     sys.stderr.flush()
     sys.exit(1)
