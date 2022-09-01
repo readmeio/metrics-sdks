@@ -1,12 +1,10 @@
 require 'readme/metrics'
 require 'rack/test'
 require 'webmock/rspec'
-require 'uuid'
+require 'securerandom'
 
 RSpec.describe Readme::Metrics do
   include Rack::Test::Methods
-
-  let(:uuid) { UUID.new }
 
   before do
     WebMock.reset_executed_requests!
@@ -450,7 +448,7 @@ RSpec.describe Readme::Metrics do
         id: env['CURRENT_USER'].id,
         label: env['CURRENT_USER'].name,
         email: env['CURRENT_USER'].email,
-        log_id: uuid.generate,
+        log_id: SecureRandom.uuid,
         ignore: false
       }.merge(group_overrides)
       group.delete :id unless group[:api_key].nil?
