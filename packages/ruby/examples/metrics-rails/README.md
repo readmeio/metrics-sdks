@@ -1,24 +1,17 @@
-# README
+# ReadMe Metrics Rails Demo
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+```sh
+make install
+```
 
-Things you may want to cover:
+## 📊 Metrics
 
-* Ruby version
+```sh
+make serve-metrics-rails
+```
 
-* System dependencies
+Access your test server to demo Metrics by making a cURL request:
 
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+```sh
+curl http://localhost:8000
+```
