@@ -178,7 +178,7 @@ describe('Metrics SDK Integration Tests', function () {
     /**
      * `startedDateTime` should look like the following, with optional microseconds component:
      *
-     *  JavaScript: `new Date.toISOString()`
+     *  JavaScript: `new Date().toISOString()`
      *    - 2022-06-30T10:21:55.394Z
      *  PHP: `date('Y-m-d\TH:i:sp')`
      *    - 2022-08-17T19:23:31Z
