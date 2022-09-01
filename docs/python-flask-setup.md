@@ -22,7 +22,7 @@ If you're a developer, it takes a few small steps to send your API logs to [Read
 1. From the directory of your codebase, run the following command in your command line to install the Flask variant of the `readme-metrics` package from [pypi](https://pypi.org/project/readme-metrics/). You can also add this to your `requirements.txt` file.
 
 ```bash
-pip install readme-metrics[Flask]
+pip install "readme-metrics[Flask]"
 ```
 
 2. In your codebase, write a grouping function to inform ReadMe of the user or API key holder that is responsible for a given request. The grouping function receives the current Flask `Request` object as input, and should return a data structure describing the current user or API key holder. A basic grouping function would look like this:
