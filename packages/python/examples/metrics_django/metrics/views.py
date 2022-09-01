@@ -1,5 +1,7 @@
 from django.http import JsonResponse, HttpResponse
 
+# pylint: disable=unused-import
+from .models import Person
 
 # pylint: disable=unused-argument
 def grouping_function(request):
