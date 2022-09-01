@@ -2,7 +2,8 @@ require 'socket'
 require 'securerandom'
 
 def validate_uuid(uuid)
-  return unless not uuid.nil?
+  return if uuid.nil?
+
   uuid.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
 end
 

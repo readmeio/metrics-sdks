@@ -103,7 +103,7 @@ module Readme
 
     def host_header
       {
-        'Host' => @request.host,
+        'Host' => @request.host
       }.compact
     end
   end
