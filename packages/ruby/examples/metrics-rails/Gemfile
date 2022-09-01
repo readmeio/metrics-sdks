@@ -28,3 +28,4 @@ group :development do
   # gem "spring"
 end
 
+gem "readme-metrics", path: "../../"

@@ -18,6 +18,11 @@ require "action_view/railtie"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+if !ENV["README_API_KEY"]
+  STDERR.puts('Missing `README_API_KEY` environment variable')
+  exit(1)
+end
+
 module MetricsRails
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
@@ -35,5 +40,14 @@ module MetricsRails
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+    config.middleware.use Readme::Metrics, { api_key: ENV["README_API_KEY"] } do |env|
+      {
+        api_key: 'owlbert-api-key',
+        label: 'Owlbert',
+        email: 'owlbert@example.com',
+      }
+    end
+
   end
 end
