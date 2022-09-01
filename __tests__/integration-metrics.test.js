@@ -196,7 +196,10 @@ describe('Metrics SDK Integration Tests', function () {
       'close',
       'keep-alive', // Running this suite with Node 18 the `connection` header is different.
     ]);
-    expect(request.headers).to.have.header('host', `localhost:${PORT}`);
+    expect(request.headers).to.have.header('host', [
+      `localhost:${PORT}`,
+      'localhost', // rails does not include the port
+    ]);
 
     expect(response.status).to.equal(200);
     expect(response.statusText).to.equal('OK');

@@ -145,6 +145,7 @@ RSpec.describe Readme::HttpRequest do
 
       expect(request.headers).to eq(
         {
+          'Host' => 'example.com',
           'X-Custom' => 'custom',
           'Accept' => 'text/plain',
           'Content-Type' => 'application/json',
