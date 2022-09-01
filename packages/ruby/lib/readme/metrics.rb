@@ -15,7 +15,7 @@ module Readme
   class Metrics
     SDK_NAME = 'readme-metrics'
     DEFAULT_BUFFER_LENGTH = 1
-    ENDPOINT = 'https://metrics.readme.io/v1/request'
+    ENDPOINT = URI.join(ENV['METRICS_SERVER'] || 'https://metrics.readme.io', '/v1/request')
 
     def self.logger
       @@logger
