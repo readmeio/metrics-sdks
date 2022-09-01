@@ -234,6 +234,10 @@ describe('Metrics SDK Integration Tests', function () {
         { name: 'arr', value: '{"1":"3"}' },
         { name: 'val', value: '1' },
       ]),
+      JSON.stringify([
+        { name: 'arr', value: { 1: '3' } },
+        { name: 'val', value: '1' },
+      ]), // Rails
     ]);
 
     expect(request.postData).to.be.undefined;
@@ -275,6 +279,10 @@ describe('Metrics SDK Integration Tests', function () {
         { name: 'arr', value: '{"1":"3"}' },
         { name: 'val', value: '1' },
       ]),
+      JSON.stringify([
+        { name: 'arr', value: { 1: '3' } },
+        { name: 'val', value: '1' },
+      ]), // Rails
     ]);
 
     expect(request.postData).to.deep.equal({
