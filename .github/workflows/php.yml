@@ -5,6 +5,7 @@ on: [push]
 jobs:
   integration:
     runs-on: ubuntu-latest
+    container: ubuntu
 
     steps:
       - uses: actions/checkout@v3
@@ -13,28 +14,9 @@ jobs:
           node-version: 16
 
       - run: npm ci --ignore-scripts
-      - run: docker-compose up --detach integration_php_laravel
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      - run: curl -v http://0.0.0.0:8000; exit 0
-      # - run: make test-php-metrics-laravel
+      # - run: docker-compose up --detach integration_php_laravel
+      # - run: curl -v http://0.0.0.0:8000; exit 0
+      - run: make test-php-metrics-laravel
       # - run: make test-php-webhooks-laravel
 
       - name: Cleanup
