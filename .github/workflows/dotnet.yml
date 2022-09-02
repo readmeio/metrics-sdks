@@ -1,29 +1,29 @@
-name: dotnet
+# name: dotnet
 
-on: [push]
+# on: [push]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/dotnet
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     defaults:
+#       run:
+#         working-directory: packages/dotnet
 
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-dotnet@v2
-        # with:
-        #   dotnet-version: '3.1.x' # SDK Version to use; x will use the latest version of the 3.1 channel
-      - run: make build
+#     steps:
+#       - uses: actions/checkout@v3
+#       - uses: actions/setup-dotnet@v2
+#         # with:
+#         #   dotnet-version: '3.1.x' # SDK Version to use; x will use the latest version of the 3.1 channel
+#       - run: make build
 
-  # integration:
-  #   runs-on: ubuntu-latest
+#   # integration:
+#   #   runs-on: ubuntu-latest
 
-  #   steps:
-  #     - uses: actions/checkout@v3
+#   #   steps:
+#   #     - uses: actions/checkout@v3
 
-  #     - run: docker-compose run integration_metrics_dotnet_v6.0
+#   #     - run: docker-compose run integration_metrics_dotnet_v6.0
 
-  #     - name: Cleanup
-  #       if: always()
-  #       run: docker-compose down
+#   #     - name: Cleanup
+#   #       if: always()
+#   #       run: docker-compose down

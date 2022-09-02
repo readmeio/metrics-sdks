@@ -1,53 +1,53 @@
-name: python
+# name: python
 
-on: [push]
+# on: [push]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/python
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     defaults:
+#       run:
+#         working-directory: packages/python
 
-    strategy:
-      matrix:
-        python-version:
-          # https://endoflife.date/python
-          - 3.7 # EOL: June 27th, 2023
-          - 3.8 # EOL: October 14th, 2024
-          - 3.9 # EOL: October 5rd, 2025
-          - '3.10' # EOL: October 4rd, 2026
+#     strategy:
+#       matrix:
+#         python-version:
+#           # https://endoflife.date/python
+#           - 3.7 # EOL: June 27th, 2023
+#           - 3.8 # EOL: October 14th, 2024
+#           - 3.9 # EOL: October 5rd, 2025
+#           - '3.10' # EOL: October 4rd, 2026
 
-    steps:
-      - uses: actions/checkout@v3
+#     steps:
+#       - uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
+#       - uses: actions/setup-python@v4
+#         with:
+#           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
-        run: make install
+#       - name: Install dependencies
+#         run: make install
 
-      - name: Check code standards
-        run: make lint
+#       - name: Check code standards
+#         run: make lint
 
-      - name: Run tests
-        run: make test
+#       - name: Run tests
+#         run: make test
 
-  # integration:
-  #   runs-on: ubuntu-latest
+#   # integration:
+#   #   runs-on: ubuntu-latest
 
-  #   steps:
-  #   - uses: actions/checkout@v3
+#   #   steps:
+#   #   - uses: actions/checkout@v3
 
-  #   # This Flask suite is **extremely** flaky in Docker. Until we can figure out how to make it not
-  #   # you can run this locally with `make test-python-metrics-flask`.
-  #   # - run: docker-compose run integration_metrics_python_flask
-  #   - run: docker-compose run integration_webhooks_python_flask
-  #   # This Django suite is **extremely** flaky in Docker. Until we can figure out how to make it not
-  #   # you can run this locally with `make test-python-metrics-django`.
-  #   # - run: docker-compose run integration_metrics_python_django
+#   #   # This Flask suite is **extremely** flaky in Docker. Until we can figure out how to make it not
+#   #   # you can run this locally with `make test-python-metrics-flask`.
+#   #   # - run: docker-compose run integration_metrics_python_flask
+#   #   - run: docker-compose run integration_webhooks_python_flask
+#   #   # This Django suite is **extremely** flaky in Docker. Until we can figure out how to make it not
+#   #   # you can run this locally with `make test-python-metrics-django`.
+#   #   # - run: docker-compose run integration_metrics_python_django
 
-  #   - name: Cleanup
-  #     if: always()
-  #     run: docker-compose down
+#   #   - name: Cleanup
+#   #     if: always()
+#   #     run: docker-compose down
