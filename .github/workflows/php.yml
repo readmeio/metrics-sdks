@@ -15,6 +15,24 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: docker-compose up --detach integration_php_laravel
       - run: curl -v http://0.0.0.0:8000
+      - run: curl -v http://0.0.0.0:8000
+      - run: curl -v http://0.0.0.0:8000
+      - run: curl -v http://0.0.0.0:8000
+      - run: curl -v http://0.0.0.0:8000
+      - run: curl -v http://0.0.0.0:8000
+      - run: curl -v http://0.0.0.0:8000
+      - run: curl -v http://0.0.0.0:8000
+      - run: curl -v http://0.0.0.0:8000
+      - run: curl -v http://0.0.0.0:8000
+      - run: curl -v http://0.0.0.0:8000
+      - run: curl -v http://0.0.0.0:8000
+      - run: curl -v http://0.0.0.0:8000
+      - run: curl -v http://0.0.0.0:8000
+      - run: curl -v http://0.0.0.0:8000
+      - run: curl -v http://0.0.0.0:8000
+      - run: curl -v http://0.0.0.0:8000
+      - run: curl -v http://0.0.0.0:8000
+      - run: curl -v http://0.0.0.0:8000
       # - run: make test-php-metrics-laravel
       # - run: make test-php-webhooks-laravel
 
