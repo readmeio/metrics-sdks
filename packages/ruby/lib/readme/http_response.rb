@@ -13,12 +13,12 @@ module Readme
     def body
       if raw_body.respond_to?(:rewind)
         raw_body.rewind
-        content = raw_body.each.reduce('', :+)
+        content = raw_body.each.sum('')
         raw_body.rewind
 
         content
       else
-        raw_body.each.reduce('', :+)
+        raw_body.each.sum('')
       end
     end
 

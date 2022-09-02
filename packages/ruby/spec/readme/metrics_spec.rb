@@ -3,6 +3,57 @@ require 'rack/test'
 require 'webmock/rspec'
 require 'securerandom'
 
+# rubocop:disable Lint/UnusedMethodArgument
+class JsonApp
+  def call(env)
+    [
+      200,
+      { 'Content-Type' => 'application/json', 'Content-Length' => '15' },
+      [{ key: 'value' }.to_json]
+    ]
+  end
+end
+
+class TextApp
+  def call(env)
+    [200, { 'Content-Type' => 'text/plain', 'Content-Lengt' => '2' }, ['OK']]
+  end
+end
+
+class EmptyApp
+  def call(env)
+    [204, {}, []]
+  end
+end
+# rubocop:enable Lint/UnusedMethodArgument
+
+# Rack::Test doesn't set the HTTP_VERSION header on requests, even though
+# real-world implementations of Rack servers do so. This middleware adds the
+# proper header to the env.
+class SetHttpVersion
+  def initialize(app)
+    @app = app
+  end
+
+  def call(env)
+    new_env = env.merge({ 'HTTP_VERSION' => 'HTTP/1.1' })
+    @app.call(new_env)
+  end
+end
+
+class SetCurrentUser
+  def initialize(app)
+    @app = app
+  end
+
+  def call(env)
+    new_env = env.merge({ 'CURRENT_USER' => CurrentUser.new('1', 'Test Testerson', 'test@example.com') })
+    @app.call(new_env)
+  end
+end
+
+CurrentUser = Struct.new(:id, :name, :email)
+
 RSpec.describe Readme::Metrics do
   include Rack::Test::Methods
 
@@ -11,7 +62,7 @@ RSpec.describe Readme::Metrics do
   end
 
   it 'has a version number' do
-    expect(Readme::Metrics::VERSION).not_to be nil
+    expect(Readme::Metrics::VERSION).not_to be_nil
   end
 
   context 'when provided a custom request queue' do
@@ -462,60 +513,7 @@ RSpec.describe Readme::Metrics do
     JsonApp.new
   end
 
-  # rubocop:disable Lint/UnusedMethodArgument
-  class JsonApp
-    def call(env)
-      [
-        200,
-        { 'Content-Type' => 'application/json', 'Content-Length' => '15' },
-        [{ key: 'value' }.to_json]
-      ]
-    end
-  end
-
-  class TextApp
-    def call(env)
-      [200, { 'Content-Type' => 'text/plain', 'Content-Lengt' => '2' }, ['OK']]
-    end
-  end
-
-  class EmptyApp
-    def call(env)
-      [204, {}, []]
-    end
-  end
-  # rubocop:enable Lint/UnusedMethodArgument
-
   def mock_response_to_raw(mock_response)
     [mock_response.status, mock_response.headers, [mock_response.body]]
   end
-
-  # Rack::Test doesn't set the HTTP_VERSION header on requests, even though
-  # real-world implementations of Rack servers do so. This middleware adds the
-  # proper header to the env.
-  # rubocop:disable RSpec/InstanceVariable
-  class SetHttpVersion
-    def initialize(app)
-      @app = app
-    end
-
-    def call(env)
-      new_env = env.merge({ 'HTTP_VERSION' => 'HTTP/1.1' })
-      @app.call(new_env)
-    end
-  end
-
-  class SetCurrentUser
-    def initialize(app)
-      @app = app
-    end
-
-    def call(env)
-      new_env = env.merge({ 'CURRENT_USER' => CurrentUser.new('1', 'Test Testerson', 'test@example.com') })
-      @app.call(new_env)
-    end
-  end
-  # rubocop:enable RSpec/InstanceVariable
-
-  CurrentUser = Struct.new(:id, :name, :email)
 end

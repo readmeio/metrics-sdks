@@ -41,7 +41,7 @@ module MetricsRails
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
-    config.middleware.use Readme::Metrics, { api_key: ENV['README_API_KEY'] } do |_env|
+    config.middleware.use Readme::Metrics, { api_key: ENV.fetch('README_API_KEY', nil) } do |_env|
       {
         api_key: 'owlbert-api-key',
         label: 'Owlbert',

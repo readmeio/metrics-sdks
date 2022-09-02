@@ -9,8 +9,8 @@ class MetricsController < ApplicationController
 
   def webhook
     render json: {
-      "petstore_auth": 'default-key',
-      "basic_auth": { "user": 'user', "pass": 'pass' }
+      petstore_auth: 'default-key',
+      basic_auth: { user: 'user', pass: 'pass' }
     }
   end
 end
