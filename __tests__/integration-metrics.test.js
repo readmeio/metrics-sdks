@@ -7,14 +7,12 @@ import { Readable } from 'node:stream';
 import chai, { expect } from 'chai';
 import { FormDataEncoder } from 'form-data-encoder';
 import { File, FormData } from 'formdata-node';
+// import getPort from 'get-port';
 import 'isomorphic-fetch';
 
 import chaiPlugins from './helpers/chai-plugins.js';
 
 chai.use(chaiPlugins);
-
-const PORT = 8000; // SDK HTTP server port
-const randomApiKey = 'rdme_abcdefghijklmnopqrstuvwxyz'; // This must match what's in `docker-compose.yml`.
 
 function supportsMultipart() {
   return 'SUPPORTS_MULTIPART' in process.env && process.env.SUPPORTS_MULTIPART === 'true';
@@ -22,7 +20,7 @@ function supportsMultipart() {
 
 function isListening(port, attempt = 0) {
   return new Promise((resolve, reject) => {
-    console.log('checking', { port, attempt })
+    console.log('checking', { port, attempt });
     if (attempt > 5) throw new Error(`Cannot connect on port: ${port}`);
     const socket = net.connect(port, '0.0.0.0');
     socket.once('error', err => {
@@ -30,12 +28,12 @@ function isListening(port, attempt = 0) {
         throw err;
       }
       return setTimeout(() => {
-        return isListening(port, attempt + 1).then(resolve, reject);
+        return isListening( port, attempt + 1).then(resolve, reject);
       }, 300 * attempt);
     });
 
     socket.once('connect', () => {
-      console.log(`0.0.0.0:${port} is accessible`)
+      console.log('im listening on', { port });
       socket.destroy();
       return resolve();
     });
@@ -52,110 +50,99 @@ async function getBody(response) {
   return JSON.parse(responseBody);
 }
 
+const PORT = 8000; // SDK HTTP server
+const randomApiKey = 'rdme_abcdefghijklmnopqrstuvwxyz'; // This must match what's in `docker-compose.yml`.
+
 describe('Metrics SDK Integration Tests', function () {
   let metricsServer;
 
-  before(function () {
-    // metricsServer = http
-    //   .createServer((req, res) => {
-    //     process.stdout.write(`[metrics server] req.url=${req.url}\n`);
-    //     // return once(res, 'finish');
-    //   })
-    //   .listen(8001, '0.0.0.0');
+  before(async function () {
+    metricsServer = http.createServer().listen(8001, '0.0.0.0');
 
-    // await once(metricsServer, 'listening');
-
-    // const { address, port } = metricsServer.address();
-
-    // process.stdout.write(`[metrics server] address=${address} port=${port}\n`)
+    await once(metricsServer, 'listening');
 
     return isListening(PORT);
   });
 
-  // after(function () {
-  //   return new Promise((resolve, reject) => {
-  //     metricsServer.close(err => {
-  //       if (err) return reject(err);
-  //       return resolve();
-  //     });
-  //   });
-  // });
+  after(function () {
+    return new Promise((resolve, reject) => {
+      metricsServer.close(err => {
+        if (err) return reject(err);
+        return resolve();
+      });
+    });
+  });
 
-  it.only('should make a request to a Metrics backend with a HAR file', async function () {
-    const serverRes = await fetch(`http://0.0.0.0:${PORT}`, { method: 'get' }).then(r => r.json());
+  it('should make a request to a Metrics backend with a HAR file', async function () {
+    await fetch(`http://localhost:${PORT}`, { method: 'get' });
 
-    console.log({ serverRes })
+    const [req, res] = await once(metricsServer, 'request');
+    const body = await getBody(req);
+    const [har] = body;
 
-    const [req] = await once(metricsServer, 'request');
+    res.end();
+    await once(res, 'finish');
 
-    console.log({ req })
+    expect(req.url).to.equal('/v1/request');
+    expect(req.headers.authorization).to.equal(`Basic ${Buffer.from(`${randomApiKey}:`).toString('base64')}`);
 
-    // expect(req.url).to.equal('/v1/request');
-    // expect(req.headers.authorization).to.equal(`Basice ${Buffer.from(`${randomApiKey}:`).toString('base64')}`);
+    // https://uibakery.io/regex-library/uuid
+    expect(har._id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 
-    // const body = await getBody(req);
-    // const [har] = body;
+    expect(har.group).to.deep.equal({
+      id: 'owlbert-api-key',
+      label: 'Owlbert',
+      email: 'owlbert@example.com',
+    });
 
-    // // https://uibakery.io/regex-library/uuid
-    // expect(har._id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+    expect(har.clientIPAddress).to.match(/\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}/);
+    expect(har.development).to.be.false;
 
-    // expect(har.group).to.deep.equal({
-    //   id: 'owlbert-api-key',
-    //   label: 'Owlbert',
-    //   email: 'owlbert@example.com',
-    // });
+    const { creator } = har.request.log;
+    expect(creator.name).to.match(/readme-metrics \((dotnet|node|php|python|ruby)\)/);
+    expect(creator.version).not.to.be.empty;
+    expect(creator.comment).not.to.be.empty;
 
-    // expect(har.clientIPAddress).to.match(/\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}/);
-    // expect(har.development).to.be.false;
+    const { request, response, startedDateTime } = har.request.log.entries[0];
 
-    // const { creator } = har.request.log;
-    // expect(creator.name).to.match(/readme-metrics \((dotnet|node|php|python|ruby)\)/);
-    // expect(creator.version).not.to.be.empty;
-    // expect(creator.comment).not.to.be.empty;
+    /**
+     * `startedDateTime` should look like the following, with optional microseconds component:
+     *
+     *  JavaScript: `new Date.toISOString()`
+     *    - 2022-06-30T10:21:55.394Z
+     *  PHP: `date('Y-m-d\TH:i:sp')`
+     *    - 2022-08-17T19:23:31Z
+     *  Python: `datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")`
+     *    - 2022-06-30T10:31:43Z
+     */
+    expect(startedDateTime).to.match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:.\d{3})?Z/);
 
-    // const { request, response, startedDateTime } = har.request.log.entries[0];
+    // Some frameworks remove the trailing slash from the URL we get.
+    expect(request.url).to.match(new RegExp(`http://localhost:${PORT}(/)?`));
+    expect(request.method).to.equal('GET');
+    expect(request.httpVersion).to.equal('HTTP/1.1');
 
-    // /**
-    //  * `startedDateTime` should look like the following, with optional microseconds component:
-    //  *
-    //  *  JavaScript: `new Date.toISOString()`
-    //  *    - 2022-06-30T10:21:55.394Z
-    //  *  PHP: `date('Y-m-d\TH:i:sp')`
-    //  *    - 2022-08-17T19:23:31Z
-    //  *  Python: `datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")`
-    //  *    - 2022-06-30T10:31:43Z
-    //  */
-    // expect(startedDateTime).to.match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:.\d{3})?Z/);
+    expect(request.headers).to.have.header('connection', [
+      'close',
+      'keep-alive', // Running this suite with Node 18 the `connection` header is different.
+    ]);
+    expect(request.headers).to.have.header('host', `localhost:${PORT}`);
 
-    // // Some frameworks remove the trailing slash from the URL we get.
-    // expect(request.url).to.match(new RegExp(`http://localhost:${PORT}(/)?`));
-    // expect(request.method).to.equal('GET');
-    // expect(request.httpVersion).to.equal('HTTP/1.1');
+    expect(response.status).to.equal(200);
+    expect(response.statusText).to.match(/OK|200/); // Django returns with "200"
+    expect(response.headers).to.have.header('content-type', /application\/json(;\s?charset=utf-8)?/);
 
-    // expect(request.headers).to.have.header('connection', [
-    //   'close',
-    //   'keep-alive', // Running this suite with Node 18 the `connection` header is different.
-    // ]);
-    // expect(request.headers).to.have.header('host', `localhost:${PORT}`);
-
-    // expect(response.status).to.equal(200);
-    // expect(response.statusText).to.match(/OK|200/); // Django returns with "200"
-    // expect(response.headers).to.have.header('content-type', /application\/json(;\s?charset=utf-8)?/);
-
-    // // Flask prints a \n character after the JSON response
-    // // https://github.com/pallets/flask/issues/4635
-    // expect(response.content.text.replace('\n', '')).to.equal(JSON.stringify({ message: 'hello world' }));
-    // expect(response.content.size).to.equal(response.content.text.length);
-    // expect(response.content.mimeType).to.match(/application\/json(;\s?charset=utf-8)?/);
-
-    // res.end();
-    // return once(res, 'finish');
+    // Flask prints a \n character after the JSON response
+    // https://github.com/pallets/flask/issues/4635
+    expect(response.content.text.replace('\n', '')).to.equal(JSON.stringify({ message: 'hello world' }));
+    expect(response.content.size).to.equal(response.content.text.length);
+    expect(response.content.mimeType).to.match(/application\/json(;\s?charset=utf-8)?/);
   });
 
   it('should capture query strings in a GET request', async function () {
     await fetch(`http://localhost:${PORT}?arr%5B1%5D=3&val=1`, { method: 'get' });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -177,9 +164,6 @@ describe('Metrics SDK Integration Tests', function () {
     ]);
 
     expect(request.postData).to.be.undefined;
-
-    res.end();
-    return once(res, 'finish');
   });
 
   it('should capture query strings that may be supplied in a POST request', async function () {
@@ -192,7 +176,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -223,11 +207,7 @@ describe('Metrics SDK Integration Tests', function () {
     });
 
     expect(response.status).to.equal(200);
-
-    res.end();
-    return once(res, 'finish');
   });
-
   it('should process a POST payload with no explicit `Content-Type` header', async function () {
     const payload = JSON.stringify({ user: { email: 'dom@readme.io' } });
     await fetch(`http://localhost:${PORT}/`, {
@@ -235,7 +215,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -247,11 +227,7 @@ describe('Metrics SDK Integration Tests', function () {
     expect(request.postData.mimeType).to.match(/text\/plain(;charset=UTF-8)?/);
     expect(request.postData.params).to.be.undefined;
     expect(request.postData.text).to.equal(payload);
-
-    res.end();
-    return once(res, 'finish');
   });
-
   it('should process an `application/json` POST payload', async function () {
     const payload = JSON.stringify({ user: { email: 'dom@readme.io' } });
     await fetch(`http://localhost:${PORT}/`, {
@@ -262,7 +238,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -276,9 +252,6 @@ describe('Metrics SDK Integration Tests', function () {
     });
 
     expect(response.status).to.equal(200);
-
-    res.end();
-    return once(res, 'finish');
   });
 
   /**
@@ -301,7 +274,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -321,9 +294,6 @@ describe('Metrics SDK Integration Tests', function () {
       // process the payload into Metrics.
       415,
     ]);
-
-    res.end();
-    return once(res, 'finish');
   });
 
   it('should process an `application/x-www-url-formencoded` POST payload', async function () {
@@ -338,7 +308,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -359,9 +329,6 @@ describe('Metrics SDK Integration Tests', function () {
       // that to Metrics regardless if Fastify supports it or not.
       415,
     ]);
-
-    res.end();
-    return once(res, 'finish');
   });
 
   it('should process a `multipart/form-data` POST payload', async function () {
@@ -383,7 +350,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: Readable.from(encoder),
     });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -400,16 +367,12 @@ describe('Metrics SDK Integration Tests', function () {
     ]);
 
     expect(request.postData.text).to.be.undefined;
-
-    res.end();
-    return once(res, 'finish');
   });
 
   it('should process a `multipart/form-data` POST payload containing files', async function () {
     if (!supportsMultipart()) {
       this.skip();
     }
-
     const owlbert = await fs.readFile('./__tests__/__datasets__/owlbert.png');
 
     const payload = new FormData();
@@ -427,7 +390,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: Readable.from(encoder),
     });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -453,9 +416,6 @@ describe('Metrics SDK Integration Tests', function () {
     ]);
 
     expect(request.postData.text).to.be.undefined;
-
-    res.end();
-    return once(res, 'finish');
   });
 
   it('should process a `text/plain` payload', async function () {
@@ -467,7 +427,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: 'Hello world',
     });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -481,8 +441,5 @@ describe('Metrics SDK Integration Tests', function () {
     });
 
     expect(response.status).to.equal(200);
-
-    res.end();
-    return once(res, 'finish');
   });
 });
