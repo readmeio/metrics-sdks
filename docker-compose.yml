@@ -66,6 +66,7 @@ services:
     build:
       context: .
       dockerfile: ./__tests__/integrations/php/laravel.Dockerfile
+      network: host
     ports:
       - 8000:8000
     environment:
