@@ -33,7 +33,9 @@ describe('Metrics SDK Integration Tests', function () {
   let metricsServer;
 
   before(async function () {
-    metricsServer = http.createServer().listen(8001, '0.0.0.0');
+    metricsServer = http.createServer((req, res) => {
+      console.log('[metrics server] req.url=', req.url)
+    }).listen(8001, '0.0.0.0');
 
     await once(metricsServer, 'listening');
   });

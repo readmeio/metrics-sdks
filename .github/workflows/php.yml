@@ -16,10 +16,6 @@ jobs:
       - run: make test-php-metrics-laravel
       - run: make test-php-webhooks-laravel
 
-      - name: Cleanup
-        if: always()
-        run: docker-compose down
-
   build:
     runs-on: ubuntu-latest
     defaults:
