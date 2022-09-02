@@ -1,6 +1,7 @@
 import { once } from 'node:events';
 import fs from 'node:fs/promises';
 import http from 'node:http';
+import net from 'node:net';
 import { Readable } from 'node:stream';
 
 import chai, { expect } from 'chai';
@@ -19,6 +20,28 @@ function supportsMultipart() {
   return 'SUPPORTS_MULTIPART' in process.env && process.env.SUPPORTS_MULTIPART === 'true';
 }
 
+function isListening(port, attempt = 0) {
+  return new Promise((resolve, reject) => {
+    console.log('checking', { port, attempt })
+    if (attempt > 5) throw new Error(`Cannot connect on port: ${port}`);
+    const socket = net.connect(port, 'localhost');
+    socket.once('error', err => {
+      if (err.code !== 'ECONNREFUSED') {
+        throw err;
+      }
+      return setTimeout(() => {
+        return isListening(port, attempt + 1).then(resolve, reject);
+      }, 300 * attempt);
+    });
+
+    socket.once('connect', () => {
+      console.log(`localhost:${port} is accessible`)
+      socket.destroy();
+      return resolve();
+    });
+  });
+}
+
 async function getBody(response) {
   let responseBody = '';
   // eslint-disable-next-line no-restricted-syntax
@@ -33,10 +56,12 @@ describe('Metrics SDK Integration Tests', function () {
   let metricsServer;
 
   before(async function () {
-    metricsServer = http.createServer((req, res) => {
-      process.stdout.write(`[metrics server] req.url=${req.url}\n`)
-      // return once(res, 'finish');
-    }).listen(8001, '0.0.0.0');
+    metricsServer = http
+      .createServer((req, res) => {
+        process.stdout.write(`[metrics server] req.url=${req.url}\n`);
+        // return once(res, 'finish');
+      })
+      .listen(8001, '0.0.0.0');
 
     await once(metricsServer, 'listening');
 
@@ -44,6 +69,7 @@ describe('Metrics SDK Integration Tests', function () {
 
     process.stdout.write(`[metrics server] address=${address} port=${port}\n`)
 
+    return isListening(PORT);
   });
 
   after(function () {
@@ -56,7 +82,7 @@ describe('Metrics SDK Integration Tests', function () {
   });
 
   it.only('should make a request to a Metrics backend with a HAR file', async function () {
-    await fetch(`localhost:${PORT}`, { method: 'get' });
+    await fetch(`http://localhost:${PORT}`, { method: 'get' });
 
     const [req, res] = await once(metricsServer, 'request');
     expect(req.url).to.equal('/v1/request');
