@@ -3,6 +3,19 @@ name: php
 on: [push]
 
 jobs:
+  integration:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - run: npm ci --ignore-scripts
+      - run: make test-php-metrics-laravel
+      - run: make test-php-webhooks-laravel
+
   build:
     runs-on: ubuntu-latest
     defaults:
@@ -55,16 +68,3 @@ jobs:
 
       - name: Run tests
         run: make test
-
-  integration:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - run: make test-php-metrics-laravel
-      - run: make test-php-webhooks-laravel
-
-      - name: Cleanup
-        if: always()
-        run: docker-compose down
