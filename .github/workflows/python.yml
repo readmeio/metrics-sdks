@@ -39,15 +39,37 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+
+    - name: Install Pip Dependencies
+      working-directory: ./packages/python
+      run: pip3 install --no-cache-dir -r requirements.txt
+
+    - name: Install Pip Dependencies
+      working-directory: ./packages/python/examples/flask
+      run: pip3 install --no-cache-dir -r requirements.txt
+
+    - name: Install Node.js Dependencies
+      run: npm ci
+
+    - name: Run tests
+      run: npm run test:integration-metrics
+      env:
+        EXAMPLE_SERVER: python3 examples/flask/app.py
 
     # This Flask suite is **extremely** flaky in Docker. Until we can figure out how to make it not
     # you can run this locally with `make test-python-metrics-flask`.
     # - run: docker-compose run integration_metrics_python_flask
-    - run: docker-compose run integration_webhooks_python_flask
+    # - run: docker-compose run integration_webhooks_python_flask
     # This Django suite is **extremely** flaky in Docker. Until we can figure out how to make it not
     # you can run this locally with `make test-python-metrics-django`.
     # - run: docker-compose run integration_metrics_python_django
 
-    - name: Cleanup
-      if: always()
-      run: docker-compose down
+    # - name: Cleanup
+    #   if: always()
+    #   run: docker-compose down
