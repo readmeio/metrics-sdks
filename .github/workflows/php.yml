@@ -13,8 +13,10 @@ jobs:
           node-version: 16
 
       - run: npm ci --ignore-scripts
-      - run: make test-php-metrics-laravel
-      - run: make test-php-webhooks-laravel
+      - run: docker-compose up --detact integration_php_laravel
+      - run: curl -v http://0.0.0.0:8000
+      # - run: make test-php-metrics-laravel
+      # - run: make test-php-webhooks-laravel
 
       - name: Cleanup
         if: always()
