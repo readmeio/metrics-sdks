@@ -31,3 +31,15 @@ jobs:
 
       - name: Run tests
         run: make test
+
+  integration:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - run: docker-compose run integration_metrics_ruby_rails
+
+    - name: Cleanup
+      if: always()
+      run: docker-compose down
