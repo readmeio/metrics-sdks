@@ -82,11 +82,14 @@ describe('Metrics SDK Integration Tests', function () {
   // });
 
   it.only('should make a request to a Metrics backend with a HAR file', async function () {
-    const res = await fetch(`http://0.0.0.0:${PORT}`, { method: 'get' }).then(r => r.json());
+    const serverRes = await fetch(`http://0.0.0.0:${PORT}`, { method: 'get' }).then(r => r.json());
 
-    console.log({ res })
+    console.log({ serverRes })
 
-    // const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
+
+    console.log({ req })
+
     // expect(req.url).to.equal('/v1/request');
     // expect(req.headers.authorization).to.equal(`Basice ${Buffer.from(`${randomApiKey}:`).toString('base64')}`);
 
