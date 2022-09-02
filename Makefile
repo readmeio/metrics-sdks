@@ -6,6 +6,10 @@ help: ## Display this help screen
 cleanup:
 	@docker-compose down
 
+cleanup-failure:
+	@docker-compose down
+	exit 1
+
 ##
 ## .NET
 ##
@@ -37,12 +41,12 @@ test-node-metrics-hapi: ## Run metrics tests against the Node SDK + hapi
 
 test-php-metrics-laravel: ## Run metrics tests against the PHP SDK + Laravel
 	docker-compose up --detach integration_php_laravel
-	SUPPORTS_MULTIPART=true npm run test:integration-metrics || make cleanup; exit 1
+	SUPPORTS_MULTIPART=true npm run test:integration-metrics || make cleanup-failure
 	@make cleanup
 
 test-php-webhooks-laravel: ## Run webhooks tests against the PHP SDK + Laravel
 	docker-compose up --detach integration_php_laravel
-	SUPPORTS_MULTIPART=true npm run test:integration-webhooks || make cleanup; exit 1
+	SUPPORTS_MULTIPART=true npm run test:integration-webhooks || make cleanup-failure
 	@make cleanup
 
 ##

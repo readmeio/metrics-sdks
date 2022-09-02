@@ -34,10 +34,16 @@ describe('Metrics SDK Integration Tests', function () {
 
   before(async function () {
     metricsServer = http.createServer((req, res) => {
-      console.log('[metrics server] req.url=', req.url)
+      process.stdout.write(`[metrics server] req.url=${req.url}\n`)
+      // return once(res, 'finish');
     }).listen(8001, '0.0.0.0');
 
     await once(metricsServer, 'listening');
+
+    const { address, port } = metricsServer.address();
+
+    process.stdout.write(`[metrics server] address=${address} port=${port}\n`)
+
   });
 
   after(function () {
@@ -54,7 +60,7 @@ describe('Metrics SDK Integration Tests', function () {
 
     const [req, res] = await once(metricsServer, 'request');
     expect(req.url).to.equal('/v1/request');
-    expect(req.headers.authorization).to.equal(`Basic ${Buffer.from(`${randomApiKey}:`).toString('base64')}`);
+    expect(req.headers.authorization).to.equal(`Basice ${Buffer.from(`${randomApiKey}:`).toString('base64')}`);
 
     const body = await getBody(req);
     const [har] = body;
