@@ -55,7 +55,7 @@ async function getBody(response) {
 describe('Metrics SDK Integration Tests', function () {
   let metricsServer;
 
-  before(async function () {
+  before(function () {
     // metricsServer = http
     //   .createServer((req, res) => {
     //     process.stdout.write(`[metrics server] req.url=${req.url}\n`);
