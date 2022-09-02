@@ -1,4 +1,9 @@
-version: '3'
+version: '3.4'
+
+x-server-config: &server-config
+  METRICS_SERVER: http://host.docker.internal:8001
+  README_API_KEY: rdme_abcdefghijklmnopqrstuvwxyz
+
 services:
   #
   # .NET
@@ -57,22 +62,14 @@ services:
   #
   # PHP
   #
-  integration_metrics_php_laravel:
+  integration_php_laravel:
     build:
       context: .
-      dockerfile: ./__tests__/integrations/php.Dockerfile
-    command: npm run test:integration-metrics
+      dockerfile: ./__tests__/integrations/php/laravel.Dockerfile
+    ports:
+      - 8000:8000
     environment:
-      - SUPPORTS_MULTIPART=true
-      - EXAMPLE_SERVER=php packages/php/examples/laravel/artisan serve
-
-  integration_webhooks_php_laravel:
-    build:
-      context: .
-      dockerfile: ./__tests__/integrations/php.Dockerfile
-    command: npm run test:integration-webhooks
-    environment:
-      - EXAMPLE_SERVER=php packages/php/examples/laravel/artisan serve
+      <<: *server-config
 
   #
   # Python

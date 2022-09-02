@@ -1,51 +1,22 @@
-import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import fs from 'node:fs/promises';
 import http from 'node:http';
-import net from 'node:net';
-import { cwd } from 'node:process';
-import { Readable, Transform } from 'node:stream';
+import { Readable } from 'node:stream';
 
 import chai, { expect } from 'chai';
 import { FormDataEncoder } from 'form-data-encoder';
 import { File, FormData } from 'formdata-node';
-import getPort from 'get-port';
 import 'isomorphic-fetch';
 
 import chaiPlugins from './helpers/chai-plugins.js';
 
-if (!process.env.EXAMPLE_SERVER) {
-  // eslint-disable-next-line no-console
-  console.error('Missing `EXAMPLE_SERVER` environment variable');
-  process.exit(1);
-}
-
 chai.use(chaiPlugins);
+
+const PORT = 8000; // SDK HTTP server port
+const randomApiKey = 'rdme_abcdefghijklmnopqrstuvwxyz'; // This must match what's in `docker-compose.yml`.
 
 function supportsMultipart() {
   return 'SUPPORTS_MULTIPART' in process.env && process.env.SUPPORTS_MULTIPART === 'true';
-}
-
-function isListening(childProcess, port, attempt = 0) {
-  return new Promise((resolve, reject) => {
-    if (childProcess.exitCode !== null) {
-      throw new Error(`Unexpected exit code: ${childProcess.exitCode} from child process`);
-    }
-    if (attempt > 5) throw new Error(`Cannot connect on port: ${port}`);
-    const socket = net.connect(port, 'localhost');
-    socket.once('error', err => {
-      if (err.code !== 'ECONNREFUSED') {
-        throw err;
-      }
-      return setTimeout(() => {
-        return isListening(childProcess, port, attempt + 1).then(resolve, reject);
-      }, 300 * attempt);
-    });
-
-    socket.once('connect', () => {
-      return resolve();
-    });
-  });
 }
 
 async function getBody(response) {
@@ -58,86 +29,16 @@ async function getBody(response) {
   return JSON.parse(responseBody);
 }
 
-const randomApiKey = 'a-random-readme-api-key';
-
 describe('Metrics SDK Integration Tests', function () {
   let metricsServer;
-  let httpServer;
-  let PORT;
 
   before(async function () {
-    metricsServer = http.createServer().listen(0, 'localhost');
+    metricsServer = http.createServer().listen(8001, '0.0.0.0');
 
     await once(metricsServer, 'listening');
-    const { address, port } = metricsServer.address();
-    PORT = await getPort();
-
-    // In order to use child_process.spawn, we have to provide a
-    // command along with an array of arguments. So this is a very
-    // rudimental way of splitting the two values provided to us
-    // from the environment variable.
-    //
-    // I tried refactoring this to use child_process.exec, which just
-    // takes in a single string to run, but that creates it's own
-    // shell so we can't do `cp.kill()` on it later on (because that
-    // just kills the shell, not the actual command we're running).
-    //
-    // Annoyingly this works under macOS, so it must be a platform
-    // difference when running under docker/linux.
-    const [command, ...args] = process.env.EXAMPLE_SERVER.split(' ');
-    if (command === 'php') {
-      // Laravel's `artisan serve` command doesn't pick up `PORT` environmental variables, instead
-      // requiring that they're supplied as a command line argument.
-      args.push(`--port=${PORT}`);
-    }
-
-    httpServer = spawn(command, args, {
-      cwd: cwd(),
-      detached: true,
-      env: {
-        PORT,
-        METRICS_SERVER: new URL(`http://${address}:${port}`).toString(),
-        README_API_KEY: randomApiKey,
-        ...process.env,
-      },
-    });
-
-    function prefixStream(prefix) {
-      return new Transform({
-        transform(chunk, encoding, cb) {
-          return cb(
-            null,
-            chunk
-              .toString()
-              .split('\n')
-              .map(line => `[${prefix}]: ${line}`)
-              .join('\n')
-          );
-        },
-      });
-    }
-    if (process.env.DEBUG) {
-      httpServer.stdout.pipe(prefixStream('stdout')).pipe(process.stdout);
-      httpServer.stderr.pipe(prefixStream('stderr')).pipe(process.stderr);
-    }
-
-    return isListening(httpServer, PORT);
   });
 
   after(function () {
-    /**
-     * Instead of running `httpServer.kill()` we need to dust the process group that was created
-     * because some languages and frameworks (like Laravel's Artisan server) fire off a sub-process
-     * that doesn't get normally cleaned up when we kill the original `php artisan serve` process.
-     *
-     * Checking that `exitCode` is null before killing group to ensure it is still running
-     *
-     * @see {@link https://stackoverflow.com/questions/56016550/node-js-cannot-kill-process-executed-with-child-process-exec/56016815#56016815}
-     * @see {@link https://www.baeldung.com/linux/kill-members-process-group#killing-a-process-using-the-pgid}
-     * @see {@link https://nodejs.org/docs/latest/api/child_process.html#subprocessexitcode}
-     */
-    if (httpServer.exitCode === null) process.kill(-httpServer.pid);
-
     return new Promise((resolve, reject) => {
       metricsServer.close(err => {
         if (err) return reject(err);
@@ -149,9 +50,9 @@ describe('Metrics SDK Integration Tests', function () {
   it('should make a request to a Metrics backend with a HAR file', async function () {
     await fetch(`http://localhost:${PORT}`, { method: 'get' });
 
-    const [req] = await once(metricsServer, 'request');
+    const [req, res] = await once(metricsServer, 'request');
     expect(req.url).to.equal('/v1/request');
-    expect(req.headers.authorization).to.equal('Basic YS1yYW5kb20tcmVhZG1lLWFwaS1rZXk6');
+    expect(req.headers.authorization).to.equal(`Basic ${Buffer.from(`${randomApiKey}:`).toString('base64')}`);
 
     const body = await getBody(req);
     const [har] = body;
@@ -165,7 +66,7 @@ describe('Metrics SDK Integration Tests', function () {
       email: 'owlbert@example.com',
     });
 
-    expect(har.clientIPAddress).to.equal('127.0.0.1');
+    expect(har.clientIPAddress).to.match(/\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}/);
     expect(har.development).to.be.false;
 
     const { creator } = har.request.log;
@@ -207,12 +108,15 @@ describe('Metrics SDK Integration Tests', function () {
     expect(response.content.text.replace('\n', '')).to.equal(JSON.stringify({ message: 'hello world' }));
     expect(response.content.size).to.equal(response.content.text.length);
     expect(response.content.mimeType).to.match(/application\/json(;\s?charset=utf-8)?/);
+
+    res.end();
+    return once(res, 'finish');
   });
 
   it('should capture query strings in a GET request', async function () {
     await fetch(`http://localhost:${PORT}?arr%5B1%5D=3&val=1`, { method: 'get' });
 
-    const [req] = await once(metricsServer, 'request');
+    const [req, res] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -234,6 +138,9 @@ describe('Metrics SDK Integration Tests', function () {
     ]);
 
     expect(request.postData).to.be.undefined;
+
+    res.end();
+    return once(res, 'finish');
   });
 
   it('should capture query strings that may be supplied in a POST request', async function () {
@@ -246,7 +153,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req] = await once(metricsServer, 'request');
+    const [req, res] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -277,7 +184,11 @@ describe('Metrics SDK Integration Tests', function () {
     });
 
     expect(response.status).to.equal(200);
+
+    res.end();
+    return once(res, 'finish');
   });
+
   it('should process a POST payload with no explicit `Content-Type` header', async function () {
     const payload = JSON.stringify({ user: { email: 'dom@readme.io' } });
     await fetch(`http://localhost:${PORT}/`, {
@@ -285,7 +196,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req] = await once(metricsServer, 'request');
+    const [req, res] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -297,7 +208,11 @@ describe('Metrics SDK Integration Tests', function () {
     expect(request.postData.mimeType).to.match(/text\/plain(;charset=UTF-8)?/);
     expect(request.postData.params).to.be.undefined;
     expect(request.postData.text).to.equal(payload);
+
+    res.end();
+    return once(res, 'finish');
   });
+
   it('should process an `application/json` POST payload', async function () {
     const payload = JSON.stringify({ user: { email: 'dom@readme.io' } });
     await fetch(`http://localhost:${PORT}/`, {
@@ -308,7 +223,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req] = await once(metricsServer, 'request');
+    const [req, res] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -322,6 +237,9 @@ describe('Metrics SDK Integration Tests', function () {
     });
 
     expect(response.status).to.equal(200);
+
+    res.end();
+    return once(res, 'finish');
   });
 
   /**
@@ -344,7 +262,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req] = await once(metricsServer, 'request');
+    const [req, res] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -364,6 +282,9 @@ describe('Metrics SDK Integration Tests', function () {
       // process the payload into Metrics.
       415,
     ]);
+
+    res.end();
+    return once(res, 'finish');
   });
 
   it('should process an `application/x-www-url-formencoded` POST payload', async function () {
@@ -378,7 +299,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req] = await once(metricsServer, 'request');
+    const [req, res] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -399,6 +320,9 @@ describe('Metrics SDK Integration Tests', function () {
       // that to Metrics regardless if Fastify supports it or not.
       415,
     ]);
+
+    res.end();
+    return once(res, 'finish');
   });
 
   it('should process a `multipart/form-data` POST payload', async function () {
@@ -420,7 +344,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: Readable.from(encoder),
     });
 
-    const [req] = await once(metricsServer, 'request');
+    const [req, res] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -437,12 +361,16 @@ describe('Metrics SDK Integration Tests', function () {
     ]);
 
     expect(request.postData.text).to.be.undefined;
+
+    res.end();
+    return once(res, 'finish');
   });
 
   it('should process a `multipart/form-data` POST payload containing files', async function () {
     if (!supportsMultipart()) {
       this.skip();
     }
+
     const owlbert = await fs.readFile('./__tests__/__datasets__/owlbert.png');
 
     const payload = new FormData();
@@ -460,7 +388,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: Readable.from(encoder),
     });
 
-    const [req] = await once(metricsServer, 'request');
+    const [req, res] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -486,6 +414,9 @@ describe('Metrics SDK Integration Tests', function () {
     ]);
 
     expect(request.postData.text).to.be.undefined;
+
+    res.end();
+    return once(res, 'finish');
   });
 
   it('should process a `text/plain` payload', async function () {
@@ -497,7 +428,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: 'Hello world',
     });
 
-    const [req] = await once(metricsServer, 'request');
+    const [req, res] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
 
@@ -511,5 +442,8 @@ describe('Metrics SDK Integration Tests', function () {
     });
 
     expect(response.status).to.equal(200);
+
+    res.end();
+    return once(res, 'finish');
   });
 });

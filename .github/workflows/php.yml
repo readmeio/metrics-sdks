@@ -3,20 +3,7 @@ name: php
 on: [push]
 
 jobs:
-  integration:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - run: docker-compose run integration_metrics_php_laravel
-      - run: docker-compose run integration_webhooks_php_laravel
-
-      - name: Cleanup
-        if: always()
-        run: docker-compose down
-
-  test:
+  build:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -68,3 +55,16 @@ jobs:
 
       - name: Run tests
         run: make test
+
+  integration:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: make test-php-metrics-laravel
+      - run: make test-php-webhooks-laravel
+
+      - name: Cleanup
+        if: always()
+        run: docker-compose down

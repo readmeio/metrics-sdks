@@ -34,20 +34,20 @@ jobs:
       - name: Run tests
         run: make test
 
-  integration:
-    runs-on: ubuntu-latest
+  # integration:
+  #   runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v3
+  #   steps:
+  #   - uses: actions/checkout@v3
 
-    # This Flask suite is **extremely** flaky in Docker. Until we can figure out how to make it not
-    # you can run this locally with `make test-python-metrics-flask`.
-    # - run: docker-compose run integration_metrics_python_flask
-    - run: docker-compose run integration_webhooks_python_flask
-    # This Django suite is **extremely** flaky in Docker. Until we can figure out how to make it not
-    # you can run this locally with `make test-python-metrics-django`.
-    # - run: docker-compose run integration_metrics_python_django
+  #   # This Flask suite is **extremely** flaky in Docker. Until we can figure out how to make it not
+  #   # you can run this locally with `make test-python-metrics-flask`.
+  #   # - run: docker-compose run integration_metrics_python_flask
+  #   - run: docker-compose run integration_webhooks_python_flask
+  #   # This Django suite is **extremely** flaky in Docker. Until we can figure out how to make it not
+  #   # you can run this locally with `make test-python-metrics-django`.
+  #   # - run: docker-compose run integration_metrics_python_django
 
-    - name: Cleanup
-      if: always()
-      run: docker-compose down
+  #   - name: Cleanup
+  #     if: always()
+  #     run: docker-compose down
