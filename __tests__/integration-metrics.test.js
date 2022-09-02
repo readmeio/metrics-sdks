@@ -24,7 +24,7 @@ function isListening(port, attempt = 0) {
   return new Promise((resolve, reject) => {
     console.log('checking', { port, attempt })
     if (attempt > 5) throw new Error(`Cannot connect on port: ${port}`);
-    const socket = net.connect(port, 'localhost');
+    const socket = net.connect(port, '0.0.0.0');
     socket.once('error', err => {
       if (err.code !== 'ECONNREFUSED') {
         throw err;
@@ -35,7 +35,7 @@ function isListening(port, attempt = 0) {
     });
 
     socket.once('connect', () => {
-      console.log(`localhost:${port} is accessible`)
+      console.log(`0.0.0.0:${port} is accessible`)
       socket.destroy();
       return resolve();
     });
@@ -82,7 +82,7 @@ describe('Metrics SDK Integration Tests', function () {
   });
 
   it.only('should make a request to a Metrics backend with a HAR file', async function () {
-    await fetch(`http://localhost:${PORT}`, { method: 'get' });
+    await fetch(`http://0.0.0.0:${PORT}`, { method: 'get' });
 
     const [req, res] = await once(metricsServer, 'request');
     expect(req.url).to.equal('/v1/request');
