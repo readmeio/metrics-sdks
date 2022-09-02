@@ -60,7 +60,7 @@ jobs:
     - name: Run tests
       run: npm run test:integration-metrics
       env:
-        EXAMPLE_SERVER: python3 examples/flask/app.py
+        EXAMPLE_SERVER: python examples/flask/app.py
         DEBUG: true
 
     # This Flask suite is **extremely** flaky in Docker. Until we can figure out how to make it not
