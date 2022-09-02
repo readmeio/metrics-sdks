@@ -52,7 +52,7 @@ describe('Metrics SDK Integration Tests', function () {
 
     const [req, res] = await once(metricsServer, 'request');
     expect(req.url).to.equal('/v1/request');
-    expect(req.headers.authorization).to.equal(`Basic ${Buffer.from(`${randomApiKey}:`).toString('base64')}`);
+    expect(req.headers.authorization).to.equal(`Basic e${Buffer.from(`${randomApiKey}:`).toString('base64')}`);
 
     const body = await getBody(req);
     const [har] = body;
