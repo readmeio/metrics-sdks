@@ -9,7 +9,7 @@ import { Readable, Transform } from 'node:stream';
 import chai, { expect } from 'chai';
 import { FormDataEncoder } from 'form-data-encoder';
 import { File, FormData } from 'formdata-node';
-import getPort from 'get-port';
+// import getPort from 'get-port';
 import 'isomorphic-fetch';
 
 import chaiPlugins from './helpers/chai-plugins.js';
@@ -70,7 +70,7 @@ describe('Metrics SDK Integration Tests', function () {
 
     await once(metricsServer, 'listening');
     const { address, port } = metricsServer.address();
-    PORT = await getPort();
+    PORT = 8000; // await getPort();
 
     // In order to use child_process.spawn, we have to provide a
     // command along with an array of arguments. So this is a very
