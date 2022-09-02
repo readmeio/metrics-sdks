@@ -4,6 +4,10 @@ x-server-config: &server-config
   METRICS_SERVER: http://host.docker.internal:8001
   README_API_KEY: rdme_abcdefghijklmnopqrstuvwxyz
 
+networks:
+  network:
+    driver: bridge
+
 services:
   #
   # .NET
@@ -66,9 +70,10 @@ services:
     build:
       context: .
       dockerfile: ./__tests__/integrations/php/laravel.Dockerfile
-      network: host
     ports:
       - 8000:8000
+    networks:
+      - network
     environment:
       <<: *server-config
 
