@@ -62,11 +62,11 @@ To publish a new version:
 NEW_VERSION="x.x.x"; sed -i '' "s/\(__version__ = \)\"\([^\"]*\)\"/\1\"$NEW_VERSION\"/" readme_metrics/__init__.py; unset NEW_VERSION
 ```
 
-3. Commit the changes to `readme_metrics/__init__.py` (and mirror that change).
-4. `rm dist/*`
-5. `python3 setup.py sdist bdist_wheel`
+1. Commit the changes to `readme_metrics/__init__.py`.
+2. `rm dist/*`
+3. `python3 setup.py sdist bdist_wheel`
    - If you get errors about `invalid command 'bdist_wheel'`, install the wheel package: `pip3 install wheel`
-6. `python3 -m twine upload dist/*`
+4. `python3 -m twine upload dist/*`
    - If you get errors about `twine` not being installed, install it with `pip3 install twine`.
    - On the first run you'll be asked to log into PyPi, so if you don't have access to `readme-metrics` there ask someone to hook you up with access.
 
