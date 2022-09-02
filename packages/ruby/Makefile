@@ -11,7 +11,7 @@ lint-fix: ## Attempt to automatically fix any code standard violations
 	bundle exec rubocop --auto-correct
 
 serve-metrics-rails: ## Start the local Express server to test Metrics
-	README_API_KEY=$(API_KEY) npm run --prefix=examples/express start:metrics
+	README_API_KEY=$(API_KEY) ./examples/metrics-rails/bin/rails server
 
 test: ## Run unit tests
 	rake spec
