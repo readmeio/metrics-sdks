@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import { once } from 'node:events';
 import fs from 'node:fs/promises';
 import http from 'node:http';
@@ -35,7 +36,7 @@ function isListening(port, attempt = 0) {
     });
 
     socket.once('connect', () => {
-      console.log('im listening on', { port });
+      console.log('sdk server is listening on', { port });
       socket.destroy();
       return resolve();
     });
@@ -44,19 +45,27 @@ function isListening(port, attempt = 0) {
 
 async function getBody(response) {
   let responseBody = '';
-  // eslint-disable-next-line no-restricted-syntax
   for await (const chunk of response) {
     responseBody += chunk;
   }
+
   expect(responseBody).not.to.equal('');
   return JSON.parse(responseBody);
 }
 
 describe('Metrics SDK Integration Tests', function () {
   let metricsServer;
+  const sockets = new Set();
 
   before(async function () {
     metricsServer = http.createServer().listen(8001, '0.0.0.0');
+
+    metricsServer.on('connection', socket => {
+      sockets.add(socket);
+      metricsServer.once('close', () => {
+        sockets.delete(socket);
+      });
+    });
 
     await once(metricsServer, 'listening');
 
@@ -64,6 +73,14 @@ describe('Metrics SDK Integration Tests', function () {
   });
 
   after(function () {
+    // The mock server will sometimes hang after we're done when we're trying to close it down,
+    // this will forcefull kill everything and prevent our tests from crashing out from Mocha "you
+    // didn't call done()" errors.
+    for (const socket of sockets) {
+      socket.destroy();
+      sockets.delete(socket);
+    }
+
     return new Promise((resolve, reject) => {
       metricsServer.close(err => {
         if (err) return reject(err);
@@ -225,6 +242,7 @@ describe('Metrics SDK Integration Tests', function () {
     expect(request.postData.params).to.be.undefined;
     expect(request.postData.text).to.equal(payload);
   });
+
   it('should process an `application/json` POST payload', async function () {
     const payload = JSON.stringify({ user: { email: 'dom@readme.io' } });
     await fetch(`http://localhost:${PORT}/`, {

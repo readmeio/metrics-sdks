@@ -14,10 +14,14 @@ cleanup-failure:
 ## .NET
 ##
 test-metrics-dotnet: ## Run Metrics tests against the .NET SDK
-	EXAMPLE_SERVER="dotnet examples/net6.0/out/net6.0.dll" npm run test:integration-metrics
+	docker-compose up --build --detach integration_dotnet_metrics_v6.0
+	npm run test:integration-metrics || make cleanup-failure
+	@make cleanup
 
 test-webhooks-dotnet: ## Run webhooks tests against the .NET SDK
-	EXAMPLE_SERVER="dotnet examples/net6.0-webhook/out/net6.0-webhook.dll" npm run test:integration-webhooks
+	docker-compose up --build --detach integration_dotnet_webhooks_v6.0
+	npm run test:integration-webhooks || make cleanup-failure
+	@make cleanup
 
 ##
 ## Node

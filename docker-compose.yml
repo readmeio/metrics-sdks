@@ -17,21 +17,25 @@ services:
   #
   # .NET
   #
-  integration_metrics_dotnet_v6.0:
+  integration_dotnet_metrics_v6.0:
     build:
       context: .
-      dockerfile: ./__tests__/integrations/dotnet.Dockerfile
-    command: npm run test:integration-metrics
+      dockerfile: ./__tests__/integrations/dotnet/v6.0.Dockerfile
+    ports:
+      - 8000:8000
+    extra_hosts: *default-extra_hosts
     environment:
-      - EXAMPLE_SERVER=dotnet examples/net6.0/out/net6.0.dll
+      <<: *server-config
 
-  integration_webhooks_dotnet_v6.0:
+  integration_dotnet_webhooks_v6.0:
     build:
       context: .
-      dockerfile: ./__tests__/integrations/dotnet.Dockerfile
-    command: npm run test:integration-webhooks
+      dockerfile: ./__tests__/integrations/dotnet/v6.0-webhooks.Dockerfile
+    ports:
+      - 8000:8000
+    extra_hosts: *default-extra_hosts
     environment:
-      - EXAMPLE_SERVER=dotnet examples/net6.0-webhook/out/net6.0-webhook.dll
+      <<: *server-config
 
   #
   # Node
