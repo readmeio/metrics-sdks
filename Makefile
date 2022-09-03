@@ -42,7 +42,7 @@ test-node-metrics-hapi: ## Run metrics tests against the Node SDK + hapi
 # curl -v http://localhost:8000
 test-php-metrics-laravel: ## Run metrics tests against the PHP SDK + Laravel
 	docker-compose up --build --detach integration_php_laravel
-	SUPPORTS_MULTIPART=true npm run test:integration-metrics
+	SUPPORTS_MULTIPART=true npm run test:integration-metrics || make cleanup-failure
 	@make cleanup
 
 test-php-webhooks-laravel: ## Run webhooks tests against the PHP SDK + Laravel

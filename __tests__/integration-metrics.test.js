@@ -74,8 +74,7 @@ describe('Metrics SDK Integration Tests', function () {
   });
 
   it.only('should make a request to a Metrics backend with a HAR file', async function () {
-    const sdk = await fetch(`http://localhost:${PORT}`, { method: 'get' }).then(r => r.json());
-    console.log({ sdk })
+    await fetch(`http://localhost:${PORT}`, { method: 'get' });
 
     const [req, res] = await once(metricsServer, 'request');
     const body = await getBody(req);
