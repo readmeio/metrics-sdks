@@ -12,7 +12,7 @@ jobs:
           node-version: 16
 
       - run: npm ci --ignore-scripts
-      # - run: make test-metrics-python-django
+      - run: make test-metrics-python-django
       - run: make test-metrics-python-flask
       - run: make test-webhooks-python-flask
 

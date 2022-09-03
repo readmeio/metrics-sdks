@@ -89,10 +89,12 @@ services:
   integration_metrics_python_django:
     build:
       context: .
-      dockerfile: ./__tests__/integrations/python.Dockerfile
-    command: npm run test:integration-metrics
+      dockerfile: ./__tests__/integrations/python/django.Dockerfile
+    ports:
+      - 8000:8000
+    extra_hosts: *default-extra_hosts
     environment:
-      - EXAMPLE_SERVER=python3 examples/metrics_django/manage.py runserver
+      <<: *server-config
 
   integration_python_flask_metrics:
     build:

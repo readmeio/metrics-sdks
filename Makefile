@@ -66,7 +66,9 @@ test-webhooks-php-laravel: ## Run webhooks tests against the PHP SDK + Laravel
 ##
 
 test-metrics-python-django: ## Run Metrics tests against the Python SDK + Django
-	EXAMPLE_SERVER="python3 packages/python/examples/metrics_django/manage.py runserver" npm run test:integration-metrics
+	docker-compose up --build --detach integration_metrics_python_django
+	HAS_HTTP_QUIRKS=true npm run test:integration-metrics || make cleanup-failure
+	@make cleanup
 
 test-metrics-python-flask: ## Run Metrics tests against the Python SDK + Flask
 	docker-compose up --build --detach integration_python_flask_metrics

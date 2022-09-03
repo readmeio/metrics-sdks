@@ -14,6 +14,7 @@ if os.getenv("README_API_KEY") is None and "runserver" in sys.argv:
 def main():
     """Run administrative tasks."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "metrics_django.settings")
+    runserver.default_addr = "0.0.0.0"
     runserver.default_port = os.getenv("PORT") or 8000
     try:
         # pylint: disable=import-outside-toplevel
