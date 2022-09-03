@@ -13,6 +13,7 @@ jobs:
 
       - run: npm ci --ignore-scripts
       - run: make test-php-metrics-laravel
+      - run: make test-php-webhooks-laravel
 
       - name: Cleanup
         if: always()
