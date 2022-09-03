@@ -27,7 +27,7 @@ WORKDIR /src/packages/php
 ADD packages/php/composer*.json ./
 RUN composer install
 
-# Install Laravel demo dependencies
+# Install Laravel
 WORKDIR /src/packages/php/examples/laravel
 ADD packages/php/examples/laravel/composer*.json ./
 RUN composer install

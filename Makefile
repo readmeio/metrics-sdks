@@ -33,7 +33,9 @@ test-metrics-node-fastify: ## Run Metrics tests against the Node SDK + Fastify
 	EXAMPLE_SERVER="node ./packages/node/examples/fastify/index.js" npm run test:integration-metrics
 
 test-metrics-node-hapi: ## Run Metrics tests against the Node SDK + hapi
-	EXAMPLE_SERVER="node ./packages/node/examples/hapi/index.js" npm run test:integration-metrics
+	docker-compose up --build --detach integration_node_hapi
+	npm run test:integration-metrics || make cleanup-failure
+	@make cleanup
 
 ##
 ## PHP
@@ -59,5 +61,5 @@ test-metrics-python-django: ## Run Metrics tests against the Python SDK + Django
 test-metrics-python-flask: ## Run Metrics tests against the Python SDK + Flask
 	EXAMPLE_SERVER="python3 packages/python/examples/flask/app.py" npm run test:integration-metrics
 
-test-metrics-python-flask: ## Run webhooks tests against the Python SDK + Flask
+test-webhooks-python-flask: ## Run webhooks tests against the Python SDK + Flask
 	EXAMPLE_SERVER="python3 packages/python/examples/flask/webhooks.py" npm run test:integration-webhooks

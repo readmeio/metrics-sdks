@@ -1,8 +1,13 @@
 version: '3.4'
 
 x-server-config: &server-config
-  METRICS_SERVER: "host.docker.internal:8001"
+  METRICS_SERVER: "http://host.docker.internal:8001"
   README_API_KEY: rdme_abcdefghijklmnopqrstuvwxyz
+
+x-extra_hosts: &default-extra_hosts
+  # Docker in Github doesn't automaticaly map these and without `host.docker.internal`
+  # working our SDK HTTP servers can't talk to our mock Metrics server.
+  - "host.docker.internal:host-gateway"
 
 services:
   runner:
@@ -55,13 +60,15 @@ services:
     environment:
       - EXAMPLE_SERVER=node ./packages/node/examples/fastify/index.js
 
-  integration_metrics_node_hapi:
+  integration_node_hapi:
     build:
       context: .
-      dockerfile: ./__tests__/integrations/node.Dockerfile
-    command: npm run test:integration-metrics
+      dockerfile: ./__tests__/integrations/node/hapi.Dockerfile
+    ports:
+      - 8000:8000
+    extra_hosts: *default-extra_hosts
     environment:
-      - EXAMPLE_SERVER=node ./packages/node/examples/hapi/index.js
+      <<: *server-config
 
   #
   # PHP
@@ -72,10 +79,7 @@ services:
       dockerfile: ./__tests__/integrations/php/laravel.Dockerfile
     ports:
       - 8000:8000
-    extra_hosts:
-      # Docker in Github doesn't automaticaly map these and without `host.docker.internal`
-      # working our SDK HTTP servers can't talk to our mock Metrics server.
-      - host.docker.internal:host-gateway
+    extra_hosts: *default-extra_hosts
     environment:
       <<: *server-config
 

@@ -7,12 +7,14 @@ import { Readable } from 'node:stream';
 import chai, { expect } from 'chai';
 import { FormDataEncoder } from 'form-data-encoder';
 import { File, FormData } from 'formdata-node';
-// import getPort from 'get-port';
 import 'isomorphic-fetch';
 
 import chaiPlugins from './helpers/chai-plugins.js';
 
 chai.use(chaiPlugins);
+
+const PORT = 8000; // SDK HTTP server
+const randomApiKey = 'rdme_abcdefghijklmnopqrstuvwxyz'; // This must match what's in `docker-compose.yml`.
 
 function supportsMultipart() {
   return 'SUPPORTS_MULTIPART' in process.env && process.env.SUPPORTS_MULTIPART === 'true';
@@ -50,9 +52,6 @@ async function getBody(response) {
   return JSON.parse(responseBody);
 }
 
-const PORT = 8000; // SDK HTTP server
-const randomApiKey = 'rdme_abcdefghijklmnopqrstuvwxyz'; // This must match what's in `docker-compose.yml`.
-
 describe('Metrics SDK Integration Tests', function () {
   let metricsServer;
 
@@ -76,12 +75,9 @@ describe('Metrics SDK Integration Tests', function () {
   it('should make a request to a Metrics backend with a HAR file', async function () {
     await fetch(`http://localhost:${PORT}`, { method: 'get' });
 
-    const [req, res] = await once(metricsServer, 'request');
+    const [req] = await once(metricsServer, 'request');
     const body = await getBody(req);
     const [har] = body;
-
-    res.end();
-    await once(res, 'finish');
 
     expect(req.url).to.equal('/v1/request');
     expect(req.headers.authorization).to.equal(`Basic ${Buffer.from(`${randomApiKey}:`).toString('base64')}`);
@@ -208,6 +204,7 @@ describe('Metrics SDK Integration Tests', function () {
 
     expect(response.status).to.equal(200);
   });
+
   it('should process a POST payload with no explicit `Content-Type` header', async function () {
     const payload = JSON.stringify({ user: { email: 'dom@readme.io' } });
     await fetch(`http://localhost:${PORT}/`, {

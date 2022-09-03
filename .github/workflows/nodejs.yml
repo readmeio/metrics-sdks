@@ -1,47 +1,51 @@
-# name: nodejs
+name: nodejs
 
-# on: [push]
+on: [push]
 
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
-#     defaults:
-#       run:
-#         working-directory: packages/node
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
 
-#     strategy:
-#       matrix:
-#         node-version:
-#           - 14
-#           - 16
-#           - 18
+      - run: npm ci --ignore-scripts
+      # - run: docker-compose run integration_metrics_node_express
+      # - run: docker-compose run integration_metrics_node_hapi
+      - run: make test-metrics-node-hapi
+      # - run: docker-compose run integration_metrics_node_fastify
+      # - run: docker-compose run integration_webhooks_node_express
 
-#     steps:
-#       - uses: actions/checkout@v3
-#       - uses: actions/setup-node@v3
-#         with:
-#           node-version: ${{ matrix.node-version }}
+      - name: Cleanup
+        if: always()
+        run: docker-compose down
 
-#       # Node 14 still ships with npm@6 so for compatibility reasons we're upping
-#       # this to match everything else.
-#       - name: Install npm@8
-#         if: matrix.node-version == '14'
-#         run: npm install -g npm@8
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/node
 
-#       - run: npm ci --ignore-scripts
-#       - run: npm test
+    strategy:
+      matrix:
+        node-version:
+          - 14
+          - 16
+          - 18
 
-#   # integration:
-#   #   runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
 
-#   #   steps:
-#   #   - uses: actions/checkout@v3
+      # Node 14 still ships with npm@6 so for compatibility reasons we're upping
+      # this to match everything else.
+      - name: Install npm@8
+        if: matrix.node-version == '14'
+        run: npm install -g npm@8
 
-#   #   - run: docker-compose run integration_metrics_node_express
-#   #   - run: docker-compose run integration_metrics_node_hapi
-#   #   - run: docker-compose run integration_metrics_node_fastify
-#   #   - run: docker-compose run integration_webhooks_node_express
-
-#   #   - name: Cleanup
-#   #     if: always()
-#   #     run: docker-compose down
+      - run: npm ci --ignore-scripts
+      - run: npm test
