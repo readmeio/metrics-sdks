@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import 'isomorphic-fetch';
 
 const PORT = 8000; // SDK HTTP server port
-const randomApiKey = 'rdme_abcdefghijklmnopqrstuvwxyz'; // This must match what's in `docker-compose.yml`.
+const randomAPIKey = 'rdme_abcdefghijklmnopqrstuvwxyz'; // This must match what's in `docker-compose.yml`.
 
 describe('Metrics SDK Webhook Integration Tests', function () {
   it('should return with a 401 if the signature is empty/missing', async function () {
@@ -31,7 +31,7 @@ describe('Metrics SDK Webhook Integration Tests', function () {
       email: 'dom@readme.io',
     };
     const unsigned = `${time}.${JSON.stringify(body)}`;
-    const hmac = crypto.createHmac('sha256', randomApiKey);
+    const hmac = crypto.createHmac('sha256', randomAPIKey);
     const output = `t=${time},v0=${hmac.update(unsigned).digest('hex')}`;
 
     const response = await fetch(`http://localhost:${PORT}/webhook`, {
