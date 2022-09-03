@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine:3.16
 
 ADD packages/php src/packages/php
 
@@ -16,7 +16,6 @@ RUN apk add php81 \
     php81-tokenizer \
     php81-xml \
     php81-xmlwriter
-RUN apk add --update nodejs npm curl
 RUN ln /usr/bin/php81 /usr/bin/php
 
 # Install Composer
