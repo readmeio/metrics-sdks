@@ -11,7 +11,7 @@ jobs:
       - name: Build the stack
         run: docker-compose up -d integration_php_laravel
       - name: Test
-        run: docker run --network container:node:16 appropriate/curl -s --retry 10 --retry-connrefused http://localhost:8000/
+        run: docker run --network container:runner appropriate/curl -s --retry 10 --retry-connrefused http://localhost:8000/
 
       # - uses: actions/setup-node@v3
       #   with:

@@ -5,6 +5,10 @@ x-server-config: &server-config
   README_API_KEY: rdme_abcdefghijklmnopqrstuvwxyz
 
 services:
+  runner:
+    container_name: runner
+    image: node:16
+
   #
   # .NET
   #
