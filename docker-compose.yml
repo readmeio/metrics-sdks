@@ -52,13 +52,15 @@ services:
     environment:
       - EXAMPLE_SERVER=node ./packages/node/examples/express/webhook.js
 
-  integration_metrics_node_fastify:
+  integration_node_fastify:
     build:
       context: .
-      dockerfile: ./__tests__/integrations/node.Dockerfile
-    command: npm run test:integration-metrics
+      dockerfile: ./__tests__/integrations/node/fastify.Dockerfile
+    ports:
+      - 8000:8000
+    extra_hosts: *default-extra_hosts
     environment:
-      - EXAMPLE_SERVER=node ./packages/node/examples/fastify/index.js
+      <<: *server-config
 
   integration_node_hapi:
     build:

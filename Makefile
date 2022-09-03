@@ -30,7 +30,9 @@ test-webhooks-node-express: ## Run webhooks tests against the Node SDK + Express
 	EXAMPLE_SERVER="node ./packages/node/examples/express/webhook.js" npm run test:integration-webhooks
 
 test-metrics-node-fastify: ## Run Metrics tests against the Node SDK + Fastify
-	EXAMPLE_SERVER="node ./packages/node/examples/fastify/index.js" npm run test:integration-metrics
+	docker-compose up --build --detach integration_node_fastify
+	npm run test:integration-metrics || make cleanup-failure
+	@make cleanup
 
 test-metrics-node-hapi: ## Run Metrics tests against the Node SDK + hapi
 	docker-compose up --build --detach integration_node_hapi

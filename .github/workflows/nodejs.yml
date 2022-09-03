@@ -13,9 +13,8 @@ jobs:
 
       - run: npm ci --ignore-scripts
       # - run: docker-compose run integration_metrics_node_express
-      # - run: docker-compose run integration_metrics_node_hapi
       - run: make test-metrics-node-hapi
-      # - run: docker-compose run integration_metrics_node_fastify
+      - run: make test-metrics-node-fastify
       # - run: docker-compose run integration_webhooks_node_express
 
       - name: Cleanup
