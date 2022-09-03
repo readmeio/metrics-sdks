@@ -1,33 +1,33 @@
-# name: cloudflare-worker
+name: cloudflare-worker
 
-# on: [push]
+on: [push]
 
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
-#     defaults:
-#       run:
-#         working-directory: packages/cloudflare-worker
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/cloudflare-worker
 
-#     strategy:
-#       matrix:
-#         node-version:
-#           - 14
-#           - 16
-#           - 18
+    strategy:
+      matrix:
+        node-version:
+          - 14
+          - 16
+          - 18
 
-#     steps:
-#       - uses: actions/checkout@v3
-#       - uses: actions/setup-node@v3
-#         with:
-#           node-version: ${{ matrix.node-version }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
 
-#       # Node 14 still ships with npm@6 so for compatibility reasons we're upping
-#       # this to match everything else.
-#       - name: Install npm@8
-#         if: matrix.node-version == '14'
-#         run: npm install -g npm@8
+      # Node 14 still ships with npm@6 so for compatibility reasons we're upping
+      # this to match everything else.
+      - name: Install npm@8
+        if: matrix.node-version == '14'
+        run: npm install -g npm@8
 
-#       - run: npm ci --ignore-scripts
-#       - run: npm run build
-#       - run: npm test
+      - run: npm ci --ignore-scripts
+      - run: npm run build
+      - run: npm test

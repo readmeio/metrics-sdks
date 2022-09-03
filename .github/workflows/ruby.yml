@@ -1,33 +1,33 @@
-# name: ruby
+name: ruby
 
-# on: [push]
+on: [push]
 
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
-#     defaults:
-#       run:
-#         working-directory: packages/ruby
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/ruby
 
-#     strategy:
-#       matrix:
-#         ruby-version:
-#           # https://endoflife.date/ruby
-#           - 2.7 # EOL: March 31st, 2023
-#           - '3.0' # EOL: March 31st, 2024
-#           - 3.1 # EOL: December 25th, 2025
+    strategy:
+      matrix:
+        ruby-version:
+          # https://endoflife.date/ruby
+          - 2.7 # EOL: March 31st, 2023
+          - '3.0' # EOL: March 31st, 2024
+          - 3.1 # EOL: December 25th, 2025
 
-#     steps:
-#       - uses: actions/checkout@v3
-#       - uses: ruby/setup-ruby@v1
-#         with:
-#           ruby-version: ${{ matrix.ruby-version }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
 
-#       - name: Install dependencies
-#         run: make install
+      - name: Install dependencies
+        run: make install
 
-#       - name: Run linter
-#         run: make lint
+      - name: Run linter
+        run: make lint
 
-#       - name: Run tests
-#         run: make test
+      - name: Run tests
+        run: make test
