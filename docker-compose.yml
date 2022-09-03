@@ -72,6 +72,8 @@ services:
       dockerfile: ./__tests__/integrations/php/laravel.Dockerfile
     ports:
       - 8000:8000
+    extra_hosts:
+      - host.docker.internal:host-gateway
     environment:
       <<: *server-config
 
