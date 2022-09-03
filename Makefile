@@ -24,10 +24,14 @@ test-webhooks-dotnet: ## Run webhooks tests against the .NET SDK
 ##
 
 test-metrics-node-express: ## Run Metrics tests against the Node SDK + Express
-	EXAMPLE_SERVER="node ./packages/node/examples/express/index.js" npm run test:integration-metrics
+	docker-compose up --build --detach integration_node_express
+	npm run test:integration-metrics || make cleanup-failure
+	@make cleanup
 
 test-webhooks-node-express: ## Run webhooks tests against the Node SDK + Express
-	EXAMPLE_SERVER="node ./packages/node/examples/express/webhook.js" npm run test:integration-webhooks
+	docker-compose up --build --detach integration_node_express
+	npm run test:integration-webhooks || make cleanup-failure
+	@make cleanup
 
 test-metrics-node-fastify: ## Run Metrics tests against the Node SDK + Fastify
 	docker-compose up --build --detach integration_node_fastify

@@ -36,21 +36,15 @@ services:
   #
   # Node
   #
-  integration_metrics_node_express:
+  integration_node_express:
     build:
       context: .
-      dockerfile: ./__tests__/integrations/node.Dockerfile
-    command: npm run test:integration-metrics
+      dockerfile: ./__tests__/integrations/node/express.Dockerfile
+    ports:
+      - 8000:8000
+    extra_hosts: *default-extra_hosts
     environment:
-      - EXAMPLE_SERVER=node ./packages/node/examples/express/index.js
-
-  integration_webhooks_node_express:
-    build:
-      context: .
-      dockerfile: ./__tests__/integrations/node.Dockerfile
-    command: npm run test:integration-webhooks
-    environment:
-      - EXAMPLE_SERVER=node ./packages/node/examples/express/webhook.js
+      <<: *server-config
 
   integration_node_fastify:
     build:
