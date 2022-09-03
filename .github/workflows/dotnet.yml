@@ -12,8 +12,8 @@ jobs:
           node-version: 16
 
       - run: npm ci --ignore-scripts
-      - run: test-metrics-dotnet
-      - run: test-webhooks-dotnet
+      - run: make test-metrics-dotnet
+      - run: make test-webhooks-dotnet
 
       - name: Cleanup
         if: always()
