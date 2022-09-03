@@ -15,7 +15,7 @@ import chaiPlugins from './helpers/chai-plugins.js';
 chai.use(chaiPlugins);
 
 const PORT = 8000; // SDK HTTP server
-const randomApiKey = 'rdme_abcdefghijklmnopqrstuvwxyz'; // This must match what's in `docker-compose.yml`.
+const randomAPIKey = 'rdme_abcdefghijklmnopqrstuvwxyz'; // This must match what's in `docker-compose.yml`.
 
 function supportsMultipart() {
   return 'SUPPORTS_MULTIPART' in process.env && process.env.SUPPORTS_MULTIPART === 'true';
@@ -43,31 +43,75 @@ function isListening(port, attempt = 0) {
   });
 }
 
-async function getBody(response) {
-  let responseBody = '';
-  for await (const chunk of response) {
-    responseBody += chunk;
-  }
-
-  expect(responseBody).not.to.equal('');
-  return JSON.parse(responseBody);
-}
-
 describe('Metrics SDK Integration Tests', function () {
-  let metricsServer;
   const sockets = new Set();
 
-  before(async function () {
-    metricsServer = http.createServer().listen(8001, '0.0.0.0');
+  let server;
+  let sdkCall = {
+    req: {},
+    body: {},
+  };
 
-    metricsServer.on('connection', socket => {
+  async function getBody(response) {
+    let responseBody = '';
+    for await (const chunk of response) {
+      responseBody += chunk;
+    }
+
+    expect(responseBody).not.to.equal('');
+    return JSON.parse(responseBody);
+  }
+
+  async function getPayload() {
+    if (process.env.HAS_HTTP_QUIRKS) {
+      return [sdkCall.req, sdkCall.body];
+    }
+
+    const [req] = await once(server, 'request');
+    const body = await getBody(req);
+    return [req, body];
+  }
+
+  beforeEach(function () {
+    sdkCall = {
+      req: {},
+      body: {},
+    };
+  });
+
+  before(async function () {
+    server = http
+      .createServer((req, res) => {
+        // Frameworks are funny. If we run this test suite with PHP we can access our Metrics
+        // request payload via a `request` event immediately on the HTTP server however if we run
+        // this same suite with Python, the `request` event sometimes gets emitted **after** we've
+        // already returned a response and closed the connection, resulting in our request payload
+        // being empty and the SDK in question crapping out with a connection read error.
+        //
+        // This quirk doesn't make sense and this logic here is extremely yikes but hey this test
+        // suite works now across all of our SDKs and is no longer flaky.
+        if (process.env.HAS_HTTP_QUIRKS) {
+          sdkCall.req = req;
+
+          let body = '';
+          req.on('data', chunk => {
+            body += chunk;
+          });
+
+          req.on('end', () => {
+            sdkCall.body = JSON.parse(body);
+            res.writeHead(200);
+            res.end();
+          });
+        }
+      })
+      .listen(8001, '0.0.0.0');
+
+    server.on('connection', socket => {
       sockets.add(socket);
-      metricsServer.once('close', () => {
-        sockets.delete(socket);
-      });
     });
 
-    await once(metricsServer, 'listening');
+    await once(server, 'listening');
 
     return isListening(PORT);
   });
@@ -82,7 +126,7 @@ describe('Metrics SDK Integration Tests', function () {
     }
 
     return new Promise((resolve, reject) => {
-      metricsServer.close(err => {
+      server.close(err => {
         if (err) return reject(err);
         return resolve();
       });
@@ -92,12 +136,11 @@ describe('Metrics SDK Integration Tests', function () {
   it('should make a request to a Metrics backend with a HAR file', async function () {
     await fetch(`http://localhost:${PORT}`, { method: 'get' });
 
-    const [req] = await once(metricsServer, 'request');
-    const body = await getBody(req);
+    const [req, body] = await getPayload();
     const [har] = body;
 
     expect(req.url).to.equal('/v1/request');
-    expect(req.headers.authorization).to.equal(`Basic ${Buffer.from(`${randomApiKey}:`).toString('base64')}`);
+    expect(req.headers.authorization).to.equal(`Basic ${Buffer.from(`${randomAPIKey}:`).toString('base64')}`);
 
     // https://uibakery.io/regex-library/uuid
     expect(har._id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
@@ -155,8 +198,7 @@ describe('Metrics SDK Integration Tests', function () {
   it('should capture query strings in a GET request', async function () {
     await fetch(`http://localhost:${PORT}?arr%5B1%5D=3&val=1`, { method: 'get' });
 
-    const [req] = await once(metricsServer, 'request');
-    const body = await getBody(req);
+    const [, body] = await getPayload();
     const [har] = body;
 
     const { request } = har.request.log.entries[0];
@@ -189,8 +231,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req] = await once(metricsServer, 'request');
-    const body = await getBody(req);
+    const [, body] = await getPayload();
     const [har] = body;
 
     const { request, response } = har.request.log.entries[0];
@@ -229,8 +270,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req] = await once(metricsServer, 'request');
-    const body = await getBody(req);
+    const [, body] = await getPayload();
     const [har] = body;
 
     const { request } = har.request.log.entries[0];
@@ -253,8 +293,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req] = await once(metricsServer, 'request');
-    const body = await getBody(req);
+    const [, body] = await getPayload();
     const [har] = body;
 
     const { request, response } = har.request.log.entries[0];
@@ -289,8 +328,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req] = await once(metricsServer, 'request');
-    const body = await getBody(req);
+    const [, body] = await getPayload();
     const [har] = body;
 
     const { request, response } = har.request.log.entries[0];
@@ -323,8 +361,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: payload,
     });
 
-    const [req] = await once(metricsServer, 'request');
-    const body = await getBody(req);
+    const [, body] = await getPayload();
     const [har] = body;
 
     const { request, response } = har.request.log.entries[0];
@@ -365,8 +402,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: Readable.from(encoder),
     });
 
-    const [req] = await once(metricsServer, 'request');
-    const body = await getBody(req);
+    const [, body] = await getPayload();
     const [har] = body;
 
     const { request } = har.request.log.entries[0];
@@ -405,8 +441,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: Readable.from(encoder),
     });
 
-    const [req] = await once(metricsServer, 'request');
-    const body = await getBody(req);
+    const [, body] = await getPayload();
     const [har] = body;
 
     const { request } = har.request.log.entries[0];
@@ -442,8 +477,7 @@ describe('Metrics SDK Integration Tests', function () {
       body: 'Hello world',
     });
 
-    const [req] = await once(metricsServer, 'request');
-    const body = await getBody(req);
+    const [, body] = await getPayload();
     const [har] = body;
 
     const { request, response } = har.request.log.entries[0];

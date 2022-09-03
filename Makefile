@@ -69,7 +69,11 @@ test-metrics-python-django: ## Run Metrics tests against the Python SDK + Django
 	EXAMPLE_SERVER="python3 packages/python/examples/metrics_django/manage.py runserver" npm run test:integration-metrics
 
 test-metrics-python-flask: ## Run Metrics tests against the Python SDK + Flask
-	EXAMPLE_SERVER="python3 packages/python/examples/flask/app.py" npm run test:integration-metrics
+	docker-compose up --build --detach integration_python_flask_metrics
+	HAS_HTTP_QUIRKS=true npm run test:integration-metrics || make cleanup-failure
+	@make cleanup
 
 test-webhooks-python-flask: ## Run webhooks tests against the Python SDK + Flask
-	EXAMPLE_SERVER="python3 packages/python/examples/flask/webhooks.py" npm run test:integration-webhooks
+	docker-compose up --build --detach integration_python_flask_webhooks
+	npm run test:integration-webhooks || make cleanup-failure
+	@make cleanup

@@ -26,6 +26,7 @@ def grouping_function(request):
 
 metrics_extension = ReadMeMetrics(
     MetricsApiConfig(
+        background_worker_mode=False,
         api_key=os.getenv("README_API_KEY"),
         grouping_function=grouping_function,
         buffer_length=1,
@@ -53,4 +54,4 @@ def post():
 
 
 if __name__ == "__main__":
-    app.run(debug=False, host="127.0.0.1", port=os.getenv("PORT", "8000"))
+    app.run(debug=False, host="0.0.0.0", port=os.getenv("PORT", "8000"))

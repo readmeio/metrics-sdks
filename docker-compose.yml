@@ -94,19 +94,22 @@ services:
     environment:
       - EXAMPLE_SERVER=python3 examples/metrics_django/manage.py runserver
 
-  integration_metrics_python_flask:
+  integration_python_flask_metrics:
     build:
       context: .
-      dockerfile: ./__tests__/integrations/python.Dockerfile
-    command: npm run test:integration-metrics
+      dockerfile: ./__tests__/integrations/python/flask.Dockerfile
+    ports:
+      - 8000:8000
+    extra_hosts: *default-extra_hosts
     environment:
-      EXAMPLE_SERVER: python3 examples/flask/app.py
-      DEBUG: 'true'
+      <<: *server-config
 
-  integration_webhooks_python_flask:
+  integration_python_flask_webhooks:
     build:
       context: .
-      dockerfile: ./__tests__/integrations/python.Dockerfile
-    command: npm run test:integration-webhooks
+      dockerfile: ./__tests__/integrations/python/flask-webhooks.Dockerfile
+    ports:
+      - 8000:8000
+    extra_hosts: *default-extra_hosts
     environment:
-      - EXAMPLE_SERVER=python3 examples/flask/webhooks.py
+      <<: *server-config
