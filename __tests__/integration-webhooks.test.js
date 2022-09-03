@@ -71,7 +71,7 @@ describe('Metrics SDK Webhook Integration Tests', function () {
       email: 'dom@readme.io',
     };
     const unsigned = `${time}.${JSON.stringify(body)}`;
-    const hmac = crypto.createHmac('sha256', randomApiKey);
+    const hmac = crypto.createHmac('sha256', randomAPIKey);
     const output = `t=${time},v0=${hmac.update(unsigned).digest('hex')}`;
 
     const response = await fetch(`http://localhost:${PORT}/webhook`, {
