@@ -15,7 +15,7 @@ jobs:
       - run: make test-metrics-node-express
       - run: make test-metrics-node-hapi
       - run: make test-metrics-node-fastify
-      - run: make test-webhooks-node-fastify
+      - run: make test-webhooks-node-express
 
       - name: Cleanup
         if: always()
