@@ -7,7 +7,7 @@ RSpec.describe Readme::Webhook do
   describe '#verify' do
     it 'raises an exception if the signature is empty/missing' do
       described_class.verify({ email: 'dom@readme.io' }.to_json, nil, random_api_key)
-    rescue RuntimeError => e
+    rescue Readme::MissingSignatureError => e
       expect(e.message).to eq 'Missing Signature'
     end
 
@@ -23,7 +23,7 @@ RSpec.describe Readme::Webhook do
 
       begin
         described_class.verify({ email: 'dom@readme.io' }.to_json, signature, random_api_key)
-      rescue RuntimeError => e
+      rescue Readme::ExpiredSignatureError => e
         expect(e.message).to eq 'Expired Signature'
       end
     end
@@ -33,7 +33,7 @@ RSpec.describe Readme::Webhook do
 
       begin
         described_class.verify({ email: 'dom@readme.io' }.to_json, signature, random_api_key)
-      rescue RuntimeError => e
+      rescue Readme::InvalidSignatureError => e
         expect(e.message).to eq 'Invalid Signature'
       end
     end

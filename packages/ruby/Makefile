@@ -8,7 +8,7 @@ lint: ## Run code standard checks
 	bundle exec rubocop
 
 lint-fix: ## Attempt to automatically fix any code standard violations
-	bundle exec rubocop --auto-correct
+	bundle exec rubocop --autocorrect
 
 serve-metrics-rails: ## Start the local Express server to test Metrics
 	README_API_KEY=$(API_KEY) ./examples/metrics-rails/bin/rails server
