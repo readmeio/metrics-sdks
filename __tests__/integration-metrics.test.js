@@ -31,7 +31,7 @@ function isListening(port, attempt = 0) {
         throw err;
       }
       return setTimeout(() => {
-        return isListening( port, attempt + 1).then(resolve, reject);
+        return isListening(port, attempt + 1).then(resolve, reject);
       }, 300 * attempt);
     });
 
