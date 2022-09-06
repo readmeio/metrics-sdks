@@ -14,7 +14,7 @@ class MetricsController < ApplicationController
 
     begin
       Readme::Webhook.verify(request.raw_post, signature, ENV.fetch('README_API_KEY', nil))
-    rescue RuntimeError => e
+    rescue Readme::MissingSignatureError, Readme::ExpiredSignatureError, Readme::InvalidSignatureError => e
       render json: { error: e.message }, status: 401
       return
     end

@@ -1,12 +1,24 @@
 require 'readme/metrics'
 
-class MissingSignatureError extends ArgumentError
-  def message
-    'Missing signature'
-  end
-end
-
 module Readme
+  class MissingSignatureError < ArgumentError
+    def message
+      'Missing Signature'
+    end
+  end
+
+  class ExpiredSignatureError < RuntimeError
+    def message
+      'Expired Signature'
+    end
+  end
+
+  class InvalidSignatureError < RuntimeError
+    def message
+      'Invalid Signature'
+    end
+  end
+
   class Webhook
     def self.verify(body, signature, secret)
       raise MissingSignatureError.new unless signature
@@ -19,12 +31,12 @@ module Readme
 
       # Make sure timestamp is recent to prevent replay attacks
       thirty_minutes = 30 * 60
-      raise 'Expired Signature' if Time.now.utc - Time.at(0, parsed[:time].to_i, :millisecond).utc > thirty_minutes
+      raise ExpiredSignatureError.new if Time.now.utc - Time.at(0, parsed[:time].to_i, :millisecond).utc > thirty_minutes
 
       # Verify the signature is valid
       unsigned = "#{parsed[:time]}.#{body}"
       mac = OpenSSL::HMAC.hexdigest('SHA256', secret, unsigned)
-      raise 'Invalid Signature' if mac != parsed[:readme_signature]
+      raise InvalidSignatureError.new if mac != parsed[:readme_signature]
     end
   end
 end
