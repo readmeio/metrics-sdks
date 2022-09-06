@@ -1,9 +1,15 @@
 require 'readme/metrics'
 
+class MissingSignatureError extends ArgumentError
+  def message
+    'Missing signature'
+  end
+end
+
 module Readme
   class Webhook
     def self.verify(body, signature, secret)
-      raise 'Missing Signature' unless signature
+      raise MissingSignatureError.new unless signature
 
       parsed = signature.split(',').each_with_object({ time: -1, readme_signature: '' }) do |item, accum|
         k, v = item.split('=')
