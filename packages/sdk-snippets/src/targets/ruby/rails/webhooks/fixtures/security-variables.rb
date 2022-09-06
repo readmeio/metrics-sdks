@@ -11,8 +11,8 @@ class MetricsController < ApplicationController
 
   def webhook
     # Your ReadMe secret
-    secret = ENV.fetch('README_API_KEY', nil)
-    # Verify the request is legitimate and came from ReadMe
+    secret = 'my-readme-secret'
+    # Verify the request is legitimate and came from ReadMe
     signature = request.headers['readme-signature']
 
     begin
@@ -28,7 +28,7 @@ class MetricsController < ApplicationController
     render json: {
       # OAS Security variables
       petstore_auth: 'default-key',
-      basic_auth: { user: 'user', pass: 'pass' }
+      basic_auth: { user: 'user', pass: 'pass' },
     }
   end
 end

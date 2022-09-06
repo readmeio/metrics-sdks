@@ -106,6 +106,9 @@ describe('webhooks', () => {
 
               expect(result.ranges).toMatchSnapshot();
               expect(result.snippet).toStrictEqual(expectedOutput);
+              // This is making sure that there is an actual secret in the
+              // generated output
+              expect(result.snippet).toMatch(/my-readme-secret/);
             });
           });
         });
