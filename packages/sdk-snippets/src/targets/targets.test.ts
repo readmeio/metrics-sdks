@@ -1,8 +1,11 @@
+/* eslint-disable mocha/no-setup-in-describe */
 import type { Variables } from '..';
 import type { ClientId, SnippetType, TargetId } from './targets';
 
 import { readdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
+
+import { expect } from 'chai';
 
 import { MetricsSDKSnippet } from '..';
 import { availableWebhookTargets, extname } from '../helpers/utils';
@@ -48,13 +51,13 @@ const testFilter =
   (item: T) =>
     list.length > 0 ? list.includes(item[property]) : true;
 
-describe('webhooks', () => {
+describe('webhooks', function () {
   availableWebhookTargets()
     .filter(testFilter('key', targetFilter))
     .forEach(({ key: targetId, title, clients }) => {
       const snippetType: SnippetType = 'webhooks';
 
-      describe(`${title} snippet generation`, () => {
+      describe(`${title} snippet generation`, function () {
         clients.filter(testFilter('key', clientFilter)).forEach(({ key: clientId }) => {
           fixtures.filter(testFilter(0, fixtureFilter)).forEach(([fixture, variables]) => {
             const fixturePath = path.join(
@@ -88,8 +91,7 @@ describe('webhooks', () => {
               return;
             }
 
-            it(`${clientId} request should match fixture for "${fixture}"`, () => {
-              // eslint-disable-next-line jest/no-if
+            it(`${clientId} request should match fixture for "${fixture}"`, function () {
               if (!result) {
                 throw new Error(`Generated ${fixture} snippet for ${clientId} was \`false\``);
               }
@@ -98,14 +100,12 @@ describe('webhooks', () => {
                * This test is to make sure that our generated snippets
                * actually do any variable outputting vs being static
                */
-              // eslint-disable-next-line jest/no-if
               if (fixture !== 'empty') {
-                // eslint-disable-next-line jest/no-conditional-expect
-                expect(Object.keys(result.ranges).length).toBeGreaterThan(0);
+                expect(Object.keys(result.ranges).length).to.be.greaterThan(0);
               }
 
               expect(result.ranges).toMatchSnapshot();
-              expect(result.snippet).toStrictEqual(expectedOutput);
+              expect(result.snippet).to.deep.equal(expectedOutput);
             });
           });
         });

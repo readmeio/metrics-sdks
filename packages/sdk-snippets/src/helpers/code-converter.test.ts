@@ -1,4 +1,9 @@
+import chai, { expect } from 'chai';
+import { jestSnapshotPlugin } from 'mocha-chai-jest-snapshot';
+
 import codeConverter from './code-converter';
+
+chai.use(jestSnapshotPlugin());
 
 const codeSample = `
 import express from 'express';
@@ -12,28 +17,8 @@ app.get('/', (req, res) => {
 app.listen(8000);
 `;
 
-test('should convert code to a CodeBuilder instance', () => {
-  expect(codeConverter(codeSample)).toMatchInlineSnapshot(`
-    "
-    blank()
-
-    push(\\"import express from 'express';\\");
-
-    blank()
-
-    push('const app = express();');
-
-    blank()
-
-    push(\\"app.get('/', (req, res) => {\\");
-    push('res.sendStatus(200);', 1);
-    push('});');
-
-    blank()
-
-    push('app.listen(8000);');
-
-    blank()
-    "
-  `);
+describe('code-converter', function () {
+  it('should convert code to a CodeBuilder instance', function () {
+    expect(codeConverter(codeSample)).to.toMatchSnapshot();
+  });
 });
