@@ -14,8 +14,7 @@
     "import/no-unresolved": ["error", { "ignore": ["@readme/cloudflare-worker"] }],
     "no-console": "off",
     "no-restricted-globals": 0,
-    "no-use-before-define": ["error", "nofunc"],
-    "sonarjs/no-nested-template-literals": "off"
+    "no-use-before-define": ["error", "nofunc"]
   },
   "overrides": [
     {
@@ -25,10 +24,5 @@
         "node/no-extraneous-require": "off"
       }
     }
-  ],
-  "settings": {
-    "jest": {
-      "version": 28
-    }
-  }
+  ]
 }

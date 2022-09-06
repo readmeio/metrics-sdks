@@ -1,3 +1,4 @@
+const { expect } = require('chai');
 const nock = require('nock');
 
 const globals = require('./service-worker-globals');
@@ -7,21 +8,22 @@ function requireWorker() {
   return require('../src'); // eslint-disable-line global-require
 }
 
-describe('worker', () => {
-  beforeAll(() => {
+describe('worker', function () {
+  before(function () {
     nock.disableNetConnect();
     nock.enableNetConnect('127.0.0.1');
   });
 
-  afterAll(() => nock.cleanAll());
+  after(function () {
+    return nock.cleanAll();
+  });
 
-  beforeEach(() => {
+  beforeEach(function () {
     Object.assign(global, globals());
   });
 
-  describe('#fetchAndCollect()', () => {
-    it('should error if response from API is missing required headers', async () => {
-      expect.hasAssertions();
+  describe('#fetchAndCollect()', function () {
+    it('should error if response from API is missing required headers', async function () {
       const request = new global.Request('https://example.com/a?b=2', {
         method: 'GET',
         headers: {
@@ -34,14 +36,13 @@ describe('worker', () => {
       try {
         await requireWorker().fetchAndCollect(request);
       } catch (e) {
-        expect(e.message).toBe('Missing headers on the response: x-readme-id, x-readme-label');
+        expect(e.message).to.equal('Missing headers on the response: x-readme-id, x-readme-label');
       }
 
       mock.done();
     });
 
-    // eslint-disable-next-line jest/expect-expect
-    it('should work for GET/HEAD requests (no body)', async () => {
+    it('should work for GET/HEAD requests (no body)', async function () {
       const request = new global.Request('https://example.com/a?b=2', {
         method: 'GET',
         headers: {
@@ -57,8 +58,7 @@ describe('worker', () => {
       mock.done();
     });
 
-    // eslint-disable-next-line jest/expect-expect
-    it('should make the request provided', async () => {
+    it('should make the request provided', async function () {
       const request = new global.Request('https://example.com/a?b=2', {
         method: 'POST',
         headers: {
@@ -77,7 +77,7 @@ describe('worker', () => {
       mock.done();
     });
 
-    it('should return a har file', async () => {
+    it('should return a har file', async function () {
       const request = new global.Request('https://example.com/a?b=2', {
         method: 'POST',
         headers: {
@@ -97,10 +97,10 @@ describe('worker', () => {
 
       const { har } = await requireWorker().fetchAndCollect(request);
 
-      expect(har.log.creator.name).toBe('@readme/cloudflare-worker');
-      expect(typeof har.log.entries[0].startedDateTime).toBe('string');
-      expect(typeof har.log.entries[0].time).toBe('number');
-      expect(har.log.entries[0].request).toStrictEqual({
+      expect(har.log.creator.name).to.equal('@readme/cloudflare-worker');
+      expect(typeof har.log.entries[0].startedDateTime).to.equal('string');
+      expect(typeof har.log.entries[0].time).to.equal('number');
+      expect(har.log.entries[0].request).to.deep.equal({
         method: request.method,
         url: request.url,
         httpVersion: '1.1',
@@ -122,7 +122,7 @@ describe('worker', () => {
         },
       });
 
-      expect(har.log.entries[0].response).toStrictEqual({
+      expect(har.log.entries[0].response).to.deep.equal({
         status: 200,
         statusText: 'OK',
         headers: [
@@ -143,7 +143,7 @@ describe('worker', () => {
       });
     });
 
-    it('should default mimeType to json if no content-type', async () => {
+    it('should default mimeType to json if no content-type', async function () {
       const request = new global.Request('https://example.com/a?b=2', {
         method: 'POST',
         headers: {
@@ -159,12 +159,11 @@ describe('worker', () => {
 
       const { har } = await requireWorker().fetchAndCollect(request);
 
-      expect(har.log.entries[0].request.postData.mimeType).toBe('application/json');
-      expect(har.log.entries[0].response.content.mimeType).toBe('application/json');
+      expect(har.log.entries[0].request.postData.mimeType).to.equal('application/json');
+      expect(har.log.entries[0].response.content.mimeType).to.equal('application/json');
     });
 
-    // eslint-disable-next-line jest/expect-expect
-    it('should return with a fresh response that can be read', async () => {
+    it('should return with a fresh response that can be read', async function () {
       const request = new global.Request('https://example.com/a?b=2', {
         method: 'POST',
         headers: {
@@ -192,7 +191,7 @@ describe('worker', () => {
       await response.json();
     });
 
-    it('should strip out any x-readme-headers', async () => {
+    it('should strip out any x-readme-headers', async function () {
       const request = new global.Request('https://example.com/a?b=2', {
         method: 'POST',
         headers: {
@@ -212,14 +211,14 @@ describe('worker', () => {
 
       const { har } = await requireWorker().fetchAndCollect(request);
       const headers = har.log.entries[0].response.headers.map(h => h.name);
-      expect(headers).not.toContain('x-readme-id');
-      expect(headers).not.toContain('x-readme-label');
-      expect(headers).not.toContain('x-readme-email');
+      expect(headers).not.to.contain('x-readme-id');
+      expect(headers).not.to.contain('x-readme-label');
+      expect(headers).not.to.contain('x-readme-email');
     });
   });
 
-  describe('#metrics()', () => {
-    it('should make a request to the metrics api', async () => {
+  describe('#metrics()', function () {
+    it('should make a request to the metrics api', async function () {
       const apiKey = 'OUW3RlI4gUCwWGpO10srIo2ufdWmMhMH';
       const group = '5afa21b97011c63320226ef3';
       const har = {
@@ -236,9 +235,9 @@ describe('worker', () => {
 
       const mock = nock('http://localhost')
         .post('/v1/request', ([body]) => {
-          expect(body.group).toBe(group);
-          expect(body.clientIPAddress).toBe(clientIPAddress);
-          expect(body.request).toStrictEqual(har);
+          expect(body.group).to.equal(group);
+          expect(body.clientIPAddress).to.equal(clientIPAddress);
+          expect(body.request).to.deep.equal(har);
           return true;
         })
         .basicAuth({ user: apiKey })
@@ -258,7 +257,7 @@ describe('worker', () => {
       mock.done();
     });
 
-    it('should default clientIPAddress to 0.0.0.0', async () => {
+    it('should default clientIPAddress to 0.0.0.0', async function () {
       const apiKey = 'OUW3RlI4gUCwWGpO10srIo2ufdWmMhMH';
       const har = {
         log: {
@@ -273,7 +272,7 @@ describe('worker', () => {
 
       const mock = nock('http://localhost')
         .post('/v1/request', ([body]) => {
-          expect(body.clientIPAddress).toBe('0.0.0.0');
+          expect(body.clientIPAddress).to.equal('0.0.0.0');
           return true;
         })
         .basicAuth({ user: apiKey })
