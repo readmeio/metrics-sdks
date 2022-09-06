@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-interface WebhookBody {
+export interface WebhookBody {
   email: string;
 }
 

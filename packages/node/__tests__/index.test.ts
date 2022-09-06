@@ -9,7 +9,7 @@ import nock from 'nock';
 import request from 'supertest';
 
 import pkg from '../package.json';
-import * as readmeio from '../src';
+import readmeio from '../src';
 import config from '../src/config';
 
 const upload = multer();
@@ -77,7 +77,7 @@ describe('#metrics', () => {
     app.use((req, res, next) => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      readmeio.log('', req, res, {});
+      readmeio.log(req, res, {});
       return next();
     });
     app.get('/test', (req, res) => res.sendStatus(200));
@@ -95,10 +95,11 @@ describe('#metrics', () => {
 
   it('should throw an error if `group` is missing', () => {
     const app = express();
+    readmeio.config(apiKey);
     app.use((req, res, next) => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      readmeio.log(apiKey, req, res);
+      readmeio.log(req, res);
       return next();
     });
     app.get('/test', (req, res) => res.sendStatus(200));
@@ -130,8 +131,9 @@ describe('#metrics', () => {
       .reply(200);
 
     const app = express();
+    readmeio.config(apiKey);
     app.use((req, res, next) => {
-      const logId = readmeio.log(apiKey, req, res, incomingGroup);
+      const logId = readmeio.log(req, res, incomingGroup);
       res.setHeader('x-log-id', logId);
       return next();
     });
@@ -161,8 +163,9 @@ describe('#metrics', () => {
       .reply(200);
 
     const app = express();
+    readmeio.config(apiKey);
     app.use((req, res, next) => {
-      readmeio.log(apiKey, req, res, incomingGroup);
+      readmeio.log(req, res, incomingGroup);
       return next();
     });
     app.get('/test/:id', (req, res) => res.sendStatus(200));
@@ -194,7 +197,8 @@ describe('#metrics', () => {
       .reply(200);
 
     const app = createServer((req, res) => {
-      readmeio.log(apiKey, req, res, incomingGroup);
+      readmeio.config(apiKey);
+      readmeio.log(req, res, incomingGroup);
       res.statusCode = 200;
       res.end();
     });
@@ -225,8 +229,9 @@ describe('#metrics', () => {
     const app = express();
     const appNest = express();
 
+    readmeio.config(apiKey);
     app.use((req, res, next) => {
-      readmeio.log(apiKey, req, res, incomingGroup);
+      readmeio.log(req, res, incomingGroup);
       return next();
     });
     appNest.get('/nested', (req, res) => {
@@ -268,8 +273,9 @@ describe('#metrics', () => {
         .reply(200);
 
       const app = express();
+      readmeio.config(apiKey);
       app.use((req, res, next) => {
-        readmeio.log(apiKey, req, res, incomingGroup, { bufferLength: 3, baseLogUrl });
+        readmeio.log(req, res, incomingGroup, { bufferLength: 3, baseLogUrl });
         return next();
       });
       app.get('/test', (req, res) => res.sendStatus(200));
@@ -348,8 +354,9 @@ describe('#metrics', () => {
       );
 
       const app = express();
+      readmeio.config(apiKey);
       app.use((req, res, next) => {
-        readmeio.log(apiKey, req, res, incomingGroup, { bufferLength });
+        readmeio.log(req, res, incomingGroup, { bufferLength });
         return next();
       });
       app.get('/test', (req, res) => res.sendStatus(200));
@@ -379,8 +386,9 @@ describe('#metrics', () => {
         .reply(200);
 
       const app = express();
+      readmeio.config(apiKey);
       app.use((req, res, next) => {
-        readmeio.log(apiKey, req, res, incomingGroup, { baseLogUrl });
+        readmeio.log(req, res, incomingGroup, { baseLogUrl });
         return next();
       });
       app.get('/test', (req, res) => res.sendStatus(200));
@@ -414,7 +422,7 @@ describe('#metrics', () => {
       const mock = createMock();
       const app = express();
       app.use((req, res, next) => {
-        readmeio.log(apiKey, req, res, incomingGroup);
+        readmeio.log(req, res, incomingGroup);
         return next();
       });
       app.get('/test', (req, res) => {
@@ -433,7 +441,7 @@ describe('#metrics', () => {
       const mock = createMock();
       const app = express();
       app.use((req, res, next) => {
-        readmeio.log(apiKey, req, res, incomingGroup);
+        readmeio.log(req, res, incomingGroup);
         return next();
       });
       app.get('/test', (req, res) => res.end(JSON.stringify(responseBody)));
@@ -447,7 +455,7 @@ describe('#metrics', () => {
       const mock = createMock();
       const app = express();
       app.use((req, res, next) => {
-        readmeio.log(apiKey, req, res, incomingGroup);
+        readmeio.log(req, res, incomingGroup);
         return next();
       });
       app.get('/test', (req, res) => res.send(responseBody));
@@ -485,7 +493,7 @@ describe('#metrics', () => {
       const app = express();
       app.use(upload.none());
       app.use((req, res, next) => {
-        readmeio.log(apiKey, req, res, incomingGroup);
+        readmeio.log(req, res, incomingGroup);
         return next();
       });
       app.post('/test', (req, res) => {

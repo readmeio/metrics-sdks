@@ -54,7 +54,7 @@ export interface ExtendedIncomingMessage extends IncomingMessage {
   _form_encoded?: string;
 }
 
-interface ExtendedResponse extends ServerResponse {
+export interface ExtendedResponse extends ServerResponse {
   _body?: string;
 }
 
@@ -136,19 +136,6 @@ export interface Options extends LogOptions {
   baseLogUrl?: string;
 }
 
-/**
- * This method will send supplied API requests to ReadMe Metrics.
- *
- * @see {@link https://readme.com/metrics}
- * @see {@link https://docs.readme.com/docs/sending-logs-to-readme-with-nodejs}
- * @param readmeApiKey The API key for your ReadMe project. This ensures your requests end up in
- *    your dashboard. You can read more about the API key in
- *    [our docs](https://docs.readme.com/reference/authentication).
- * @param req This is your incoming request object from your HTTP server and/or framework.
- * @param res This is your outgoing response object for your HTTP server and/or framework.
- * @param group A function that helps translate incoming request data to our metrics grouping data.
- * @param options Additional options. See the documentation for more details.
- */
 export function log(
   readmeApiKey: string,
   req: ExtendedIncomingMessage,
