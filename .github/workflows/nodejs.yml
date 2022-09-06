@@ -1,50 +1,50 @@
-name: nodejs
+# name: nodejs
 
-on: [push]
+# on: [push]
 
-jobs:
-  integration:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
+# jobs:
+#   integration:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#       - uses: actions/setup-node@v3
+#         with:
+#           node-version: 16
 
-      - run: npm ci --ignore-scripts
-      - run: make test-metrics-node-express
-      - run: make test-metrics-node-hapi
-      - run: make test-metrics-node-fastify
-      - run: make test-webhooks-node-express
+#       - run: npm ci --ignore-scripts
+#       - run: make test-metrics-node-express
+#       - run: make test-metrics-node-hapi
+#       - run: make test-metrics-node-fastify
+#       - run: make test-webhooks-node-express
 
-      - name: Cleanup
-        if: always()
-        run: docker-compose down
+#       - name: Cleanup
+#         if: always()
+#         run: docker-compose down
 
-  build:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/node
+#   build:
+#     runs-on: ubuntu-latest
+#     defaults:
+#       run:
+#         working-directory: packages/node
 
-    strategy:
-      matrix:
-        node-version:
-          - 14
-          - 16
-          - 18
+#     strategy:
+#       matrix:
+#         node-version:
+#           - 14
+#           - 16
+#           - 18
 
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
+#     steps:
+#       - uses: actions/checkout@v3
+#       - uses: actions/setup-node@v3
+#         with:
+#           node-version: ${{ matrix.node-version }}
 
-      # Node 14 still ships with npm@6 so for compatibility reasons we're upping
-      # this to match everything else.
-      - name: Install npm@8
-        if: matrix.node-version == '14'
-        run: npm install -g npm@8
+#       # Node 14 still ships with npm@6 so for compatibility reasons we're upping
+#       # this to match everything else.
+#       - name: Install npm@8
+#         if: matrix.node-version == '14'
+#         run: npm install -g npm@8
 
-      - run: npm ci --ignore-scripts
-      - run: npm test
+#       - run: npm ci --ignore-scripts
+#       - run: npm test
