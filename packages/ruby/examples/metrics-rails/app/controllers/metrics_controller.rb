@@ -12,7 +12,7 @@ class MetricsController < ApplicationController
   def webhook
     # Your ReadMe secret
     secret = ENV.fetch('README_API_KEY', nil)
-    # Verify the request is legitimate and came from ReadMe
+    # Verify the request is legitimate and came from ReadMe
     signature = request.headers['readme-signature']
 
     begin
