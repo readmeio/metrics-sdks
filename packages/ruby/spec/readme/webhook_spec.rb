@@ -6,9 +6,9 @@ random_api_key = 'rdme_abcdefghijklmnopqrstuvwxyz'
 RSpec.describe Readme::Webhook do
   describe '#verify' do
     it 'raises an exception if the signature is empty/missing' do
-      described_class.verify({ email: 'dom@readme.io' }.to_json, nil, random_api_key)
-    rescue Readme::MissingSignatureError => e
-      expect(e.message).to eq 'Missing Signature'
+      expect {
+        described_class.verify({ email: 'dom@readme.io' }.to_json, nil, random_api_key)
+      }.to raise_error(Readme::MissingSignatureError, 'Missing Signature')
     end
 
     it 'raises an exception with an expired signature' do
@@ -21,21 +21,17 @@ RSpec.describe Readme::Webhook do
       hmac = OpenSSL::HMAC.hexdigest('SHA256', random_api_key, unsigned)
       signature = "t=#{(time.to_f * 1000).to_i},v0=#{hmac}"
 
-      begin
+      expect {
         described_class.verify({ email: 'dom@readme.io' }.to_json, signature, random_api_key)
-      rescue Readme::ExpiredSignatureError => e
-        expect(e.message).to eq 'Expired Signature'
-      end
+      }.to raise_error(Readme::ExpiredSignatureError, 'Expired Signature')
     end
 
     it 'raises an exception if the signature is not correct' do
       signature = "t=#{(Time.now.utc.to_f * 1000).to_i},v0=abcdefghjkl"
 
-      begin
+      expect {
         described_class.verify({ email: 'dom@readme.io' }.to_json, signature, random_api_key)
-      rescue Readme::InvalidSignatureError => e
-        expect(e.message).to eq 'Invalid Signature'
-      end
+      }.to raise_error(Readme::InvalidSignatureError, 'Invalid Signature')
     end
 
     it 'does not raise an exception if it validates successfully' do
