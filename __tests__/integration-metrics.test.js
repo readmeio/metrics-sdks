@@ -35,7 +35,6 @@ function isListening(port, attempt = 0) {
     });
 
     socket.once('connect', () => {
-      console.log('sdk server is listening on', { port });
       socket.destroy();
       return resolve();
     });
