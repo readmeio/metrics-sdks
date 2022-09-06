@@ -2,7 +2,7 @@ require 'readme/webhook'
 
 class MetricsController < ApplicationController
   def index
-    render json: { 'message' => 'hello world' }
+    render json: { message: 'hello world' }
   end
 
   def post
