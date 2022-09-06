@@ -23,7 +23,6 @@ function supportsMultipart() {
 
 function isListening(port, attempt = 0) {
   return new Promise((resolve, reject) => {
-    console.log('checking', { port, attempt });
     if (attempt > 5) throw new Error(`Cannot connect on port: ${port}`);
     const socket = net.connect(port, '0.0.0.0');
     socket.once('error', err => {
