@@ -2,6 +2,7 @@ import type { ExtendedIncomingMessage, ExtendedResponse, Options } from './lib/l
 import type { GroupingObject } from './lib/metrics-log';
 import type { WebhookBody } from './lib/verify-webhook';
 
+import { getProjectBaseUrl } from './lib/get-project-base-url';
 import { log } from './lib/log';
 import verifyWebhook from './lib/verify-webhook';
 
@@ -30,5 +31,7 @@ class ReadMe {
     return verifyWebhook(body, signature, secret);
   }
 }
+
+export { getProjectBaseUrl, ReadMe };
 
 export default new ReadMe();
