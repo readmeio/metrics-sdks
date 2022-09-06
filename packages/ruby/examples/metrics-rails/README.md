@@ -1,4 +1,4 @@
-# ReadMe Metrics Rails Demo
+# ReadMe Metrics/Webhooks Rails Demo
 
 ```sh
 make install
