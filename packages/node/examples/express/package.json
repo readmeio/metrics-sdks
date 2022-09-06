@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start:metrics": "DEBUG=express:router npx node-dev index.js",
-    "start:webhooks": "DEBUG=express:router npx node-dev webhook.js"
+    "start:webhooks": "DEBUG=express:router npx node-dev index.js"
   },
   "license": "ISC",
   "type": "module",

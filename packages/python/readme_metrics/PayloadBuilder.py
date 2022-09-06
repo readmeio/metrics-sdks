@@ -160,17 +160,40 @@ class PayloadBuilder:
             dict: Wrapped request payload
         """
         headers = self.redact_dict(request.headers)
-        params = parse.parse_qsl(self._get_query_string(request))
+        queryString = parse.parse_qsl(self._get_query_string(request))
 
         content_type = self._get_content_type(headers)
         post_data = False
-        if getattr(request, "content_length", None):
+        if getattr(request, "content_length", None) or getattr(
+            request, "rm_content_length", None
+        ):
             if content_type == "application/x-www-form-urlencoded":
+                # Flask creates `request.form` but Django puts that data in `request.body`, and
+                # then our `request.rm_body` store, instead.
+                if hasattr(request, "form"):
+                    params = [
+                        # Reason this is not mixed in with the `rm_body` parsing if we don't have
+                        # `request.form` is that if we attempt to do `str(var, 'utf-8)` on data
+                        # coming out of `request.form.items()` an "decoding str is not supported"
+                        # exception will be raised as they're already strings.
+                        {"name": k, "value": v}
+                        for (k, v) in request.form.items()
+                    ]
+                else:
+                    params = [
+                        # `request.form.items` will give us already decoded UTF-8 data but
+                        # `parse_qsl` gives us bytes. If we don't do this we'll be creating an
+                        # invalid JSON payload.
+                        {
+                            "name": str(k, "utf-8"),
+                            "value": str(v, "utf-8"),
+                        }
+                        for (k, v) in parse.parse_qsl(request.rm_body)
+                    ]
+
                 post_data = {
                     "mimeType": content_type,
-                    "params": [
-                        {"name": k, "value": v} for (k, v) in request.form.items()
-                    ],
+                    "params": params,
                 }
             else:
                 post_data = self._process_body(content_type, request.rm_body)
@@ -180,7 +203,7 @@ class PayloadBuilder:
             "url": self._build_base_url(request),
             "httpVersion": request.environ["SERVER_PROTOCOL"],
             "headers": [{"name": k, "value": v} for (k, v) in headers.items()],
-            "queryString": [{"name": k, "value": v} for (k, v) in params],
+            "queryString": [{"name": k, "value": v} for (k, v) in queryString],
         }
 
         if not post_data is False:

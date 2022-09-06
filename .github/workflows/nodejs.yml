@@ -3,6 +3,24 @@ name: nodejs
 on: [push]
 
 jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - run: npm ci --ignore-scripts
+      - run: make test-metrics-node-express
+      - run: make test-metrics-node-hapi
+      - run: make test-metrics-node-fastify
+      - run: make test-webhooks-node-express
+
+      - name: Cleanup
+        if: always()
+        run: docker-compose down
+
   build:
     runs-on: ubuntu-latest
     defaults:
@@ -30,18 +48,3 @@ jobs:
 
       - run: npm ci --ignore-scripts
       - run: npm test
-
-  integration:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - run: docker-compose run integration_metrics_node_express
-    - run: docker-compose run integration_metrics_node_hapi
-    - run: docker-compose run integration_metrics_node_fastify
-    - run: docker-compose run integration_webhooks_node_express
-
-    - name: Cleanup
-      if: always()
-      run: docker-compose down

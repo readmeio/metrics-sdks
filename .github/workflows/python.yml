@@ -3,6 +3,23 @@ name: python
 on: [push]
 
 jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - run: npm ci --ignore-scripts
+      - run: make test-metrics-python-django
+      - run: make test-metrics-python-flask
+      - run: make test-webhooks-python-flask
+
+      - name: Cleanup
+        if: always()
+        run: docker-compose down
+
   build:
     runs-on: ubuntu-latest
     defaults:
@@ -33,18 +50,3 @@ jobs:
 
       - name: Run tests
         run: make test
-
-  integration:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-
-    # This Flask suite is **extremely** flaky in Docker. Until we can figure out how to make it not
-    # you can run this locally with `make test-python-metrics-flask`.
-    # - run: docker-compose run integration_metrics_python_flask
-    - run: docker-compose run integration_webhooks_python_flask
-
-    - name: Cleanup
-      if: always()
-      run: docker-compose down

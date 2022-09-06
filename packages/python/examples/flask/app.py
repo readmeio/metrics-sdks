@@ -28,6 +28,7 @@ metrics_extension = ReadMeMetrics(
     MetricsApiConfig(
         api_key=os.getenv("README_API_KEY"),
         grouping_function=grouping_function,
+        background_worker_mode=False,
         buffer_length=1,
         timeout=5,
     )
@@ -53,4 +54,4 @@ def post():
 
 
 if __name__ == "__main__":
-    app.run(debug=False, host="127.0.0.1", port=os.getenv("PORT", "8000"))
+    app.run(debug=False, host="0.0.0.0", port=os.getenv("PORT", "8000"))

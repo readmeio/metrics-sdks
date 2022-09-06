@@ -20,8 +20,8 @@ With [ReadMe's Metrics API](https://readme.com/metrics) your team can get deep i
 - ReadMe populates Metrics with this information, such as which endpoint is being called, response code, and error messages. It also identifies the customer who called your API, using whichever keys in the middleware you call out as containing relevant customer info.
 
 ```bash
-pip install readme-metrics[Django] # Django applications
-pip install readme-metrics[Flask] # Flask applications
+pip install "readme-metrics[Django]" # Django applications
+pip install "readme-metrics[Flask]" # Flask applications
 pip install readme-metrics # WSGI
 ```
 

@@ -6,11 +6,14 @@ install: # Install all dependencies
 	pip3 install -r requirements.dev.txt
 
 lint: ## Run code standard checks
-	pylint --output-format=colorized examples/ readme_metrics/
+	pylint --output-format=colorized examples/ readme_metrics/ --ignore=venv
 	black --check .
 
 lint-fix: ## Run code formatting checks
 	black .
+
+serve-metrics-django: ## Start the local Django server to test Metrics
+	README_API_KEY=$(API_KEY) python3 examples/metrics_django/manage.py runserver
 
 serve-metrics-flask: ## Start the local Flask server to test Metrics
 	README_API_KEY=$(API_KEY) python3 examples/flask/app.py
