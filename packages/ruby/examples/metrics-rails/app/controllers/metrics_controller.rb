@@ -1,6 +1,8 @@
 require 'readme/webhook'
 
 class MetricsController < ApplicationController
+  secret = ENV.fetch('README_API_KEY', nil)
+
   def index
     render json: { message: 'hello world' }
   end
@@ -10,16 +12,23 @@ class MetricsController < ApplicationController
   end
 
   def webhook
+    # Your ReadMe secret
+    secret = ENV.fetch('README_API_KEY', nil)
+    # Verify the request is legitimate and came from ReadMe
     signature = request.headers['readme-signature']
 
     begin
-      Readme::Webhook.verify(request.raw_post, signature, ENV.fetch('README_API_KEY', nil))
+      Readme::Webhook.verify(request.raw_post, signature, secret)
     rescue Readme::MissingSignatureError, Readme::ExpiredSignatureError, Readme::InvalidSignatureError => e
+      # Handle invalid requests
       render json: { error: e.message }, status: 401
       return
     end
 
+    # Fetch the user from the database and return their data for use with OpenAPI variables.
+    # current_user ||= User.find(session[:user_id]) if session[:user_id]
     render json: {
+      # OAS Security variables
       petstore_auth: 'default-key',
       basic_auth: { user: 'user', pass: 'pass' }
     }
