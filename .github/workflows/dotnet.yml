@@ -3,6 +3,22 @@ name: dotnet
 on: [push]
 
 jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - run: npm ci --ignore-scripts
+      - run: make test-metrics-dotnet
+      - run: make test-webhooks-dotnet
+
+      - name: Cleanup
+        if: always()
+        run: docker-compose down
+
   build:
     runs-on: ubuntu-latest
     defaults:
@@ -15,15 +31,3 @@ jobs:
         # with:
         #   dotnet-version: '3.1.x' # SDK Version to use; x will use the latest version of the 3.1 channel
       - run: make build
-
-  integration:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - run: docker-compose run integration_metrics_dotnet_v6.0
-
-      - name: Cleanup
-        if: always()
-        run: docker-compose down

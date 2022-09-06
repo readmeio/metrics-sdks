@@ -42,6 +42,6 @@ fastify.post('/', (request, reply) => {
   reply.code(200).send();
 });
 
-fastify.listen({ port }, err => {
+fastify.listen({ host: '0.0.0.0', port }, err => {
   if (err) throw err;
 });

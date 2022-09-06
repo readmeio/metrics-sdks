@@ -131,5 +131,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 README_METRICS_CONFIG = MetricsApiConfig(
     api_key=os.getenv("README_API_KEY"),
     grouping_function="metrics.views.grouping_function",
+    background_worker_mode=False,
+    buffer_length=1,
     timeout=5,
 )

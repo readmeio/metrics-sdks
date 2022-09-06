@@ -10,7 +10,7 @@ if (!process.env.README_API_KEY) {
 const port = process.env.PORT || 8000;
 
 const init = async () => {
-  const server = Hapi.server({ host: 'localhost', port });
+  const server = Hapi.server({ host: '0.0.0.0', port });
 
   server.ext('onPreResponse', function (request, h) {
     const { req, res } = request.raw;

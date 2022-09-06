@@ -5,18 +5,21 @@ on: [push]
 jobs:
   integration:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
 
-      - run: docker-compose run integration_metrics_php_laravel
-      - run: docker-compose run integration_webhooks_php_laravel
+      - run: npm ci --ignore-scripts
+      - run: make test-metrics-php-laravel
+      - run: make test-webhooks-php-laravel
 
       - name: Cleanup
         if: always()
         run: docker-compose down
 
-  test:
+  build:
     runs-on: ubuntu-latest
     defaults:
       run:
