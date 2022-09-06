@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
-    "lib": ["es2019"],
-    "declaration": true,
     "allowJs": true,
+    "baseUrl": ".",
+    "declaration": true,
     "esModuleInterop": true,
     "inlineSourceMap": true,
-    "resolveJsonModule": true,
-    "baseUrl": "."
+    "lib": ["es2019"],
+    "outDir": "./dist",
+    "resolveJsonModule": true
   },
   "include": [
     "src/**/*",

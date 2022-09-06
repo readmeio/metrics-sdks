@@ -5,6 +5,7 @@ import { createServer } from 'http';
 import os from 'os';
 import * as qs from 'querystring';
 
+import { expect } from 'chai';
 import { isValidUUIDV4 } from 'is-valid-uuid-v4';
 import request from 'supertest';
 
@@ -39,7 +40,7 @@ function createApp(options?: LogOptions, payloadData?: PayloadData) {
   return createServer(requestListener);
 }
 
-describe('constructPayload()', () => {
+describe('constructPayload()', function () {
   const group = {
     apiKey: 'user_api_key',
     label: 'label',
@@ -48,16 +49,16 @@ describe('constructPayload()', () => {
     responseEndDateTime: new Date('Mon Sep 27 2021 14:40:40 GMT-0400'),
   };
 
-  it('should convert apiKey should take precedence over id field', () => {
+  it('should convert apiKey should take precedence over id field', function () {
     return request(createApp(undefined, group))
       .post('/')
       .expect(({ body }) => {
-        expect(body.group.id).toBe(group.apiKey);
-        expect(body.group.apiKey).toBeUndefined();
+        expect(body.group.id).to.equal(group.apiKey);
+        expect(body.group.apiKey).to.be.undefined;
       });
   });
 
-  it('should still support id even though it has been deprecated in favor of apiKey', () => {
+  it('should still support id even though it has been deprecated in favor of apiKey', function () {
     const groupAlt = {
       apiKey: 'user_api_key',
       label: 'label',
@@ -69,74 +70,78 @@ describe('constructPayload()', () => {
     return request(createApp(undefined, groupAlt))
       .post('/')
       .expect(({ body }) => {
-        expect(body.group.id).toBe(group.apiKey);
-        expect(body.group.apiKey).toBeUndefined();
+        expect(body.group.id).to.equal(group.apiKey);
+        expect(body.group.apiKey).to.be.undefined;
       });
   });
 
-  it('should construct a har file from the request/response', () => {
+  it('should construct a har file from the request/response', function () {
     return request(createApp({ denylist: ['password'] }, group))
       .post('/')
       .send({ password: '123456' })
       .expect(({ body }) => {
-        expect(isValidUUIDV4(body._id)).toBe(true);
-        expect(typeof body.request.log.entries[0].request).toBe('object');
-        expect(typeof body.request.log.entries[0].response).toBe('object');
-        expect(body.request.log.entries[0].request.postData).toStrictEqual({
+        expect(isValidUUIDV4(body._id)).to.equal(true);
+        expect(body.request.log.entries[0].request).to.be.a('object');
+        expect(body.request.log.entries[0].response).to.be.a('object');
+        expect(body.request.log.entries[0].request.postData).to.deep.equal({
           mimeType: 'application/json',
           text: '{"password":"[REDACTED 6]"}',
         });
       });
   });
 
-  it('#creator', () =>
-    request(createApp(undefined, group))
+  it('#creator', function () {
+    return request(createApp(undefined, group))
       .post('/')
       .expect(({ body }) => {
-        expect(body.request.log.creator).toStrictEqual({
+        expect(body.request.log.creator).to.deep.equal({
           name: 'readme-metrics (node)',
           version: pkg.version,
           comment: `${os.arch()}-${os.platform()}${os.release()}/${process.versions.node}`,
         });
-      }));
+      });
+  });
 
-  it('#clientIPAddress', () =>
-    request(createApp(undefined, group))
-      .post('/')
-      .expect(({ body }) => {
-        expect(body.clientIPAddress).toBe('::ffff:127.0.0.1');
-      }));
-
-  it('#pageref should be `req.route.path`', () =>
-    request(createApp(undefined, group))
-      .post('/')
-      .expect(({ body }) => {
-        expect(body.request.log.entries[0].pageref).toMatch(/http:\/\/127.0.0.1:\d+\//);
-      }));
-
-  it('#pageref baseurl should be included as well', () =>
-    request(createApp(undefined, group))
-      .post('/test-base-path/a')
-      .expect(({ body }) => {
-        expect(body.request.log.entries[0].pageref).toMatch(/http:\/\/127.0.0.1:\d+\/test-base-path\/a/);
-      }));
-
-  it('#startedDateTime', () => {
+  it('#clientIPAddress', function () {
     return request(createApp(undefined, group))
       .post('/')
       .expect(({ body }) => {
-        expect(new Date(body.request.log.entries[0].startedDateTime).toISOString()).toBe(
+        expect(body.clientIPAddress).to.equal('::ffff:127.0.0.1');
+      });
+  });
+
+  it('#pageref should be `req.route.path`', function () {
+    return request(createApp(undefined, group))
+      .post('/')
+      .expect(({ body }) => {
+        expect(body.request.log.entries[0].pageref).to.match(/http:\/\/127.0.0.1:\d+\//);
+      });
+  });
+
+  it('#pageref baseurl should be included as well', function () {
+    return request(createApp(undefined, group))
+      .post('/test-base-path/a')
+      .expect(({ body }) => {
+        expect(body.request.log.entries[0].pageref).to.match(/http:\/\/127.0.0.1:\d+\/test-base-path\/a/);
+      });
+  });
+
+  it('#startedDateTime', function () {
+    return request(createApp(undefined, group))
+      .post('/')
+      .expect(({ body }) => {
+        expect(new Date(body.request.log.entries[0].startedDateTime).toISOString()).to.equal(
           group.startedDateTime.toISOString()
         );
       });
   });
 
-  it('#time', () => {
+  it('#time', function () {
     return request(createApp(undefined, group))
       .post('/')
       .expect(({ body }) => {
-        expect(typeof body.request.log.entries[0].time).toBe('number');
-        expect(body.request.log.entries[0].time).toBe(20000);
+        expect(body.request.log.entries[0].time).to.be.a('number');
+        expect(body.request.log.entries[0].time).to.equal(20000);
       });
   });
 });

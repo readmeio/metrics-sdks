@@ -1,9 +1,9 @@
 import * as crypto from 'crypto';
 import { createServer } from 'http';
 
+import chai, { expect } from 'chai';
 import express from 'express';
 import FormData from 'form-data';
-import { isValidUUIDV4 } from 'is-valid-uuid-v4';
 import multer from 'multer';
 import nock from 'nock';
 import request from 'supertest';
@@ -11,6 +11,10 @@ import request from 'supertest';
 import pkg from '../package.json';
 import * as readmeio from '../src';
 import config from '../src/config';
+
+import chaiPlugins from './helpers/chai-plugins';
+
+chai.use(chaiPlugins);
 
 const upload = multer();
 
@@ -27,52 +31,17 @@ const outgoingGroup = {
   email: 'test@example.com',
 };
 
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace jest {
-    interface Matchers<R> {
-      toHaveDocumentationHeader(baseLogUrl: string): R;
-    }
-  }
-}
-
-expect.extend({
-  toHaveDocumentationHeader(res, baseLogUrl) {
-    const { matcherHint, printExpected, printReceived } = this.utils;
-    const message = (pass, actual) => () => {
-      return (
-        `${matcherHint(pass ? '.not.toHaveDocumentationHeader' : '.toHaveDocumentationHeader')}\n\n` +
-        `Expected response headers to have a ${printExpected('x-documentation-url')} header with a valid UUIDv4 ID.\n` +
-        'Received:\n' +
-        `\t${printReceived(actual)}`
-      );
-    };
-
-    let pass;
-    if (!('x-documentation-url' in res.headers)) {
-      pass = false;
-    } else {
-      pass = isValidUUIDV4(res.headers['x-documentation-url'].replace(`${baseLogUrl}/logs/`, ''));
-    }
-
-    return {
-      pass,
-      message: message(pass, 'x-documentation-url' in res.headers ? res.headers['x-documentation-url'] : undefined),
-    };
-  },
-});
-
-describe('#metrics', () => {
-  beforeEach(() => {
+describe('#metrics', function () {
+  beforeEach(function () {
     nock.disableNetConnect();
     nock.enableNetConnect('127.0.0.1');
   });
 
-  afterEach(() => {
+  afterEach(function () {
     nock.cleanAll();
   });
 
-  it('should throw an error if `apiKey` is missing', () => {
+  it('should throw an error if `apiKey` is missing', function () {
     const app = express();
     app.use((req, res, next) => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -89,11 +58,11 @@ describe('#metrics', () => {
       .get('/test')
       .expect(500)
       .then(res => {
-        expect(res.text).toMatch(/Error: You must provide your ReadMe API key/);
+        expect(res.text).to.match(/Error: You must provide your ReadMe API key/);
       });
   });
 
-  it('should throw an error if `group` is missing', () => {
+  it('should throw an error if `group` is missing', function () {
     const app = express();
     app.use((req, res, next) => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -110,11 +79,11 @@ describe('#metrics', () => {
       .get('/test')
       .expect(500)
       .then(res => {
-        expect(res.text).toMatch(/Error: You must provide a group/);
+        expect(res.text).to.match(/Error: You must provide a group/);
       });
   });
 
-  it('should send a request to the metrics server', () => {
+  it('should send a request to the metrics server', function () {
     const mock = nock(config.host, {
       reqheaders: {
         'Content-Type': 'application/json',
@@ -122,8 +91,8 @@ describe('#metrics', () => {
       },
     })
       .post('/v1/request', ([body]) => {
-        expect(body.group).toStrictEqual(outgoingGroup);
-        expect(typeof body.request.log.entries[0].startedDateTime).toBe('string');
+        expect(body.group).to.deep.equal(outgoingGroup);
+        expect(typeof body.request.log.entries[0].startedDateTime).to.equal('string');
         return true;
       })
       .basicAuth({ user: apiKey })
@@ -146,7 +115,7 @@ describe('#metrics', () => {
       });
   });
 
-  it('should set `pageref` correctly based on `req.route`', () => {
+  it('should set `pageref` correctly based on `req.route`', function () {
     const mock = nock(config.host, {
       reqheaders: {
         'Content-Type': 'application/json',
@@ -154,7 +123,7 @@ describe('#metrics', () => {
       },
     })
       .post('/v1/request', ([body]) => {
-        expect(body.request.log.entries[0].pageref).toBe('http://127.0.0.1/test/:id');
+        expect(body.request.log.entries[0].pageref).to.equal('http://127.0.0.1/test/:id');
         return true;
       })
       .basicAuth({ user: apiKey })
@@ -179,7 +148,7 @@ describe('#metrics', () => {
   // When not in express, pageref contains the port but in express it does not.
   // This is due to us using `req.hostname` to construct the URL vs just
   // req.headers.host which has not been parsed.
-  it('should set `pageref` without express', () => {
+  it('should set `pageref` without express', function () {
     const mock = nock(config.host, {
       reqheaders: {
         'Content-Type': 'application/json',
@@ -187,7 +156,7 @@ describe('#metrics', () => {
       },
     })
       .post('/v1/request', ([body]) => {
-        expect(body.request.log.entries[0].pageref).toMatch(/http:\/\/127.0.0.1:\d.*\/test\/hello/);
+        expect(body.request.log.entries[0].pageref).to.match(/http:\/\/127.0.0.1:\d.*\/test\/hello/);
         return true;
       })
       .basicAuth({ user: apiKey })
@@ -207,7 +176,7 @@ describe('#metrics', () => {
       });
   });
 
-  it('express should log the full request url with nested express apps', () => {
+  it('express should log the full request url with nested express apps', function () {
     const mock = nock(config.host, {
       reqheaders: {
         'Content-Type': 'application/json',
@@ -215,8 +184,8 @@ describe('#metrics', () => {
       },
     })
       .post('/v1/request', ([body]) => {
-        expect(body.group).toStrictEqual(outgoingGroup);
-        expect(body.request.log.entries[0].request.url).toContain('/test/nested');
+        expect(body.group).to.deep.equal(outgoingGroup);
+        expect(body.request.log.entries[0].request.url).to.contain('/test/nested');
         return true;
       })
       .basicAuth({ user: apiKey })
@@ -230,9 +199,10 @@ describe('#metrics', () => {
       return next();
     });
     appNest.get('/nested', (req, res) => {
-      // We're asserting `req.url` to be `/nested` here because the way that Express does contextual route loading
-      // `req.url` won't include the `/test`. The `/test` is only added later internally in Express with `req.originalUrl`.
-      expect(req.url).toBe('/nested');
+      // We're asserting `req.url` to be `/nested` here because the way that Express does contextual
+      // route loading `req.url` won't include the `/test`. The `/test` is only added later
+      // internally in Express with `req.originalUrl`.
+      expect(req.url).to.equal('/nested');
       res.sendStatus(200);
     });
 
@@ -246,13 +216,13 @@ describe('#metrics', () => {
       });
   });
 
-  describe('#timeout', () => {
-    it.todo('should silently fail metrics requests if they take longer than the timeout');
+  describe('#timeout', function () {
+    it.skip('should silently fail metrics requests if they take longer than the timeout');
 
-    it.todo('should silently fail baseLogUrl requests if they take longer than the timeout');
+    it.skip('should silently fail baseLogUrl requests if they take longer than the timeout');
   });
 
-  describe('#bufferLength', () => {
+  describe('#bufferLength', function () {
     it('should send requests when number hits `bufferLength` size', async function test() {
       const baseLogUrl = 'https://docs.example.com';
       const mock = nock(config.host, {
@@ -262,7 +232,7 @@ describe('#metrics', () => {
         },
       })
         .post('/v1/request', body => {
-          expect(body).toHaveLength(3);
+          expect(body).to.have.lengthOf(3);
           return true;
         })
         .reply(200);
@@ -281,40 +251,40 @@ describe('#metrics', () => {
         .get('/test')
         .expect(200)
         .expect(res => {
-          expect(res).toHaveDocumentationHeader(baseLogUrl);
+          expect(res.headers).to.have.a.documentationHeader(baseLogUrl);
           logUrl = res.headers['x-documentation-url'];
-          expect(logUrl).toBeDefined();
+          expect(logUrl).not.to.be.undefined;
         });
 
-      expect(mock.isDone()).toBe(false);
+      expect(mock.isDone()).to.be.false;
 
       await request(app)
         .get('/test')
         .expect(200)
         .expect(res => {
-          expect(res).toHaveDocumentationHeader(baseLogUrl);
-          expect(res.headers['x-documentation-url']).not.toBe(logUrl);
+          expect(res.headers).to.have.a.documentationHeader(baseLogUrl);
+          expect(res.headers['x-documentation-url']).not.to.equal(logUrl);
           logUrl = res.headers['x-documentation-url'];
-          expect(logUrl).toBeDefined();
+          expect(logUrl).not.to.be.undefined;
         });
 
-      expect(mock.isDone()).toBe(false);
+      expect(mock.isDone()).to.be.false;
 
       await request(app)
         .get('/test')
         .expect(200)
         .expect(res => {
-          expect(res).toHaveDocumentationHeader(baseLogUrl);
-          expect(res.headers['x-documentation-url']).not.toBe(logUrl);
+          expect(res.headers).to.have.a.documentationHeader(baseLogUrl);
+          expect(res.headers['x-documentation-url']).not.to.equal(logUrl);
           logUrl = res.headers['x-documentation-url'];
-          expect(logUrl).toBeDefined();
+          expect(logUrl).not.to.be.undefined;
         });
 
-      expect(mock.isDone()).toBe(true);
+      expect(mock.isDone()).to.be.true;
       mock.done();
     });
 
-    it('should clear out the queue when sent', () => {
+    it('should clear out the queue when sent', function () {
       const numberOfLogs = 20;
       const numberOfMocks = 4;
       const bufferLength = numberOfLogs / numberOfMocks;
@@ -329,12 +299,12 @@ describe('#metrics', () => {
           },
         })
           .post('/v1/request', body => {
-            expect(body).toHaveLength(bufferLength);
+            expect(body).to.have.lengthOf(bufferLength);
 
             // Ensure that our executed requests and the buffered queue they're in remain unique.
             body.forEach(req => {
               const requestHash = crypto.createHash('md5').update(JSON.stringify(req)).digest('hex');
-              expect(seenLogs).not.toContain(requestHash);
+              expect(seenLogs).not.to.contain(requestHash);
               seenLogs.push(requestHash);
             });
 
@@ -364,8 +334,8 @@ describe('#metrics', () => {
     });
   });
 
-  describe('#baseLogUrl', () => {
-    it('should set x-documentation-url if `baseLogUrl` is passed', async () => {
+  describe('#baseLogUrl', function () {
+    it('should set x-documentation-url if `baseLogUrl` is passed', async function () {
       const baseLogUrl = 'https://docs.example.com';
 
       const mock = nock(config.host, {
@@ -388,13 +358,13 @@ describe('#metrics', () => {
       await request(app)
         .get('/test')
         .expect(200)
-        .expect(res => expect(res).toHaveDocumentationHeader(baseLogUrl));
+        .expect(res => expect(res.headers).to.have.a.documentationHeader(baseLogUrl));
 
       mock.done();
     });
   });
 
-  describe('`res._body`', () => {
+  describe('`res._body`', function () {
     const responseBody = { a: 1, b: 2, c: 3 };
     function createMock() {
       return nock(config.host, {
@@ -404,13 +374,13 @@ describe('#metrics', () => {
         },
       })
         .post('/v1/request', ([body]) => {
-          expect(body.request.log.entries[0].response.content.text).toBe(JSON.stringify(responseBody));
+          expect(body.request.log.entries[0].response.content.text).to.equal(JSON.stringify(responseBody));
           return true;
         })
         .reply(200);
     }
 
-    it('should buffer up res.write() calls', async () => {
+    it('should buffer up res.write() calls', async function () {
       const mock = createMock();
       const app = express();
       app.use((req, res, next) => {
@@ -429,7 +399,7 @@ describe('#metrics', () => {
       mock.done();
     });
 
-    it('should buffer up res.end() calls', async () => {
+    it('should buffer up res.end() calls', async function () {
       const mock = createMock();
       const app = express();
       app.use((req, res, next) => {
@@ -443,7 +413,7 @@ describe('#metrics', () => {
       mock.done();
     });
 
-    it('should work for res.send() calls', async () => {
+    it('should work for res.send() calls', async function () {
       const mock = createMock();
       const app = express();
       app.use((req, res, next) => {
@@ -458,7 +428,7 @@ describe('#metrics', () => {
     });
   });
 
-  describe('`req.body`', () => {
+  describe('`req.body`', function () {
     function createMock(checkLocation: 'text' | 'params', requestBody: unknown) {
       return nock(config.host, {
         reqheaders: {
@@ -467,13 +437,13 @@ describe('#metrics', () => {
         },
       })
         .post('/v1/request', ([body]) => {
-          expect(body.request.log.entries[0].request.postData[checkLocation]).toBe(requestBody);
+          expect(body.request.log.entries[0].request.postData[checkLocation]).to.equal(requestBody);
           return true;
         })
         .reply(200);
     }
 
-    it('should accept multipart/form-data', async () => {
+    it('should accept multipart/form-data', async function () {
       const form = new FormData();
       form.append('password', '123456');
       form.append('apiKey', 'abc');

@@ -1,7 +1,7 @@
 .github/
 coverage/
-__tests__/
-.eslint*
-.jsinspectrc
-.prettier*
 examples/
+test/
+.eslint*
+.mocha*
+.prettier*

@@ -1,9 +1,11 @@
 import crypto from 'crypto';
 
+import { expect } from 'chai';
+
 import verifyWebhook from '../../src/lib/verify-webhook';
 
-describe('verifyWebhook()', () => {
-  it('should return the body if the signature is valid', () => {
+describe('verifyWebhook', function () {
+  it('should return the body if the signature is valid', function () {
     const body = { email: 'marc@readme.io' };
     const secret = 'docs4dayz';
     const time = Date.now();
@@ -12,10 +14,10 @@ describe('verifyWebhook()', () => {
     const signature = `t=${time},v0=${hmac.update(unsigned).digest('hex')}`;
 
     const verifiedBody = verifyWebhook(body, signature, secret);
-    expect(verifiedBody).toStrictEqual(body);
+    expect(verifiedBody).to.deep.equal(body);
   });
 
-  it('should throw an error if signature is invalid', () => {
+  it('should throw an error if signature is invalid', function () {
     const body = { email: 'marc@readme.io' };
     const secret = 'docs4dayz';
     const time = Date.now();
@@ -25,10 +27,10 @@ describe('verifyWebhook()', () => {
 
     expect(() => {
       verifyWebhook(body, signature, secret);
-    }).toThrow(/Invalid Signature/);
+    }).to.throw(/Invalid Signature/);
   });
 
-  it('should throw an error if timestamp is too old', () => {
+  it('should throw an error if timestamp is too old', function () {
     const body = { email: 'marc@readme.io' };
     const secret = 'docs4dayz';
     const time = new Date();
@@ -39,16 +41,16 @@ describe('verifyWebhook()', () => {
 
     expect(() => {
       verifyWebhook(body, signature, secret);
-    }).toThrow(/Expired Signature/);
+    }).to.throw(/Expired Signature/);
   });
 
-  it('should throw an error if signature is missing', () => {
+  it('should throw an error if signature is missing', function () {
     const body = { email: 'marc@readme.io' };
     const secret = 'docs4dayz';
     const signature = undefined;
 
     expect(() => {
       verifyWebhook(body, signature, secret);
-    }).toThrow(/Missing Signature/);
+    }).to.throw(/Missing Signature/);
   });
 });
