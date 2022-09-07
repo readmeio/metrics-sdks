@@ -1,5 +1,6 @@
-__tests__/
+.nyc_output/
 coverage/
+test/
 .eslint*
 .mocha*
 .nyc*

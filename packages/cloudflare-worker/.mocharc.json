@@ -1,6 +1,6 @@
 {
   "require": [
-    "__tests__/helpers/init.js"
+    "test/helpers/init.js"
   ],
   "recursive": true,
   "reporter": "spec"

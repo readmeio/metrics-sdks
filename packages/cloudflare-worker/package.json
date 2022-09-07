@@ -14,7 +14,7 @@
     "prepublishOnly": "npm run build",
     "pretest": "npm run lint",
     "prettier": "prettier --list-different \"./**/**.js\"",
-    "test": "nyc mocha __tests__/"
+    "test": "nyc mocha"
   },
   "author": "Dom Harrington <dom@readme.io>",
   "license": "ISC",
