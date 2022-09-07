@@ -89,7 +89,7 @@ test-metrics-ruby-rails: ## Run Metrics tests against the Ruby SDK + Rails
 	netstat
 	docker ps
 	docker ps --filter name=metrics-sdks_integration_ruby_rails
-	docker exec $(docker ps --filter name=metrics-sdks_integration_ruby_rails -q) env
+	docker exec -it $(docker ps --filter name=metrics-sdks_integration_ruby_rails -q) env
 	npm run test:integration-metrics
 
 test-webhooks-ruby-rails: ## Run webhooks tests against the Ruby SDK + Rails
