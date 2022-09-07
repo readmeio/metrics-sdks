@@ -1,5 +1,15 @@
 require 'readme/content_type_helper'
 
+class FakeRequest
+  include Readme::ContentTypeHelper
+
+  attr_reader :content_type
+
+  def initialize(content_type)
+    @content_type = content_type
+  end
+end
+
 RSpec.describe Readme::ContentTypeHelper do
   describe '#json?' do
     it 'is true for all various JSON types' do
@@ -18,16 +28,6 @@ RSpec.describe Readme::ContentTypeHelper do
       request = FakeRequest.new('text/plain')
 
       expect(request).not_to be_json
-    end
-  end
-
-  class FakeRequest
-    include Readme::ContentTypeHelper
-
-    attr_reader :content_type
-
-    def initialize(content_type)
-      @content_type = content_type
     end
   end
 end

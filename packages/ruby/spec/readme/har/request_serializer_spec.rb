@@ -58,7 +58,7 @@ RSpec.describe Readme::Har::RequestSerializer do
         body: { key1: 'key1', key2: 'key2' }.to_json
       )
       reject_params = %w[Filtered-Header key1]
-      request = described_class.new(http_request, Filter.for(reject: reject_params))
+      request = described_class.new(http_request, Readme::Filter.for(reject: reject_params))
       json = request.as_json
 
       request_body = JSON.parse(json.dig(:postData, :text))
@@ -83,7 +83,7 @@ RSpec.describe Readme::Har::RequestSerializer do
         form_data?: true,
         parsed_form_data: { 'item' => '1', 'other' => '2', 'reject' => '3' }
       )
-      serializer = described_class.new(http_request, Filter.for(reject: ['reject']))
+      serializer = described_class.new(http_request, Readme::Filter.for(reject: ['reject']))
       json = serializer.as_json
 
       expect(json[:postData]).not_to have_key(:text)

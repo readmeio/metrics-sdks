@@ -60,6 +60,7 @@ module Readme
         .to_h
         .transform_keys { |header| normalize_header_name(header) }
         .merge unprefixed_headers
+        .merge host_header
     end
 
     def body
@@ -97,6 +98,12 @@ module Readme
       {
         'Content-Type' => @request.content_type,
         'Content-Length' => @request.content_length
+      }.compact
+    end
+
+    def host_header
+      {
+        'Host' => @request.host
       }.compact
     end
   end
