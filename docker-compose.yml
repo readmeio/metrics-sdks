@@ -115,3 +115,16 @@ services:
     extra_hosts: *default-extra_hosts
     environment:
       <<: *server-config
+
+  #
+  # Ruby
+  #
+  integration_ruby_rails:
+    build:
+      context: .
+      dockerfile: ./__tests__/integrations/ruby/rails.Dockerfile
+    ports:
+      - 8000:8000
+    extra_hosts: *default-extra_hosts
+    environment:
+      <<: *server-config

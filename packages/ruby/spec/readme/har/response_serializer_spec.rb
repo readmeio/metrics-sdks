@@ -2,14 +2,12 @@ require 'readme/har/response_serializer'
 require 'readme/filter'
 
 RSpec.describe Readme::Har::ResponseSerializer do
-  Filter = Readme::Filter # rubocop:disable RSpec/LeakyConstantDeclaration
-
   describe '#as_json' do
     it 'creates a structure that is valid according the schema' do
       request = build_request
       response = build_response
 
-      serializer = described_class.new(request, response, Filter.for)
+      serializer = described_class.new(request, response, Readme::Filter.for)
       json = serializer.as_json
 
       expect(json).to match_json_schema('response')
@@ -26,7 +24,7 @@ RSpec.describe Readme::Har::ResponseSerializer do
       serializer = described_class.new(
         request,
         response,
-        Filter.for(reject: ['reject'])
+        Readme::Filter.for(reject: ['reject'])
       )
       json = serializer.as_json
 
@@ -64,7 +62,7 @@ RSpec.describe Readme::Har::ResponseSerializer do
       serializer = described_class.new(
         request,
         response,
-        Filter.for(reject: ['reject'])
+        Readme::Filter.for(reject: ['reject'])
       )
       json = serializer.as_json
 
@@ -84,7 +82,7 @@ RSpec.describe Readme::Har::ResponseSerializer do
       serializer = described_class.new(
         request,
         response,
-        Filter.for
+        Readme::Filter.for
       )
       json = serializer.as_json
 
@@ -100,7 +98,7 @@ RSpec.describe Readme::Har::ResponseSerializer do
       serializer = described_class.new(
         request,
         response,
-        Filter.for(reject: ['reject'])
+        Readme::Filter.for(reject: ['reject'])
       )
       json = serializer.as_json
 

@@ -1,4 +1,4 @@
-# frozen-string-literal: true
+# frozen_string_literal: true
 
 require 'readme/metrics/version'
 require 'readme/har/serializer'
@@ -15,7 +15,7 @@ module Readme
   class Metrics
     SDK_NAME = 'readme-metrics'
     DEFAULT_BUFFER_LENGTH = 1
-    ENDPOINT = 'https://metrics.readme.io/v1/request'
+    ENDPOINT = URI.join(ENV['METRICS_SERVER'] || 'https://metrics.readme.io', '/v1/request')
 
     def self.logger
       @@logger
@@ -136,9 +136,9 @@ module Readme
 
     # rubocop:disable Style/InverseMethods
     def user_info_valid?(user_info)
-      !user_info.nil? &&
+      (!user_info.nil? &&
         !user_info.values.any?(&:nil?) &&
-        user_info.key?(:api_key) || user_info.key?(:id)
+        user_info.key?(:api_key)) || user_info.key?(:id)
     end
     # rubocop:enable Style/InverseMethods
   end

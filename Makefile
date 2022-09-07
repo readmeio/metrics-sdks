@@ -79,3 +79,24 @@ test-webhooks-python-flask: ## Run webhooks tests against the Python SDK + Flask
 	docker-compose up --build --detach integration_python_flask_webhooks
 	npm run test:integration-webhooks || make cleanup-failure
 	@make cleanup
+
+##
+## Ruby
+##
+
+# For some reason the Rails server kept failing without the `sleep 5` and we
+# ran out of patience to try and figure out why. You can see our frustrated
+# attempts to fix it over here: https://github.com/readmeio/metrics-sdks/pull/590
+# This is the only thing that works consistently. It's not great but it'll do.
+
+test-metrics-ruby-rails: ## Run Metrics tests against the Ruby SDK + Rails
+	docker-compose up --build --detach integration_ruby_rails
+	sleep 5
+	npm run test:integration-metrics || make cleanup-failure
+	@make cleanup
+
+test-webhooks-ruby-rails: ## Run webhooks tests against the Ruby SDK + Rails
+	docker-compose up --build --detach integration_ruby_rails
+	sleep 5
+	npm run test:integration-webhooks || make cleanup-failure
+	@make cleanup

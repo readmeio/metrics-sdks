@@ -451,3 +451,116 @@ Object {
   },
 }
 `;
+
+exports[`webhooks Ruby snippet generation rails request should match fixture for "empty" 1`] = `Object {}`;
+
+exports[`webhooks Ruby snippet generation rails request should match fixture for "empty-default" 1`] = `
+Object {
+  "security": Object {
+    "petstore_auth": Object {
+      "line": 33,
+    },
+  },
+  "server": Object {
+    "name": Object {
+      "line": 30,
+    },
+  },
+}
+`;
+
+exports[`webhooks Ruby snippet generation rails request should match fixture for "quirky-escaping" 1`] = `
+Object {
+  "security": Object {
+    "\\"petstore\\" auth": Object {
+      "line": 36,
+    },
+    "basic-auth": Object {
+      "line": 37,
+    },
+    "normal_security_var": Object {
+      "line": 38,
+    },
+  },
+  "server": Object {
+    "*port": Object {
+      "line": 31,
+    },
+    "2name": Object {
+      "line": 30,
+    },
+    "normal_server_var": Object {
+      "line": 33,
+    },
+    "p*o?r*t": Object {
+      "line": 32,
+    },
+  },
+}
+`;
+
+exports[`webhooks Ruby snippet generation rails request should match fixture for "security-and-server-variables" 1`] = `
+Object {
+  "security": Object {
+    "basic_auth": Object {
+      "line": 35,
+    },
+    "petstore_auth": Object {
+      "line": 34,
+    },
+  },
+  "server": Object {
+    "name": Object {
+      "line": 30,
+    },
+    "port": Object {
+      "line": 31,
+    },
+  },
+}
+`;
+
+exports[`webhooks Ruby snippet generation rails request should match fixture for "security-types" 1`] = `
+Object {
+  "security": Object {
+    "api_key": Object {
+      "line": 30,
+    },
+    "http_basic": Object {
+      "line": 31,
+    },
+    "http_bearer": Object {
+      "line": 32,
+    },
+    "oauth2": Object {
+      "line": 33,
+    },
+  },
+}
+`;
+
+exports[`webhooks Ruby snippet generation rails request should match fixture for "security-variables" 1`] = `
+Object {
+  "security": Object {
+    "basic_auth": Object {
+      "line": 31,
+    },
+    "petstore_auth": Object {
+      "line": 30,
+    },
+  },
+}
+`;
+
+exports[`webhooks Ruby snippet generation rails request should match fixture for "server-variables" 1`] = `
+Object {
+  "server": Object {
+    "name": Object {
+      "line": 30,
+    },
+    "port": Object {
+      "line": 31,
+    },
+  },
+}
+`;

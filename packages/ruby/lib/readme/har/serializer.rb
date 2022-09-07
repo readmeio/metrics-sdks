@@ -1,4 +1,4 @@
-# frozen-string-literal: true
+# frozen_string_literal: true
 
 require 'rack'
 require 'readme/metrics'
@@ -46,7 +46,7 @@ module Readme
             timings: timings,
             request: request,
             response: response,
-            startedDateTime: @start_time.iso8601,
+            startedDateTime: @start_time.utc.iso8601(3),
             time: elapsed_time
           }
         ]

@@ -36,12 +36,17 @@ function isListening(port, attempt = 0) {
 
     socket.once('connect', () => {
       socket.destroy();
-      return resolve();
+      // Sometimes the TCP connection is resolving before
+      // the HTTP server is ready to receive connections
+      // So just sleeping for 500ms to be sure.
+      return setTimeout(() => resolve(), 500);
     });
   });
 }
 
 describe('Metrics SDK Integration Tests', function () {
+  this.retries(2);
+
   const sockets = new Set();
 
   let server;
@@ -78,6 +83,8 @@ describe('Metrics SDK Integration Tests', function () {
   });
 
   before(async function () {
+    await isListening(PORT);
+
     server = http
       .createServer((req, res) => {
         // Frameworks are funny. If we run this test suite with PHP we can access our Metrics
@@ -109,9 +116,7 @@ describe('Metrics SDK Integration Tests', function () {
       sockets.add(socket);
     });
 
-    await once(server, 'listening');
-
-    return isListening(PORT);
+    return once(server, 'listening');
   });
 
   after(function () {
@@ -162,7 +167,7 @@ describe('Metrics SDK Integration Tests', function () {
     /**
      * `startedDateTime` should look like the following, with optional microseconds component:
      *
-     *  JavaScript: `new Date.toISOString()`
+     *  JavaScript: `new Date().toISOString()`
      *    - 2022-06-30T10:21:55.394Z
      *  PHP: `date('Y-m-d\TH:i:sp')`
      *    - 2022-08-17T19:23:31Z
@@ -180,7 +185,10 @@ describe('Metrics SDK Integration Tests', function () {
       'close',
       'keep-alive', // Running this suite with Node 18 the `connection` header is different.
     ]);
-    expect(request.headers).to.have.header('host', `localhost:${PORT}`);
+    expect(request.headers).to.have.header('host', [
+      `localhost:${PORT}`,
+      'localhost', // rails does not include the port
+    ]);
 
     expect(response.status).to.equal(200);
     expect(response.statusText).to.match(/OK|200/); // Django returns with "200"
@@ -214,6 +222,10 @@ describe('Metrics SDK Integration Tests', function () {
         { name: 'arr', value: '{"1":"3"}' },
         { name: 'val', value: '1' },
       ]),
+      JSON.stringify([
+        { name: 'arr', value: { 1: '3' } },
+        { name: 'val', value: '1' },
+      ]), // Rails
     ]);
 
     expect(request.postData).to.be.undefined;
@@ -251,6 +263,10 @@ describe('Metrics SDK Integration Tests', function () {
         { name: 'arr', value: '{"1":"3"}' },
         { name: 'val', value: '1' },
       ]),
+      JSON.stringify([
+        { name: 'arr', value: { 1: '3' } },
+        { name: 'val', value: '1' },
+      ]), // Rails
     ]);
 
     expect(request.postData).to.deep.equal({

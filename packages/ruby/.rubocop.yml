@@ -9,6 +9,8 @@ AllCops:
 # https://docs.rubocop.org/rubocop/cops_layout.html
 Layout/LineLength:
   Max: 150
+  Exclude:
+    - examples/metrics-rails/bin/*
 
 # https://docs.rubocop.org/rubocop/cops_metrics.html
 Metrics/AbcSize:
@@ -64,4 +66,7 @@ Style/RescueStandardError:
   # on all types of errors that might be thrown in the couple places this rule is being suppressed
   # and by only catching `StandardError` we'll miss out on something else and potentially take down
   # someones integration.
+  Enabled: false
+
+Gemspec/RequireMFA:
   Enabled: false
