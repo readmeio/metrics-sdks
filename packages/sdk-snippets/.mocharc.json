@@ -1,0 +1,12 @@
+{
+  "require": [
+    "mocha.init.js",
+    "ts-node/register"
+  ],
+  "watch-extensions": [
+    "ts"
+  ],
+  "watch-files": ["src/**/*.ts"],
+  "recursive": true,
+  "reporter": "spec"
+}

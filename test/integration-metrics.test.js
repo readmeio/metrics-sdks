@@ -438,7 +438,7 @@ describe('Metrics SDK Integration Tests', function () {
     if (!supportsMultipart()) {
       this.skip();
     }
-    const owlbert = await fs.readFile('./__tests__/__datasets__/owlbert.png');
+    const owlbert = await fs.readFile('./test/__datasets__/owlbert.png');
 
     const payload = new FormData();
     payload.append('password', 123456);
@@ -465,7 +465,7 @@ describe('Metrics SDK Integration Tests', function () {
     expect(request.headers).to.have.header('content-length', 982);
     expect(request.postData.mimeType).to.match(/multipart\/form-data; boundary=(.*)/);
 
-    const owlbertDataURL = await fs.readFile('./__tests__/__datasets__/owlbert.dataurl.json').then(JSON.parse);
+    const owlbertDataURL = await fs.readFile('./test/__datasets__/owlbert.dataurl.json').then(JSON.parse);
     expect(request.postData.params).to.deep.equal([
       { name: 'password', value: '123456' },
       { name: 'apiKey', value: 'abcdef' },
