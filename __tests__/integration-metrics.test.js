@@ -83,6 +83,8 @@ describe('Metrics SDK Integration Tests', function () {
   });
 
   before(async function () {
+    await isListening(PORT);
+
     server = http
       .createServer((req, res) => {
         // Frameworks are funny. If we run this test suite with PHP we can access our Metrics
@@ -115,9 +117,7 @@ describe('Metrics SDK Integration Tests', function () {
       sockets.add(socket);
     });
 
-    await once(server, 'listening');
-
-    return isListening(PORT);
+    return once(server, 'listening');
   });
 
   after(function () {
