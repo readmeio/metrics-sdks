@@ -67,15 +67,16 @@ describe('Metrics SDK Integration Tests', function () {
       return [sdkCall.req, sdkCall.body];
     }
 
-    const [req] = await once(server, 'request');
+    const [req, res] = await once(server, 'request');
     const body = await getBody(req);
-    return [req, body];
+    return [req, body, res];
   }
 
   beforeEach(function () {
     sdkCall = {
       req: {},
       body: {},
+      res: {},
     };
   });
 
@@ -92,6 +93,7 @@ describe('Metrics SDK Integration Tests', function () {
         // suite works now across all of our SDKs and is no longer flaky.
         if (process.env.HAS_HTTP_QUIRKS) {
           sdkCall.req = req;
+          sdkCall.res = res;
 
           let body = '';
           req.on('data', chunk => {
@@ -136,7 +138,7 @@ describe('Metrics SDK Integration Tests', function () {
   it.only('should make a request to a Metrics backend with a HAR file', async function () {
     await fetch(`http://localhost:${PORT}`, { method: 'get' });
 
-    const [req, body] = await getPayload();
+    const [req, body, res] = await getPayload();
     const [har] = body;
 
     expect(req.url).to.equal('/v1/request');
@@ -196,6 +198,8 @@ describe('Metrics SDK Integration Tests', function () {
     expect(response.content.text.replace('\n', '')).to.equal(JSON.stringify({ message: 'hello world' }));
     expect(response.content.size).to.equal(response.content.text.length);
     expect(response.content.mimeType).to.match(/application\/json(;\s?charset=utf-8)?/);
+
+    res.end();
   });
 
   it('should capture query strings in a GET request', async function () {
