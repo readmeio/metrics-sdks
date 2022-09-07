@@ -87,6 +87,11 @@ test-webhooks-python-flask: ## Run webhooks tests against the Python SDK + Flask
 test-metrics-ruby-rails: ## Run Metrics tests against the Ruby SDK + Rails
 	docker-compose up --build --detach integration_ruby_rails
 	curl -v http://localhost:8000
+	curl -v http://localhost:8000
+	curl -v http://localhost:8000
+	curl -v http://localhost:8000
+	curl -v http://localhost:8000
+	curl -v http://localhost:8000
 	npm run test:integration-metrics
 
 test-webhooks-ruby-rails: ## Run webhooks tests against the Ruby SDK + Rails
