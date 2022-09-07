@@ -1,7 +1,0 @@
-{
-  "extends": "@readme/eslint-config/testing",
-  "rules": {
-    "jest/no-conditional-expect": "off",
-    "jest/no-try-expect": "off"
-  }
-}

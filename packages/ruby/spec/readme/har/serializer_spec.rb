@@ -39,7 +39,7 @@ RSpec.describe Readme::Har::Serializer do
       expect(json.dig('log', 'entries', 0, 'timings', 'send')).to eq 0
       expect(json.dig('log', 'entries', 0, 'timings', 'receive')).to eq 0
       expect(json.dig('log', 'entries', 0, 'timings', 'wait')).to eq 1000
-      expect(json.dig('log', 'entries', 0, 'startedDateTime')).to eq start_time.iso8601
+      expect(json.dig('log', 'entries', 0, 'startedDateTime')).to eq start_time.utc.iso8601(3)
       expect(json.dig('log', 'entries', 0, 'time')).to eq 1000
     end
   end

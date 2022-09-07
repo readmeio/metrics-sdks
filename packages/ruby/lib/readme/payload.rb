@@ -1,5 +1,11 @@
 require 'socket'
-require 'uuid'
+require 'securerandom'
+
+def validate_uuid(uuid)
+  return if uuid.nil?
+
+  uuid.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
+end
 
 module Readme
   class Payload
@@ -13,12 +19,12 @@ module Readme
       @ignore = info[:ignore]
       @ip_address = ip_address
       @development = development
-      @uuid = UUID.new
+      @uuid = SecureRandom.uuid
     end
 
     def to_json(*_args)
       {
-        logId: UUID.validate(@log_id) ? @log_id : @uuid.generate,
+        _id: validate_uuid(@log_id) ? @log_id : @uuid,
         group: @user_info,
         clientIPAddress: @ip_address,
         development: @development,

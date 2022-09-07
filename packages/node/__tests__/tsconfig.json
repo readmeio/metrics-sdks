@@ -1,8 +1,0 @@
-{
-  "extends": "../tsconfig.json",
-  "compilerOptions": {
-    "downlevelIteration": true,
-    "types": ["node", "jest"]
-  },
-  "include": ["./index.test.ts", "./lib/*.ts"]
-}

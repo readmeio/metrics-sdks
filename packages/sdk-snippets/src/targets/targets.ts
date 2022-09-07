@@ -6,6 +6,7 @@ import { csharp } from './csharp/target';
 import { node } from './node/target';
 import { php } from './php/target';
 import { python } from './python/target';
+import { ruby } from './ruby/target';
 
 export type TargetId = keyof typeof targets;
 export type SnippetType = 'webhooks' | 'server';
@@ -63,4 +64,5 @@ export const targets = {
   node,
   php,
   python,
+  ruby,
 };

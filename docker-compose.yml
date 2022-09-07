@@ -20,7 +20,7 @@ services:
   integration_dotnet_metrics_v6.0:
     build:
       context: .
-      dockerfile: ./__tests__/integrations/dotnet/v6.0.Dockerfile
+      dockerfile: ./test/integrations/dotnet/v6.0.Dockerfile
     ports:
       - 8000:8000
     extra_hosts: *default-extra_hosts
@@ -30,7 +30,7 @@ services:
   integration_dotnet_webhooks_v6.0:
     build:
       context: .
-      dockerfile: ./__tests__/integrations/dotnet/v6.0-webhooks.Dockerfile
+      dockerfile: ./test/integrations/dotnet/v6.0-webhooks.Dockerfile
     ports:
       - 8000:8000
     extra_hosts: *default-extra_hosts
@@ -43,7 +43,7 @@ services:
   integration_node_express:
     build:
       context: .
-      dockerfile: ./__tests__/integrations/node/express.Dockerfile
+      dockerfile: ./test/integrations/node/express.Dockerfile
     ports:
       - 8000:8000
     extra_hosts: *default-extra_hosts
@@ -53,7 +53,7 @@ services:
   integration_node_fastify:
     build:
       context: .
-      dockerfile: ./__tests__/integrations/node/fastify.Dockerfile
+      dockerfile: ./test/integrations/node/fastify.Dockerfile
     ports:
       - 8000:8000
     extra_hosts: *default-extra_hosts
@@ -63,7 +63,7 @@ services:
   integration_node_hapi:
     build:
       context: .
-      dockerfile: ./__tests__/integrations/node/hapi.Dockerfile
+      dockerfile: ./test/integrations/node/hapi.Dockerfile
     ports:
       - 8000:8000
     extra_hosts: *default-extra_hosts
@@ -76,7 +76,7 @@ services:
   integration_php_laravel:
     build:
       context: .
-      dockerfile: ./__tests__/integrations/php/laravel.Dockerfile
+      dockerfile: ./test/integrations/php/laravel.Dockerfile
     ports:
       - 8000:8000
     extra_hosts: *default-extra_hosts
@@ -89,7 +89,7 @@ services:
   integration_metrics_python_django:
     build:
       context: .
-      dockerfile: ./__tests__/integrations/python/django.Dockerfile
+      dockerfile: ./test/integrations/python/django.Dockerfile
     ports:
       - 8000:8000
     extra_hosts: *default-extra_hosts
@@ -99,7 +99,7 @@ services:
   integration_python_flask_metrics:
     build:
       context: .
-      dockerfile: ./__tests__/integrations/python/flask.Dockerfile
+      dockerfile: ./test/integrations/python/flask.Dockerfile
     ports:
       - 8000:8000
     extra_hosts: *default-extra_hosts
@@ -109,7 +109,20 @@ services:
   integration_python_flask_webhooks:
     build:
       context: .
-      dockerfile: ./__tests__/integrations/python/flask-webhooks.Dockerfile
+      dockerfile: ./test/integrations/python/flask-webhooks.Dockerfile
+    ports:
+      - 8000:8000
+    extra_hosts: *default-extra_hosts
+    environment:
+      <<: *server-config
+
+  #
+  # Ruby
+  #
+  integration_ruby_rails:
+    build:
+      context: .
+      dockerfile: ./test/integrations/ruby/rails.Dockerfile
     ports:
       - 8000:8000
     extra_hosts: *default-extra_hosts

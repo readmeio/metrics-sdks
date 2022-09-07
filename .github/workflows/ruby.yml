@@ -3,6 +3,23 @@ name: ruby
 on: [push]
 
 jobs:
+  integration:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+
+    - run: npm ci --ignore-scripts
+    - run: make test-metrics-ruby-rails
+    - run: make test-webhooks-ruby-rails
+
+    - name: Cleanup
+      if: always()
+      run: docker-compose down
+
   build:
     runs-on: ubuntu-latest
     defaults:

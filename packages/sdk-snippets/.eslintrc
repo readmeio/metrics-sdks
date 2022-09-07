@@ -2,15 +2,10 @@
   "extends": [
     "@readme/eslint-config",
     "@readme/eslint-config/typescript",
-    "@readme/eslint-config/testing"
+    "@readme/eslint-config/testing-mocha"
   ],
   "root": true,
   "rules": {
     "@typescript-eslint/no-explicit-any": "off"
-  },
-  "settings": {
-    "jest": {
-      "version": 28
-    }
   }
 }

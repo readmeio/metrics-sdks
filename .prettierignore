@@ -2,7 +2,9 @@ packages/cloudflare-worker/coverage/
 packages/cloudflare-worker/dist/
 packages/node/coverage/
 packages/node/dist/
+packages/php/examples/
 packages/php/vendor/
+packages/python/.pytest_cache/
 packages/sdk-snippets/src/targets/**/fixtures/
 CHANGELOG.md
 dist

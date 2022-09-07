@@ -126,7 +126,7 @@ To run integration testing on a new Metrics SDK or an implementation of that SDK
 
 - [ ] The HTTP server should have a listener on `GET /` that responds with a 200 status code, and a JSON response body of `{ "message": "hello world" }`.
 - [ ] The HTTP server should have a listener on `POST /` that will be provided with a JSON body of `{ "user": { "email": "dom@readme.io" } }` which should be included in the Metrics payload. This should respond with a 200 status code and an empty body.
-- [ ] You must create a Docker container for your HTTP server in `__tests__/integrations/` under the SDK language you're using.
+- [ ] You must create a Docker container for your HTTP server in `test/integrations/` under the SDK language you're using.
   - See those directories for some existing examples.
 - [ ] You must add your Docker container into `docker-compose.yml`.
   - See `docker-compose.yml` for existing examples.
@@ -159,7 +159,7 @@ To run integration testing on a new webhooks implementation you must do the foll
   - If the signature passes validation, it should respond with a 200 status code, and a JSON response body of `{ "petstore_auth": "default-key", "basic_auth": { user: "user", pass: "pass" } }`
 * [ ] The HTTP server should use the `README_API_KEY` environment variable as the secret to validate the Webhook signature.
 
-- [ ] You must create a Docker container for your HTTP server in `__tests__/integrations/` under the SDK language you're using.
+- [ ] You must create a Docker container for your HTTP server in `test/integrations/` under the SDK language you're using.
   - See those directories for some existing examples.
   - If you can, try to keep webhooks and Metrics applications in the same stack so we don't have demo apps only to demo webhooks or the same but for Metrics. The less overall code we need to maintain in these applications the better.
 - [ ] You must add your Docker container into `docker-compose.yml`.
@@ -212,5 +212,5 @@ http
 5. Run the test suite with Mocha:
 
 ```js
-npx mocha __tests__/integration-metrics.test.js
+npx mocha test/integration-metrics.test.js
 ```
