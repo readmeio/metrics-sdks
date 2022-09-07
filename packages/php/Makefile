@@ -1,4 +1,4 @@
-.PHONY: help
+.PHONY: help test
 API_KEY ?= $(shell bash -c 'read -p "ReadMe API Key: " api_key; echo $$api_key')
 
 install: # Install all dependencies

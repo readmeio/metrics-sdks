@@ -185,8 +185,6 @@ describe('processResponse()', function () {
     it('#size', function () {
       const body = JSON.stringify({ a: 1, b: 2, c: 3 });
       return testResponse(res => {
-        // `.content.size` returns a string, while `.length` is integer, and Jest doesn't have any
-        // assertions that do just a `==` so we need to coax the response a bit.
         expect(processResponse(res, res.__bodyCache).content.size).to.equal(JSON.stringify(body).length);
       }, JSON.stringify(body));
     });
