@@ -16,6 +16,10 @@ jobs:
     - run: make test-metrics-ruby-rails
     # - run: make test-webhooks-ruby-rails
 
+    - name: Dump docker logs on failure
+      if: failure()
+      uses: jwalton/gh-docker-logs@v1
+
     - name: Cleanup
       if: always()
       run: docker-compose down

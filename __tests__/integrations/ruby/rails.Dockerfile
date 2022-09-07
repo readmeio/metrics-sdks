@@ -11,4 +11,4 @@ RUN bundle install
 WORKDIR /usr/src/app/examples/metrics-rails
 RUN bundle install
 
-CMD ["bin/rails", "server", "-b", "0.0.0.0", "-p", "8000"]
+CMD ["bin/rails", "server", "-b", "0.0.0.0", "-p", "8000", "-e", "development"]
