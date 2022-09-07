@@ -90,7 +90,7 @@ test-metrics-ruby-rails: ## Run Metrics tests against the Ruby SDK + Rails
 	# docker ps
 	# docker ps --filter name=metrics-sdks_integration_ruby_rails -q
 	# docker exec `docker ps --filter name=metrics-sdks_integration_ruby_rails -q` env
-	# sleep 5
+	sleep 5
 	npm run test:integration-metrics
 
 test-webhooks-ruby-rails: ## Run webhooks tests against the Ruby SDK + Rails
