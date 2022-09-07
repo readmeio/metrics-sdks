@@ -13,7 +13,14 @@ jobs:
           node-version: 14
 
       - run: npm ci --ignore-scripts
-      - run: make test-metrics-ruby-rails
+
+      - run: docker-compose up --build --detach integration_ruby_rails
+
+      - uses: jwalton/gh-docker-logs@v1
+
+      - run: npm run test:integration-metrics
+
+      # - run: make test-metrics-ruby-rails
       # - run: make test-webhooks-ruby-rails
 
       - name: Dump docker logs on failure
