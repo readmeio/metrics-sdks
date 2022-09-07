@@ -42,8 +42,6 @@ function isListening(port, attempt = 0) {
 }
 
 describe('Metrics SDK Integration Tests', function () {
-  this.retries(4);
-
   const sockets = new Set();
 
   let server;
