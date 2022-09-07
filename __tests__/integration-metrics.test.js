@@ -136,7 +136,7 @@ describe('Metrics SDK Integration Tests', function () {
   });
 
   it.only('should make a request to a Metrics backend with a HAR file', async function () {
-    await fetch(`http://0.0.0.0:${PORT}`, { method: 'get' });
+    await fetch(`http://integration_ruby_rails:${PORT}`, { method: 'get' });
 
     const [req, body, res] = await getPayload();
     const [har] = body;
