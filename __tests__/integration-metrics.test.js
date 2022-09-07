@@ -24,6 +24,7 @@ function supportsMultipart() {
 function isListening(port, attempt = 0) {
   return new Promise((resolve, reject) => {
     if (attempt > 5) throw new Error(`Cannot connect on port: ${port}`);
+    console.log(`[isListening] checking 0.0.0.0:${port}`);
     const socket = net.connect(port, '0.0.0.0');
     socket.once('error', err => {
       if (err.code !== 'ECONNREFUSED') {
@@ -35,6 +36,7 @@ function isListening(port, attempt = 0) {
     });
 
     socket.once('connect', () => {
+      console.log(`[isListening] 0.0.0.0:${port} is up`);
       socket.destroy();
       return resolve();
     });
