@@ -38,7 +38,10 @@ function isListening(port, attempt = 0) {
     socket.once('connect', () => {
       console.log(`[isListening] 0.0.0.0:${port} is up`);
       socket.destroy();
-      return resolve();
+      // Sometimes the TCP connection is resolving before
+      // the HTTP server is ready to receive connections
+      // So just sleeping for 500ms to be sure.
+      return setTimeout(() => resolve(), 500);
     });
   });
 }
