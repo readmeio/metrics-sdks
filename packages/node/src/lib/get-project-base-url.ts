@@ -8,7 +8,7 @@ import timeoutSignal from 'timeout-signal';
 import pkg from '../../package.json';
 import config from '../config';
 
-export default async function getProjectBaseUrl(readmeApiKey: string, requestTimeout = config.timeout) {
+export function getCache(readmeApiKey) {
   const encodedApiKey = Buffer.from(`${readmeApiKey}:`).toString('base64');
   const cacheDir = findCacheDir({ name: pkg.name, create: true });
   const fsSafeApikey = crypto.createHash('md5').update(encodedApiKey).digest('hex');
@@ -17,8 +17,13 @@ export default async function getProjectBaseUrl(readmeApiKey: string, requestTim
   // automatically get refreshed when the package is updated/installed.
   const cacheKey = `${pkg.name}-${pkg.version}-${fsSafeApikey}`;
 
-  const cache = flatCache.load(cacheKey, cacheDir);
+  return flatCache.load(cacheKey, cacheDir);
+}
 
+export async function getProjectBaseUrl(readmeApiKey: string, requestTimeout = config.timeout): Promise<string> {
+  const encodedApiKey = Buffer.from(`${readmeApiKey}:`).toString('base64');
+
+  const cache = getCache(readmeApiKey);
   // Does the cache exist? If it doesn't, let's fill it. If it does, let's see if it's stale. Caches should have a TTL
   // of 1 day.
   const lastUpdated = cache.getKey('lastUpdated');

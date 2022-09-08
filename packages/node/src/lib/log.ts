@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import config from '../config';
 
 import { constructPayload } from './construct-payload';
+import { getProjectBaseUrl } from './get-project-base-url';
 import isRequest from './is-request';
 import { metricsAPICall } from './metrics-log';
 import { patchRequest } from './patch-request';
@@ -64,6 +65,17 @@ export interface Options extends LogOptions {
   baseLogUrl?: string;
 }
 
+function setDocumentationHeader(res, baseLogUrl, logId) {
+  // This is to catch the potential race condition where `getProjectBaseUrl()`
+  // takes longer to respond than the original req/res to finish. Without this
+  // we would get an error that would be very difficult to trace. This could
+  // do with a test, but it's a little difficult to test. Maybe with a nock()
+  // delay timeout.
+  if (res.headersSent) return;
+
+  res.setHeader('x-documentation-url', `${baseLogUrl}/logs/${logId}`);
+}
+
 /**
  * This method will send supplied API requests to ReadMe Metrics.
  *
@@ -90,18 +102,21 @@ export function log(
   // Ensures the buffer length is between 1 and 30
   const bufferLength = clamp(options.bufferLength || config.bufferLength, 1, 30);
 
-  const baseLogUrl = options.baseLogUrl || undefined;
-
   const startedDateTime = new Date();
   const logId = uuidv4();
 
+  // baseLogUrl can be provided, but if it isn't then we
+  // attempt to fetch it from the ReadMe API
+  if (typeof options.baseLogUrl === 'string') {
+    setDocumentationHeader(res, options.baseLogUrl, logId);
+  } else {
+    getProjectBaseUrl(readmeApiKey).then(baseLogUrl => {
+      setDocumentationHeader(res, baseLogUrl, logId);
+    });
+  }
+
   patchResponse(res);
   patchRequest(req);
-
-  // @todo we should remove this and put this in the code samples
-  if (baseLogUrl !== undefined && typeof baseLogUrl === 'string') {
-    res.setHeader('x-documentation-url', `${baseLogUrl}/logs/${logId}`);
-  }
 
   /*
    * This should in future become more sophisticated, with flush timeouts and more error checking but

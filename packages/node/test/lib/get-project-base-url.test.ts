@@ -1,18 +1,13 @@
-import { createHash } from 'crypto';
-
 import { expect } from 'chai';
-import findCacheDir from 'find-cache-dir';
-import flatCache from 'flat-cache';
 import nock from 'nock';
-import rimraf from 'rimraf';
 
 import pkg from '../../package.json';
 import { getProjectBaseUrl } from '../../src';
 import config from '../../src/config';
+import { getCache } from '../../src/lib/get-project-base-url';
 
 const apiKey = 'mockReadMeApiKey';
 const baseLogUrl = 'https://docs.example.com';
-const cacheDir = findCacheDir({ name: pkg.name });
 
 // eslint-disable-next-line mocha/no-exports
 export function getReadMeApiMock(numberOfTimes, baseUrl = baseLogUrl) {
@@ -27,18 +22,9 @@ export function getReadMeApiMock(numberOfTimes, baseUrl = baseLogUrl) {
     .reply(200, { baseUrl });
 }
 
-function getCache() {
-  const encodedApiKey = Buffer.from(`${apiKey}:`).toString('base64');
-  const fsSafeApikey = createHash('md5').update(encodedApiKey).digest('hex');
-  const cacheKey = [pkg.name, pkg.version, fsSafeApikey].join('-');
-
-  return flatCache.load(cacheKey, cacheDir);
-}
-
 function hydrateCache(lastUpdated) {
-  const cache = getCache();
+  const cache = getCache(apiKey);
 
-  // Postdate the cache to two days ago so it'll bee seen as stale.
   cache.setKey('lastUpdated', lastUpdated);
   cache.setKey('baseUrl', baseLogUrl);
   cache.save();
@@ -53,19 +39,17 @@ describe('get-project-base-url', function () {
   afterEach(function () {
     nock.cleanAll();
 
-    // Clean up the cache dir between tests.
-    rimraf.sync(cacheDir);
+    getCache(apiKey).destroy();
   });
 
   it('should not call the API for project data if the cache is fresh', async function () {
     const apiMock = getReadMeApiMock(1);
 
     await getProjectBaseUrl(apiKey, 2000);
-    expect(getCache().getKey('baseUrl')).to.deep.equal(baseLogUrl);
-    const lastUpdated = getCache().getKey('lastUpdated');
-
+    expect(getCache(apiKey).getKey('baseUrl')).to.deep.equal(baseLogUrl);
+    const lastUpdated = getCache(apiKey).getKey('lastUpdated');
     await getProjectBaseUrl(apiKey, 2000);
-    expect(getCache().getKey('lastUpdated')).to.deep.equal(lastUpdated);
+    expect(getCache(apiKey).getKey('lastUpdated')).to.deep.equal(lastUpdated);
     apiMock.done();
   });
 
@@ -73,7 +57,7 @@ describe('get-project-base-url', function () {
     const apiMock = getReadMeApiMock(1);
 
     await getProjectBaseUrl(apiKey, 2000);
-    expect(getCache().getKey('baseUrl')).to.deep.equal(baseLogUrl);
+    expect(getCache(apiKey).getKey('baseUrl')).to.deep.equal(baseLogUrl);
 
     apiMock.done();
   });
@@ -83,12 +67,12 @@ describe('get-project-base-url', function () {
 
     // Hydrate and postdate the cache to two days ago so it'll be seen as stale.
     hydrateCache(Math.round(Date.now() / 1000 - 86400 * 2));
-    expect(getCache().getKey('baseUrl')).to.deep.equal(baseLogUrl);
+    expect(getCache(apiKey).getKey('baseUrl')).to.deep.equal(baseLogUrl);
 
-    const lastUpdated = getCache().getKey('lastUpdated');
+    const lastUpdated = getCache(apiKey).getKey('lastUpdated');
     await getProjectBaseUrl(apiKey, 2000);
-    expect(getCache().getKey('baseUrl')).to.deep.equal(baseLogUrl);
-    expect(getCache().getKey('lastUpdated')).not.to.deep.equal(lastUpdated);
+    expect(getCache(apiKey).getKey('baseUrl')).to.deep.equal(baseLogUrl);
+    expect(getCache(apiKey).getKey('lastUpdated')).not.to.deep.equal(lastUpdated);
 
     apiMock.done();
   });
@@ -111,7 +95,7 @@ describe('get-project-base-url', function () {
       });
 
     await getProjectBaseUrl(apiKey, 2000);
-    expect(getCache().getKey('baseUrl')).to.deep.equal(null);
+    expect(getCache(apiKey).getKey('baseUrl')).to.deep.equal(null);
 
     apiMock.done();
   });
