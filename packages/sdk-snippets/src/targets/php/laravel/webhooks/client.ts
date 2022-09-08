@@ -16,7 +16,9 @@ export const laravel: Client = {
       ...options,
     };
 
-    const { blank, join, push, pushVariable, ranges } = new CodeBuilder({ indent: opts.indent });
+    const { blank, endSection, join, push, pushVariable, ranges, startSection } = new CodeBuilder({
+      indent: opts.indent,
+    });
 
     push('<?php');
     blank();
@@ -27,6 +29,7 @@ export const laravel: Client = {
 
     push('// Add this code into your `routes/web.php` file.');
     push("Route::post('/webhook', function (\\Illuminate\\Http\\Request $request) use ($secret) {");
+    startSection('verification');
     push('// Verify the request is legitimate and came from ReadMe.', 1);
     push("$signature = $request->headers->get('readme-signature', '');", 1);
     blank();
@@ -39,8 +42,10 @@ export const laravel: Client = {
     push("'error' => $e->getMessage()", 3);
     push('], 401);', 2);
     push('}', 1);
+    endSection('verification');
     blank();
 
+    startSection('payload');
     push('// Fetch the user from the database and return their data for use with OpenAPI variables.', 1);
     push("// $user = DB::table('users')->where('email', $request->input('email'))->limit(1)->get();", 1);
     push('return response()->json([', 1);
@@ -98,7 +103,9 @@ export const laravel: Client = {
     }
 
     push(']);', 1);
+    endSection('payload');
     push('});');
+    blank();
 
     return {
       ranges: ranges(),

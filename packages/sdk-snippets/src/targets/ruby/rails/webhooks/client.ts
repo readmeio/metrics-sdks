@@ -16,7 +16,9 @@ export const rails: Client = {
       ...options,
     };
 
-    const { blank, join, push, pushVariable, ranges } = new CodeBuilder({ indent: opts.indent });
+    const { blank, endSection, join, push, pushVariable, ranges, startSection } = new CodeBuilder({
+      indent: opts.indent,
+    });
 
     push("require 'readme/webhook'");
 
@@ -37,9 +39,10 @@ export const rails: Client = {
     blank();
 
     push('def webhook', 1);
+    startSection('verification');
     push('# Your ReadMe secret', 2);
     push(`secret = '${secret}'`, 2);
-    push('# Verify the request is legitimate and came from ReadMe', 2);
+    push('# Verify the request is legitimate and came from ReadMe', 2);
     push("signature = request.headers['readme-signature']", 2);
 
     blank();
@@ -51,9 +54,11 @@ export const rails: Client = {
     push('render json: { error: e.message }, status: 401', 3);
     push('return', 3);
     push('end', 2);
+    endSection('verification');
 
     blank();
 
+    startSection('payload');
     push('# Fetch the user from the database and return their data for use with OpenAPI variables.', 2);
     push('# current_user ||= User.find(session[:user_id]) if session[:user_id]', 2);
     push('render json: {', 2);
@@ -110,6 +115,7 @@ export const rails: Client = {
     }
 
     push('}', 2);
+    endSection('payload');
     push('end', 1);
     push('end');
 

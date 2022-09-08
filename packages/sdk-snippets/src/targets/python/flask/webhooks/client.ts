@@ -16,7 +16,9 @@ export const flask: Client = {
       ...options,
     };
 
-    const { blank, join, push, pushVariable, ranges } = new CodeBuilder({ indent: opts.indent });
+    const { blank, endSection, join, push, pushVariable, ranges, startSection } = new CodeBuilder({
+      indent: opts.indent,
+    });
 
     push('import os');
     push('import sys');
@@ -40,6 +42,7 @@ export const flask: Client = {
 
     push('@app.post("/webhook")');
     push('def webhook():');
+    startSection('verification');
     push('# Verify the request is legitimate and came from ReadMe.', 1);
     push('signature = request.headers.get("readme-signature", None)', 1);
     blank();
@@ -52,8 +55,10 @@ export const flask: Client = {
     push('401,', 3);
     push('{"Content-Type": "application/json; charset=utf-8"},', 3);
     push(')', 2);
+    endSection('verification');
     blank();
 
+    startSection('payload');
     push('# Fetch the user from the database and return their data for use with OpenAPI variables.', 1);
     push('# user = User.objects.get(email__exact=request.values.get("email"))', 1);
     push('return (', 1);
@@ -115,11 +120,13 @@ export const flask: Client = {
     push('200,', 2);
     push('{"Content-Type": "application/json; charset=utf-8"},', 2);
     push(')', 1);
+    endSection('payload');
     blank();
     blank();
 
     push('if __name__ == "__main__":');
     push('app.run(debug=False, host="127.0.0.1", port=os.getenv("PORT", "8000"))', 1);
+    blank();
 
     return {
       ranges: ranges(),
