@@ -4,8 +4,8 @@ import type { TLSSocket } from 'tls';
 
 import os from 'os';
 import { URL } from 'url';
-import ssri from 'ssri';
 
+import ssri from 'ssri';
 import { v4 as uuidv4 } from 'uuid';
 
 import { version } from '../../package.json';
