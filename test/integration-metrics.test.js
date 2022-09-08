@@ -136,6 +136,14 @@ describe('Metrics SDK Integration Tests', function () {
     });
   });
 
+  function getGroupId() {
+    // Hashing is only supported in some versions of the SDK
+    if (process.env.SUPPORTS_HASHING) {
+      return 'sha512-u2GbQ83jIqNa+a8v110+8IDztQQr4joL1xSE+wFH51zSOA1qQKPwOC8t2n2LWJQA1mX4ZLZ45SEokITzLed/ow==?-key';
+    }
+    return 'owlbert-api-key';
+  }
+
   it('should make a request to a Metrics backend with a HAR file', async function () {
     await fetch(`http://localhost:${PORT}`, { method: 'get' });
 
@@ -148,11 +156,9 @@ describe('Metrics SDK Integration Tests', function () {
     // https://uibakery.io/regex-library/uuid
     expect(har._id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 
-    expect(har.group).to.deep.equal({
-      id: 'owlbert-api-key',
-      label: 'Owlbert',
-      email: 'owlbert@example.com',
-    });
+    expect(har.group.id).toBe(getGroupId());
+    expect(har.group.email).toBe('owlbert@example.com');
+    expect(har.group.label).toBe('Owlbert');
 
     expect(har.clientIPAddress).to.match(/\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}/);
     expect(har.development).to.be.false;
