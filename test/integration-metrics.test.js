@@ -207,6 +207,25 @@ describe('Metrics SDK Integration Tests', function () {
     expect(response.content.mimeType).to.match(/application\/json(;\s?charset=utf-8)?/);
   });
 
+  const authorizationHeader = 'Bearer: a-random-api-key';
+  function getAuthorizationHeader() {
+    if (process.env.SUPPORTS_HASHING) {
+      return 'sha512-7S+L0vUE8Fn6HI3836rtz4b6fVf6H4JFur6SGkOnL3bFpC856+OSZkpIHphZ0ipNO+kUw1ePb5df2iYrNQCpXw==?-key';
+    }
+    return authorizationHeader;
+  }
+
+  it('should process `Authorization` header', async function () {
+    await fetch(`http://localhost:${PORT}`, { method: 'get', headers: { authorization: authorizationHeader } });
+
+    const [body] = await getPayload();
+    const [har] = body;
+
+    const { request } = har.request.log.entries[0];
+
+    expect(request.headers).to.have.header('authorization', getAuthorizationHeader());
+  });
+
   it('should capture query strings in a GET request', async function () {
     await fetch(`http://localhost:${PORT}?arr%5B1%5D=3&val=1`, { method: 'get' });
 
