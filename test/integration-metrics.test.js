@@ -156,9 +156,9 @@ describe('Metrics SDK Integration Tests', function () {
     // https://uibakery.io/regex-library/uuid
     expect(har._id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 
-    expect(har.group.id).toBe(getGroupId());
-    expect(har.group.email).toBe('owlbert@example.com');
-    expect(har.group.label).toBe('Owlbert');
+    expect(har.group.id).to.equal(getGroupId());
+    expect(har.group.email).to.equal('owlbert@example.com');
+    expect(har.group.label).to.equal('Owlbert');
 
     expect(har.clientIPAddress).to.match(/\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}/);
     expect(har.development).to.be.false;
@@ -218,7 +218,7 @@ describe('Metrics SDK Integration Tests', function () {
   it('should process `Authorization` header', async function () {
     await fetch(`http://localhost:${PORT}`, { method: 'get', headers: { authorization: authorizationHeader } });
 
-    const [body] = await getPayload();
+    const [, body] = await getPayload();
     const [har] = body;
 
     const { request } = har.request.log.entries[0];
