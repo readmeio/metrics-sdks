@@ -142,7 +142,7 @@ describe('process-request', function () {
       .set('authorization', 'Bearer 123456')
       .expect(({ body }) => {
         expect(body.headers).to.have.header(
-          'host',
+          'authorization',
           'sha512-31rXi6lhQcMvMwee0P6yu9xyHuAWDUEuDzcSBQCCUUvlQ6BZXcu67qy1hrD2nbrjeDLKrYrBbQoMOrLnJVmbCw==?3456'
         );
       });
