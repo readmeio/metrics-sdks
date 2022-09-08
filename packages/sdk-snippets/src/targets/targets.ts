@@ -20,8 +20,14 @@ export interface ClientInfo {
 }
 
 export interface ClientRanges {
-  security?: Record<string, { line: number }>;
-  server?: Record<string, { line: number }>;
+  sections: {
+    payload?: { start: number; end: number };
+    verification?: { start: number; end: number };
+  };
+  variables: {
+    security?: Record<string, { line: number }>;
+    server?: Record<string, { line: number }>;
+  };
 }
 
 export type Converter<T extends Record<string, any>> = (

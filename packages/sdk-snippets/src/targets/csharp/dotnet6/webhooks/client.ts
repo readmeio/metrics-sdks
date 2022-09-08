@@ -16,7 +16,9 @@ export const dotnet6: Client = {
       ...options,
     };
 
-    const { blank, join, push, pushVariable, ranges } = new CodeBuilder({ indent: opts.indent });
+    const { blank, endSection, join, push, pushVariable, ranges, startSection } = new CodeBuilder({
+      indent: opts.indent,
+    });
 
     push('var builder = WebApplication.CreateBuilder(args);');
     push('var app = builder.Build();');
@@ -30,6 +32,7 @@ export const dotnet6: Client = {
 
     push('app.MapPost("/webhook", async context =>');
     push('{');
+    startSection('verification');
     push('// Verify the request is legitimate and came from ReadMe.', 1);
     push('var signature = context.Request.Headers["readme-signature"];', 1);
     push('var body = await new StreamReader(context.Request.Body).ReadToEndAsync();', 1);
@@ -49,8 +52,10 @@ export const dotnet6: Client = {
     push('});', 2);
     push('return;', 2);
     push('}', 1);
+    endSection('verification');
     blank();
 
+    startSection('payload');
     push('// Fetch the user from the database and return their data for use with OpenAPI variables.', 1);
     push('// @todo Write your own query logic to fetch a user by `body["email"]`.', 1);
     blank();
@@ -111,11 +116,13 @@ export const dotnet6: Client = {
     }
 
     push('});', 1);
+    endSection('payload');
     push('});');
 
     blank();
 
     push('app.Run($"http://localhost:8000");');
+    blank();
 
     return {
       ranges: ranges(),

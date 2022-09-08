@@ -16,7 +16,9 @@ export const express: Client = {
       ...options,
     };
 
-    const { blank, join, push, pushVariable, ranges } = new CodeBuilder({ indent: opts.indent });
+    const { blank, endSection, join, push, pushVariable, ranges, startSection } = new CodeBuilder({
+      indent: opts.indent,
+    });
 
     push("import express from 'express';");
     push("import readme from 'readmeio';");
@@ -31,6 +33,7 @@ export const express: Client = {
     blank();
 
     push("app.post('/webhook', express.json({ type: 'application/json' }), async (req, res) => {");
+    startSection('verification');
     push('// Verify the request is legitimate and came from ReadMe.', 1);
     push("const signature = req.headers['readme-signature'];", 1);
     blank();
@@ -41,8 +44,10 @@ export const express: Client = {
     push('// Handle invalid requests', 2);
     push('return res.status(401).json({ error: e.message });', 2);
     push('}', 1);
+    endSection('verification');
     blank();
 
+    startSection('payload');
     push('// Fetch the user from the database and return their data for use with OpenAPI variables.', 1);
     push('// const user = await db.find({ email: req.body.email })', 1);
     push('return res.json({', 1);
@@ -100,11 +105,13 @@ export const express: Client = {
     }
 
     push('});', 1);
+    endSection('payload');
     push('});');
 
     blank();
 
     push('app.listen(8000);');
+    blank();
 
     return {
       ranges: ranges(),

@@ -1,17 +1,43 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`webhooks C# snippet generation dotnet6 request should match fixture for "empty" 1`] = `Object {}`;
+exports[`webhooks C# snippet generation dotnet6 request should match fixture for "empty" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 33,
+      "start": 27,
+    },
+    "verification": Object {
+      "end": 25,
+      "start": 9,
+    },
+  },
+  "variables": Object {},
+}
+`;
 
 exports[`webhooks C# snippet generation dotnet6 request should match fixture for "empty-default" 1`] = `
 Object {
-  "security": Object {
-    "petstore_auth": Object {
-      "line": 36,
+  "sections": Object {
+    "payload": Object {
+      "end": 37,
+      "start": 27,
+    },
+    "verification": Object {
+      "end": 25,
+      "start": 9,
     },
   },
-  "server": Object {
-    "name": Object {
-      "line": 33,
+  "variables": Object {
+    "security": Object {
+      "petstore_auth": Object {
+        "line": 36,
+      },
+    },
+    "server": Object {
+      "name": Object {
+        "line": 33,
+      },
     },
   },
 }
@@ -19,29 +45,41 @@ Object {
 
 exports[`webhooks C# snippet generation dotnet6 request should match fixture for "quirky-escaping" 1`] = `
 Object {
-  "security": Object {
-    "\\"petstore\\" auth": Object {
-      "line": 39,
+  "sections": Object {
+    "payload": Object {
+      "end": 42,
+      "start": 27,
     },
-    "basic-auth": Object {
-      "line": 40,
-    },
-    "normal_security_var": Object {
-      "line": 41,
+    "verification": Object {
+      "end": 25,
+      "start": 9,
     },
   },
-  "server": Object {
-    "*port": Object {
-      "line": 34,
+  "variables": Object {
+    "security": Object {
+      "\\"petstore\\" auth": Object {
+        "line": 39,
+      },
+      "basic-auth": Object {
+        "line": 40,
+      },
+      "normal_security_var": Object {
+        "line": 41,
+      },
     },
-    "2name": Object {
-      "line": 33,
-    },
-    "normal_server_var": Object {
-      "line": 36,
-    },
-    "p*o?r*t": Object {
-      "line": 35,
+    "server": Object {
+      "*port": Object {
+        "line": 34,
+      },
+      "2name": Object {
+        "line": 33,
+      },
+      "normal_server_var": Object {
+        "line": 36,
+      },
+      "p*o?r*t": Object {
+        "line": 35,
+      },
     },
   },
 }
@@ -49,20 +87,32 @@ Object {
 
 exports[`webhooks C# snippet generation dotnet6 request should match fixture for "security-and-server-variables" 1`] = `
 Object {
-  "security": Object {
-    "basic_auth": Object {
-      "line": 38,
+  "sections": Object {
+    "payload": Object {
+      "end": 39,
+      "start": 27,
     },
-    "petstore_auth": Object {
-      "line": 37,
+    "verification": Object {
+      "end": 25,
+      "start": 9,
     },
   },
-  "server": Object {
-    "name": Object {
-      "line": 33,
+  "variables": Object {
+    "security": Object {
+      "basic_auth": Object {
+        "line": 38,
+      },
+      "petstore_auth": Object {
+        "line": 37,
+      },
     },
-    "port": Object {
-      "line": 34,
+    "server": Object {
+      "name": Object {
+        "line": 33,
+      },
+      "port": Object {
+        "line": 34,
+      },
     },
   },
 }
@@ -70,18 +120,30 @@ Object {
 
 exports[`webhooks C# snippet generation dotnet6 request should match fixture for "security-types" 1`] = `
 Object {
-  "security": Object {
-    "api_key": Object {
-      "line": 33,
+  "sections": Object {
+    "payload": Object {
+      "end": 37,
+      "start": 27,
     },
-    "http_basic": Object {
-      "line": 34,
+    "verification": Object {
+      "end": 25,
+      "start": 9,
     },
-    "http_bearer": Object {
-      "line": 35,
-    },
-    "oauth2": Object {
-      "line": 36,
+  },
+  "variables": Object {
+    "security": Object {
+      "api_key": Object {
+        "line": 33,
+      },
+      "http_basic": Object {
+        "line": 34,
+      },
+      "http_bearer": Object {
+        "line": 35,
+      },
+      "oauth2": Object {
+        "line": 36,
+      },
     },
   },
 }
@@ -89,12 +151,24 @@ Object {
 
 exports[`webhooks C# snippet generation dotnet6 request should match fixture for "security-variables" 1`] = `
 Object {
-  "security": Object {
-    "basic_auth": Object {
-      "line": 34,
+  "sections": Object {
+    "payload": Object {
+      "end": 35,
+      "start": 27,
     },
-    "petstore_auth": Object {
-      "line": 33,
+    "verification": Object {
+      "end": 25,
+      "start": 9,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "basic_auth": Object {
+        "line": 34,
+      },
+      "petstore_auth": Object {
+        "line": 33,
+      },
     },
   },
 }
@@ -102,29 +176,67 @@ Object {
 
 exports[`webhooks C# snippet generation dotnet6 request should match fixture for "server-variables" 1`] = `
 Object {
-  "server": Object {
-    "name": Object {
-      "line": 33,
+  "sections": Object {
+    "payload": Object {
+      "end": 35,
+      "start": 27,
     },
-    "port": Object {
-      "line": 34,
+    "verification": Object {
+      "end": 25,
+      "start": 9,
+    },
+  },
+  "variables": Object {
+    "server": Object {
+      "name": Object {
+        "line": 33,
+      },
+      "port": Object {
+        "line": 34,
+      },
     },
   },
 }
 `;
 
-exports[`webhooks Node.js snippet generation express request should match fixture for "empty" 1`] = `Object {}`;
+exports[`webhooks Node.js snippet generation express request should match fixture for "empty" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 24,
+      "start": 20,
+    },
+    "verification": Object {
+      "end": 18,
+      "start": 10,
+    },
+  },
+  "variables": Object {},
+}
+`;
 
 exports[`webhooks Node.js snippet generation express request should match fixture for "empty-default" 1`] = `
 Object {
-  "security": Object {
-    "petstore_auth": Object {
-      "line": 27,
+  "sections": Object {
+    "payload": Object {
+      "end": 28,
+      "start": 20,
+    },
+    "verification": Object {
+      "end": 18,
+      "start": 10,
     },
   },
-  "server": Object {
-    "name": Object {
-      "line": 24,
+  "variables": Object {
+    "security": Object {
+      "petstore_auth": Object {
+        "line": 27,
+      },
+    },
+    "server": Object {
+      "name": Object {
+        "line": 24,
+      },
     },
   },
 }
@@ -132,29 +244,41 @@ Object {
 
 exports[`webhooks Node.js snippet generation express request should match fixture for "quirky-escaping" 1`] = `
 Object {
-  "security": Object {
-    "\\"petstore\\" auth": Object {
-      "line": 30,
+  "sections": Object {
+    "payload": Object {
+      "end": 33,
+      "start": 20,
     },
-    "basic-auth": Object {
-      "line": 31,
-    },
-    "normal_security_var": Object {
-      "line": 32,
+    "verification": Object {
+      "end": 18,
+      "start": 10,
     },
   },
-  "server": Object {
-    "*port": Object {
-      "line": 25,
+  "variables": Object {
+    "security": Object {
+      "\\"petstore\\" auth": Object {
+        "line": 30,
+      },
+      "basic-auth": Object {
+        "line": 31,
+      },
+      "normal_security_var": Object {
+        "line": 32,
+      },
     },
-    "2name": Object {
-      "line": 24,
-    },
-    "normal_server_var": Object {
-      "line": 27,
-    },
-    "p*o?r*t": Object {
-      "line": 26,
+    "server": Object {
+      "*port": Object {
+        "line": 25,
+      },
+      "2name": Object {
+        "line": 24,
+      },
+      "normal_server_var": Object {
+        "line": 27,
+      },
+      "p*o?r*t": Object {
+        "line": 26,
+      },
     },
   },
 }
@@ -162,20 +286,32 @@ Object {
 
 exports[`webhooks Node.js snippet generation express request should match fixture for "security-and-server-variables" 1`] = `
 Object {
-  "security": Object {
-    "basic_auth": Object {
-      "line": 29,
+  "sections": Object {
+    "payload": Object {
+      "end": 30,
+      "start": 20,
     },
-    "petstore_auth": Object {
-      "line": 28,
+    "verification": Object {
+      "end": 18,
+      "start": 10,
     },
   },
-  "server": Object {
-    "name": Object {
-      "line": 24,
+  "variables": Object {
+    "security": Object {
+      "basic_auth": Object {
+        "line": 29,
+      },
+      "petstore_auth": Object {
+        "line": 28,
+      },
     },
-    "port": Object {
-      "line": 25,
+    "server": Object {
+      "name": Object {
+        "line": 24,
+      },
+      "port": Object {
+        "line": 25,
+      },
     },
   },
 }
@@ -183,18 +319,30 @@ Object {
 
 exports[`webhooks Node.js snippet generation express request should match fixture for "security-types" 1`] = `
 Object {
-  "security": Object {
-    "api_key": Object {
-      "line": 24,
+  "sections": Object {
+    "payload": Object {
+      "end": 28,
+      "start": 20,
     },
-    "http_basic": Object {
-      "line": 25,
+    "verification": Object {
+      "end": 18,
+      "start": 10,
     },
-    "http_bearer": Object {
-      "line": 26,
-    },
-    "oauth2": Object {
-      "line": 27,
+  },
+  "variables": Object {
+    "security": Object {
+      "api_key": Object {
+        "line": 24,
+      },
+      "http_basic": Object {
+        "line": 25,
+      },
+      "http_bearer": Object {
+        "line": 26,
+      },
+      "oauth2": Object {
+        "line": 27,
+      },
     },
   },
 }
@@ -202,12 +350,24 @@ Object {
 
 exports[`webhooks Node.js snippet generation express request should match fixture for "security-variables" 1`] = `
 Object {
-  "security": Object {
-    "basic_auth": Object {
-      "line": 25,
+  "sections": Object {
+    "payload": Object {
+      "end": 26,
+      "start": 20,
     },
-    "petstore_auth": Object {
-      "line": 24,
+    "verification": Object {
+      "end": 18,
+      "start": 10,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "basic_auth": Object {
+        "line": 25,
+      },
+      "petstore_auth": Object {
+        "line": 24,
+      },
     },
   },
 }
@@ -215,29 +375,67 @@ Object {
 
 exports[`webhooks Node.js snippet generation express request should match fixture for "server-variables" 1`] = `
 Object {
-  "server": Object {
-    "name": Object {
-      "line": 24,
+  "sections": Object {
+    "payload": Object {
+      "end": 26,
+      "start": 20,
     },
-    "port": Object {
-      "line": 25,
+    "verification": Object {
+      "end": 18,
+      "start": 10,
+    },
+  },
+  "variables": Object {
+    "server": Object {
+      "name": Object {
+        "line": 24,
+      },
+      "port": Object {
+        "line": 25,
+      },
     },
   },
 }
 `;
 
-exports[`webhooks PHP snippet generation laravel request should match fixture for "empty" 1`] = `Object {}`;
+exports[`webhooks PHP snippet generation laravel request should match fixture for "empty" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 24,
+      "start": 20,
+    },
+    "verification": Object {
+      "end": 18,
+      "start": 8,
+    },
+  },
+  "variables": Object {},
+}
+`;
 
 exports[`webhooks PHP snippet generation laravel request should match fixture for "empty-default" 1`] = `
 Object {
-  "security": Object {
-    "petstore_auth": Object {
-      "line": 27,
+  "sections": Object {
+    "payload": Object {
+      "end": 28,
+      "start": 20,
+    },
+    "verification": Object {
+      "end": 18,
+      "start": 8,
     },
   },
-  "server": Object {
-    "name": Object {
-      "line": 24,
+  "variables": Object {
+    "security": Object {
+      "petstore_auth": Object {
+        "line": 27,
+      },
+    },
+    "server": Object {
+      "name": Object {
+        "line": 24,
+      },
     },
   },
 }
@@ -245,29 +443,41 @@ Object {
 
 exports[`webhooks PHP snippet generation laravel request should match fixture for "quirky-escaping" 1`] = `
 Object {
-  "security": Object {
-    "\\"petstore\\" auth": Object {
-      "line": 30,
+  "sections": Object {
+    "payload": Object {
+      "end": 33,
+      "start": 20,
     },
-    "basic-auth": Object {
-      "line": 31,
-    },
-    "normal_security_var": Object {
-      "line": 32,
+    "verification": Object {
+      "end": 18,
+      "start": 8,
     },
   },
-  "server": Object {
-    "*port": Object {
-      "line": 25,
+  "variables": Object {
+    "security": Object {
+      "\\"petstore\\" auth": Object {
+        "line": 30,
+      },
+      "basic-auth": Object {
+        "line": 31,
+      },
+      "normal_security_var": Object {
+        "line": 32,
+      },
     },
-    "2name": Object {
-      "line": 24,
-    },
-    "normal_server_var": Object {
-      "line": 27,
-    },
-    "p*o?r*t": Object {
-      "line": 26,
+    "server": Object {
+      "*port": Object {
+        "line": 25,
+      },
+      "2name": Object {
+        "line": 24,
+      },
+      "normal_server_var": Object {
+        "line": 27,
+      },
+      "p*o?r*t": Object {
+        "line": 26,
+      },
     },
   },
 }
@@ -275,20 +485,32 @@ Object {
 
 exports[`webhooks PHP snippet generation laravel request should match fixture for "security-and-server-variables" 1`] = `
 Object {
-  "security": Object {
-    "basic_auth": Object {
-      "line": 29,
+  "sections": Object {
+    "payload": Object {
+      "end": 30,
+      "start": 20,
     },
-    "petstore_auth": Object {
-      "line": 28,
+    "verification": Object {
+      "end": 18,
+      "start": 8,
     },
   },
-  "server": Object {
-    "name": Object {
-      "line": 24,
+  "variables": Object {
+    "security": Object {
+      "basic_auth": Object {
+        "line": 29,
+      },
+      "petstore_auth": Object {
+        "line": 28,
+      },
     },
-    "port": Object {
-      "line": 25,
+    "server": Object {
+      "name": Object {
+        "line": 24,
+      },
+      "port": Object {
+        "line": 25,
+      },
     },
   },
 }
@@ -296,18 +518,30 @@ Object {
 
 exports[`webhooks PHP snippet generation laravel request should match fixture for "security-types" 1`] = `
 Object {
-  "security": Object {
-    "api_key": Object {
-      "line": 24,
+  "sections": Object {
+    "payload": Object {
+      "end": 28,
+      "start": 20,
     },
-    "http_basic": Object {
-      "line": 25,
+    "verification": Object {
+      "end": 18,
+      "start": 8,
     },
-    "http_bearer": Object {
-      "line": 26,
-    },
-    "oauth2": Object {
-      "line": 27,
+  },
+  "variables": Object {
+    "security": Object {
+      "api_key": Object {
+        "line": 24,
+      },
+      "http_basic": Object {
+        "line": 25,
+      },
+      "http_bearer": Object {
+        "line": 26,
+      },
+      "oauth2": Object {
+        "line": 27,
+      },
     },
   },
 }
@@ -315,12 +549,24 @@ Object {
 
 exports[`webhooks PHP snippet generation laravel request should match fixture for "security-variables" 1`] = `
 Object {
-  "security": Object {
-    "basic_auth": Object {
-      "line": 25,
+  "sections": Object {
+    "payload": Object {
+      "end": 26,
+      "start": 20,
     },
-    "petstore_auth": Object {
-      "line": 24,
+    "verification": Object {
+      "end": 18,
+      "start": 8,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "basic_auth": Object {
+        "line": 25,
+      },
+      "petstore_auth": Object {
+        "line": 24,
+      },
     },
   },
 }
@@ -328,29 +574,67 @@ Object {
 
 exports[`webhooks PHP snippet generation laravel request should match fixture for "server-variables" 1`] = `
 Object {
-  "server": Object {
-    "name": Object {
-      "line": 24,
+  "sections": Object {
+    "payload": Object {
+      "end": 26,
+      "start": 20,
     },
-    "port": Object {
-      "line": 25,
+    "verification": Object {
+      "end": 18,
+      "start": 8,
+    },
+  },
+  "variables": Object {
+    "server": Object {
+      "name": Object {
+        "line": 24,
+      },
+      "port": Object {
+        "line": 25,
+      },
     },
   },
 }
 `;
 
-exports[`webhooks Python snippet generation flask request should match fixture for "empty" 1`] = `Object {}`;
+exports[`webhooks Python snippet generation flask request should match fixture for "empty" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 39,
+      "start": 31,
+    },
+    "verification": Object {
+      "end": 29,
+      "start": 19,
+    },
+  },
+  "variables": Object {},
+}
+`;
 
 exports[`webhooks Python snippet generation flask request should match fixture for "empty-default" 1`] = `
 Object {
-  "security": Object {
-    "petstore_auth": Object {
-      "line": 39,
+  "sections": Object {
+    "payload": Object {
+      "end": 43,
+      "start": 31,
+    },
+    "verification": Object {
+      "end": 29,
+      "start": 19,
     },
   },
-  "server": Object {
-    "name": Object {
-      "line": 36,
+  "variables": Object {
+    "security": Object {
+      "petstore_auth": Object {
+        "line": 39,
+      },
+    },
+    "server": Object {
+      "name": Object {
+        "line": 36,
+      },
     },
   },
 }
@@ -358,29 +642,41 @@ Object {
 
 exports[`webhooks Python snippet generation flask request should match fixture for "quirky-escaping" 1`] = `
 Object {
-  "security": Object {
-    "\\"petstore\\" auth": Object {
-      "line": 42,
+  "sections": Object {
+    "payload": Object {
+      "end": 48,
+      "start": 31,
     },
-    "basic-auth": Object {
-      "line": 43,
-    },
-    "normal_security_var": Object {
-      "line": 44,
+    "verification": Object {
+      "end": 29,
+      "start": 19,
     },
   },
-  "server": Object {
-    "*port": Object {
-      "line": 37,
+  "variables": Object {
+    "security": Object {
+      "\\"petstore\\" auth": Object {
+        "line": 42,
+      },
+      "basic-auth": Object {
+        "line": 43,
+      },
+      "normal_security_var": Object {
+        "line": 44,
+      },
     },
-    "2name": Object {
-      "line": 36,
-    },
-    "normal_server_var": Object {
-      "line": 39,
-    },
-    "p*o?r*t": Object {
-      "line": 38,
+    "server": Object {
+      "*port": Object {
+        "line": 37,
+      },
+      "2name": Object {
+        "line": 36,
+      },
+      "normal_server_var": Object {
+        "line": 39,
+      },
+      "p*o?r*t": Object {
+        "line": 38,
+      },
     },
   },
 }
@@ -388,20 +684,32 @@ Object {
 
 exports[`webhooks Python snippet generation flask request should match fixture for "security-and-server-variables" 1`] = `
 Object {
-  "security": Object {
-    "basic_auth": Object {
-      "line": 41,
+  "sections": Object {
+    "payload": Object {
+      "end": 45,
+      "start": 31,
     },
-    "petstore_auth": Object {
-      "line": 40,
+    "verification": Object {
+      "end": 29,
+      "start": 19,
     },
   },
-  "server": Object {
-    "name": Object {
-      "line": 36,
+  "variables": Object {
+    "security": Object {
+      "basic_auth": Object {
+        "line": 41,
+      },
+      "petstore_auth": Object {
+        "line": 40,
+      },
     },
-    "port": Object {
-      "line": 37,
+    "server": Object {
+      "name": Object {
+        "line": 36,
+      },
+      "port": Object {
+        "line": 37,
+      },
     },
   },
 }
@@ -409,18 +717,30 @@ Object {
 
 exports[`webhooks Python snippet generation flask request should match fixture for "security-types" 1`] = `
 Object {
-  "security": Object {
-    "api_key": Object {
-      "line": 36,
+  "sections": Object {
+    "payload": Object {
+      "end": 43,
+      "start": 31,
     },
-    "http_basic": Object {
-      "line": 37,
+    "verification": Object {
+      "end": 29,
+      "start": 19,
     },
-    "http_bearer": Object {
-      "line": 38,
-    },
-    "oauth2": Object {
-      "line": 39,
+  },
+  "variables": Object {
+    "security": Object {
+      "api_key": Object {
+        "line": 36,
+      },
+      "http_basic": Object {
+        "line": 37,
+      },
+      "http_bearer": Object {
+        "line": 38,
+      },
+      "oauth2": Object {
+        "line": 39,
+      },
     },
   },
 }
@@ -428,12 +748,24 @@ Object {
 
 exports[`webhooks Python snippet generation flask request should match fixture for "security-variables" 1`] = `
 Object {
-  "security": Object {
-    "basic_auth": Object {
-      "line": 37,
+  "sections": Object {
+    "payload": Object {
+      "end": 41,
+      "start": 31,
     },
-    "petstore_auth": Object {
-      "line": 36,
+    "verification": Object {
+      "end": 29,
+      "start": 19,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "basic_auth": Object {
+        "line": 37,
+      },
+      "petstore_auth": Object {
+        "line": 36,
+      },
     },
   },
 }
@@ -441,29 +773,67 @@ Object {
 
 exports[`webhooks Python snippet generation flask request should match fixture for "server-variables" 1`] = `
 Object {
-  "server": Object {
-    "name": Object {
-      "line": 36,
+  "sections": Object {
+    "payload": Object {
+      "end": 41,
+      "start": 31,
     },
-    "port": Object {
-      "line": 37,
+    "verification": Object {
+      "end": 29,
+      "start": 19,
+    },
+  },
+  "variables": Object {
+    "server": Object {
+      "name": Object {
+        "line": 36,
+      },
+      "port": Object {
+        "line": 37,
+      },
     },
   },
 }
 `;
 
-exports[`webhooks Ruby snippet generation rails request should match fixture for "empty" 1`] = `Object {}`;
+exports[`webhooks Ruby snippet generation rails request should match fixture for "empty" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 30,
+      "start": 26,
+    },
+    "verification": Object {
+      "end": 24,
+      "start": 13,
+    },
+  },
+  "variables": Object {},
+}
+`;
 
 exports[`webhooks Ruby snippet generation rails request should match fixture for "empty-default" 1`] = `
 Object {
-  "security": Object {
-    "petstore_auth": Object {
-      "line": 33,
+  "sections": Object {
+    "payload": Object {
+      "end": 34,
+      "start": 26,
+    },
+    "verification": Object {
+      "end": 24,
+      "start": 13,
     },
   },
-  "server": Object {
-    "name": Object {
-      "line": 30,
+  "variables": Object {
+    "security": Object {
+      "petstore_auth": Object {
+        "line": 33,
+      },
+    },
+    "server": Object {
+      "name": Object {
+        "line": 30,
+      },
     },
   },
 }
@@ -471,29 +841,41 @@ Object {
 
 exports[`webhooks Ruby snippet generation rails request should match fixture for "quirky-escaping" 1`] = `
 Object {
-  "security": Object {
-    "\\"petstore\\" auth": Object {
-      "line": 36,
+  "sections": Object {
+    "payload": Object {
+      "end": 39,
+      "start": 26,
     },
-    "basic-auth": Object {
-      "line": 37,
-    },
-    "normal_security_var": Object {
-      "line": 38,
+    "verification": Object {
+      "end": 24,
+      "start": 13,
     },
   },
-  "server": Object {
-    "*port": Object {
-      "line": 31,
+  "variables": Object {
+    "security": Object {
+      "\\"petstore\\" auth": Object {
+        "line": 36,
+      },
+      "basic-auth": Object {
+        "line": 37,
+      },
+      "normal_security_var": Object {
+        "line": 38,
+      },
     },
-    "2name": Object {
-      "line": 30,
-    },
-    "normal_server_var": Object {
-      "line": 33,
-    },
-    "p*o?r*t": Object {
-      "line": 32,
+    "server": Object {
+      "*port": Object {
+        "line": 31,
+      },
+      "2name": Object {
+        "line": 30,
+      },
+      "normal_server_var": Object {
+        "line": 33,
+      },
+      "p*o?r*t": Object {
+        "line": 32,
+      },
     },
   },
 }
@@ -501,20 +883,32 @@ Object {
 
 exports[`webhooks Ruby snippet generation rails request should match fixture for "security-and-server-variables" 1`] = `
 Object {
-  "security": Object {
-    "basic_auth": Object {
-      "line": 35,
+  "sections": Object {
+    "payload": Object {
+      "end": 36,
+      "start": 26,
     },
-    "petstore_auth": Object {
-      "line": 34,
+    "verification": Object {
+      "end": 24,
+      "start": 13,
     },
   },
-  "server": Object {
-    "name": Object {
-      "line": 30,
+  "variables": Object {
+    "security": Object {
+      "basic_auth": Object {
+        "line": 35,
+      },
+      "petstore_auth": Object {
+        "line": 34,
+      },
     },
-    "port": Object {
-      "line": 31,
+    "server": Object {
+      "name": Object {
+        "line": 30,
+      },
+      "port": Object {
+        "line": 31,
+      },
     },
   },
 }
@@ -522,18 +916,30 @@ Object {
 
 exports[`webhooks Ruby snippet generation rails request should match fixture for "security-types" 1`] = `
 Object {
-  "security": Object {
-    "api_key": Object {
-      "line": 30,
+  "sections": Object {
+    "payload": Object {
+      "end": 34,
+      "start": 26,
     },
-    "http_basic": Object {
-      "line": 31,
+    "verification": Object {
+      "end": 24,
+      "start": 13,
     },
-    "http_bearer": Object {
-      "line": 32,
-    },
-    "oauth2": Object {
-      "line": 33,
+  },
+  "variables": Object {
+    "security": Object {
+      "api_key": Object {
+        "line": 30,
+      },
+      "http_basic": Object {
+        "line": 31,
+      },
+      "http_bearer": Object {
+        "line": 32,
+      },
+      "oauth2": Object {
+        "line": 33,
+      },
     },
   },
 }
@@ -541,12 +947,24 @@ Object {
 
 exports[`webhooks Ruby snippet generation rails request should match fixture for "security-variables" 1`] = `
 Object {
-  "security": Object {
-    "basic_auth": Object {
-      "line": 31,
+  "sections": Object {
+    "payload": Object {
+      "end": 32,
+      "start": 26,
     },
-    "petstore_auth": Object {
-      "line": 30,
+    "verification": Object {
+      "end": 24,
+      "start": 13,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "basic_auth": Object {
+        "line": 31,
+      },
+      "petstore_auth": Object {
+        "line": 30,
+      },
     },
   },
 }
@@ -554,12 +972,24 @@ Object {
 
 exports[`webhooks Ruby snippet generation rails request should match fixture for "server-variables" 1`] = `
 Object {
-  "server": Object {
-    "name": Object {
-      "line": 30,
+  "sections": Object {
+    "payload": Object {
+      "end": 32,
+      "start": 26,
     },
-    "port": Object {
-      "line": 31,
+    "verification": Object {
+      "end": 24,
+      "start": 13,
+    },
+  },
+  "variables": Object {
+    "server": Object {
+      "name": Object {
+        "line": 30,
+      },
+      "port": Object {
+        "line": 31,
+      },
     },
   },
 }
