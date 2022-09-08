@@ -11,8 +11,10 @@ import request from 'supertest';
 import pkg from '../package.json';
 import * as readmeio from '../src';
 import config from '../src/config';
+import { getCache } from '../src/lib/get-project-base-url';
 
 import chaiPlugins from './helpers/chai-plugins';
+import { getReadMeApiMock } from './lib/get-project-base-url.test';
 
 chai.use(chaiPlugins);
 
@@ -35,10 +37,16 @@ describe('#metrics', function () {
   beforeEach(function () {
     nock.disableNetConnect();
     nock.enableNetConnect('127.0.0.1');
+    const cache = getCache(apiKey);
+
+    cache.setKey('lastUpdated', Date.now());
+    cache.setKey('baseUrl', 'https://docs.example.com');
+    cache.save();
   });
 
   afterEach(function () {
     nock.cleanAll();
+    getCache(apiKey).destroy();
   });
 
   it('should throw an error if `apiKey` is missing', function () {
@@ -335,6 +343,52 @@ describe('#metrics', function () {
   });
 
   describe('#baseLogUrl', function () {
+    it('should fetch the `baseLogUrl` if not passed', async function () {
+      // Invalidating the cache so we do a fetch from the API
+      const cache = getCache(apiKey);
+      const lastUpdated = new Date();
+      lastUpdated.setDate(lastUpdated.getDate() - 2);
+      cache.setKey('lastUpdated', lastUpdated.getTime());
+      cache.save();
+
+      const baseLogUrl = 'https://docs.example.com';
+
+      const apiMock = getReadMeApiMock(1, baseLogUrl);
+      const mock = nock(config.host, {
+        reqheaders: {
+          'Content-Type': 'application/json',
+          'User-Agent': `${pkg.name}/${pkg.version}`,
+        },
+      })
+        .post('/v1/request')
+        .basicAuth({ user: apiKey })
+        .reply(200);
+
+      const app = express();
+      app.use((req, res, next) => {
+        readmeio.log(apiKey, req, res, incomingGroup);
+        return next();
+      });
+      app.get('/test', (req, res) => {
+        // We have to delay the response here so that the request to fetch
+        // the base url has a chance to resolve. We may have to figure out
+        // a better way to do this in future
+        return setTimeout(() => {
+          res.sendStatus(200);
+        }, 50);
+      });
+
+      await request(app)
+        .get('/test')
+        .expect(200)
+        .expect(res => {
+          expect(res.headers).to.have.a.documentationHeader(baseLogUrl);
+        });
+
+      apiMock.done();
+      mock.done();
+    });
+
     it('should set x-documentation-url if `baseLogUrl` is passed', async function () {
       const baseLogUrl = 'https://docs.example.com';
 

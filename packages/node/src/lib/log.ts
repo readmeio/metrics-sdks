@@ -2,7 +2,6 @@ import type { LogOptions } from './construct-payload';
 import type { GroupingObject, OutgoingLogBody } from './metrics-log';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
-import { StringDecoder } from 'string_decoder';
 import * as url from 'url';
 
 import clamp from 'lodash/clamp';
@@ -11,8 +10,11 @@ import { v4 as uuidv4 } from 'uuid';
 import config from '../config';
 
 import { constructPayload } from './construct-payload';
+import { getProjectBaseUrl } from './get-project-base-url';
 import isRequest from './is-request';
 import { metricsAPICall } from './metrics-log';
+import { patchRequest } from './patch-request';
+import { patchResponse } from './patch-response';
 
 let queue: OutgoingLogBody[] = [];
 function doSend(readmeApiKey, options) {
@@ -58,82 +60,20 @@ interface ExtendedResponse extends ServerResponse {
   _body?: string;
 }
 
-// We're doing this to buffer up the response body
-// so we can send it off to the metrics server
-// It's unfortunate that this isn't accessible
-// natively. This may take up lots of memory on
-// big responses, we can make it configurable in future
-function patchResponse(res) {
-  const { write, end } = res;
-
-  res._body = '';
-
-  res.write = (chunk, encoding, cb) => {
-    res._body += chunk;
-    write.call(res, chunk, encoding, cb);
-  };
-
-  res.end = (chunk, encoding, cb) => {
-    // Chunk is optional in res.end
-    // http://nodejs.org/dist/latest/docs/api/http.html#http_response_end_data_encoding_callback
-    if (chunk) res._body += chunk;
-    end.call(res, chunk, encoding, cb);
-  };
-}
-
-/**
- * For `text/*` requests Express doesn't give us a native way to retrieve data out of the payload
- * without using the `body-parser` middleware so we need to workaround it and access that obtain
- * that data ourselves.
- *
- * For `application/vnd.api+json` types of requests, Express doesn't recognize them as being JSON,
- * resulting in `req.body` being empty. Frustratingly enough `req.is('json')` also doesn't work so
- * we need to do our own check to look if it's got `+json` and then surface that potential JSON
- * payload accordingly.
- *
- * And if you can believe it or not, Express also doesn't process `x-www-form-urlencoded` payloads
- * into `req.body` for us without the `body-parser` middleware.
- *
- * @see {@link https://stackoverflow.com/a/12497793}
- * @see {@link https://stackoverflow.com/a/58568473}
- * @param {IncomingMessage} req
- */
-function patchRequest(req: ExtendedIncomingMessage) {
-  // If we already have a body then whatever framework we're being run inside of is able to
-  // handle these requests and we can rely on `req.body` instead hacky workarounds.
-  if (req.body !== undefined) {
-    return;
-  }
-
-  if (isRequest(req, 'text/*')) {
-    req._text = '';
-    req.setEncoding('utf8');
-    req.on('data', function (chunk) {
-      if (chunk) req._text += chunk;
-    });
-  } else if (isRequest(req, '+json')) {
-    req._json = '';
-    req.setEncoding('utf8');
-    req.on('data', function (chunk) {
-      if (chunk) req._json += chunk;
-    });
-  } else if (isRequest(req, 'application/x-www-form-urlencoded')) {
-    const decoder = new StringDecoder('utf-8');
-    req._form_encoded = '';
-
-    req.on('data', chunk => {
-      req._form_encoded += decoder.write(chunk);
-    });
-
-    req.on('end', () => {
-      req._form_encoded += decoder.end();
-    });
-  }
-}
-
 export interface Options extends LogOptions {
   bufferLength?: number;
   baseLogUrl?: string;
+}
+
+function setDocumentationHeader(res, baseLogUrl, logId) {
+  // This is to catch the potential race condition where `getProjectBaseUrl()`
+  // takes longer to respond than the original req/res to finish. Without this
+  // we would get an error that would be very difficult to trace. This could
+  // do with a test, but it's a little difficult to test. Maybe with a nock()
+  // delay timeout.
+  if (res.headersSent) return;
+
+  res.setHeader('x-documentation-url', `${baseLogUrl}/logs/${logId}`);
 }
 
 /**
@@ -162,18 +102,21 @@ export function log(
   // Ensures the buffer length is between 1 and 30
   const bufferLength = clamp(options.bufferLength || config.bufferLength, 1, 30);
 
-  const baseLogUrl = options.baseLogUrl || undefined;
-
   const startedDateTime = new Date();
   const logId = uuidv4();
 
+  // baseLogUrl can be provided, but if it isn't then we
+  // attempt to fetch it from the ReadMe API
+  if (typeof options.baseLogUrl === 'string') {
+    setDocumentationHeader(res, options.baseLogUrl, logId);
+  } else {
+    getProjectBaseUrl(readmeApiKey).then(baseLogUrl => {
+      setDocumentationHeader(res, baseLogUrl, logId);
+    });
+  }
+
   patchResponse(res);
   patchRequest(req);
-
-  // @todo we should remove this and put this in the code samples
-  if (baseLogUrl !== undefined && typeof baseLogUrl === 'string') {
-    res.setHeader('x-documentation-url', `${baseLogUrl}/logs/${logId}`);
-  }
 
   /*
    * This should in future become more sophisticated, with flush timeouts and more error checking but
