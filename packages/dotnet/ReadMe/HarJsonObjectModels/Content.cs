@@ -2,7 +2,6 @@
 
 namespace ReadMe.HarJsonObjectModels
 {
-  [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
   class Content
   {
     public string text { get; set; }

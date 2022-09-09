@@ -203,7 +203,10 @@ class PayloadBuilder:
             "url": self._build_base_url(request),
             "httpVersion": request.environ["SERVER_PROTOCOL"],
             "headers": [{"name": k, "value": v} for (k, v) in headers.items()],
+            "headersSize": -1,
             "queryString": [{"name": k, "value": v} for (k, v) in queryString],
+            "cookies": [],
+            "bodySize": -1,
         }
 
         if not post_data is False:
@@ -234,6 +237,8 @@ class PayloadBuilder:
             "status": status_code,
             "statusText": status_text or "",
             "headers": headers,
+            "headersSize": -1,
+            "bodySize": int(response.content_length),
             "content": {
                 "text": body,
                 "size": int(response.content_length),

@@ -116,7 +116,7 @@ class PayloadTest extends \PHPUnit\Framework\TestCase
         $request = $this->getMockRequest(
             content_type: 'application/json',
             method: 'get',
-            payload: self::MOCK_QUERY_PARAMS
+            payload: self::MOCK_QUERY_PARAMS,
         );
 
         $response = $this->getMockJsonResponse();
@@ -157,6 +157,7 @@ class PayloadTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('https://api.example.com/v1/user?arr%5B1%5D=3&val=1', $har_request['url']);
         $this->assertSame('HTTP/1.1', $har_request['httpVersion']);
 
+        $this->assertEquals(-1, $har_request['headersSize']);
         $this->assertSame([
             ['name' => 'host', 'value' => 'api.example.com'],
             ['name' => 'user-agent', 'value' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) ...'],
@@ -196,6 +197,34 @@ class PayloadTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(73, $har_response['content']['size']);
         $this->assertSame($response->headers->get('Content-Type'), $har_response['content']['mimeType']);
+    }
+
+    /**
+     * @group create
+     */
+    public function testCreateWithCookies(): void
+    {
+        $request = $this->getMockRequest(
+            content_type: 'application/json',
+            method: 'post',
+            payload: self::MOCK_QUERY_PARAMS,
+            cookies: [
+                'pizza' => 'large',
+                'buster' => 'asleep'
+            ]
+        );
+
+        $response = $this->getMockJsonResponse();
+        $har = $this->payload->create('fake-uuid', $request, $response);
+
+        $this->assertCount(1, $har['request']['log']['entries']);
+
+        $har_entry = $har['request']['log']['entries'][0];
+        $har_request = $har_entry['request'];
+        $this->assertSame([
+            ['name' => 'pizza', 'value' => 'large'],
+            ['name' => 'buster', 'value' => 'asleep']
+        ], $har_request['cookies']);
     }
 
     /**
@@ -241,6 +270,8 @@ class PayloadTest extends \PHPUnit\Framework\TestCase
         $har = $this->payload->create('fake-uuid', $request, $response);
 
         $har_request = $har['request']['log']['entries'][0]['request'];
+
+        $this->assertEquals(-1, $har_request['bodySize']);
 
         $this->assertSame('http://api.example.com/v1/user?arr%5B1%5D=3&val=1', $har_request['url']);
         $this->assertSame([
@@ -465,6 +496,7 @@ class PayloadTest extends \PHPUnit\Framework\TestCase
         string $method,
         array $payload = [],
         array $files = [],
+        array $cookies = [],
         string $url = 'https://api.example.com/v1/user/'
     ): Request {
         // We only need to encode JSON payloads into `$request->getContent()` if we're sending
@@ -481,7 +513,7 @@ class PayloadTest extends \PHPUnit\Framework\TestCase
                 $url,
                 $method,
                 $payload,
-                [],
+                $cookies,
                 $files,
                 [
                     'CONTENT_TYPE' => $content_type,
