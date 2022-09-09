@@ -215,7 +215,7 @@ describe('Metrics SDK Integration Tests', function () {
     return authorizationHeader;
   }
 
-  it('should process `Authorization` header', async function () {
+  it('should mask `Authorization` headers', async function () {
     await fetch(`http://localhost:${PORT}`, { method: 'get', headers: { authorization: authorizationHeader } });
 
     const [, body] = await getPayload();
