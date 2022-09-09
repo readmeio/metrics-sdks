@@ -1,5 +1,5 @@
-import express from 'express';
-import readme from 'readmeio';
+const express = require('express');
+const readme = require('readmeio');
 
 const app = express();
 

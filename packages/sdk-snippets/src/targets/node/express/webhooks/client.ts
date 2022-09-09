@@ -20,8 +20,8 @@ export const express: Client = {
       indent: opts.indent,
     });
 
-    push("import express from 'express';");
-    push("import readme from 'readmeio';");
+    push("const express = require('express');");
+    push("const readme = require('readmeio');");
 
     blank();
 
