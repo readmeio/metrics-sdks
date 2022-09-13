@@ -1,13 +1,20 @@
 import type { URLSearchParams } from 'url';
 
-export function objectToArray(object: Record<string, unknown>): { name: string; value: string }[] {
+export function objectToArray(
+  object: Record<string, unknown>,
+  opts: {
+    castToString: boolean;
+  } = {
+    castToString: false,
+  }
+): { name: string; value: string }[] {
   return Object.entries(object).reduce((prev, [name, value]) => {
     if (Array.isArray(value)) {
       value.forEach(val => {
-        prev.push({ name, value: val });
+        prev.push({ name, value: opts.castToString ? String(val) : val });
       });
     } else {
-      prev.push({ name, value });
+      prev.push({ name, value: opts.castToString ? String(value) : value });
     }
 
     return prev;

@@ -1,5 +1,6 @@
 import caseless from 'caseless';
 import chai from 'chai';
+import validate from 'har-validator';
 
 /**
  * Converts an array of headers like this:
@@ -49,6 +50,71 @@ export default function chaiPlugins(_chai, utils) {
       new chai.Assertion(headers.get(header)).to.oneOf(expected.map(e => e.toString()));
     } else {
       new chai.Assertion(headers.get(header)).to.equal(expected.toString());
+    }
+  });
+
+  /**
+   * Determine if a given object has the basic properties of a HAR.
+   *
+   * This does **not** do full HAR validation because we only /really/ actually care about the
+   * contents of the `request` object in `log.entries[*]`. This method is just to give the
+   * `.request`  assertion some nice syntactic prefixing sugar.
+   *
+   * @example await expect(har).to.have.a.har.request;
+   */
+  utils.addChainableMethod(chai.Assertion.prototype, 'har', null, function () {
+    const har = utils.flag(this, 'object');
+    new chai.Assertion(har).to.have.property('log').and.have.property('entries').and.have.lengthOf(1);
+  });
+
+  /**
+   * Determine if a given HAR object has a valid `request` object.
+   *
+   * @example await expect(har).to.have.a.har.request;
+   */
+  utils.addProperty(chai.Assertion.prototype, 'request', async function () {
+    const har = utils.flag(this, 'object');
+    const entry = har.log.entries[0];
+
+    new chai.Assertion(entry).of.have.property('request');
+
+    try {
+      await validate.request(entry.request);
+    } catch (err) {
+      let error = '`log.entries[0].request` HAR validation failed:\n\n';
+      err.errors.forEach(e => {
+        error += `· [${e.dataPath}] ${e.message}\n`;
+      });
+
+      chai.assert.ifError(new Error(error));
+    }
+  });
+
+  /**
+   * Determine if a given HAR object has a valid `response` object.
+   *
+   * @example await expect(har).to.have.a.har.response;
+   */
+  utils.addProperty(chai.Assertion.prototype, 'response', async function () {
+    const har = utils.flag(this, 'object');
+    const entry = har.log.entries[0];
+
+    new chai.Assertion(entry).of.have.property('response');
+
+    // We don't add or care about these three items in the HAR `response` spec.
+    entry.response.httpVersion = '';
+    entry.response.cookies = [];
+    entry.response.redirectURL = '';
+
+    try {
+      await validate.response(entry.response);
+    } catch (err) {
+      let error = '`log.entries[0].response` HAR validation failed:\n\n';
+      err.errors.forEach(e => {
+        error += `· [${e.dataPath}] ${e.message}\n`;
+      });
+
+      chai.assert.ifError(new Error(error));
     }
   });
 }

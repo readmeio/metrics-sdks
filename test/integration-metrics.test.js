@@ -45,7 +45,7 @@ function isListening(port, attempt = 0) {
 }
 
 describe('Metrics SDK Integration Tests', function () {
-  this.retries(2);
+  // this.retries(2);
 
   const sockets = new Set();
 
@@ -65,7 +65,7 @@ describe('Metrics SDK Integration Tests', function () {
     return JSON.parse(responseBody);
   }
 
-  async function getPayload() {
+  async function getRequest() {
     if (process.env.HAS_HTTP_QUIRKS) {
       return [sdkCall.req, sdkCall.body];
     }
@@ -139,30 +139,34 @@ describe('Metrics SDK Integration Tests', function () {
   it('should make a request to a Metrics backend with a HAR file', async function () {
     await fetch(`http://localhost:${PORT}`, { method: 'get' });
 
-    const [req, body] = await getPayload();
-    const [har] = body;
+    const [req, body] = await getRequest();
+    const [payload] = body;
 
     expect(req.url).to.equal('/v1/request');
     expect(req.headers.authorization).to.equal(`Basic ${Buffer.from(`${randomAPIKey}:`).toString('base64')}`);
 
     // https://uibakery.io/regex-library/uuid
-    expect(har._id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+    expect(payload._id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 
-    expect(har.group).to.deep.equal({
+    expect(payload.group).to.deep.equal({
       id: 'owlbert-api-key',
       label: 'Owlbert',
       email: 'owlbert@example.com',
     });
 
-    expect(har.clientIPAddress).to.match(/\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}/);
-    expect(har.development).to.be.false;
+    expect(payload.clientIPAddress).to.match(/\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}/);
+    expect(payload.development).to.be.false;
 
-    const { creator } = har.request.log;
+    const har = payload.request;
+    await expect(har).to.have.a.har.request;
+    await expect(har).to.have.a.har.response;
+
+    const { creator } = har.log;
     expect(creator.name).to.match(/readme-metrics \((dotnet|node|php|python|ruby)\)/);
     expect(creator.version).not.to.be.empty;
     expect(creator.comment).not.to.be.empty;
 
-    const { request, response, startedDateTime } = har.request.log.entries[0];
+    const { request, response, startedDateTime } = har.log.entries[0];
 
     /**
      * `startedDateTime` should look like the following, with optional microseconds component:
@@ -204,10 +208,14 @@ describe('Metrics SDK Integration Tests', function () {
   it('should capture query strings in a GET request', async function () {
     await fetch(`http://localhost:${PORT}?arr%5B1%5D=3&val=1`, { method: 'get' });
 
-    const [, body] = await getPayload();
-    const [har] = body;
+    const [, body] = await getRequest();
+    const [payload] = body;
 
-    const { request } = har.request.log.entries[0];
+    const har = payload.request;
+    await expect(har).to.have.a.har.request;
+    await expect(har).to.have.a.har.response;
+
+    const { request } = har.log.entries[0];
 
     // Some frameworks remove the trailing slash from the URL we get.
     expect(request.url).to.match(new RegExp(`http://localhost:${PORT}(/)?\\?arr%5B1%5D=3&val=1`));
@@ -232,19 +240,23 @@ describe('Metrics SDK Integration Tests', function () {
   });
 
   it('should capture query strings that may be supplied in a POST request', async function () {
-    const payload = JSON.stringify({ user: { email: 'dom@readme.io' } });
+    const content = JSON.stringify({ user: { email: 'dom@readme.io' } });
     await fetch(`http://localhost:${PORT}/?arr%5B1%5D=3&val=1`, {
       method: 'post',
       headers: {
         'content-type': 'application/json',
       },
-      body: payload,
+      body: content,
     });
 
-    const [, body] = await getPayload();
-    const [har] = body;
+    const [, body] = await getRequest();
+    const [payload] = body;
 
-    const { request, response } = har.request.log.entries[0];
+    const har = payload.request;
+    await expect(har).to.be.have.a.har.request;
+    await expect(har).to.have.a.har.response;
+
+    const { request, response } = har.log.entries[0];
 
     expect(request.method).to.equal('POST');
 
@@ -271,52 +283,60 @@ describe('Metrics SDK Integration Tests', function () {
 
     expect(request.postData).to.deep.equal({
       mimeType: 'application/json',
-      text: payload,
+      text: content,
     });
 
     expect(response.status).to.equal(200);
   });
 
   it('should process a POST payload with no explicit `Content-Type` header', async function () {
-    const payload = JSON.stringify({ user: { email: 'dom@readme.io' } });
+    const content = JSON.stringify({ user: { email: 'dom@readme.io' } });
     await fetch(`http://localhost:${PORT}/`, {
       method: 'post',
-      body: payload,
+      body: content,
     });
 
-    const [, body] = await getPayload();
-    const [har] = body;
+    const [, body] = await getRequest();
+    const [payload] = body;
 
-    const { request } = har.request.log.entries[0];
+    const har = payload.request;
+    await expect(har).to.have.a.har.request;
+    await expect(har).to.have.a.har.response;
+
+    const { request } = har.log.entries[0];
 
     expect(request.method).to.equal('POST');
     expect(request.headers).to.have.header('content-type', 'text/plain;charset=UTF-8');
 
     expect(request.postData.mimeType).to.match(/text\/plain(;charset=UTF-8)?/);
     expect(request.postData.params).to.be.undefined;
-    expect(request.postData.text).to.equal(payload);
+    expect(request.postData.text).to.equal(content);
   });
 
   it('should process an `application/json` POST payload', async function () {
-    const payload = JSON.stringify({ user: { email: 'dom@readme.io' } });
+    const content = JSON.stringify({ user: { email: 'dom@readme.io' } });
     await fetch(`http://localhost:${PORT}/`, {
       method: 'post',
       headers: {
         'content-type': 'application/json',
       },
-      body: payload,
+      body: content,
     });
 
-    const [, body] = await getPayload();
-    const [har] = body;
+    const [, body] = await getRequest();
+    const [payload] = body;
 
-    const { request, response } = har.request.log.entries[0];
+    const har = payload.request;
+    await expect(har).to.have.a.har.request;
+    await expect(har).to.have.a.har.response;
+
+    const { request, response } = har.log.entries[0];
 
     expect(request.method).to.equal('POST');
     expect(request.headers).to.have.header('content-type', 'application/json');
     expect(request.postData).to.deep.equal({
       mimeType: 'application/json',
-      text: payload,
+      text: content,
     });
 
     expect(response.status).to.equal(200);
@@ -333,25 +353,29 @@ describe('Metrics SDK Integration Tests', function () {
   it.skip('should process an `application/JSON POST payload containing unparseable JSON');
 
   it('should process a vendored `+json` POST payload', async function () {
-    const payload = JSON.stringify({ user: { email: 'dom@readme.io' } });
+    const content = JSON.stringify({ user: { email: 'dom@readme.io' } });
     await fetch(`http://localhost:${PORT}/`, {
       method: 'post',
       headers: {
         'content-type': 'application/vnd.api+json',
       },
-      body: payload,
+      body: content,
     });
 
-    const [, body] = await getPayload();
-    const [har] = body;
+    const [, body] = await getRequest();
+    const [payload] = body;
 
-    const { request, response } = har.request.log.entries[0];
+    const har = payload.request;
+    await expect(har).to.have.a.har.request;
+    await expect(har).to.have.a.har.response;
+
+    const { request, response } = har.log.entries[0];
 
     expect(request.method).to.equal('POST');
     expect(request.headers).to.have.header('content-type', 'application/vnd.api+json');
     expect(request.postData).to.deep.equal({
       mimeType: 'application/vnd.api+json',
-      text: payload,
+      text: content,
     });
 
     expect(response.status).to.be.oneOf([
@@ -364,21 +388,25 @@ describe('Metrics SDK Integration Tests', function () {
   });
 
   it('should process an `application/x-www-url-formencoded` POST payload', async function () {
-    const payload = new URLSearchParams();
-    payload.append('email', 'dom@readme.io');
+    const params = new URLSearchParams();
+    params.append('email', 'dom@readme.io');
 
     await fetch(`http://localhost:${PORT}/`, {
       method: 'post',
       headers: {
         'content-type': 'application/x-www-form-urlencoded',
       },
-      body: payload,
+      body: params,
     });
 
-    const [, body] = await getPayload();
-    const [har] = body;
+    const [, body] = await getRequest();
+    const [payload] = body;
 
-    const { request, response } = har.request.log.entries[0];
+    const har = payload.request;
+    await expect(har).to.have.a.har.request;
+    await expect(har).to.have.a.har.response;
+
+    const { request, response } = har.log.entries[0];
 
     expect(request.method).to.equal('POST');
     expect(request.headers).to.have.header('content-type', 'application/x-www-form-urlencoded');
@@ -416,10 +444,14 @@ describe('Metrics SDK Integration Tests', function () {
       body: Readable.from(encoder),
     });
 
-    const [, body] = await getPayload();
-    const [har] = body;
+    const [, body] = await getRequest();
+    const [payload] = body;
 
-    const { request } = har.request.log.entries[0];
+    const har = payload.request;
+    await expect(har).to.have.a.har.request;
+    await expect(har).to.have.a.har.response;
+
+    const { request } = har.log.entries[0];
 
     expect(request.method).to.equal('POST');
     expect(request.headers).to.have.header('content-type', /multipart\/form-data; boundary=(.*)/);
@@ -440,14 +472,14 @@ describe('Metrics SDK Integration Tests', function () {
     }
     const owlbert = await fs.readFile('./test/__datasets__/owlbert.png');
 
-    const payload = new FormData();
-    payload.append('password', 123456);
-    payload.append('apiKey', 'abcdef');
-    payload.append('another', 'Hello world');
-    payload.append('buster', [1234, 5678]);
-    payload.append('owlbert.png', new File([owlbert], 'owlbert.png', { type: 'image/png' }), 'owlbert.png');
+    const formData = new FormData();
+    formData.append('password', 123456);
+    formData.append('apiKey', 'abcdef');
+    formData.append('another', 'Hello world');
+    formData.append('buster', [1234, 5678]);
+    formData.append('owlbert.png', new File([owlbert], 'owlbert.png', { type: 'image/png' }), 'owlbert.png');
 
-    const encoder = new FormDataEncoder(payload);
+    const encoder = new FormDataEncoder(formData);
 
     await fetch(`http://localhost:${PORT}/`, {
       method: 'post',
@@ -455,10 +487,14 @@ describe('Metrics SDK Integration Tests', function () {
       body: Readable.from(encoder),
     });
 
-    const [, body] = await getPayload();
-    const [har] = body;
+    const [, body] = await getRequest();
+    const [payload] = body;
 
-    const { request } = har.request.log.entries[0];
+    const har = payload.request;
+    await expect(har).to.have.a.har.request;
+    await expect(har).to.have.a.har.response;
+
+    const { request } = har.log.entries[0];
 
     expect(request.method).to.equal('POST');
     expect(request.headers).to.have.header('content-type', /multipart\/form-data; boundary=(.*)/);
@@ -491,10 +527,14 @@ describe('Metrics SDK Integration Tests', function () {
       body: 'Hello world',
     });
 
-    const [, body] = await getPayload();
-    const [har] = body;
+    const [, body] = await getRequest();
+    const [payload] = body;
 
-    const { request, response } = har.request.log.entries[0];
+    const har = payload.request;
+    await expect(har).to.have.a.har.request;
+    await expect(har).to.have.a.har.response;
+
+    const { request, response } = har.log.entries[0];
 
     expect(request.method).to.equal('POST');
     expect(request.headers).to.have.header('content-type', 'text/plain');

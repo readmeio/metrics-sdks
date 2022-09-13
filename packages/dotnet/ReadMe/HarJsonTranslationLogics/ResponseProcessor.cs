@@ -88,7 +88,7 @@ namespace ReadMe.HarJsonObjectModels
       Content content = new Content();
       content.text = this.responseBodyData;
       content.size = this.responseBodyData.Length;
-      content.mimeType = this.response.ContentType;
+      content.mimeType = this.response.ContentType ??= "text/plain";
       return content;
     }
 

@@ -137,7 +137,10 @@ class Payload
             'url' => $request->fullUrl(),
             'httpVersion' => $request->server('SERVER_PROTOCOL', 'HTTP/1.1'),
             'headers' => static::convertHeaderBagToArray($request->headers),
+            'headersSize' => -1,
             'queryString' => static::convertObjectToArray($request->query()),
+            'cookies' => static::convertObjectToArray($request->cookie()),
+            'bodySize' => -1,
         ];
 
         if ($post_data) {
@@ -184,6 +187,8 @@ class Payload
                 ? Response::$statusTexts[$status_code]
                 : 'Unknown status',
             'headers' => static::convertHeaderBagToArray($response->headers),
+            'headersSize' => -1,
+            'bodySize' => (int)$content_size,
             'content' => [
                 'text' => (is_scalar($body)) ? $body : json_encode($body),
                 'size' => (int)$content_size,

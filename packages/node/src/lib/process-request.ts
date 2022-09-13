@@ -203,8 +203,8 @@ export default function processRequest(
     postData,
     // TODO: When readme starts accepting these, send the correct values
     cookies: [],
-    headersSize: 0,
-    bodySize: 0,
+    headersSize: -1,
+    bodySize: -1,
   };
 
   if (requestData.postData === null) {

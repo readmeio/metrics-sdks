@@ -1,3 +1,5 @@
+require 'json'
+
 module Readme
   module Har
     class Collection
@@ -11,7 +13,7 @@ module Readme
       end
 
       def to_a
-        filtered_hash.map { |name, value| { name: name, value: value } }
+        filtered_hash.map { |name, value| { name: name, value: value.is_a?(Hash) ? value.to_json : value } }
       end
 
       private
