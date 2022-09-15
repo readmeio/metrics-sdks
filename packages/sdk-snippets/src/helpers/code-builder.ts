@@ -5,13 +5,32 @@ import { CodeBuilder as HTTPSnippetCodeBuilder } from '@readme/httpsnippet/dist/
 export type { CodeBuilderOptions };
 
 export class CodeBuilder extends HTTPSnippetCodeBuilder {
-  variableRanges: {
+  sections: {
+    payload?: { start: number; end: number };
+    verification?: { start: number; end: number };
+  } = {};
+
+  variables: {
     security?: Record<string, { line: number }>;
     server?: Record<string, { line: number }>;
   } = {};
 
+  startSection = (section: 'payload' | 'verification') => {
+    this.sections[section] = {
+      start: this.code.length + 1,
+      end: 0,
+    };
+  };
+
+  endSection = (section: 'payload' | 'verification') => {
+    this.sections[section].end = this.code.length;
+  };
+
   ranges = () => {
-    return this.variableRanges;
+    return {
+      sections: this.sections,
+      variables: this.variables,
+    };
   };
 
   /**
@@ -29,11 +48,11 @@ export class CodeBuilder extends HTTPSnippetCodeBuilder {
     this.push(line, opts.indentationLevel);
 
     // Record where in the snippet this variable is located.
-    if (!this.variableRanges[opts.type]) {
-      this.variableRanges[opts.type] = {};
+    if (!this.variables[opts.type]) {
+      this.variables[opts.type] = {};
     }
 
-    this.variableRanges[opts.type][opts.name] = {
+    this.variables[opts.type][opts.name] = {
       line: this.code.length,
     };
   };

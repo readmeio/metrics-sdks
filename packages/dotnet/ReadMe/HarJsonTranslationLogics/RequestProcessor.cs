@@ -22,6 +22,7 @@ namespace ReadMe.HarJsonObjectModels
       Request requestObj = new Request();
       requestObj.headers = this.GetHeaders();
       requestObj.headersSize = this.GetHeadersSize();
+      requestObj.bodySize = -1;
       requestObj.queryString = this.GetQueryStrings();
       requestObj.cookies = this.GetCookies();
       requestObj.method = this.request.Method;

@@ -13,6 +13,8 @@ namespace ReadMe.HarJsonObjectModels
 
     public long headersSize { get; set; }
 
+    public long bodySize { get; set; }
+
     public List<QueryStrings> queryString { get; set; }
 
     public PostData postData { get; set; }

@@ -5,10 +5,13 @@ import type { ClientId, SnippetType, TargetId } from './targets';
 import { readdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 
-import { expect } from 'chai';
+import chai, { expect } from 'chai';
+import { jestSnapshotPlugin } from 'mocha-chai-jest-snapshot';
 
 import { MetricsSDKSnippet } from '..';
 import { availableWebhookTargets, extname } from '../helpers/utils';
+
+chai.use(jestSnapshotPlugin());
 
 const expectedBasePath = ['src', 'fixtures', 'webhooks'];
 

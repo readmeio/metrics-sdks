@@ -114,10 +114,13 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
                 ['name' => 'accept-charset', 'value' => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7'],
                 ['name' => 'content-type', 'value' => 'application/json']
             ],
+            'headersSize' => -1,
             'queryString' => [
                 ['name' => 'arr', 'value' => json_encode([1 => '3'])],
                 ['name' => 'val', 'value' => '1'],
             ],
+            'cookies' => [],
+            'bodySize' => -1,
             'postData' => [
                 'mimeType' => 'application/json',
                 'text' => json_encode([
