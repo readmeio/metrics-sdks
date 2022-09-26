@@ -54,7 +54,9 @@ This generates the following object:
 }
 ```
 
-The generated snippet for this results in a [ReadMe Node Metrics SDK](https://npm.im/readmeio) Personalized Docs Webhook example:
+<!-- TODO: add a link to the ReadMe documentation for personalized docs once that's published -->
+
+The generated snippet for this results in a Personalized Docs Webhook example, which uses the [ReadMe Node Metrics SDK](https://npm.im/readmeio):
 
 ```js
 import express from 'express';
