@@ -30,6 +30,6 @@ app.post('/webhook', express.json({ type: 'application/json' }), async (req, res
   });
 });
 
-const server = app.listen(8000, '0.0.0.0', function () {
+const server = app.listen(8000, '0.0.0.0', () => {
   console.log('Example app listening at http://%s:%s', server.address().address, server.address().port);
 });
