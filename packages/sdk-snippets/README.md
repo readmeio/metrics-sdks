@@ -54,7 +54,7 @@ This generates the following object:
 }
 ```
 
-The generated snippet for this results in a [ReadMe Node Metrics SDK](https://npm.im/readmeio) webhooks example:
+The generated snippet for this results in a [ReadMe Node Metrics SDK](https://npm.im/readmeio) Personalized Docs Webhook example:
 
 ```js
 import express from 'express';
@@ -85,5 +85,8 @@ app.post('/webhook', express.json({ type: 'application/json' }), async (req, res
   });
 });
 
-app.listen(8000);
+const port = 8000;
+const server = app.listen(port, '0.0.0.0', function () {
+  console.log('Personalized Docs Webhook example app listening at http://%s:%s', server.address().address, port);
+});
 ```
