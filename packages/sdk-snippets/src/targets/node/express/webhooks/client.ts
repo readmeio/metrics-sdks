@@ -112,10 +112,7 @@ export const express: Client = {
 
     push('const port = 8000;');
     push("const server = app.listen(port, '0.0.0.0', function () {");
-    push(
-      "console.log('Example app listening at http://%s:%s', server.address().address, port);",
-      1
-    );
+    push("console.log('Example app listening at http://%s:%s', server.address().address, port);", 1);
     push('});');
     blank();
 
