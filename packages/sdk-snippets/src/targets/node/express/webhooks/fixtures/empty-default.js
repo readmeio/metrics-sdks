@@ -30,5 +30,5 @@ app.post('/webhook', express.json({ type: 'application/json' }), async (req, res
 
 const port = 8000;
 const server = app.listen(port, '0.0.0.0', function () {
-  console.log('Personalized Docs Webhook example app listening at http://%s:%s', server.address().address, port);
+  console.log('Example app listening at http://%s:%s', server.address().address, port);
 });
