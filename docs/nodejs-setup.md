@@ -121,8 +121,8 @@ Prettier's table formatting is cursed, hence this ignore block.
 <!-- prettier-ignore-start -->
 | Option | Type | Description |
 | :--- | :--- | :--- |
-| denyList | Array of strings | An array of parameter names that will be redacted from the query parameters, request body (when JSON or form-encoded), response body (when JSON) and headers. For nested request parameters use dot notation (e.g. `a.b.c` to redact the field `c` within `{ a: { b: { c: 'foo' }}}`). |
-| allowList | Array of strings | If included, `denyList` will be ignored and all parameters but those in this list will be redacted. |
+| denylist | Array of strings | An array of parameter names that will be redacted from the query parameters, request body (when JSON or form-encoded), response body (when JSON) and headers. For nested request parameters use dot notation (e.g. `a.b.c` to redact the field `c` within `{ a: { b: { c: 'foo' }}}`). |
+| allowlist | Array of strings | If included, `denylist` will be ignored and all parameters but those in this list will be redacted. |
 |  development | bool | Defaults to false. When `true`, the log will be marked as a development log. This is great for separating staging or test data from data coming from customers. |
 | fireAndForget | bool | Defaults to `true`. When `false`, the server will wait for the response from the metrics call. This will be slower, but the response is useful in debugging problems. |
 | bufferLength | number | Defaults to `1`. This value should be a number representing the amount of requests to group up before sending them over the network. Increasing this value will increase performance but delay the time until logs show up in the dashboard. The default value is 1. |
@@ -307,8 +307,8 @@ Prettier's table formatting is cursed, hence this ignore block.
 <!-- prettier-ignore-start -->
 | Option | Type | Description |
 | :--- | :--- | :--- |
-| `denyList` | Array of strings | An array of parameter names that will be redacted from the query parameters, request body (when provided as an object, or as a JSON or form encoded string), response body (when JSON) and headers. |
-| `allowList` | Array of strings | If included, `denyList` will be ignored and all parameters but those in this list will be redacted. |
+| `denylist` | Array of strings | An array of parameter names that will be redacted from the query parameters, request body (when provided as an object, or as a JSON or form encoded string), response body (when JSON) and headers. |
+| `allowlist` | Array of strings | If included, `denylist` will be ignored and all parameters but those in this list will be redacted. |
 | `development` | bool | Defaults to `false`. When `true`, the log will be marked as a development log. This is great for separating staging or test data from data coming from customers. |
 | `fireAndForget` | bool | Defaults to `true`. When `false`, the server will wait for the response from the metrics call. This will be slower, but the response is useful in debugging problems. |
 <!-- prettier-ignore-end -->
@@ -317,7 +317,7 @@ Prettier's table formatting is cursed, hence this ignore block.
 
 ```js
 {
-  denyList: ['password', 'secret'],
+  denylist: ['password', 'secret'],
   development: true,
   fireAndForget: true
 }
@@ -325,4 +325,4 @@ Prettier's table formatting is cursed, hence this ignore block.
 
 ## Limitations
 
-- The Express.js plugin only supports `allowList` and `denyList` for JSON and form-encoded request bodies. If you need `allowList` or `denyList` support for other request bodies, you can parse the request body yourself, and provide it to the [`log` function](#log-reference).
+- The Express.js plugin only supports `allowlist` and `denylist` for JSON and form-encoded request bodies. If you need `allowlist` or `denylist` support for other request bodies, you can parse the request body yourself, and provide it to the [`log` function](#log-reference).
