@@ -72,9 +72,6 @@ The MetricsApiConfig object takes the following parameters:
 
 There are three fields that you can use to identify the user making the API call. We recommend passing all three to make API Metrics as useful as possible.
 
-<!--
-Prettier's table formatting is cursed, hence this ignore block.
--->
 <!-- prettier-ignore-start -->
 | Field | Type | Description |
 | :--- | :--- | :--- |
@@ -100,9 +97,6 @@ metrics_extension = ReadMeMetrics(
 )
 ```
 
-<!--
-Prettier's table formatting is cursed, hence this ignore block.
--->
 <!-- prettier-ignore-start -->
 | Option | Type | Description |
 | :--- | :--- | :--- |
