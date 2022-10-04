@@ -305,6 +305,14 @@ When logging your request with Node.js's native `Request` and `Response` data we
 }
 ```
 
+## Security
+
+By default API keys sent the grouping function and `Authorization` headers are encrypted into an integrity hash using the [ssri](https://npm.im/ssri) library. In order for us to safely utilize this data later in your ReadMe dashboards, and allow you to do user tracing, we pluck the last 4 characters off of the end of the encrypted string and save that with the integrity hash.
+
+For example if the API key is `1999e4893f732ba38b948dbe8d34ed48cd54f058` we will include `f058` on the end of the hash, resulting in ReadMe Metrics recording the following in our database:
+
+> sha512-/0bFzsk3a5wrmdTxA6qstL9TExGVTr9BUgZvhIjVrTa2M/KsNkW+AF8wJtgYd1OIvHc5qGgB9WfUbCA8PPbE8w==?f058
+
 ## Limitations
 
 - The Express.js plugin only supports `allowlist` and `denylist` for JSON and form-encoded request bodies. If you need `allowlist` or `denylist` support for other request bodies, you can parse the request body yourself, and provide it to the [`log` function](#log-reference).
