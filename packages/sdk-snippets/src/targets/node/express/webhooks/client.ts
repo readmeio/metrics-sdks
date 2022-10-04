@@ -110,7 +110,9 @@ export const express: Client = {
 
     blank();
 
-    push('app.listen(8000);');
+    push("const server = app.listen(8000, '0.0.0.0', () => {");
+    push("console.log('Example app listening at http://%s:%s', server.address().address, server.address().port);", 1);
+    push('});');
     blank();
 
     return {

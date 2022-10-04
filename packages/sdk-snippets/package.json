@@ -1,6 +1,6 @@
 {
   "name": "@readme/metrics-sdk-snippets",
-  "version": "2.0.0",
+  "version": "2.1.1-alpha.0",
   "description": "Generate code snippets for ReadMe Metrics SDKs in multiple languages",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -35,7 +35,7 @@
   "devDependencies": {
     "@readme/eslint-config": "^10.0.0",
     "@types/chai": "^4.3.3",
-    "@types/mocha": "^9.1.1",
+    "@types/mocha": "^10.0.0",
     "chai": "^4.3.6",
     "eslint": "^8.21.0",
     "mocha": "^10.0.0",

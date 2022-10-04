@@ -54,7 +54,9 @@ This generates the following object:
 }
 ```
 
-The generated snippet for this results in a [ReadMe Node Metrics SDK](https://npm.im/readmeio) webhooks example:
+<!-- TODO: add a link to the ReadMe documentation for personalized docs once that's published -->
+
+The generated snippet for this results in a Personalized Docs Webhook example, which uses the [ReadMe Node Metrics SDK](https://npm.im/readmeio):
 
 ```js
 import express from 'express';
@@ -85,5 +87,7 @@ app.post('/webhook', express.json({ type: 'application/json' }), async (req, res
   });
 });
 
-app.listen(8000);
+const server = app.listen(8000, '0.0.0.0', () => {
+  console.log('Example app listening at http://%s:%s', server.address().address, server.address().port);
+});
 ```
