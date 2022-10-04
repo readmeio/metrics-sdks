@@ -136,6 +136,14 @@ describe('Metrics SDK Integration Tests', function () {
     });
   });
 
+  function getGroupId() {
+    // Hashing is only supported in some versions of the SDK
+    if (process.env.SUPPORTS_HASHING) {
+      return 'sha512-u2GbQ83jIqNa+a8v110+8IDztQQr4joL1xSE+wFH51zSOA1qQKPwOC8t2n2LWJQA1mX4ZLZ45SEokITzLed/ow==?-key';
+    }
+    return 'owlbert-api-key';
+  }
+
   it('should make a request to a Metrics backend with a HAR file', async function () {
     await fetch(`http://localhost:${PORT}`, { method: 'get' });
 
@@ -148,11 +156,9 @@ describe('Metrics SDK Integration Tests', function () {
     // https://uibakery.io/regex-library/uuid
     expect(payload._id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 
-    expect(payload.group).to.deep.equal({
-      id: 'owlbert-api-key',
-      label: 'Owlbert',
-      email: 'owlbert@example.com',
-    });
+    expect(payload.group.id).to.equal(getGroupId());
+    expect(payload.group.email).to.equal('owlbert@example.com');
+    expect(payload.group.label).to.equal('Owlbert');
 
     expect(payload.clientIPAddress).to.match(/\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}/);
     expect(payload.development).to.be.false;
@@ -203,6 +209,25 @@ describe('Metrics SDK Integration Tests', function () {
     expect(response.content.text.replace('\n', '')).to.equal(JSON.stringify({ message: 'hello world' }));
     expect(response.content.size).to.equal(response.content.text.length);
     expect(response.content.mimeType).to.match(/application\/json(;\s?charset=utf-8)?/);
+  });
+
+  it('should mask `Authorization` headers', async function () {
+    const authorizationHeader = 'Bearer: a-random-api-key';
+    function getAuthorizationHeader() {
+      if (process.env.SUPPORTS_HASHING) {
+        return 'sha512-7S+L0vUE8Fn6HI3836rtz4b6fVf6H4JFur6SGkOnL3bFpC856+OSZkpIHphZ0ipNO+kUw1ePb5df2iYrNQCpXw==?-key';
+      }
+      return authorizationHeader;
+    }
+
+    await fetch(`http://localhost:${PORT}`, { method: 'get', headers: { authorization: authorizationHeader } });
+
+    const [, body] = await getRequest();
+    const [har] = body;
+
+    const { request } = har.request.log.entries[0];
+
+    expect(request.headers).to.have.header('authorization', getAuthorizationHeader());
   });
 
   it('should capture query strings in a GET request', async function () {

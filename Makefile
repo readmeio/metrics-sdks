@@ -30,7 +30,7 @@ test-webhooks-dotnet: ## Run webhooks tests against the .NET SDK
 
 test-metrics-node-express: ## Run Metrics tests against the Node SDK + Express
 	docker-compose up --build --detach integration_node_express
-	npm run test:integration-metrics || make cleanup-failure
+	SUPPORTS_HASHING=true npm run test:integration-metrics || make cleanup-failure
 	@make cleanup
 
 test-webhooks-node-express: ## Run webhooks tests against the Node SDK + Express
@@ -40,12 +40,12 @@ test-webhooks-node-express: ## Run webhooks tests against the Node SDK + Express
 
 test-metrics-node-fastify: ## Run Metrics tests against the Node SDK + Fastify
 	docker-compose up --build --detach integration_node_fastify
-	npm run test:integration-metrics || make cleanup-failure
+	SUPPORTS_HASHING=true npm run test:integration-metrics || make cleanup-failure
 	@make cleanup
 
 test-metrics-node-hapi: ## Run Metrics tests against the Node SDK + hapi
 	docker-compose up --build --detach integration_node_hapi
-	npm run test:integration-metrics || make cleanup-failure
+	SUPPORTS_HASHING=true npm run test:integration-metrics || make cleanup-failure
 	@make cleanup
 
 ##

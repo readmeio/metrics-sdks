@@ -28,7 +28,7 @@ const incomingGroup = {
 };
 
 const outgoingGroup = {
-  id: '5afa21b97011c63320226ef3',
+  id: 'sha512-+MnFCkFeabWc/YaeOiMTjE5giOSFEQnar9xWSjm/BSYjNAoDmRQJvSyPZ3mYv0u9orXbfYWBqepmtY0SGBTF1A==?6ef3',
   label: 'test',
   email: 'test@example.com',
 };
@@ -99,6 +99,7 @@ describe('#metrics', function () {
       },
     })
       .post('/v1/request', ([body]) => {
+        expect(body._version).to.equal(3);
         expect(body.group).to.deep.equal(outgoingGroup);
         expect(typeof body.request.log.entries[0].startedDateTime).to.equal('string');
         return true;

@@ -21,7 +21,7 @@ module.exports = {
     'no-underscore-dangle': [
       'error',
       {
-        allow: ['_id', '_body', '__bodyCache', '_form_encoded', '_json', '_text'],
+        allow: ['_id', '_body', '__bodyCache', '_form_encoded', '_json', '_text', '_version'],
       },
     ],
 

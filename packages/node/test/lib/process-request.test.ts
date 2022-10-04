@@ -134,6 +134,20 @@ describe('process-request', function () {
       });
   });
 
+  it('should hash Authorization header', function () {
+    const app = createApp();
+
+    return request(app)
+      .post('/')
+      .set('authorization', 'Bearer 123456')
+      .expect(({ body }) => {
+        expect(body.headers).to.have.header(
+          'authorization',
+          'sha512-31rXi6lhQcMvMwee0P6yu9xyHuAWDUEuDzcSBQCCUUvlQ6BZXcu67qy1hrD2nbrjeDLKrYrBbQoMOrLnJVmbCw==?3456'
+        );
+      });
+  });
+
   describe('options', function () {
     describe('denylist/allowlist', function () {
       it('should strip denylisted json properties', function () {

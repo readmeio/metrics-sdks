@@ -11,7 +11,7 @@ import merge from 'lodash/merge';
 import pick from 'lodash/pick';
 import set from 'lodash/set';
 
-import { getProto } from './construct-payload';
+import { getProto, mask } from './construct-payload';
 import { objectToArray, searchToArray } from './object-to-array';
 
 /**
@@ -184,6 +184,10 @@ export default function processRequest(
   // We only ever use this reqUrl with the fake hostname for the pathname and querystring.
   // req.originalUrl is express specific, req.url is node.js
   const reqUrl = new URL(req.originalUrl || req.url, 'https://readme.io');
+
+  if (req.headers.authorization) {
+    req.headers.authorization = mask(req.headers.authorization);
+  }
 
   const requestData = {
     method: req.method,
