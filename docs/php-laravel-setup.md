@@ -95,9 +95,6 @@ class ReadMe implements \ReadMe\Handler
 }
 ```
 
-<!--
-Prettier's table formatting is cursed, hence this ignore block.
--->
 <!-- prettier-ignore-start -->
 | Field | Usage |
 | :--- | :--- |
@@ -110,9 +107,6 @@ Prettier's table formatting is cursed, hence this ignore block.
 
 There are a few configurable options in `config/readme.php` that let you change how logs are sent to ReadMe.
 
-<!--
-Prettier's table formatting is cursed, hence this ignore block.
--->
 <!-- prettier-ignore-start -->
 | Option | Type | Description |
 | :--- | :--- | :--- |

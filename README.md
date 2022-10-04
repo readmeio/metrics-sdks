@@ -2,9 +2,6 @@
 
 This is the monorepo for SDK's for [ReadMe's Metrics](https://readme.com/metrics/) product.
 
-<!--
-Prettier's table formatting is cursed, hence this ignore block.
--->
 <!-- prettier-ignore-start -->
 | | Language / Framework | Package | Latest Release |
 | :--- |:--- | :--- | :--- |

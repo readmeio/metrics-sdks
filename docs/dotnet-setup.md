@@ -69,9 +69,6 @@ For a full example take a look at our example projects:
 
 Before assigning the ReadMe.Metrics middleware you should assign custom middleware to extract certain grouping parameters, as seen in step 2 of the ASP.NET Core Integration. The grouping parameters includes three values: apiKey, label and email. While only apiKey is required, we recommend providing all three values to get the most out of the metrics dashboard.
 
-<!--
-Prettier's table formatting is cursed, hence this ignore block.
--->
 <!-- prettier-ignore-start -->
 | Field | Type | Description |
 | :--- | :--- | :--- |
@@ -99,9 +96,6 @@ app.Use(async (context, next) =>
 
 The ASP.NET Core middleware extracts the following parameters from `appsettings.json` file:
 
-<!--
-Prettier's table formatting is cursed, hence this ignore block.
--->
 <!-- prettier-ignore-start -->
 | Parameter | Description |
 | :--- | :--- |
@@ -113,9 +107,6 @@ Prettier's table formatting is cursed, hence this ignore block.
 
 This is an optional object used to restrict traffic being sent to readme server based on given values in allowList or denyList arrays.
 
-<!--
-Prettier's table formatting is cursed, hence this ignore block.
--->
 <!-- prettier-ignore-start -->
 | Option | Type | Description |
 | :--- | :--- | :--- |

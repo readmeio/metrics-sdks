@@ -84,9 +84,6 @@ app.wsgi_app = MetricsMiddleware(
 )
 ```
 
-<!--
-Prettier's table formatting is cursed, hence this ignore block.
--->
 <!-- prettier-ignore-start -->
 | Field | Type | Description |
 | :--- | :--- | :--- |
@@ -117,9 +114,6 @@ app.wsgi_app = MetricsMiddleware(
 )
 ```
 
-<!--
-Prettier's table formatting is cursed, hence this ignore block.
--->
 <!-- prettier-ignore-start -->
 | Option | Type | Description |
 | :--- | :--- | :--- |

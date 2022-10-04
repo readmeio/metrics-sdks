@@ -108,9 +108,6 @@ end
 
 Additional you can also send the following two optional pieces of data within this payload:
 
-<!--
-Prettier's table formatting is cursed, hence this ignore block.
--->
 <!-- prettier-ignore-start -->
 | Parameter | Type | Description |
 | :--- | :--- | :--- |
@@ -122,9 +119,6 @@ Prettier's table formatting is cursed, hence this ignore block.
 
 There are a few options in addition to `api_key` you can pass in to change how the logs are sent to ReadMe. These are all optional:
 
-<!--
-Prettier's table formatting is cursed, hence this ignore block.
--->
 <!-- prettier-ignore-start -->
 | Option | Type | Description |
 | :--- | :--- | :--- |

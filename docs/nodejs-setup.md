@@ -69,9 +69,6 @@ The Express middleware accepts the following parameters:
 
 > Note that this middleware is not likely to be sensitive to order. If you are new to Express, see [How to Write Middleware for Express.js Apps](https://stormpath.com/blog/how-to-write-middleware-for-express-apps).
 
-<!--
-Prettier's table formatting is cursed, hence this ignore block.
--->
 <!-- prettier-ignore-start -->
 | Parameter | Required? | Description |
 | :--- | :--- | :--- |
@@ -92,9 +89,6 @@ The grouping function is a function your script should include that extracts ide
 
 Return data:
 
-<!--
-Prettier's table formatting is cursed, hence this ignore block.
--->
 <!-- prettier-ignore-start -->
 | Field | Required? | Type | Usage |
 | :--- | :--- | :--- | :--- |
@@ -115,9 +109,6 @@ app.use(readme.express(readmeAPIKey, req => ({
 
 ### Additional Express Options
 
-<!--
-Prettier's table formatting is cursed, hence this ignore block.
--->
 <!-- prettier-ignore-start -->
 | Option | Type | Description |
 | :--- | :--- | :--- |
@@ -241,9 +232,6 @@ Take one of your IDs and go to the following URL to see what details were logged
 
 ### `log` Reference
 
-<!--
-Prettier's table formatting is cursed, hence this ignore block.
--->
 <!-- prettier-ignore-start -->
 | Parameter | Required? | Type | Description |
 | :--- | :--- | :--- | :--- |
@@ -264,9 +252,6 @@ readme.log(readmeAPIKey, req, res, payloadData, logOptions);
 
 When logging your request with Node.js's native `Request` and `Response` data we can't get all the information we need this `log` parameter `log`; it helps you provide all the information we can't otherwise retrieve for you.
 
-<!--
-Prettier's table formatting is cursed, hence this ignore block.
--->
 <!-- prettier-ignore-start -->
 | Option | Required? | Type | Description |
 | :--- | :--- | :--- | :--- |
@@ -301,9 +286,6 @@ Prettier's table formatting is cursed, hence this ignore block.
 
 ### Additional Node.js Options
 
-<!--
-Prettier's table formatting is cursed, hence this ignore block.
--->
 <!-- prettier-ignore-start -->
 | Option | Type | Description |
 | :--- | :--- | :--- |
