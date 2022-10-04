@@ -26,6 +26,7 @@ npm install readmeio --save
 
 - [Express.js Integration](https://docs.readme.com/docs/sending-logs-to-readme-with-nodejs#expressjs-integration)
 - [Generic Node.js Integration](https://docs.readme.com/docs/sending-logs-to-readme-with-nodejs#generic-nodejs-integration)
+- [Security](https://docs.readme.com/docs/sending-logs-to-readme-with-nodejs#security)
 - [Limitations](https://docs.readme.com/docs/sending-logs-to-readme-with-nodejs#limitations)
 
 > 🚧 Any Issues?
