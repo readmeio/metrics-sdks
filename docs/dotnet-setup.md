@@ -72,9 +72,9 @@ Before assigning the ReadMe.Metrics middleware you should assign custom middlewa
 <!-- prettier-ignore-start -->
 | Field | Type | Description |
 | :--- | :--- | :--- |
-| apiKey | string | **Required** API Key used to make the request. Note that this is different from the `readmeAPIKey` described above and should be a value from your API that is unique to each of your users, not part of ReadMe's API. |
-| label | string | This will be the users' display name in the API Metrics Dashboard, as it's much easier to remember a name than an API key. |
-| email | string | Email of the user that is making the call. |
+| `apiKey` | string | **Required** API Key used to make the request. Note that this is different from the `readmeAPIKey` described above and should be a value from your API that is unique to each of your users, not part of ReadMe's API. |
+| `label` | string | This will be the users' display name in the API Metrics Dashboard, as it's much easier to remember a name than an API key. |
+| `email` | string | Email of the user that is making the call. |
 <!-- prettier-ignore-end -->
 
 #### Example
@@ -110,10 +110,10 @@ This is an optional object used to restrict traffic being sent to readme server 
 <!-- prettier-ignore-start -->
 | Option | Type | Description |
 | :--- | :--- | :--- |
-| `denyList` | Array of strings | An array of parameter names that will be redacted from the query parameters, request body (when JSON or form-encoded), response body (when JSON) and headers. For nested request parameters use dot notation (e.g. a.b.c to redact the field `c` within `{ a: { b: { c: 'foo' }}}`). |
+| `baseLogUrl` | string | This value is used when building the `x-documentation-url` header (see docs below). It is your ReadMe documentation's base URL (e.g. `https://example.readme.io`). If not provided, we will make one API call a day to determine your base URL (more info in [Documentation URL](https://docs.readme.com/docs/net-setup#documentation-url).<br /><br />**Note:** `.readme.com` will not work. Make sure to use `.readme.io`, or your custom hostname. |
 | `allowList` | Array of strings | If included, `denyList` will be ignored and all parameters but those in this list will be redacted.
+| `denyList` | Array of strings | An array of parameter names that will be redacted from the query parameters, request body (when JSON or form-encoded), response body (when JSON) and headers. For nested request parameters use dot notation (e.g. a.b.c to redact the field `c` within `{ a: { b: { c: 'foo' }}}`). |
 | `development` | bool | Defaults to `false`. When `true`, the log will be marked as a development log. This is great for separating staging or test data from data coming from customers. |
-| `baseLogUrl` | string | This value is used when building the `x-documentation-url` header (see docs below). It is your ReadMe documentation's base URL (e.g. `https://example.readme.io`). If not provided, we will make one API call a day to determine your base URL (more info in [Documentation URL](https://docs.readme.com/docs/net-setup#documentation-url).<br /><br />**Note:** .readme.com will not work. Make sure to use .readme.io, or your custom hostname. |
 <!-- prettier-ignore-end -->
 
 #### Example
@@ -145,3 +145,7 @@ Make sure to supply a `baseLogUrl` option into your readme settings, which shoul
      - Any other config values you are using.
      - The Method, URL, Query Parameters, Request Body and Headers of the API call you are trying to log.
      - The response of the API call to the metrics server (i.e. the value of `response` on [this line](https://github.com/readmeio/metrics-sdks/blob/99dc92e891bde0167b59f8c224c7201fe4035d60/packages/dotnet/Readme/HarJsonTranslationLogics/ReadmeApiCaller.cs#L30)).
+
+## Sample Applications
+
+- [.NET 6.0](https://github.com/readmeio/metrics-sdks/tree/main/packages/dotnet/examples/net6.0)

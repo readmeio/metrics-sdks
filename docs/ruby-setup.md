@@ -131,6 +131,4 @@ There are a few options in addition to `api_key` you can pass in to change how t
 
 ## Sample Applications
 
-- [Rails](https://github.com/readmeio/metrics-sdk-rails-sample)
-- [Rack](https://github.com/readmeio/metrics-sdk-racks-sample)
-- [Sinatra](https://github.com/readmeio/metrics-sdk-sinatra-example)
+- [Rails](https://github.com/readmeio/metrics-sdks/tree/main/packages/ruby/examples/metrics-rails)

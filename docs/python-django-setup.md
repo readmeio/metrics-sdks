@@ -76,9 +76,9 @@ There are three fields that you can use to identify the user making the API call
 <!-- prettier-ignore-start -->
 | Field | Type | Description |
 | :--- | :--- | :--- |
-| api_key | string | **Required** API key used to make the request, or another unique identifier of the user who made the request. |
-| label | string | Display name for the user or account holder in the API Metrics Dashboard, since it's much more useful to have names than just unique identifiers or API keys. |
-| email | string | Email address of the user or account holder that is making the call. |
+| `api_key` | string | **Required** API key used to make the request, or another unique identifier of the user who made the request. |
+| `label` | string | Display name for the user or account holder in the API Metrics Dashboard, since it's much more useful to have names than just unique identifiers or API keys. |
+| `email` | string | Email address of the user or account holder that is making the call. |
 <!-- prettier-ignore-end -->
 
 ## Configuration Options

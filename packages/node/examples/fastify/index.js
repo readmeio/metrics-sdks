@@ -23,8 +23,10 @@ fastify.addHook('onSend', async (request, reply, payload) => {
     // User's email address
     email: 'owlbert@example.com',
   };
+
   // We have to patch the req/res objects with the params required for the sdk
   req.body = request.body;
+
   // Modified approach taken from here:
   // https://github.com/fastify/fastify-nextjs/pull/112
   // Fastify uses `writeHead` for performance reasons, which means those header values
