@@ -120,6 +120,10 @@ There are a few configurable options in `config/readme.php` that let you change 
 >
 > `blacklist` and `whitelist` do not support support dot-notation so only top-level keys can be specified.
 
+## Sample Applications
+
+- [Laravel](https://github.com/readmeio/metrics-sdks/tree/main/packages/php/examples/laravel)
+
 ## FAQ
 
 ### How can I upgrade to v2.0?

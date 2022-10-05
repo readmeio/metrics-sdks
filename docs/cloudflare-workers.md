@@ -24,11 +24,13 @@ It's a few small steps if you're a developer! There are only two steps required 
 
 First, you will need to modify your API to return two new headers with your request. These allow ReadMe to understand who is making the call.
 
-| Header           | Description                                                                                                                 |
-| :--------------- | :-------------------------------------------------------------------------------------------------------------------------- |
-| `x-readme-id`    | Unique identifier for the caller. This can be anything that is unique such as an id of a user in your database.             |
-| `x-readme-label` | This will be augment the log in ReadMe, since it's much easier to remember a label than a unique identifier.                |
+<!-- prettier-ignore-start -->
+| Header | Description  |
+| :--- | :--- |
+| `x-readme-id` | Unique identifier for the caller. This can be anything that is unique such as an id of a user in your database. |
+| `x-readme-label` | This will be augment the log in ReadMe, since it's much easier to remember a label than a unique identifier. |
 | `x-readme-email` | _(Optional)_ For further insight into API calls, you can send an email along with your request to target users more easily. |
+<!-- prettier-ignore-end -->
 
 Here's an example of setting these headers in [Express.js](https://expressjs.com/):
 
