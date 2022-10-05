@@ -87,9 +87,9 @@ app.wsgi_app = MetricsMiddleware(
 <!-- prettier-ignore-start -->
 | Field | Type | Description |
 | :--- | :--- | :--- |
-| api_key | string | **Required** API key used to make the request, or another unique identifier of the user who made the request. |
-| label | string | Display name for the user or account holder in the API Metrics Dashboard, since it's much more useful to have names than just unique identifiers or API keys. |
-| email | string | Email address of the user or account holder that is making the call. |
+| `api_key` | string | **Required** API key used to make the request, or another unique identifier of the user who made the request. |
+| `label` | string | Display name for the user or account holder in the API Metrics Dashboard, since it's much more useful to have names than just unique identifiers or API keys. |
+| `email` | string | Email address of the user or account holder that is making the call. |
 <!-- prettier-ignore-end -->
 
 ## Configuration Options
@@ -117,8 +117,11 @@ app.wsgi_app = MetricsMiddleware(
 <!-- prettier-ignore-start -->
 | Option | Type | Description |
 | :--- | :--- | :--- |
-| development | bool | Defaults to `False`. If `True`, the log will be separate from normal production logs. This is great for separating staging or test data from data coming from customers. |
-| bufferLength | int | By default, we only send logs to ReadMe after 10 requests are made. Depending on the usage of your API it make make sense to send logs more or less frequently. |
-| denylist | dict | Defaults to `None`. An array of keys from your API requests and responses headers and bodies that you wish to block from being sent to ReadMe.<br /><br />If you configure a `denylist`, it will override any `allowlist` configuration. |
-| allowlist | dict | Defaults to `None`. An array of keys from your API requests and responses headers and bodies that you only wish to send to ReadMe. |
+| `buffer_length` | int | By default, we only send logs to ReadMe after 10 requests are made. Depending on the usage of your API it make make sense to send logs more or less frequently. |
+| `development_mode` | bool | Defaults to `False`. If `True`, the log will be separate from normal production logs. This is great for separating staging or test data from data coming from customers. |
+| `background_worker_mode` | bool | Defaults to `True`. Determines whether to issue the call to the ReadMe API in a background thread (`True`), or in the main thread (`False`). If the ReadMe API call is issued in the main thread, your application server will block until the API call finishes. |
+| `denylist` | dict | Defaults to `None`. An array of keys from your API requests and responses headers and bodies that you wish to block from being sent to ReadMe.<br /><br />Both the request and response will be checked for these keys, in their HTTP headers, form fields, URL parameters, and JSON request/response bodies. JSON is only checked at the top level, so a nested field will still be sent even if its key matches one of the keys in denylist.<br /><br />If you configure a denylist, it will override any `allowlist` configuration. |
+| `allowlist`	| dict | Defaults to `None`. An array of headers and JSON body properties to send to ReadMe. If you configure an allowlist then all other properties will be dropped. Otherwise the semantics are similar to `denylist`. |
+| `allowed_http_hosts` | dict | Defaults to `None`. A list of HTTP hosts which should be logged to ReadMe. If this is present, requests will only be sent to ReadMe whose Host header matches one of the allowed hosts. |
+| `timeout` | int | Defaults to `3`. Timeout (in seconds) for calls back to the ReadMe Metrics API. |
 <!-- prettier-ignore-end -->

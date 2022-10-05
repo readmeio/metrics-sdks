@@ -4,9 +4,9 @@ slug: sending-logs-to-readme-with-php-laravel
 category: 5f7cefc76b6e5e04c3a4c74c
 ---
 
-> 👍 Upgrade config to 2.0
+> 🚀 Upgrading to v2.0?
 >
-> Please upgrade to our [v2.0 configuration](#section--how-can-i-upgrade-to-v2-0-)
+> Please see our [upgrade path documentation](#section--how-can-i-upgrade-to-v2-0-).
 
 > 🚧 Any issues?
 >
@@ -110,10 +110,10 @@ There are a few configurable options in `config/readme.php` that let you change 
 <!-- prettier-ignore-start -->
 | Option | Type | Description |
 | :--- | :--- | :--- |
-| development_mode | bool | When disabled, `development_mode` will make all API requests asynchronously as well as silencing all possible errors in transit. This defaults to `true`, and you should change it to false before deploying your integration to production. |
-| blacklist | Array of strings | An array of keys from your API requests and responses that you wish to blacklist from sending to ReadMe. If this option is present, it will be favored over the `whitelist` option below. |
-| whitelist | Array of strings | An array of keys from your API requests and responses that you only wish to send to ReadMe. |
-| base_log_url | string | This is the base URL for your ReadMe project. Normally this would be `https://projectName.readme.io` or `https://docs.yourdomain.com`, however if this value is not supplied, a request to the ReadMe API will be made once a day to retrieve it. This data is cached into `$COMPOSER_HOME/cache`. |
+| `development_mode` | bool | When disabled, `development_mode` will make all API requests asynchronously as well as silencing all possible errors in transit. This defaults to `true`, and you should change it to false before deploying your integration to production. |
+| `blacklist` | Array of strings | An array of keys from your API requests and responses that you wish to blacklist from sending to ReadMe. If this option is present, it will be favored over the `whitelist` option below. |
+| `whitelist` | Array of strings | An array of keys from your API requests and responses that you only wish to send to ReadMe. |
+| `base_log_url` | string | This is the base URL for your ReadMe project. Normally this would be `https://projectName.readme.io` or `https://docs.yourdomain.com`, however if this value is not supplied, a request to the ReadMe API will be made once a day to retrieve it. This data is cached into `$COMPOSER_HOME/cache`. |
 <!-- prettier-ignore-end -->
 
 > ⚠️
