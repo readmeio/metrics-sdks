@@ -22,7 +22,7 @@ def publish_batch(config, queue):
             return
 
         version = importlib.import_module(__package__).__version__
-        url = urljoin(os.getenv("METRICS_SERVER", config.METRICS_API), "/v1/request")
+        url = urljoin(os.getenv("README_METRICS_SERVER", config.METRICS_API), "/v1/request")
 
         readme_result = requests.post(
             url,

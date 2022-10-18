@@ -113,7 +113,7 @@ To run integration testing on a new Metrics SDK or an implementation of that SDK
 - [ ] Ensure that the the SDK is running in an HTTP server that is bound to `http://0.0.0.0:8000`.
   - The port should also be able to be optionally overridden with a `PORT` environment variable but port 8000 **must** be the default.
 - [ ] The SDK configuration must **not** have buffering enabled, or if it does its buffer limit is 1. If a request comes through to the HTTP server, the Metrics SDK must immediately send that to Metrics.
-- [ ] The SDK, and HTTP server, must allow our production Metrics server to be overridden with a `METRICS_SERVER` environment .
+- [ ] The SDK, and HTTP server, must allow our production Metrics server to be overridden with a `README_METRICS_SERVER` environment variable.
 - [ ] The HTTP server should have a Metrics SDK installed that responds with the following identification object for the user making the request:
 
 ```json
