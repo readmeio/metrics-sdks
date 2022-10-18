@@ -1,6 +1,0 @@
-{
-  "host": "https://metrics.readme.io",
-  "readmeApiUrl": "https://dash.readme.io/api",
-  "bufferLength": 1,
-  "timeout": 2000
-}

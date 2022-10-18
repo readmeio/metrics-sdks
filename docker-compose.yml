@@ -1,8 +1,8 @@
 version: '3.4'
 
 x-server-config: &server-config
-  METRICS_SERVER: "http://host.docker.internal:8001"
   README_API_KEY: rdme_abcdefghijklmnopqrstuvwxyz
+  README_METRICS_SERVER: "http://host.docker.internal:8001"
 
 x-extra_hosts: &default-extra_hosts
   # Docker in Github doesn't automaticaly map these and without `host.docker.internal`

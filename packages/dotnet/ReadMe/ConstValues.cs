@@ -16,7 +16,7 @@ namespace ReadMe
     {
       get
       {
-        var metricsHost = System.Environment.GetEnvironmentVariable("METRICS_SERVER");
+        var metricsHost = System.Environment.GetEnvironmentVariable("README_METRICS_SERVER");
         if (metricsHost == null)
         {
           metricsHost = "https://metrics.readme.io/";

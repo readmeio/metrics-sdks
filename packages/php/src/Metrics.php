@@ -70,7 +70,7 @@ class Metrics
         $this->curl_handler = new CurlMultiHandler();
         $this->client = (isset($options['client'])) ? $options['client'] : new Client([
             'handler' => HandlerStack::create($this->curl_handler),
-            'base_uri' => env('METRICS_SERVER', self::METRICS_SERVER),
+            'base_uri' => env('README_METRICS_SERVER', self::METRICS_SERVER),
             'timeout' => $curl_timeout,
         ]);
 
