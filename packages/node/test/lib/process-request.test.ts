@@ -157,6 +157,7 @@ describe('process-request', function () {
           .post('/')
           .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
           .expect(({ body }) => {
+            expect(body.url).to.be.a.url;
             expect(body.postData.text).to.equal(
               '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}'
             );
@@ -171,6 +172,7 @@ describe('process-request', function () {
           .send('password=123456&apiKey=abc&another=Hello world')
           .set('Content-Type', 'application/x-www-form-urlencoded')
           .expect(({ body }) => {
+            expect(body.url).to.be.a.url;
             expect(body.postData.text).to.be.undefined;
             expect(body.postData.params).to.deep.equal([
               {
@@ -196,6 +198,7 @@ describe('process-request', function () {
           .post('/')
           .send({ a: { b: { c: {} } } })
           .expect(({ body }) => {
+            expect(body.url).to.be.a.url;
             expect(body.postData.text).to.equal('{"a":{"b":{"c":"[REDACTED]"}}}');
           });
       });
@@ -207,6 +210,7 @@ describe('process-request', function () {
           .post('/')
           .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
           .expect(({ body }) => {
+            expect(body.url).to.be.a.url;
             expect(body.postData.text).to.equal('{"password":"123456","apiKey":"abc","another":"[REDACTED 11]"}');
           });
       });
@@ -218,6 +222,7 @@ describe('process-request', function () {
           .post('/')
           .send('password=123456&apiKey=abc&another=Hello world')
           .expect(({ body }) => {
+            expect(body.url).to.be.a.url;
             expect(body.postData.text).to.be.undefined;
             expect(body.postData.params).to.deep.equal([
               {
@@ -243,6 +248,7 @@ describe('process-request', function () {
           .post('/')
           .send({ a: { b: { c: 1 } }, d: 2 })
           .expect(({ body }) => {
+            expect(body.url).to.be.a.url;
             expect(body.postData.text).to.equal('{"a":{"b":{"c":1}},"d":"[REDACTED]"}');
           });
       });
@@ -254,6 +260,7 @@ describe('process-request', function () {
           .post('/')
           .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
           .expect(({ body }) => {
+            expect(body.url).to.be.a.url;
             expect(body.postData.text).to.equal(
               '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}'
             );
@@ -265,26 +272,28 @@ describe('process-request', function () {
 
         return request(app)
           .post('/')
-          .set('a', '1')
+          .set('x-ratelimit-limit', '10')
           .expect(({ body }) => {
+            expect(body.url).to.be.a.url;
             expect(body.headers).to.have.header('host', '[REDACTED 15]');
             expect(body.headers).to.have.header('accept-encoding', '[REDACTED 13]');
-            expect(body.headers).to.have.header('a', '1');
+            expect(body.headers).to.have.header('x-ratelimit-limit', '10');
             expect(body.headers).to.have.header('connection', '[REDACTED 5]');
             expect(body.headers).to.have.header('content-length', '0');
           });
       });
 
       it('should only send allowlisted headers', function () {
-        const app = createApp({ allowlist: ['a'] });
+        const app = createApp({ allowlist: ['x-ratelimit-limit'] });
 
         return request(app)
           .post('/')
-          .set('a', '1')
+          .set('x-ratelimit-limit', '10')
           .expect(({ body }) => {
+            expect(body.url).to.be.a.url;
             expect(body.headers).to.have.header('host', '[REDACTED 15]');
             expect(body.headers).to.have.header('accept-encoding', '[REDACTED 13]');
-            expect(body.headers).to.have.header('a', '1');
+            expect(body.headers).to.have.header('x-ratelimit-limit', '10');
             expect(body.headers).to.have.header('connection', '[REDACTED 5]');
             expect(body.headers).to.have.header('content-length', '[REDACTED 1]');
           });
@@ -299,12 +308,13 @@ describe('process-request', function () {
       return request(app)
         .post('/')
         .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
-        .set('a', '1')
+        .set('x-ratelimit-limit', '10')
         .expect(({ body }) => {
+          expect(body.url).to.be.a.url;
           expect(body.headers).to.have.header('host', '[REDACTED 15]');
           expect(body.headers).to.have.header('accept-encoding', '[REDACTED 13]');
           expect(body.headers).to.have.header('content-type', 'application/json');
-          expect(body.headers).to.have.header('a', '1');
+          expect(body.headers).to.have.header('x-ratelimit-limit', '10');
           expect(body.headers).to.have.header('content-length', '[REDACTED 2]');
           expect(body.headers).to.have.header('connection', '[REDACTED 5]');
 
@@ -316,18 +326,19 @@ describe('process-request', function () {
 
     it('should only send allowlisted nested properties in body and headers', function () {
       const app = createApp({
-        allowlist: ['a', 'another', 'content-type'],
+        allowlist: ['x-ratelimit-limit', 'another', 'content-type'],
       });
 
       return request(app)
         .post('/')
         .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
-        .set('a', '1')
+        .set('x-ratelimit-limit', '10')
         .expect(({ body }) => {
+          expect(body.url).to.be.a.url;
           expect(body.headers).to.have.header('host', '[REDACTED 15]');
           expect(body.headers).to.have.header('accept-encoding', '[REDACTED 13]');
           expect(body.headers).to.have.header('content-type', 'application/json');
-          expect(body.headers).to.have.header('a', '1');
+          expect(body.headers).to.have.header('x-ratelimit-limit', '10');
           expect(body.headers).to.have.header('content-length', '[REDACTED 2]');
           expect(body.headers).to.have.header('connection', '[REDACTED 5]');
 
@@ -346,12 +357,13 @@ describe('process-request', function () {
       return request(app)
         .post('/')
         .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
-        .set('a', '1')
+        .set('x-ratelimit-limit', '10')
         .expect(({ body }) => {
+          expect(body.url).to.be.a.url;
           expect(body.headers).to.have.header('host', '[REDACTED 15]');
           expect(body.headers).to.have.header('accept-encoding', '[REDACTED 13]');
           expect(body.headers).to.have.header('content-type', 'application/json');
-          expect(body.headers).to.have.header('a', '1');
+          expect(body.headers).to.have.header('x-ratelimit-limit', '10');
           expect(body.headers).to.have.header('content-length', '[REDACTED 2]');
           expect(body.headers).to.have.header('connection', '[REDACTED 5]');
 
@@ -375,6 +387,7 @@ describe('process-request', function () {
         .post('/')
         .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
         .expect(({ body }) => {
+          expect(body.url).to.be.a.url;
           expect(body.postData.text).to.equal(
             '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}'
           );
@@ -389,6 +402,7 @@ describe('process-request', function () {
         .set('content-type', 'application/json')
         .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
         .expect(({ body }) => {
+          expect(body.url).to.be.a.url;
           expect(body.postData.text).to.equal('{"password":"123456","apiKey":"abc","another":"[REDACTED 11]"}');
         });
     });
