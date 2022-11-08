@@ -28,7 +28,7 @@
     "@types/har-format": "^1.2.7",
     "@types/node-fetch": "^2.6.2",
     "content-type": "^1.0.4",
-    "find-cache-dir": "^3.3.2",
+    "find-cache-dir": "^4.0.0",
     "flat-cache": "^3.0.4",
     "lodash": "^4.17.15",
     "node-fetch": "^2.6.7",
