@@ -33,7 +33,10 @@ updates:
       prefix: chore(deps)
       prefix-development: chore(deps-dev)
     ignore:
-      # node-fetch is now an ESM package and can't be used here without a rewrite.
+      # These packages are now ESM-only and can't be used without a rewrite.
+      - dependency-name: find-cache-dir
+        versions:
+          - ">= 4"
       - dependency-name: node-fetch
         versions:
           - ">= 3"
