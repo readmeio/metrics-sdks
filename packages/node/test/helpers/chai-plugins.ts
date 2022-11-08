@@ -15,7 +15,12 @@ declare global {
       /**
        * Assert that a given HAR `headers` array has a given header matching a specific value.
        */
-      header: (header: string, expected: string) => void;
+      header: (header: string, expected: string | RegExp) => void;
+
+      /**
+       * Assert that a given URL is a valid URL.
+       */
+      url: void;
     }
   }
 }
@@ -87,6 +92,23 @@ export default function chaiPlugins(_chai, utils) {
       new chai.Assertion(headers.get(header)).to.oneOf(expected.map(e => e.toString()));
     } else {
       new chai.Assertion(headers.get(header)).to.equal(expected.toString());
+    }
+  });
+
+  /**
+   * Assert that a given URL is a valid URL.
+   *
+   * @example
+   * expect(body.url).to.be.a.url;
+   */
+  utils.addProperty(chai.Assertion.prototype, 'url', function () {
+    const url = utils.flag(this, 'object');
+
+    try {
+      // eslint-disable-next-line no-new
+      new URL(url);
+    } catch (err) {
+      new chai.Assertion(err.code).not.to.equal('ERR_INVALID_URL', `${url} is not a valid url`);
     }
   });
 }

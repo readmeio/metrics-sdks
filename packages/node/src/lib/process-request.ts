@@ -130,6 +130,9 @@ export default function processRequest(
   requestBody?: Record<string, unknown> | string,
   options?: LogOptions
 ): Entry['request'] {
+  const protocol = fixHeader(req.headers['x-forwarded-proto'])?.toLowerCase() || getProto(req);
+  const host = fixHeader(req.headers['x-forwarded-host']) || req.headers.host;
+
   const denylist = options?.denylist || options?.blacklist;
   const allowlist = options?.allowlist || options?.whitelist;
 
@@ -178,8 +181,6 @@ export default function processRequest(
     };
   }
 
-  const protocol = fixHeader(req.headers['x-forwarded-proto'])?.toLowerCase() || getProto(req);
-  const host = fixHeader(req.headers['x-forwarded-host']) || req.headers.host;
   // We use a fake host here because we rely on the host header which could be redacted.
   // We only ever use this reqUrl with the fake hostname for the pathname and querystring.
   // req.originalUrl is express specific, req.url is node.js
