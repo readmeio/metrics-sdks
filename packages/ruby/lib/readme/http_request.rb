@@ -8,7 +8,7 @@ module Readme
 
     HTTP_NON_HEADERS = [
       Rack::HTTP_COOKIE,
-      Rack::HTTP_VERSION,
+      Rack::SERVER_PROTOCOL,
       Rack::HTTP_HOST,
       Rack::HTTP_PORT
     ].freeze
@@ -30,7 +30,7 @@ module Readme
     end
 
     def http_version
-      @request.get_header(Rack::HTTP_VERSION)
+      @request.get_header(Rack::SERVER_PROTOCOL)
     end
 
     def request_method
