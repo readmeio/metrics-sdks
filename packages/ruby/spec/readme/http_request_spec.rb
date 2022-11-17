@@ -132,24 +132,24 @@ RSpec.describe Readme::HttpRequest do
   describe '#headers' do
     it 'is the normalized Rack HTTP_ keys minus a few non-header ones plus content type and length' do
       env = {
-        'CONTENT_LENGTH' => '10'
+        'CONTENT_LENGTH' => '10',
         'CONTENT_TYPE' => 'application/json',
         'HTTP_ACCEPT' => 'text/plain',
         'HTTP_COOKIE' => 'cookie1=value1; cookie2=value2',
         'HTTP_HOST' => 'example.com',
         'HTTP_PORT' => '8080',
         'HTTP_X_CUSTOM' => 'custom',
-        'SERVER_PROTOCOL' => 'HTTP/1.1',
+        'SERVER_PROTOCOL' => 'HTTP/1.1'
       }
       request = described_class.new(env)
 
       expect(request.headers).to eq(
         {
           'Accept' => 'text/plain',
-          'Content-Length' => '10'
+          'Content-Length' => '10',
           'Content-Type' => 'application/json',
           'Host' => 'example.com',
-          'X-Custom' => 'custom',
+          'X-Custom' => 'custom'
         }
       )
     end
