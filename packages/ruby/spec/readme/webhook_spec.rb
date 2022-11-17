@@ -41,7 +41,7 @@ RSpec.describe Readme::Webhook do
       hmac = OpenSSL::HMAC.hexdigest('SHA256', random_api_key, unsigned)
       signature = "t=#{time},v0=#{hmac}"
 
-      described_class.verify({ email: 'dom@readme.io' }.to_json, signature, random_api_key)
+      expect(described_class.verify({ email: 'dom@readme.io' }.to_json, signature, random_api_key)).to be_nil
     end
   end
 end

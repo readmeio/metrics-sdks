@@ -107,10 +107,9 @@ RSpec.describe Readme::Metrics do
     it "doesn't modify the response" do
       post '/'
 
-      response_without_middleware = noop_app.call(double)
       response_with_middleware = mock_response_to_raw(last_response)
 
-      expect(response_with_middleware).to eq response_without_middleware
+      expect(response_with_middleware).to eq [200, { 'content-length' => '15', 'content-type' => 'application/json' }, ['{"key":"value"}']]
     end
 
     it 'submits to the Readme API for POST requests with a JSON body' do
