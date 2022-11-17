@@ -13,6 +13,6 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Sync docs to ReadMe
-        uses: readmeio/rdme@8.0.4
+        uses: readmeio/rdme@8.1.0
         with:
           rdme: docs ./docs --key=${{ secrets.README_API_KEY }} --version=2.0
