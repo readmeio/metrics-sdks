@@ -158,7 +158,7 @@ RSpec.describe Readme::HttpRequest do
   describe '#body' do
     it 'reads the body from the rack.input key' do
       env = {
-        'rack.input' => Rack::Lint::InputWrapper.new(StringIO.new('[BODY]'))
+        'rack.input' => Rack::Lint::Wrapper::InputWrapper.new(StringIO.new('[BODY]'))
       }
       request = described_class.new(env)
 
@@ -167,7 +167,7 @@ RSpec.describe Readme::HttpRequest do
 
     it 'can be read safely multiple times' do
       env = {
-        'rack.input' => Rack::Lint::InputWrapper.new(StringIO.new('[BODY]'))
+        'rack.input' => Rack::Lint::Wrapper::InputWrapper.new(StringIO.new('[BODY]'))
       }
       request = described_class.new(env)
 
@@ -180,7 +180,7 @@ RSpec.describe Readme::HttpRequest do
     it 'returns the parsed form-encoded body as a hash' do
       env = {
         'CONTENT_TYPE' => 'application/x-www-form-urlencoded',
-        'rack.input' => Rack::Lint::InputWrapper.new(StringIO.new('first=1&second=2'))
+        'rack.input' => Rack::Lint::Wrapper::InputWrapper.new(StringIO.new('first=1&second=2'))
       }
 
       request = described_class.new(env)
