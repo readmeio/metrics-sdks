@@ -199,6 +199,55 @@ Object {
 }
 `;
 
+exports[`webhooks Node.js snippet generation aws request should match fixture for "empty" 1`] = `
+Object {
+  "sections": Object {},
+  "variables": Object {},
+}
+`;
+
+exports[`webhooks Node.js snippet generation aws request should match fixture for "empty-default" 1`] = `
+Object {
+  "sections": Object {},
+  "variables": Object {},
+}
+`;
+
+exports[`webhooks Node.js snippet generation aws request should match fixture for "quirky-escaping" 1`] = `
+Object {
+  "sections": Object {},
+  "variables": Object {},
+}
+`;
+
+exports[`webhooks Node.js snippet generation aws request should match fixture for "security-and-server-variables" 1`] = `
+Object {
+  "sections": Object {},
+  "variables": Object {},
+}
+`;
+
+exports[`webhooks Node.js snippet generation aws request should match fixture for "security-types" 1`] = `
+Object {
+  "sections": Object {},
+  "variables": Object {},
+}
+`;
+
+exports[`webhooks Node.js snippet generation aws request should match fixture for "security-variables" 1`] = `
+Object {
+  "sections": Object {},
+  "variables": Object {},
+}
+`;
+
+exports[`webhooks Node.js snippet generation aws request should match fixture for "server-variables" 1`] = `
+Object {
+  "sections": Object {},
+  "variables": Object {},
+}
+`;
+
 exports[`webhooks Node.js snippet generation express request should match fixture for "empty" 1`] = `
 Object {
   "sections": Object {
