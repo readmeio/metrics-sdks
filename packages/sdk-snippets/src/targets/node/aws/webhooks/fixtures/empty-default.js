@@ -5,7 +5,7 @@ const readme = require('readmeio');
 const README_SECRET = 'my-readme-secret';
 
 exports.handler = async event => {
-  let statusCode, apiKey, error;
+  let statusCode, email, apiKey, error;
 
   try {
     const signature = event.headers['ReadMe-Signature'];
@@ -17,6 +17,7 @@ exports.handler = async event => {
     const command = new GetApiKeysCommand({ nameQuery: email, includeValues: true });
     const keys = await client.send(command);
     if (keys.items.length > 0) {
+      // if multiple API keys are returned for the given email, use the first one
       apiKey = keys.items[0].value;
       statusCode = 200;
     } else {
@@ -31,6 +32,15 @@ exports.handler = async event => {
   return {
     statusCode,
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ apiKey, message: error }),
+    body: JSON.stringify({
+      // OAS Server variables
+      name: '',
+
+      // OAS Security variables
+      petstore_auth: apiKey,
+
+      // Error message, if any
+      message: error,
+    }),
   };
 };
