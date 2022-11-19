@@ -199,55 +199,6 @@ Object {
 }
 `;
 
-exports[`webhooks Node.js snippet generation aws request should match fixture for "empty" 1`] = `
-Object {
-  "sections": Object {},
-  "variables": Object {},
-}
-`;
-
-exports[`webhooks Node.js snippet generation aws request should match fixture for "empty-default" 1`] = `
-Object {
-  "sections": Object {},
-  "variables": Object {},
-}
-`;
-
-exports[`webhooks Node.js snippet generation aws request should match fixture for "quirky-escaping" 1`] = `
-Object {
-  "sections": Object {},
-  "variables": Object {},
-}
-`;
-
-exports[`webhooks Node.js snippet generation aws request should match fixture for "security-and-server-variables" 1`] = `
-Object {
-  "sections": Object {},
-  "variables": Object {},
-}
-`;
-
-exports[`webhooks Node.js snippet generation aws request should match fixture for "security-types" 1`] = `
-Object {
-  "sections": Object {},
-  "variables": Object {},
-}
-`;
-
-exports[`webhooks Node.js snippet generation aws request should match fixture for "security-variables" 1`] = `
-Object {
-  "sections": Object {},
-  "variables": Object {},
-}
-`;
-
-exports[`webhooks Node.js snippet generation aws request should match fixture for "server-variables" 1`] = `
-Object {
-  "sections": Object {},
-  "variables": Object {},
-}
-`;
-
 exports[`webhooks Node.js snippet generation express request should match fixture for "empty" 1`] = `
 Object {
   "sections": Object {
@@ -1038,6 +989,404 @@ Object {
       },
       "port": Object {
         "line": 31,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks-aws Node.js snippet generation aws request should match fixture for "empty" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 26,
+      "start": 15,
+    },
+    "verification": Object {
+      "end": 13,
+      "start": 11,
+    },
+  },
+  "variables": Object {},
+}
+`;
+
+exports[`webhooks-aws Node.js snippet generation aws request should match fixture for "empty-create" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 52,
+      "start": 23,
+    },
+    "verification": Object {
+      "end": 21,
+      "start": 19,
+    },
+  },
+  "variables": Object {},
+}
+`;
+
+exports[`webhooks-aws Node.js snippet generation aws request should match fixture for "empty-default" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 26,
+      "start": 15,
+    },
+    "verification": Object {
+      "end": 13,
+      "start": 11,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "petstore_auth": Object {
+        "line": 40,
+      },
+    },
+    "server": Object {
+      "name": Object {
+        "line": 37,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks-aws Node.js snippet generation aws request should match fixture for "empty-default-create" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 52,
+      "start": 23,
+    },
+    "verification": Object {
+      "end": 21,
+      "start": 19,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "petstore_auth": Object {
+        "line": 66,
+      },
+    },
+    "server": Object {
+      "name": Object {
+        "line": 63,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks-aws Node.js snippet generation aws request should match fixture for "quirky-escaping" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 26,
+      "start": 15,
+    },
+    "verification": Object {
+      "end": 13,
+      "start": 11,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "\\"petstore\\" auth": Object {
+        "line": 43,
+      },
+      "basic-auth": Object {
+        "line": 44,
+      },
+      "normal_security_var": Object {
+        "line": 45,
+      },
+    },
+    "server": Object {
+      "*port": Object {
+        "line": 38,
+      },
+      "2name": Object {
+        "line": 37,
+      },
+      "normal_server_var": Object {
+        "line": 40,
+      },
+      "p*o?r*t": Object {
+        "line": 39,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks-aws Node.js snippet generation aws request should match fixture for "quirky-escaping-create" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 52,
+      "start": 23,
+    },
+    "verification": Object {
+      "end": 21,
+      "start": 19,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "\\"petstore\\" auth": Object {
+        "line": 69,
+      },
+      "basic-auth": Object {
+        "line": 70,
+      },
+      "normal_security_var": Object {
+        "line": 71,
+      },
+    },
+    "server": Object {
+      "*port": Object {
+        "line": 64,
+      },
+      "2name": Object {
+        "line": 63,
+      },
+      "normal_server_var": Object {
+        "line": 66,
+      },
+      "p*o?r*t": Object {
+        "line": 65,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks-aws Node.js snippet generation aws request should match fixture for "security-and-server-variables" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 26,
+      "start": 15,
+    },
+    "verification": Object {
+      "end": 13,
+      "start": 11,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "basic_auth": Object {
+        "line": 42,
+      },
+      "petstore_auth": Object {
+        "line": 41,
+      },
+    },
+    "server": Object {
+      "name": Object {
+        "line": 37,
+      },
+      "port": Object {
+        "line": 38,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks-aws Node.js snippet generation aws request should match fixture for "security-and-server-variables-create" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 52,
+      "start": 23,
+    },
+    "verification": Object {
+      "end": 21,
+      "start": 19,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "basic_auth": Object {
+        "line": 68,
+      },
+      "petstore_auth": Object {
+        "line": 67,
+      },
+    },
+    "server": Object {
+      "name": Object {
+        "line": 63,
+      },
+      "port": Object {
+        "line": 64,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks-aws Node.js snippet generation aws request should match fixture for "security-types" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 26,
+      "start": 15,
+    },
+    "verification": Object {
+      "end": 13,
+      "start": 11,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "api_key": Object {
+        "line": 37,
+      },
+      "http_basic": Object {
+        "line": 38,
+      },
+      "http_bearer": Object {
+        "line": 39,
+      },
+      "oauth2": Object {
+        "line": 40,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks-aws Node.js snippet generation aws request should match fixture for "security-types-create" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 52,
+      "start": 23,
+    },
+    "verification": Object {
+      "end": 21,
+      "start": 19,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "api_key": Object {
+        "line": 63,
+      },
+      "http_basic": Object {
+        "line": 64,
+      },
+      "http_bearer": Object {
+        "line": 65,
+      },
+      "oauth2": Object {
+        "line": 66,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks-aws Node.js snippet generation aws request should match fixture for "security-variables" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 26,
+      "start": 15,
+    },
+    "verification": Object {
+      "end": 13,
+      "start": 11,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "basic_auth": Object {
+        "line": 38,
+      },
+      "petstore_auth": Object {
+        "line": 37,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks-aws Node.js snippet generation aws request should match fixture for "security-variables-create" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 52,
+      "start": 23,
+    },
+    "verification": Object {
+      "end": 21,
+      "start": 19,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "basic_auth": Object {
+        "line": 64,
+      },
+      "petstore_auth": Object {
+        "line": 63,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks-aws Node.js snippet generation aws request should match fixture for "server-variables" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 26,
+      "start": 15,
+    },
+    "verification": Object {
+      "end": 13,
+      "start": 11,
+    },
+  },
+  "variables": Object {
+    "server": Object {
+      "name": Object {
+        "line": 37,
+      },
+      "port": Object {
+        "line": 38,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks-aws Node.js snippet generation aws request should match fixture for "server-variables-create" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 52,
+      "start": 23,
+    },
+    "verification": Object {
+      "end": 21,
+      "start": 19,
+    },
+  },
+  "variables": Object {
+    "server": Object {
+      "name": Object {
+        "line": 63,
+      },
+      "port": Object {
+        "line": 64,
       },
     },
   },
