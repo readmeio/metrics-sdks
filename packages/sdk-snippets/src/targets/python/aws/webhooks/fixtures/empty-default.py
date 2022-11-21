@@ -26,7 +26,7 @@ def handler(event, lambda_context):
             api_key = keys["items"][0]["value"]
             status_code = 200
         else:
-            error = 'Email not found'
+            error = "Email not found"
             status_code = 404
     except Exception as e:
         error = str(e)
