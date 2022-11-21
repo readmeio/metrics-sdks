@@ -1592,6 +1592,426 @@ Object {
 }
 `;
 
+exports[`webhooks Ruby AWS snippet generation with automatic creation of new API keys aws request should match fixture for "empty-create" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 47,
+      "start": 20,
+    },
+    "verification": Object {
+      "end": 18,
+      "start": 17,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "apiKey": Object {
+        "line": 59,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks Ruby AWS snippet generation with automatic creation of new API keys aws request should match fixture for "empty-default-create" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 47,
+      "start": 20,
+    },
+    "verification": Object {
+      "end": 18,
+      "start": 17,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "petstore_auth": Object {
+        "line": 62,
+      },
+    },
+    "server": Object {
+      "name": Object {
+        "line": 59,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks Ruby AWS snippet generation with automatic creation of new API keys aws request should match fixture for "quirky-escaping-create" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 47,
+      "start": 20,
+    },
+    "verification": Object {
+      "end": 18,
+      "start": 17,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "\\"petstore\\" auth": Object {
+        "line": 65,
+      },
+      "basic-auth": Object {
+        "line": 66,
+      },
+      "normal_security_var": Object {
+        "line": 67,
+      },
+    },
+    "server": Object {
+      "*port": Object {
+        "line": 60,
+      },
+      "2name": Object {
+        "line": 59,
+      },
+      "normal_server_var": Object {
+        "line": 62,
+      },
+      "p*o?r*t": Object {
+        "line": 61,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks Ruby AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-and-server-variables-create" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 47,
+      "start": 20,
+    },
+    "verification": Object {
+      "end": 18,
+      "start": 17,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "basic_auth": Object {
+        "line": 64,
+      },
+      "petstore_auth": Object {
+        "line": 63,
+      },
+    },
+    "server": Object {
+      "name": Object {
+        "line": 59,
+      },
+      "port": Object {
+        "line": 60,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks Ruby AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-types-create" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 47,
+      "start": 20,
+    },
+    "verification": Object {
+      "end": 18,
+      "start": 17,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "api_key": Object {
+        "line": 59,
+      },
+      "http_basic": Object {
+        "line": 60,
+      },
+      "http_bearer": Object {
+        "line": 61,
+      },
+      "oauth2": Object {
+        "line": 62,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks Ruby AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-variables-create" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 47,
+      "start": 20,
+    },
+    "verification": Object {
+      "end": 18,
+      "start": 17,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "basic_auth": Object {
+        "line": 60,
+      },
+      "petstore_auth": Object {
+        "line": 59,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks Ruby AWS snippet generation with automatic creation of new API keys aws request should match fixture for "server-variables-create" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 47,
+      "start": 20,
+    },
+    "verification": Object {
+      "end": 18,
+      "start": 17,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "apiKey": Object {
+        "line": 63,
+      },
+    },
+    "server": Object {
+      "name": Object {
+        "line": 59,
+      },
+      "port": Object {
+        "line": 60,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks Ruby snippet generation aws request should match fixture for "empty" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 31,
+      "start": 17,
+    },
+    "verification": Object {
+      "end": 15,
+      "start": 14,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "apiKey": Object {
+        "line": 43,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks Ruby snippet generation aws request should match fixture for "empty-default" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 31,
+      "start": 17,
+    },
+    "verification": Object {
+      "end": 15,
+      "start": 14,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "petstore_auth": Object {
+        "line": 46,
+      },
+    },
+    "server": Object {
+      "name": Object {
+        "line": 43,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks Ruby snippet generation aws request should match fixture for "quirky-escaping" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 31,
+      "start": 17,
+    },
+    "verification": Object {
+      "end": 15,
+      "start": 14,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "\\"petstore\\" auth": Object {
+        "line": 49,
+      },
+      "basic-auth": Object {
+        "line": 50,
+      },
+      "normal_security_var": Object {
+        "line": 51,
+      },
+    },
+    "server": Object {
+      "*port": Object {
+        "line": 44,
+      },
+      "2name": Object {
+        "line": 43,
+      },
+      "normal_server_var": Object {
+        "line": 46,
+      },
+      "p*o?r*t": Object {
+        "line": 45,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks Ruby snippet generation aws request should match fixture for "security-and-server-variables" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 31,
+      "start": 17,
+    },
+    "verification": Object {
+      "end": 15,
+      "start": 14,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "basic_auth": Object {
+        "line": 48,
+      },
+      "petstore_auth": Object {
+        "line": 47,
+      },
+    },
+    "server": Object {
+      "name": Object {
+        "line": 43,
+      },
+      "port": Object {
+        "line": 44,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks Ruby snippet generation aws request should match fixture for "security-types" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 31,
+      "start": 17,
+    },
+    "verification": Object {
+      "end": 15,
+      "start": 14,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "api_key": Object {
+        "line": 43,
+      },
+      "http_basic": Object {
+        "line": 44,
+      },
+      "http_bearer": Object {
+        "line": 45,
+      },
+      "oauth2": Object {
+        "line": 46,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks Ruby snippet generation aws request should match fixture for "security-variables" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 31,
+      "start": 17,
+    },
+    "verification": Object {
+      "end": 15,
+      "start": 14,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "basic_auth": Object {
+        "line": 44,
+      },
+      "petstore_auth": Object {
+        "line": 43,
+      },
+    },
+  },
+}
+`;
+
+exports[`webhooks Ruby snippet generation aws request should match fixture for "server-variables" 1`] = `
+Object {
+  "sections": Object {
+    "payload": Object {
+      "end": 31,
+      "start": 17,
+    },
+    "verification": Object {
+      "end": 15,
+      "start": 14,
+    },
+  },
+  "variables": Object {
+    "security": Object {
+      "apiKey": Object {
+        "line": 47,
+      },
+    },
+    "server": Object {
+      "name": Object {
+        "line": 43,
+      },
+      "port": Object {
+        "line": 44,
+      },
+    },
+  },
+}
+`;
+
 exports[`webhooks Ruby snippet generation rails request should match fixture for "empty" 1`] = `
 Object {
   "sections": Object {

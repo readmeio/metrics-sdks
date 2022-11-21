@@ -1,5 +1,6 @@
 import type { Target } from '../targets';
 
+import { aws } from './aws/webhooks/client';
 import { rails } from './rails/webhooks/client';
 
 export const ruby: Target = {
@@ -13,6 +14,7 @@ export const ruby: Target = {
   services: {
     server: {},
     webhooks: {
+      aws,
       rails,
     },
   },
