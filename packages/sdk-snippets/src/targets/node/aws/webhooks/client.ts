@@ -76,6 +76,7 @@ export const aws: Client = {
     if (opts.createKeys) {
       push('const createKeyCommand = new CreateApiKeyCommand({', 3);
       push('name: email,', 4);
+      // eslint-disable-next-line no-template-curly-in-string
       push('description: `API key for ReadMe user ${email}`,', 4);
       push('tags: {', 4);
       push('user: email,', 5);
