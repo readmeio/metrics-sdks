@@ -211,7 +211,13 @@ Object {
       "start": 19,
     },
   },
-  "variables": Object {},
+  "variables": Object {
+    "security": Object {
+      "apiKey": Object {
+        "line": 63,
+      },
+    },
+  },
 }
 `;
 
@@ -386,6 +392,11 @@ Object {
     },
   },
   "variables": Object {
+    "security": Object {
+      "apiKey": Object {
+        "line": 67,
+      },
+    },
     "server": Object {
       "name": Object {
         "line": 63,
@@ -410,7 +421,13 @@ Object {
       "start": 11,
     },
   },
-  "variables": Object {},
+  "variables": Object {
+    "security": Object {
+      "apiKey": Object {
+        "line": 37,
+      },
+    },
+  },
 }
 `;
 
@@ -585,6 +602,11 @@ Object {
     },
   },
   "variables": Object {
+    "security": Object {
+      "apiKey": Object {
+        "line": 41,
+      },
+    },
     "server": Object {
       "name": Object {
         "line": 37,
@@ -1007,7 +1029,13 @@ Object {
       "start": 20,
     },
   },
-  "variables": Object {},
+  "variables": Object {
+    "security": Object {
+      "apiKey": Object {
+        "line": 55,
+      },
+    },
+  },
 }
 `;
 
@@ -1182,6 +1210,11 @@ Object {
     },
   },
   "variables": Object {
+    "security": Object {
+      "apiKey": Object {
+        "line": 59,
+      },
+    },
     "server": Object {
       "name": Object {
         "line": 55,
@@ -1206,7 +1239,13 @@ Object {
       "start": 17,
     },
   },
-  "variables": Object {},
+  "variables": Object {
+    "security": Object {
+      "apiKey": Object {
+        "line": 41,
+      },
+    },
+  },
 }
 `;
 
@@ -1381,6 +1420,11 @@ Object {
     },
   },
   "variables": Object {
+    "security": Object {
+      "apiKey": Object {
+        "line": 45,
+      },
+    },
     "server": Object {
       "name": Object {
         "line": 41,

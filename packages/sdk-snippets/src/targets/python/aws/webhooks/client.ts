@@ -83,7 +83,7 @@ export const aws: Client = {
       push('api_key = key["value"]', 3);
       push('status_code = 200', 3);
     } else {
-      push("error = 'Email not found'", 3);
+      push('error = "Email not found"', 3);
       push('status_code = 404', 3);
     }
     endSection('payload');
@@ -138,7 +138,11 @@ export const aws: Client = {
       });
     } else {
       push("# The user's API key", 3);
-      push('"apiKey": api_key', 3);
+      pushVariable('"apiKey": api_key', {
+        type: 'security',
+        name: 'apiKey',
+        indentationLevel: 3,
+      });
     }
     push('}', 2);
     push('else:', 1);
