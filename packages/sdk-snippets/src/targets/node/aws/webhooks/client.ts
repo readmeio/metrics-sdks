@@ -151,7 +151,11 @@ export const aws: Client = {
       });
     } else {
       push("// The user's API key", 3);
-      push('apiKey,', 3);
+      pushVariable('apiKey,', {
+        type: 'security',
+        name: 'apiKey',
+        indentationLevel: 3,
+      });
     }
     blank();
     push('// Error message, if any', 3);
