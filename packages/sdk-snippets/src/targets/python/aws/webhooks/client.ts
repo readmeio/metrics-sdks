@@ -83,7 +83,7 @@ export const aws: Client = {
       push('api_key = key["value"]', 3);
       push('status_code = 200', 3);
     } else {
-      push("error = 'Email not found'", 3);
+      push('error = "Email not found"', 3);
       push('status_code = 404', 3);
     }
     endSection('payload');
