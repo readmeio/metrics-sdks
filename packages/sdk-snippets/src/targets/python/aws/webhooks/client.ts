@@ -62,7 +62,7 @@ export const aws: Client = {
     startSection('payload');
     push('email = body.get("email")', 2);
     push('client = boto3.client("apigateway")', 2);
-    push(`keys = client.get_api_keys(nameQuery=email, includeValues=True)`, 2);
+    push('keys = client.get_api_keys(nameQuery=email, includeValues=True)', 2);
     push('if len(keys.get("items", [])) > 0:', 2);
     push('# if multiple API keys are returned for the given email, use the first one', 3);
     push('api_key = keys["items"][0]["value"]', 3);

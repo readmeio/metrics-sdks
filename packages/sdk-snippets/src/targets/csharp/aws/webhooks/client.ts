@@ -3,7 +3,7 @@
 import type { Client } from '../../../targets';
 
 import { CodeBuilder } from '../../../../helpers/code-builder';
-import { escapeForObjectKey, escapeForDoubleQuotes } from '../../../../helpers/escape';
+import { escapeForDoubleQuotes } from '../../../../helpers/escape';
 
 export const aws: Client = {
   info: {
