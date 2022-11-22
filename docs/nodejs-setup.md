@@ -6,7 +6,7 @@ category: 62292aea889520008ed0113b
 
 > 🚀 Upgrading to v6.0?
 >
-> Please see our [upgrade path documentation](#section--how-can-i-upgrade-to-v6-0-).
+> Please see our [upgrade path documentation](#how-can-i-upgrade-to-v60).
 
 > 🚧 Any issues?
 >
