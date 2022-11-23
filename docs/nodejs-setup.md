@@ -1,12 +1,12 @@
 ---
 title: Node.js Setup
 slug: sending-logs-to-readme-with-nodejs
-category: 5f7cefc76b6e5e04c3a4c74c
+category: 62292aea889520008ed0113b
 ---
 
 > 🚀 Upgrading to v6.0?
 >
-> Please see our [upgrade path documentation](#section--how-can-i-upgrade-to-v6-0-).
+> Please see our [upgrade path documentation](#how-can-i-upgrade-to-v60).
 
 > 🚧 Any issues?
 >
