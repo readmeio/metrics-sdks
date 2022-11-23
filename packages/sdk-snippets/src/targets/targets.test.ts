@@ -62,76 +62,8 @@ describe('webhooks', function () {
 
       describe(`${title} snippet generation`, function () {
         clients.filter(testFilter('key', clientFilter)).forEach(({ key: clientId }) => {
-          fixtures.filter(testFilter(0, fixtureFilter)).forEach(([fixture, variables]) => {
-            const fixturePath = path.join(
-              'src',
-              'targets',
-              targetId,
-              clientId,
-              snippetType,
-              'fixtures',
-              `${fixture}${extname(targetId)}`
-            );
-
-            let expectedOutput: string;
-            try {
-              expectedOutput = readFileSync(fixturePath).toString();
-            } catch (err) {
-              if (OVERWRITE_EVERYTHING) {
-                writeFileSync(fixturePath, '');
-                return;
-              }
-              throw new Error(
-                `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${fixturePath}\``
-              );
-            }
-
-            const { convert } = new MetricsSDKSnippet(variables);
-            const result = convert(snippetType, targetId, clientId);
-
-            if (OVERWRITE_EVERYTHING && result) {
-              writeFileSync(fixturePath, String(result.snippet));
-              return;
-            }
-
-            it(`${clientId} request should match fixture for "${fixture}"`, function () {
-              if (!result) {
-                throw new Error(`Generated ${fixture} snippet for ${clientId} was \`false\``);
-              }
-
-              /*
-               * This test is to make sure that our generated snippets
-               * actually do any variable outputting vs being static
-               */
-              if (fixture !== 'empty') {
-                expect(Object.keys(result.ranges).length).to.be.greaterThan(0);
-              }
-
-              expect(result.ranges).toMatchSnapshot();
-              expect(result.snippet).to.deep.equal(expectedOutput);
-
-              // This is making sure that there is an actual secret in the
-              // generated output
-              expect(result.snippet).to.match(/my-readme-secret/);
-            });
-          });
-        });
-      });
-    });
-
-  availableWebhookTargets()
-    .filter(testFilter('key', targetFilter))
-    .forEach(({ key: targetId, title, clients }) => {
-      const snippetType: SnippetType = 'webhooks';
-
-      describe(`${title} AWS snippet generation with automatic creation of new API keys`, function () {
-        clients
-          .filter(c => c.key === 'aws')
-          .filter(testFilter('key', clientFilter))
-          .forEach(({ key: clientId }) => {
+          describe(clientId, function () {
             fixtures.filter(testFilter(0, fixtureFilter)).forEach(([fixture, variables]) => {
-              const createKeys = true;
-              const suffix = createKeys ? '-create' : '';
               const fixturePath = path.join(
                 'src',
                 'targets',
@@ -139,7 +71,7 @@ describe('webhooks', function () {
                 clientId,
                 snippetType,
                 'fixtures',
-                `${fixture}${suffix}${extname(targetId)}`
+                `${fixture}${extname(targetId)}`
               );
 
               let expectedOutput: string;
@@ -150,28 +82,27 @@ describe('webhooks', function () {
                   writeFileSync(fixturePath, '');
                   return;
                 }
+
                 throw new Error(
                   `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${fixturePath}\``
                 );
               }
 
-              const { convert } = new MetricsSDKSnippet(variables);
-              const result = convert(snippetType, targetId, clientId, { createKeys });
+              it(`request should match fixture for "${fixture}"`, function () {
+                const { convert } = new MetricsSDKSnippet(variables);
+                const result = convert(snippetType, targetId, clientId);
 
-              if (OVERWRITE_EVERYTHING && result) {
-                writeFileSync(fixturePath, String(result.snippet));
-                return;
-              }
+                if (OVERWRITE_EVERYTHING && result) {
+                  writeFileSync(fixturePath, String(result.snippet));
+                  return;
+                }
 
-              it(`${clientId} request should match fixture for "${fixture}${suffix}"`, function () {
                 if (!result) {
                   throw new Error(`Generated ${fixture} snippet for ${clientId} was \`false\``);
                 }
 
-                /*
-                 * This test is to make sure that our generated snippets
-                 * actually do any variable outputting vs being static
-                 */
+                // This test is to make sure that our generated snippets actually do any variable
+                // outputting vs being static.
                 if (fixture !== 'empty') {
                   expect(Object.keys(result.ranges).length).to.be.greaterThan(0);
                 }
@@ -179,12 +110,69 @@ describe('webhooks', function () {
                 expect(result.ranges).toMatchSnapshot();
                 expect(result.snippet).to.deep.equal(expectedOutput);
 
-                // This is making sure that there is an actual secret in the
-                // generated output
+                // This is making sure that there is an actual secret in the generated output.
                 expect(result.snippet).to.match(/my-readme-secret/);
               });
             });
+
+            if (clientId === 'aws') {
+              describe('AWS snippet generation with automatic creation of new API keys', function () {
+                fixtures.filter(testFilter(0, fixtureFilter)).forEach(([fixture, variables]) => {
+                  const createKeys = true;
+                  const suffix = createKeys ? '-create' : '';
+                  const fixturePath = path.join(
+                    'src',
+                    'targets',
+                    targetId,
+                    clientId,
+                    snippetType,
+                    'fixtures',
+                    `${fixture}${suffix}${extname(targetId)}`
+                  );
+
+                  let expectedOutput: string;
+                  try {
+                    expectedOutput = readFileSync(fixturePath).toString();
+                  } catch (err) {
+                    if (OVERWRITE_EVERYTHING) {
+                      writeFileSync(fixturePath, '');
+                      return;
+                    }
+                    throw new Error(
+                      `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${fixturePath}\``
+                    );
+                  }
+
+                  const { convert } = new MetricsSDKSnippet(variables);
+                  const result = convert(snippetType, targetId, clientId, { createKeys });
+
+                  if (OVERWRITE_EVERYTHING && result) {
+                    writeFileSync(fixturePath, String(result.snippet));
+                    return;
+                  }
+
+                  it(`${clientId} request should match fixture for "${fixture}${suffix}"`, function () {
+                    if (!result) {
+                      throw new Error(`Generated ${fixture} snippet for ${clientId} was \`false\``);
+                    }
+
+                    // This test is to make sure that our generated snippets actually do any
+                    // variable outputting vs being static.
+                    if (fixture !== 'empty') {
+                      expect(Object.keys(result.ranges).length).to.be.greaterThan(0);
+                    }
+
+                    expect(result.ranges).toMatchSnapshot();
+                    expect(result.snippet).to.deep.equal(expectedOutput);
+
+                    // This is making sure that there is an actual secret in the generated output.
+                    expect(result.snippet).to.match(/my-readme-secret/);
+                  });
+                });
+              });
+            }
           });
+        });
       });
     });
 });

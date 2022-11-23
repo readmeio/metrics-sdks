@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`webhooks C# AWS snippet generation with automatic creation of new API keys aws request should match fixture for "empty-create" 1`] = `
+exports[`webhooks C# snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "empty-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -22,7 +22,7 @@ Object {
 }
 `;
 
-exports[`webhooks C# AWS snippet generation with automatic creation of new API keys aws request should match fixture for "empty-default-create" 1`] = `
+exports[`webhooks C# snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "empty-default-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -49,7 +49,7 @@ Object {
 }
 `;
 
-exports[`webhooks C# AWS snippet generation with automatic creation of new API keys aws request should match fixture for "quirky-escaping-create" 1`] = `
+exports[`webhooks C# snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "quirky-escaping-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -91,7 +91,7 @@ Object {
 }
 `;
 
-exports[`webhooks C# AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-and-server-variables-create" 1`] = `
+exports[`webhooks C# snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-and-server-variables-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -124,7 +124,7 @@ Object {
 }
 `;
 
-exports[`webhooks C# AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-types-create" 1`] = `
+exports[`webhooks C# snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-types-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -155,7 +155,7 @@ Object {
 }
 `;
 
-exports[`webhooks C# AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-variables-create" 1`] = `
+exports[`webhooks C# snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-variables-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -180,7 +180,7 @@ Object {
 }
 `;
 
-exports[`webhooks C# AWS snippet generation with automatic creation of new API keys aws request should match fixture for "server-variables-create" 1`] = `
+exports[`webhooks C# snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "server-variables-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -619,7 +619,7 @@ Object {
 }
 `;
 
-exports[`webhooks Node.js AWS snippet generation with automatic creation of new API keys aws request should match fixture for "empty-create" 1`] = `
+exports[`webhooks Node.js snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "empty-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -641,7 +641,7 @@ Object {
 }
 `;
 
-exports[`webhooks Node.js AWS snippet generation with automatic creation of new API keys aws request should match fixture for "empty-default-create" 1`] = `
+exports[`webhooks Node.js snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "empty-default-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -668,7 +668,7 @@ Object {
 }
 `;
 
-exports[`webhooks Node.js AWS snippet generation with automatic creation of new API keys aws request should match fixture for "quirky-escaping-create" 1`] = `
+exports[`webhooks Node.js snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "quirky-escaping-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -710,7 +710,7 @@ Object {
 }
 `;
 
-exports[`webhooks Node.js AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-and-server-variables-create" 1`] = `
+exports[`webhooks Node.js snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-and-server-variables-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -743,7 +743,7 @@ Object {
 }
 `;
 
-exports[`webhooks Node.js AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-types-create" 1`] = `
+exports[`webhooks Node.js snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-types-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -774,7 +774,7 @@ Object {
 }
 `;
 
-exports[`webhooks Node.js AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-variables-create" 1`] = `
+exports[`webhooks Node.js snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-variables-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -799,7 +799,7 @@ Object {
 }
 `;
 
-exports[`webhooks Node.js AWS snippet generation with automatic creation of new API keys aws request should match fixture for "server-variables-create" 1`] = `
+exports[`webhooks Node.js snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "server-variables-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -1437,7 +1437,7 @@ Object {
 }
 `;
 
-exports[`webhooks Python AWS snippet generation with automatic creation of new API keys aws request should match fixture for "empty-create" 1`] = `
+exports[`webhooks Python snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "empty-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -1459,7 +1459,7 @@ Object {
 }
 `;
 
-exports[`webhooks Python AWS snippet generation with automatic creation of new API keys aws request should match fixture for "empty-default-create" 1`] = `
+exports[`webhooks Python snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "empty-default-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -1486,7 +1486,7 @@ Object {
 }
 `;
 
-exports[`webhooks Python AWS snippet generation with automatic creation of new API keys aws request should match fixture for "quirky-escaping-create" 1`] = `
+exports[`webhooks Python snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "quirky-escaping-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -1528,7 +1528,7 @@ Object {
 }
 `;
 
-exports[`webhooks Python AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-and-server-variables-create" 1`] = `
+exports[`webhooks Python snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-and-server-variables-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -1561,7 +1561,7 @@ Object {
 }
 `;
 
-exports[`webhooks Python AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-types-create" 1`] = `
+exports[`webhooks Python snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-types-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -1592,7 +1592,7 @@ Object {
 }
 `;
 
-exports[`webhooks Python AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-variables-create" 1`] = `
+exports[`webhooks Python snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-variables-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -1617,7 +1617,7 @@ Object {
 }
 `;
 
-exports[`webhooks Python AWS snippet generation with automatic creation of new API keys aws request should match fixture for "server-variables-create" 1`] = `
+exports[`webhooks Python snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "server-variables-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -2056,7 +2056,7 @@ Object {
 }
 `;
 
-exports[`webhooks Ruby AWS snippet generation with automatic creation of new API keys aws request should match fixture for "empty-create" 1`] = `
+exports[`webhooks Ruby snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "empty-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -2078,7 +2078,7 @@ Object {
 }
 `;
 
-exports[`webhooks Ruby AWS snippet generation with automatic creation of new API keys aws request should match fixture for "empty-default-create" 1`] = `
+exports[`webhooks Ruby snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "empty-default-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -2105,7 +2105,7 @@ Object {
 }
 `;
 
-exports[`webhooks Ruby AWS snippet generation with automatic creation of new API keys aws request should match fixture for "quirky-escaping-create" 1`] = `
+exports[`webhooks Ruby snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "quirky-escaping-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -2147,7 +2147,7 @@ Object {
 }
 `;
 
-exports[`webhooks Ruby AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-and-server-variables-create" 1`] = `
+exports[`webhooks Ruby snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-and-server-variables-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -2180,7 +2180,7 @@ Object {
 }
 `;
 
-exports[`webhooks Ruby AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-types-create" 1`] = `
+exports[`webhooks Ruby snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-types-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -2211,7 +2211,7 @@ Object {
 }
 `;
 
-exports[`webhooks Ruby AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-variables-create" 1`] = `
+exports[`webhooks Ruby snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "security-variables-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
@@ -2236,7 +2236,7 @@ Object {
 }
 `;
 
-exports[`webhooks Ruby AWS snippet generation with automatic creation of new API keys aws request should match fixture for "server-variables-create" 1`] = `
+exports[`webhooks Ruby snippet generation aws AWS snippet generation with automatic creation of new API keys aws request should match fixture for "server-variables-create" 1`] = `
 Object {
   "sections": Object {
     "payload": Object {
