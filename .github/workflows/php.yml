@@ -1,6 +1,10 @@
 name: php
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   integration:
