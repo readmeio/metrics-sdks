@@ -1,5 +1,6 @@
 import type { Target } from '../targets';
 
+import { aws } from './aws/webhooks/client';
 import { dotnet6 } from './dotnet6/webhooks/client';
 
 export const csharp: Target = {
@@ -13,6 +14,7 @@ export const csharp: Target = {
   services: {
     server: {},
     webhooks: {
+      aws,
       dotnet6,
     },
   },

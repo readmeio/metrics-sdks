@@ -1,5 +1,6 @@
 import type { Target } from '../targets';
 
+import { aws } from './aws/webhooks/client';
 import { flask } from './flask/webhooks/client';
 
 export const python: Target = {
@@ -14,6 +15,7 @@ export const python: Target = {
     server: {},
     webhooks: {
       flask,
+      aws,
     },
   },
 };
