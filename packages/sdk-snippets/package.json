@@ -1,6 +1,6 @@
 {
   "name": "@readme/metrics-sdk-snippets",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Generate code snippets for ReadMe Metrics SDKs in multiple languages",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
