@@ -11,6 +11,9 @@ export const aws: Client = {
     title: 'AWS API Gateway',
     link: 'https://aws.amazon.com/api-gateway/',
     description: 'ReadMe Metrics Webhooks SDK usage on AWS API Gateway',
+    metadata: {
+      lambdaRuntime: 'nodejs16.x',
+    },
   },
   convert: ({ secret, security, server }, options) => {
     const opts = {

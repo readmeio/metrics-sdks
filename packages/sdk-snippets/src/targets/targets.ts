@@ -17,6 +17,9 @@ export interface ClientInfo {
   title: string;
   link: string;
   description: string;
+  metadata?: {
+    lambdaRuntime?: string;
+  };
 }
 
 export interface ClientRanges {
