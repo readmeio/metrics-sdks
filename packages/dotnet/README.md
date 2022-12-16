@@ -4,7 +4,7 @@
 
 Track usage of your API and troubleshoot issues faster.
 
-[![Latest release](https://img.shields.io/nuget/v/ReadMe.Metrics.svg?style=for-the-badge)](https://www.nuget.org/packages/ReadMe.Metrics/) [![Build status](https://img.shields.io/github/workflow/status/readmeio/metrics-sdks/dotnet.svg?style=for-the-badge)](https://github.com/readmeio/metrics-sdks)
+[![Latest release](https://img.shields.io/nuget/v/ReadMe.Metrics.svg?style=for-the-badge)](https://www.nuget.org/packages/ReadMe.Metrics/) [![Build status](https://img.shields.io/github/actions/workflow/status/readmeio/metrics-sdks/dotnet.yml?branch=main&style=for-the-badge)](https://github.com/readmeio/metrics-sdks)
 
 With [ReadMe's Metrics API](https://readme.com/metrics) your team can get deep insights into your API's usage. If you're a developer, it takes a few small steps to send your API logs to [ReadMe](http://readme.com). Here's an overview of how the integration works:
 
