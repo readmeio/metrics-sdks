@@ -24,7 +24,7 @@ namespace WebhookHandler
         // Your ReadMe secret; you may want to store this in AWS Secrets Manager
         private const string README_SECRET = "my-readme-secret";
 
-        // Your default API Gateway usage plan; this will be attached to the API keys that being created
+        // Your default API Gateway usage plan; this will be attached to new API keys being created
         private const string DEFAULT_USAGE_PLAN_ID = "123abc";
 
         public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest apigProxyEvent, ILambdaContext context)
@@ -37,10 +37,12 @@ namespace WebhookHandler
 
             try
             {
+                // Verify the request is legitimate and came from ReadMe.
                 string signature = apigProxyEvent.Headers["ReadMe-Signature"];
                 string body = apigProxyEvent.Body;
                 ReadMe.Webhook.Verify(body, signature, Handler.README_SECRET);
 
+                // Look up the API key associated with the user's email address.
                 email = JsonSerializer.Deserialize<Dictionary<string, string>>(body)["email"];
                 var client = new AmazonAPIGatewayClient();
                 var keysRequest = new GetApiKeysRequest
@@ -52,12 +54,13 @@ namespace WebhookHandler
 
                 if (keys.Items.Count > 0)
                 {
-                    // if multiple API keys are returned for the given email, use the first one
+                    // If multiple API keys are returned for the given email, use the first one.
                     apiKey = keys.Items[0].Value;
                     statusCode = 200;
                 }
                 else
                 {
+                    // If no API keys were found, create a new key and apply a usage plan.
                     var createKeyRequest = new CreateApiKeyRequest
                     {
                         Name = email,

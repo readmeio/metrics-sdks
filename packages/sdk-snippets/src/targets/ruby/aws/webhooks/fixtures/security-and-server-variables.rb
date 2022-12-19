@@ -11,9 +11,11 @@ def handler(event:, context:)
     error = nil
 
     begin
+        # Verify the request is legitimate and came from ReadMe.
         signature = event['headers']['ReadMe-Signature'];
         Readme::Webhook.verify(event['body'], signature, README_SECRET)
 
+        # Look up the API key associated with the user's email address.
         body = JSON.parse(event['body']);
         email = body['email']
         client = Aws::APIGateway::Client.new()
@@ -22,7 +24,7 @@ def handler(event:, context:)
             include_values: true
         })
         if keys.items.length > 0
-            # if multiple API keys are returned for the given email, use the first one
+            # If multiple API keys are returned for the given email, use the first one.
             api_key = keys.items[0].value
             status_code = 200
         else
