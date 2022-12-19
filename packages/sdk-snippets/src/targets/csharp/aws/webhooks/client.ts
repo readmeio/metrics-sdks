@@ -59,7 +59,7 @@ export const aws: Client = {
     push(`private const string README_SECRET = "${secret}";`, 2);
     blank();
     if (opts.createKeys) {
-      push('// Your default API Gateway usage plan; this will be attached to the API keys that being created', 2);
+      push('// Your default API Gateway usage plan; this will be attached to new API keys being created', 2);
       push(`private const string DEFAULT_USAGE_PLAN_ID = "${opts.defaultUsagePlanId}";`, 2);
       blank();
     }
@@ -77,12 +77,14 @@ export const aws: Client = {
     push('try', 3);
     push('{', 3);
     startSection('verification');
+    push('// Verify the request is legitimate and came from ReadMe.', 4);
     push('string signature = apigProxyEvent.Headers["ReadMe-Signature"];', 4);
     push('string body = apigProxyEvent.Body;', 4);
     push('ReadMe.Webhook.Verify(body, signature, Handler.README_SECRET);', 4);
     endSection('verification');
     blank();
     startSection('payload');
+    push("// Look up the API key associated with the user's email address.", 4);
     push('email = JsonSerializer.Deserialize<Dictionary<string, string>>(body)["email"];', 4);
     push('var client = new AmazonAPIGatewayClient();', 4);
     const requestName = opts.createKeys ? 'keysRequest' : 'request';
@@ -95,13 +97,14 @@ export const aws: Client = {
     blank();
     push('if (keys.Items.Count > 0)', 4);
     push('{', 4);
-    push('// if multiple API keys are returned for the given email, use the first one', 5);
+    push('// If multiple API keys are returned for the given email, use the first one.', 5);
     push('apiKey = keys.Items[0].Value;', 5);
     push('statusCode = 200;', 5);
     push('}', 4);
     push('else', 4);
     push('{', 4);
     if (opts.createKeys) {
+      push('// If no API keys were found, create a new key and apply a usage plan.', 5);
       push('var createKeyRequest = new CreateApiKeyRequest', 5);
       push('{', 5);
       push('Name = email,', 6);

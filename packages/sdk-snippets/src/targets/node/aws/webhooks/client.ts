@@ -48,7 +48,7 @@ export const aws: Client = {
     blank();
 
     if (opts.createKeys) {
-      push('// Your default API Gateway usage plan; this will be attached to the API keys that being created');
+      push('// Your default API Gateway usage plan; this will be attached to new API keys being created');
       push(`const DEFAULT_USAGE_PLAN_ID = '${opts.defaultUsagePlanId}';`);
       blank();
     }
@@ -59,6 +59,7 @@ export const aws: Client = {
 
     push('try {', 1);
     startSection('verification');
+    push('// Verify the request is legitimate and came from ReadMe.', 2);
     push("const signature = event.headers['ReadMe-Signature'];", 2);
     push('const body = JSON.parse(event.body);', 2);
     push('readme.verifyWebhook(body, signature, README_SECRET);', 2);
@@ -67,16 +68,18 @@ export const aws: Client = {
 
     startSection('payload');
     const getCommandName = opts.createKeys ? 'getCommand' : 'command';
+    push("// Look up the API key associated with the user's email address.", 2);
     push('const email = body.email;', 2);
     push('const client = new APIGatewayClient();', 2);
     push(`const ${getCommandName} = new GetApiKeysCommand({ nameQuery: email, includeValues: true });`, 2);
     push(`const keys = await client.send(${getCommandName});`, 2);
     push('if (keys.items.length > 0) {', 2);
-    push('// if multiple API keys are returned for the given email, use the first one', 3);
+    push('// If multiple API keys are returned for the given email, use the first one.', 3);
     push('apiKey = keys.items[0].value;', 3);
     push('statusCode = 200;', 3);
     push('} else {', 2);
     if (opts.createKeys) {
+      push('// If no API keys were found, create a new key and apply a usage plan.', 3);
       push('const createKeyCommand = new CreateApiKeyCommand({', 3);
       push('name: email,', 4);
       // eslint-disable-next-line no-template-curly-in-string

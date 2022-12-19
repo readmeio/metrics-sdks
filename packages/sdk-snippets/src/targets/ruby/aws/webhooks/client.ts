@@ -40,7 +40,7 @@ export const aws: Client = {
     blank();
 
     if (opts.createKeys) {
-      push('# Your default API Gateway usage plan; this will be attached to the API keys that being created');
+      push('# Your default API Gateway usage plan; this will be attached to new API keys being created');
       push(`DEFAULT_USAGE_PLAN_ID = "${opts.defaultUsagePlanId}"`);
       blank();
     }
@@ -53,12 +53,14 @@ export const aws: Client = {
 
     push('begin', 1);
     startSection('verification');
+    push('# Verify the request is legitimate and came from ReadMe.', 2);
     push("signature = event['headers']['ReadMe-Signature'];", 2);
     push("Readme::Webhook.verify(event['body'], signature, README_SECRET)", 2);
     endSection('verification');
     blank();
 
     startSection('payload');
+    push("# Look up the API key associated with the user's email address.", 2);
     push("body = JSON.parse(event['body']);", 2);
     push("email = body['email']", 2);
     push('client = Aws::APIGateway::Client.new()', 2);
@@ -67,11 +69,12 @@ export const aws: Client = {
     push('include_values: true', 3);
     push('})', 2);
     push('if keys.items.length > 0', 2);
-    push('# if multiple API keys are returned for the given email, use the first one', 3);
+    push('# If multiple API keys are returned for the given email, use the first one.', 3);
     push('api_key = keys.items[0].value', 3);
     push('status_code = 200', 3);
     push('else', 2);
     if (opts.createKeys) {
+      push('# If no API keys were found, create a new key and apply a usage plan.', 3);
       push('key = client.create_api_key(', 3);
       push('name: email,', 4);
       push('description: "API key for ReadMe user #{email}",', 4);
