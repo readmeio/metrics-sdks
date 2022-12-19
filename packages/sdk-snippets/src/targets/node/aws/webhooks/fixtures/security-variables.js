@@ -8,16 +8,18 @@ exports.handler = async event => {
   let statusCode, email, apiKey, error;
 
   try {
+    // Verify the request is legitimate and came from ReadMe.
     const signature = event.headers['ReadMe-Signature'];
     const body = JSON.parse(event.body);
     readme.verifyWebhook(body, signature, README_SECRET);
 
+    // Look up the API key associated with the user's email address.
     const email = body.email;
     const client = new APIGatewayClient();
     const command = new GetApiKeysCommand({ nameQuery: email, includeValues: true });
     const keys = await client.send(command);
     if (keys.items.length > 0) {
-      // if multiple API keys are returned for the given email, use the first one
+      // If multiple API keys are returned for the given email, use the first one.
       apiKey = keys.items[0].value;
       statusCode = 200;
     } else {

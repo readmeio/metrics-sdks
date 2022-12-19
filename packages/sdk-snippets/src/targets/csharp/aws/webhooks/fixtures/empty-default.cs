@@ -34,10 +34,12 @@ namespace WebhookHandler
 
             try
             {
+                // Verify the request is legitimate and came from ReadMe.
                 string signature = apigProxyEvent.Headers["ReadMe-Signature"];
                 string body = apigProxyEvent.Body;
                 ReadMe.Webhook.Verify(body, signature, Handler.README_SECRET);
 
+                // Look up the API key associated with the user's email address.
                 email = JsonSerializer.Deserialize<Dictionary<string, string>>(body)["email"];
                 var client = new AmazonAPIGatewayClient();
                 var request = new GetApiKeysRequest
@@ -49,7 +51,7 @@ namespace WebhookHandler
 
                 if (keys.Items.Count > 0)
                 {
-                    // if multiple API keys are returned for the given email, use the first one
+                    // If multiple API keys are returned for the given email, use the first one.
                     apiKey = keys.Items[0].Value;
                     statusCode = 200;
                 }

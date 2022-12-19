@@ -9,26 +9,29 @@ const readme = require('readmeio');
 // Your ReadMe secret; you may want to store this in AWS Secrets Manager
 const README_SECRET = 'my-readme-secret';
 
-// Your default API Gateway usage plan; this will be attached to the API keys that being created
+// Your default API Gateway usage plan; this will be attached to new API keys being created
 const DEFAULT_USAGE_PLAN_ID = '123abc';
 
 exports.handler = async event => {
   let statusCode, email, apiKey, error;
 
   try {
+    // Verify the request is legitimate and came from ReadMe.
     const signature = event.headers['ReadMe-Signature'];
     const body = JSON.parse(event.body);
     readme.verifyWebhook(body, signature, README_SECRET);
 
+    // Look up the API key associated with the user's email address.
     const email = body.email;
     const client = new APIGatewayClient();
     const getCommand = new GetApiKeysCommand({ nameQuery: email, includeValues: true });
     const keys = await client.send(getCommand);
     if (keys.items.length > 0) {
-      // if multiple API keys are returned for the given email, use the first one
+      // If multiple API keys are returned for the given email, use the first one.
       apiKey = keys.items[0].value;
       statusCode = 200;
     } else {
+      // If no API keys were found, create a new key and apply a usage plan.
       const createKeyCommand = new CreateApiKeyCommand({
         name: email,
         description: `API key for ReadMe user ${email}`,

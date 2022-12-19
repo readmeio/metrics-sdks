@@ -4,18 +4,18 @@ exports[`webhooks C# snippet generation aws AWS snippet generation with automati
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 80,
-      "start": 44,
+      "end": 83,
+      "start": 45,
     },
     "verification": Object {
-      "end": 42,
+      "end": 43,
       "start": 40,
     },
   },
   "variables": Object {
     "security": Object {
       "apiKey": Object {
-        "line": 100,
+        "line": 103,
       },
     },
   },
@@ -26,23 +26,23 @@ exports[`webhooks C# snippet generation aws AWS snippet generation with automati
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 80,
-      "start": 44,
+      "end": 83,
+      "start": 45,
     },
     "verification": Object {
-      "end": 42,
+      "end": 43,
       "start": 40,
     },
   },
   "variables": Object {
     "security": Object {
       "petstore_auth": Object {
-        "line": 103,
+        "line": 106,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 100,
+        "line": 103,
       },
     },
   },
@@ -53,38 +53,38 @@ exports[`webhooks C# snippet generation aws AWS snippet generation with automati
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 80,
-      "start": 44,
+      "end": 83,
+      "start": 45,
     },
     "verification": Object {
-      "end": 42,
+      "end": 43,
       "start": 40,
     },
   },
   "variables": Object {
     "security": Object {
       "\\"petstore\\" auth": Object {
-        "line": 106,
+        "line": 109,
       },
       "basic-auth": Object {
-        "line": 107,
+        "line": 110,
       },
       "normal_security_var": Object {
-        "line": 108,
+        "line": 111,
       },
     },
     "server": Object {
       "*port": Object {
-        "line": 101,
+        "line": 104,
       },
       "2name": Object {
-        "line": 100,
-      },
-      "normal_server_var": Object {
         "line": 103,
       },
+      "normal_server_var": Object {
+        "line": 106,
+      },
       "p*o?r*t": Object {
-        "line": 102,
+        "line": 105,
       },
     },
   },
@@ -95,29 +95,29 @@ exports[`webhooks C# snippet generation aws AWS snippet generation with automati
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 80,
-      "start": 44,
+      "end": 83,
+      "start": 45,
     },
     "verification": Object {
-      "end": 42,
+      "end": 43,
       "start": 40,
     },
   },
   "variables": Object {
     "security": Object {
       "basic_auth": Object {
-        "line": 105,
+        "line": 108,
       },
       "petstore_auth": Object {
-        "line": 104,
+        "line": 107,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 100,
+        "line": 103,
       },
       "port": Object {
-        "line": 101,
+        "line": 104,
       },
     },
   },
@@ -128,27 +128,27 @@ exports[`webhooks C# snippet generation aws AWS snippet generation with automati
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 80,
-      "start": 44,
+      "end": 83,
+      "start": 45,
     },
     "verification": Object {
-      "end": 42,
+      "end": 43,
       "start": 40,
     },
   },
   "variables": Object {
     "security": Object {
       "api_key": Object {
-        "line": 100,
+        "line": 103,
       },
       "http_basic": Object {
-        "line": 101,
+        "line": 104,
       },
       "http_bearer": Object {
-        "line": 102,
+        "line": 105,
       },
       "oauth2": Object {
-        "line": 103,
+        "line": 106,
       },
     },
   },
@@ -159,21 +159,21 @@ exports[`webhooks C# snippet generation aws AWS snippet generation with automati
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 80,
-      "start": 44,
+      "end": 83,
+      "start": 45,
     },
     "verification": Object {
-      "end": 42,
+      "end": 43,
       "start": 40,
     },
   },
   "variables": Object {
     "security": Object {
       "basic_auth": Object {
-        "line": 101,
+        "line": 104,
       },
       "petstore_auth": Object {
-        "line": 100,
+        "line": 103,
       },
     },
   },
@@ -184,26 +184,26 @@ exports[`webhooks C# snippet generation aws AWS snippet generation with automati
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 80,
-      "start": 44,
+      "end": 83,
+      "start": 45,
     },
     "verification": Object {
-      "end": 42,
+      "end": 43,
       "start": 40,
     },
   },
   "variables": Object {
     "security": Object {
       "apiKey": Object {
-        "line": 104,
+        "line": 107,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 100,
+        "line": 103,
       },
       "port": Object {
-        "line": 101,
+        "line": 104,
       },
     },
   },
@@ -214,18 +214,18 @@ exports[`webhooks C# snippet generation aws request should match fixture for "em
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 60,
-      "start": 41,
+      "end": 62,
+      "start": 42,
     },
     "verification": Object {
-      "end": 39,
+      "end": 40,
       "start": 37,
     },
   },
   "variables": Object {
     "security": Object {
       "apiKey": Object {
-        "line": 80,
+        "line": 82,
       },
     },
   },
@@ -236,23 +236,23 @@ exports[`webhooks C# snippet generation aws request should match fixture for "em
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 60,
-      "start": 41,
+      "end": 62,
+      "start": 42,
     },
     "verification": Object {
-      "end": 39,
+      "end": 40,
       "start": 37,
     },
   },
   "variables": Object {
     "security": Object {
       "petstore_auth": Object {
-        "line": 83,
+        "line": 85,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 80,
+        "line": 82,
       },
     },
   },
@@ -263,38 +263,38 @@ exports[`webhooks C# snippet generation aws request should match fixture for "qu
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 60,
-      "start": 41,
+      "end": 62,
+      "start": 42,
     },
     "verification": Object {
-      "end": 39,
+      "end": 40,
       "start": 37,
     },
   },
   "variables": Object {
     "security": Object {
       "\\"petstore\\" auth": Object {
-        "line": 86,
+        "line": 88,
       },
       "basic-auth": Object {
-        "line": 87,
+        "line": 89,
       },
       "normal_security_var": Object {
-        "line": 88,
+        "line": 90,
       },
     },
     "server": Object {
       "*port": Object {
-        "line": 81,
-      },
-      "2name": Object {
-        "line": 80,
-      },
-      "normal_server_var": Object {
         "line": 83,
       },
-      "p*o?r*t": Object {
+      "2name": Object {
         "line": 82,
+      },
+      "normal_server_var": Object {
+        "line": 85,
+      },
+      "p*o?r*t": Object {
+        "line": 84,
       },
     },
   },
@@ -305,29 +305,29 @@ exports[`webhooks C# snippet generation aws request should match fixture for "se
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 60,
-      "start": 41,
+      "end": 62,
+      "start": 42,
     },
     "verification": Object {
-      "end": 39,
+      "end": 40,
       "start": 37,
     },
   },
   "variables": Object {
     "security": Object {
       "basic_auth": Object {
-        "line": 85,
+        "line": 87,
       },
       "petstore_auth": Object {
-        "line": 84,
+        "line": 86,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 80,
+        "line": 82,
       },
       "port": Object {
-        "line": 81,
+        "line": 83,
       },
     },
   },
@@ -338,27 +338,27 @@ exports[`webhooks C# snippet generation aws request should match fixture for "se
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 60,
-      "start": 41,
+      "end": 62,
+      "start": 42,
     },
     "verification": Object {
-      "end": 39,
+      "end": 40,
       "start": 37,
     },
   },
   "variables": Object {
     "security": Object {
       "api_key": Object {
-        "line": 80,
-      },
-      "http_basic": Object {
-        "line": 81,
-      },
-      "http_bearer": Object {
         "line": 82,
       },
-      "oauth2": Object {
+      "http_basic": Object {
         "line": 83,
+      },
+      "http_bearer": Object {
+        "line": 84,
+      },
+      "oauth2": Object {
+        "line": 85,
       },
     },
   },
@@ -369,21 +369,21 @@ exports[`webhooks C# snippet generation aws request should match fixture for "se
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 60,
-      "start": 41,
+      "end": 62,
+      "start": 42,
     },
     "verification": Object {
-      "end": 39,
+      "end": 40,
       "start": 37,
     },
   },
   "variables": Object {
     "security": Object {
       "basic_auth": Object {
-        "line": 81,
+        "line": 83,
       },
       "petstore_auth": Object {
-        "line": 80,
+        "line": 82,
       },
     },
   },
@@ -394,26 +394,26 @@ exports[`webhooks C# snippet generation aws request should match fixture for "se
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 60,
-      "start": 41,
+      "end": 62,
+      "start": 42,
     },
     "verification": Object {
-      "end": 39,
+      "end": 40,
       "start": 37,
     },
   },
   "variables": Object {
     "security": Object {
       "apiKey": Object {
-        "line": 84,
+        "line": 86,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 80,
+        "line": 82,
       },
       "port": Object {
-        "line": 81,
+        "line": 83,
       },
     },
   },
@@ -623,18 +623,18 @@ exports[`webhooks Node.js snippet generation aws AWS snippet generation with aut
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 52,
-      "start": 23,
+      "end": 55,
+      "start": 24,
     },
     "verification": Object {
-      "end": 21,
+      "end": 22,
       "start": 19,
     },
   },
   "variables": Object {
     "security": Object {
       "apiKey": Object {
-        "line": 63,
+        "line": 66,
       },
     },
   },
@@ -645,23 +645,23 @@ exports[`webhooks Node.js snippet generation aws AWS snippet generation with aut
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 52,
-      "start": 23,
+      "end": 55,
+      "start": 24,
     },
     "verification": Object {
-      "end": 21,
+      "end": 22,
       "start": 19,
     },
   },
   "variables": Object {
     "security": Object {
       "petstore_auth": Object {
-        "line": 66,
+        "line": 69,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 63,
+        "line": 66,
       },
     },
   },
@@ -672,38 +672,38 @@ exports[`webhooks Node.js snippet generation aws AWS snippet generation with aut
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 52,
-      "start": 23,
+      "end": 55,
+      "start": 24,
     },
     "verification": Object {
-      "end": 21,
+      "end": 22,
       "start": 19,
     },
   },
   "variables": Object {
     "security": Object {
       "\\"petstore\\" auth": Object {
-        "line": 69,
+        "line": 72,
       },
       "basic-auth": Object {
-        "line": 70,
+        "line": 73,
       },
       "normal_security_var": Object {
-        "line": 71,
+        "line": 74,
       },
     },
     "server": Object {
       "*port": Object {
-        "line": 64,
+        "line": 67,
       },
       "2name": Object {
-        "line": 63,
-      },
-      "normal_server_var": Object {
         "line": 66,
       },
+      "normal_server_var": Object {
+        "line": 69,
+      },
       "p*o?r*t": Object {
-        "line": 65,
+        "line": 68,
       },
     },
   },
@@ -714,29 +714,29 @@ exports[`webhooks Node.js snippet generation aws AWS snippet generation with aut
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 52,
-      "start": 23,
+      "end": 55,
+      "start": 24,
     },
     "verification": Object {
-      "end": 21,
+      "end": 22,
       "start": 19,
     },
   },
   "variables": Object {
     "security": Object {
       "basic_auth": Object {
-        "line": 68,
+        "line": 71,
       },
       "petstore_auth": Object {
-        "line": 67,
+        "line": 70,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 63,
+        "line": 66,
       },
       "port": Object {
-        "line": 64,
+        "line": 67,
       },
     },
   },
@@ -747,27 +747,27 @@ exports[`webhooks Node.js snippet generation aws AWS snippet generation with aut
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 52,
-      "start": 23,
+      "end": 55,
+      "start": 24,
     },
     "verification": Object {
-      "end": 21,
+      "end": 22,
       "start": 19,
     },
   },
   "variables": Object {
     "security": Object {
       "api_key": Object {
-        "line": 63,
+        "line": 66,
       },
       "http_basic": Object {
-        "line": 64,
+        "line": 67,
       },
       "http_bearer": Object {
-        "line": 65,
+        "line": 68,
       },
       "oauth2": Object {
-        "line": 66,
+        "line": 69,
       },
     },
   },
@@ -778,21 +778,21 @@ exports[`webhooks Node.js snippet generation aws AWS snippet generation with aut
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 52,
-      "start": 23,
+      "end": 55,
+      "start": 24,
     },
     "verification": Object {
-      "end": 21,
+      "end": 22,
       "start": 19,
     },
   },
   "variables": Object {
     "security": Object {
       "basic_auth": Object {
-        "line": 64,
+        "line": 67,
       },
       "petstore_auth": Object {
-        "line": 63,
+        "line": 66,
       },
     },
   },
@@ -803,26 +803,26 @@ exports[`webhooks Node.js snippet generation aws AWS snippet generation with aut
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 52,
-      "start": 23,
+      "end": 55,
+      "start": 24,
     },
     "verification": Object {
-      "end": 21,
+      "end": 22,
       "start": 19,
     },
   },
   "variables": Object {
     "security": Object {
       "apiKey": Object {
-        "line": 67,
+        "line": 70,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 63,
+        "line": 66,
       },
       "port": Object {
-        "line": 64,
+        "line": 67,
       },
     },
   },
@@ -833,18 +833,18 @@ exports[`webhooks Node.js snippet generation aws request should match fixture fo
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 26,
-      "start": 15,
+      "end": 28,
+      "start": 16,
     },
     "verification": Object {
-      "end": 13,
+      "end": 14,
       "start": 11,
     },
   },
   "variables": Object {
     "security": Object {
       "apiKey": Object {
-        "line": 37,
+        "line": 39,
       },
     },
   },
@@ -855,23 +855,23 @@ exports[`webhooks Node.js snippet generation aws request should match fixture fo
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 26,
-      "start": 15,
+      "end": 28,
+      "start": 16,
     },
     "verification": Object {
-      "end": 13,
+      "end": 14,
       "start": 11,
     },
   },
   "variables": Object {
     "security": Object {
       "petstore_auth": Object {
-        "line": 40,
+        "line": 42,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 37,
+        "line": 39,
       },
     },
   },
@@ -882,38 +882,38 @@ exports[`webhooks Node.js snippet generation aws request should match fixture fo
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 26,
-      "start": 15,
+      "end": 28,
+      "start": 16,
     },
     "verification": Object {
-      "end": 13,
+      "end": 14,
       "start": 11,
     },
   },
   "variables": Object {
     "security": Object {
       "\\"petstore\\" auth": Object {
-        "line": 43,
+        "line": 45,
       },
       "basic-auth": Object {
-        "line": 44,
+        "line": 46,
       },
       "normal_security_var": Object {
-        "line": 45,
+        "line": 47,
       },
     },
     "server": Object {
       "*port": Object {
-        "line": 38,
-      },
-      "2name": Object {
-        "line": 37,
-      },
-      "normal_server_var": Object {
         "line": 40,
       },
-      "p*o?r*t": Object {
+      "2name": Object {
         "line": 39,
+      },
+      "normal_server_var": Object {
+        "line": 42,
+      },
+      "p*o?r*t": Object {
+        "line": 41,
       },
     },
   },
@@ -924,29 +924,29 @@ exports[`webhooks Node.js snippet generation aws request should match fixture fo
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 26,
-      "start": 15,
+      "end": 28,
+      "start": 16,
     },
     "verification": Object {
-      "end": 13,
+      "end": 14,
       "start": 11,
     },
   },
   "variables": Object {
     "security": Object {
       "basic_auth": Object {
-        "line": 42,
+        "line": 44,
       },
       "petstore_auth": Object {
-        "line": 41,
+        "line": 43,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 37,
+        "line": 39,
       },
       "port": Object {
-        "line": 38,
+        "line": 40,
       },
     },
   },
@@ -957,27 +957,27 @@ exports[`webhooks Node.js snippet generation aws request should match fixture fo
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 26,
-      "start": 15,
+      "end": 28,
+      "start": 16,
     },
     "verification": Object {
-      "end": 13,
+      "end": 14,
       "start": 11,
     },
   },
   "variables": Object {
     "security": Object {
       "api_key": Object {
-        "line": 37,
-      },
-      "http_basic": Object {
-        "line": 38,
-      },
-      "http_bearer": Object {
         "line": 39,
       },
-      "oauth2": Object {
+      "http_basic": Object {
         "line": 40,
+      },
+      "http_bearer": Object {
+        "line": 41,
+      },
+      "oauth2": Object {
+        "line": 42,
       },
     },
   },
@@ -988,21 +988,21 @@ exports[`webhooks Node.js snippet generation aws request should match fixture fo
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 26,
-      "start": 15,
+      "end": 28,
+      "start": 16,
     },
     "verification": Object {
-      "end": 13,
+      "end": 14,
       "start": 11,
     },
   },
   "variables": Object {
     "security": Object {
       "basic_auth": Object {
-        "line": 38,
+        "line": 40,
       },
       "petstore_auth": Object {
-        "line": 37,
+        "line": 39,
       },
     },
   },
@@ -1013,26 +1013,26 @@ exports[`webhooks Node.js snippet generation aws request should match fixture fo
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 26,
-      "start": 15,
+      "end": 28,
+      "start": 16,
     },
     "verification": Object {
-      "end": 13,
+      "end": 14,
       "start": 11,
     },
   },
   "variables": Object {
     "security": Object {
       "apiKey": Object {
-        "line": 41,
+        "line": 43,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 37,
+        "line": 39,
       },
       "port": Object {
-        "line": 38,
+        "line": 40,
       },
     },
   },
@@ -1441,18 +1441,18 @@ exports[`webhooks Python snippet generation aws AWS snippet generation with auto
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 44,
-      "start": 24,
+      "end": 47,
+      "start": 25,
     },
     "verification": Object {
-      "end": 22,
+      "end": 23,
       "start": 20,
     },
   },
   "variables": Object {
     "security": Object {
       "apiKey": Object {
-        "line": 55,
+        "line": 58,
       },
     },
   },
@@ -1463,23 +1463,23 @@ exports[`webhooks Python snippet generation aws AWS snippet generation with auto
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 44,
-      "start": 24,
+      "end": 47,
+      "start": 25,
     },
     "verification": Object {
-      "end": 22,
+      "end": 23,
       "start": 20,
     },
   },
   "variables": Object {
     "security": Object {
       "petstore_auth": Object {
-        "line": 58,
+        "line": 61,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 55,
+        "line": 58,
       },
     },
   },
@@ -1490,38 +1490,38 @@ exports[`webhooks Python snippet generation aws AWS snippet generation with auto
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 44,
-      "start": 24,
+      "end": 47,
+      "start": 25,
     },
     "verification": Object {
-      "end": 22,
+      "end": 23,
       "start": 20,
     },
   },
   "variables": Object {
     "security": Object {
       "\\"petstore\\" auth": Object {
-        "line": 61,
+        "line": 64,
       },
       "basic-auth": Object {
-        "line": 62,
+        "line": 65,
       },
       "normal_security_var": Object {
-        "line": 63,
+        "line": 66,
       },
     },
     "server": Object {
       "*port": Object {
-        "line": 56,
+        "line": 59,
       },
       "2name": Object {
-        "line": 55,
-      },
-      "normal_server_var": Object {
         "line": 58,
       },
+      "normal_server_var": Object {
+        "line": 61,
+      },
       "p*o?r*t": Object {
-        "line": 57,
+        "line": 60,
       },
     },
   },
@@ -1532,29 +1532,29 @@ exports[`webhooks Python snippet generation aws AWS snippet generation with auto
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 44,
-      "start": 24,
+      "end": 47,
+      "start": 25,
     },
     "verification": Object {
-      "end": 22,
+      "end": 23,
       "start": 20,
     },
   },
   "variables": Object {
     "security": Object {
       "basic_auth": Object {
-        "line": 60,
+        "line": 63,
       },
       "petstore_auth": Object {
-        "line": 59,
+        "line": 62,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 55,
+        "line": 58,
       },
       "port": Object {
-        "line": 56,
+        "line": 59,
       },
     },
   },
@@ -1565,27 +1565,27 @@ exports[`webhooks Python snippet generation aws AWS snippet generation with auto
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 44,
-      "start": 24,
+      "end": 47,
+      "start": 25,
     },
     "verification": Object {
-      "end": 22,
+      "end": 23,
       "start": 20,
     },
   },
   "variables": Object {
     "security": Object {
       "api_key": Object {
-        "line": 55,
+        "line": 58,
       },
       "http_basic": Object {
-        "line": 56,
+        "line": 59,
       },
       "http_bearer": Object {
-        "line": 57,
+        "line": 60,
       },
       "oauth2": Object {
-        "line": 58,
+        "line": 61,
       },
     },
   },
@@ -1596,21 +1596,21 @@ exports[`webhooks Python snippet generation aws AWS snippet generation with auto
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 44,
-      "start": 24,
+      "end": 47,
+      "start": 25,
     },
     "verification": Object {
-      "end": 22,
+      "end": 23,
       "start": 20,
     },
   },
   "variables": Object {
     "security": Object {
       "basic_auth": Object {
-        "line": 56,
+        "line": 59,
       },
       "petstore_auth": Object {
-        "line": 55,
+        "line": 58,
       },
     },
   },
@@ -1621,26 +1621,26 @@ exports[`webhooks Python snippet generation aws AWS snippet generation with auto
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 44,
-      "start": 24,
+      "end": 47,
+      "start": 25,
     },
     "verification": Object {
-      "end": 22,
+      "end": 23,
       "start": 20,
     },
   },
   "variables": Object {
     "security": Object {
       "apiKey": Object {
-        "line": 59,
+        "line": 62,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 55,
+        "line": 58,
       },
       "port": Object {
-        "line": 56,
+        "line": 59,
       },
     },
   },
@@ -1651,18 +1651,18 @@ exports[`webhooks Python snippet generation aws request should match fixture for
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 30,
-      "start": 21,
+      "end": 32,
+      "start": 22,
     },
     "verification": Object {
-      "end": 19,
+      "end": 20,
       "start": 17,
     },
   },
   "variables": Object {
     "security": Object {
       "apiKey": Object {
-        "line": 41,
+        "line": 43,
       },
     },
   },
@@ -1673,23 +1673,23 @@ exports[`webhooks Python snippet generation aws request should match fixture for
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 30,
-      "start": 21,
+      "end": 32,
+      "start": 22,
     },
     "verification": Object {
-      "end": 19,
+      "end": 20,
       "start": 17,
     },
   },
   "variables": Object {
     "security": Object {
       "petstore_auth": Object {
-        "line": 44,
+        "line": 46,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 41,
+        "line": 43,
       },
     },
   },
@@ -1700,38 +1700,38 @@ exports[`webhooks Python snippet generation aws request should match fixture for
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 30,
-      "start": 21,
+      "end": 32,
+      "start": 22,
     },
     "verification": Object {
-      "end": 19,
+      "end": 20,
       "start": 17,
     },
   },
   "variables": Object {
     "security": Object {
       "\\"petstore\\" auth": Object {
-        "line": 47,
+        "line": 49,
       },
       "basic-auth": Object {
-        "line": 48,
+        "line": 50,
       },
       "normal_security_var": Object {
-        "line": 49,
+        "line": 51,
       },
     },
     "server": Object {
       "*port": Object {
-        "line": 42,
-      },
-      "2name": Object {
-        "line": 41,
-      },
-      "normal_server_var": Object {
         "line": 44,
       },
-      "p*o?r*t": Object {
+      "2name": Object {
         "line": 43,
+      },
+      "normal_server_var": Object {
+        "line": 46,
+      },
+      "p*o?r*t": Object {
+        "line": 45,
       },
     },
   },
@@ -1742,29 +1742,29 @@ exports[`webhooks Python snippet generation aws request should match fixture for
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 30,
-      "start": 21,
+      "end": 32,
+      "start": 22,
     },
     "verification": Object {
-      "end": 19,
+      "end": 20,
       "start": 17,
     },
   },
   "variables": Object {
     "security": Object {
       "basic_auth": Object {
-        "line": 46,
+        "line": 48,
       },
       "petstore_auth": Object {
-        "line": 45,
+        "line": 47,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 41,
+        "line": 43,
       },
       "port": Object {
-        "line": 42,
+        "line": 44,
       },
     },
   },
@@ -1775,27 +1775,27 @@ exports[`webhooks Python snippet generation aws request should match fixture for
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 30,
-      "start": 21,
+      "end": 32,
+      "start": 22,
     },
     "verification": Object {
-      "end": 19,
+      "end": 20,
       "start": 17,
     },
   },
   "variables": Object {
     "security": Object {
       "api_key": Object {
-        "line": 41,
-      },
-      "http_basic": Object {
-        "line": 42,
-      },
-      "http_bearer": Object {
         "line": 43,
       },
-      "oauth2": Object {
+      "http_basic": Object {
         "line": 44,
+      },
+      "http_bearer": Object {
+        "line": 45,
+      },
+      "oauth2": Object {
+        "line": 46,
       },
     },
   },
@@ -1806,21 +1806,21 @@ exports[`webhooks Python snippet generation aws request should match fixture for
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 30,
-      "start": 21,
+      "end": 32,
+      "start": 22,
     },
     "verification": Object {
-      "end": 19,
+      "end": 20,
       "start": 17,
     },
   },
   "variables": Object {
     "security": Object {
       "basic_auth": Object {
-        "line": 42,
+        "line": 44,
       },
       "petstore_auth": Object {
-        "line": 41,
+        "line": 43,
       },
     },
   },
@@ -1831,26 +1831,26 @@ exports[`webhooks Python snippet generation aws request should match fixture for
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 30,
-      "start": 21,
+      "end": 32,
+      "start": 22,
     },
     "verification": Object {
-      "end": 19,
+      "end": 20,
       "start": 17,
     },
   },
   "variables": Object {
     "security": Object {
       "apiKey": Object {
-        "line": 45,
+        "line": 47,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 41,
+        "line": 43,
       },
       "port": Object {
-        "line": 42,
+        "line": 44,
       },
     },
   },
@@ -2060,18 +2060,18 @@ exports[`webhooks Ruby snippet generation aws AWS snippet generation with automa
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 47,
-      "start": 20,
+      "end": 50,
+      "start": 21,
     },
     "verification": Object {
-      "end": 18,
+      "end": 19,
       "start": 17,
     },
   },
   "variables": Object {
     "security": Object {
       "apiKey": Object {
-        "line": 59,
+        "line": 62,
       },
     },
   },
@@ -2082,23 +2082,23 @@ exports[`webhooks Ruby snippet generation aws AWS snippet generation with automa
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 47,
-      "start": 20,
+      "end": 50,
+      "start": 21,
     },
     "verification": Object {
-      "end": 18,
+      "end": 19,
       "start": 17,
     },
   },
   "variables": Object {
     "security": Object {
       "petstore_auth": Object {
-        "line": 62,
+        "line": 65,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 59,
+        "line": 62,
       },
     },
   },
@@ -2109,38 +2109,38 @@ exports[`webhooks Ruby snippet generation aws AWS snippet generation with automa
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 47,
-      "start": 20,
+      "end": 50,
+      "start": 21,
     },
     "verification": Object {
-      "end": 18,
+      "end": 19,
       "start": 17,
     },
   },
   "variables": Object {
     "security": Object {
       "\\"petstore\\" auth": Object {
-        "line": 65,
+        "line": 68,
       },
       "basic-auth": Object {
-        "line": 66,
+        "line": 69,
       },
       "normal_security_var": Object {
-        "line": 67,
+        "line": 70,
       },
     },
     "server": Object {
       "*port": Object {
-        "line": 60,
+        "line": 63,
       },
       "2name": Object {
-        "line": 59,
-      },
-      "normal_server_var": Object {
         "line": 62,
       },
+      "normal_server_var": Object {
+        "line": 65,
+      },
       "p*o?r*t": Object {
-        "line": 61,
+        "line": 64,
       },
     },
   },
@@ -2151,29 +2151,29 @@ exports[`webhooks Ruby snippet generation aws AWS snippet generation with automa
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 47,
-      "start": 20,
+      "end": 50,
+      "start": 21,
     },
     "verification": Object {
-      "end": 18,
+      "end": 19,
       "start": 17,
     },
   },
   "variables": Object {
     "security": Object {
       "basic_auth": Object {
-        "line": 64,
+        "line": 67,
       },
       "petstore_auth": Object {
-        "line": 63,
+        "line": 66,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 59,
+        "line": 62,
       },
       "port": Object {
-        "line": 60,
+        "line": 63,
       },
     },
   },
@@ -2184,27 +2184,27 @@ exports[`webhooks Ruby snippet generation aws AWS snippet generation with automa
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 47,
-      "start": 20,
+      "end": 50,
+      "start": 21,
     },
     "verification": Object {
-      "end": 18,
+      "end": 19,
       "start": 17,
     },
   },
   "variables": Object {
     "security": Object {
       "api_key": Object {
-        "line": 59,
+        "line": 62,
       },
       "http_basic": Object {
-        "line": 60,
+        "line": 63,
       },
       "http_bearer": Object {
-        "line": 61,
+        "line": 64,
       },
       "oauth2": Object {
-        "line": 62,
+        "line": 65,
       },
     },
   },
@@ -2215,21 +2215,21 @@ exports[`webhooks Ruby snippet generation aws AWS snippet generation with automa
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 47,
-      "start": 20,
+      "end": 50,
+      "start": 21,
     },
     "verification": Object {
-      "end": 18,
+      "end": 19,
       "start": 17,
     },
   },
   "variables": Object {
     "security": Object {
       "basic_auth": Object {
-        "line": 60,
+        "line": 63,
       },
       "petstore_auth": Object {
-        "line": 59,
+        "line": 62,
       },
     },
   },
@@ -2240,26 +2240,26 @@ exports[`webhooks Ruby snippet generation aws AWS snippet generation with automa
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 47,
-      "start": 20,
+      "end": 50,
+      "start": 21,
     },
     "verification": Object {
-      "end": 18,
+      "end": 19,
       "start": 17,
     },
   },
   "variables": Object {
     "security": Object {
       "apiKey": Object {
-        "line": 63,
+        "line": 66,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 59,
+        "line": 62,
       },
       "port": Object {
-        "line": 60,
+        "line": 63,
       },
     },
   },
@@ -2270,18 +2270,18 @@ exports[`webhooks Ruby snippet generation aws request should match fixture for "
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 31,
-      "start": 17,
+      "end": 33,
+      "start": 18,
     },
     "verification": Object {
-      "end": 15,
+      "end": 16,
       "start": 14,
     },
   },
   "variables": Object {
     "security": Object {
       "apiKey": Object {
-        "line": 43,
+        "line": 45,
       },
     },
   },
@@ -2292,23 +2292,23 @@ exports[`webhooks Ruby snippet generation aws request should match fixture for "
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 31,
-      "start": 17,
+      "end": 33,
+      "start": 18,
     },
     "verification": Object {
-      "end": 15,
+      "end": 16,
       "start": 14,
     },
   },
   "variables": Object {
     "security": Object {
       "petstore_auth": Object {
-        "line": 46,
+        "line": 48,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 43,
+        "line": 45,
       },
     },
   },
@@ -2319,38 +2319,38 @@ exports[`webhooks Ruby snippet generation aws request should match fixture for "
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 31,
-      "start": 17,
+      "end": 33,
+      "start": 18,
     },
     "verification": Object {
-      "end": 15,
+      "end": 16,
       "start": 14,
     },
   },
   "variables": Object {
     "security": Object {
       "\\"petstore\\" auth": Object {
-        "line": 49,
+        "line": 51,
       },
       "basic-auth": Object {
-        "line": 50,
+        "line": 52,
       },
       "normal_security_var": Object {
-        "line": 51,
+        "line": 53,
       },
     },
     "server": Object {
       "*port": Object {
-        "line": 44,
-      },
-      "2name": Object {
-        "line": 43,
-      },
-      "normal_server_var": Object {
         "line": 46,
       },
-      "p*o?r*t": Object {
+      "2name": Object {
         "line": 45,
+      },
+      "normal_server_var": Object {
+        "line": 48,
+      },
+      "p*o?r*t": Object {
+        "line": 47,
       },
     },
   },
@@ -2361,29 +2361,29 @@ exports[`webhooks Ruby snippet generation aws request should match fixture for "
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 31,
-      "start": 17,
+      "end": 33,
+      "start": 18,
     },
     "verification": Object {
-      "end": 15,
+      "end": 16,
       "start": 14,
     },
   },
   "variables": Object {
     "security": Object {
       "basic_auth": Object {
-        "line": 48,
+        "line": 50,
       },
       "petstore_auth": Object {
-        "line": 47,
+        "line": 49,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 43,
+        "line": 45,
       },
       "port": Object {
-        "line": 44,
+        "line": 46,
       },
     },
   },
@@ -2394,27 +2394,27 @@ exports[`webhooks Ruby snippet generation aws request should match fixture for "
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 31,
-      "start": 17,
+      "end": 33,
+      "start": 18,
     },
     "verification": Object {
-      "end": 15,
+      "end": 16,
       "start": 14,
     },
   },
   "variables": Object {
     "security": Object {
       "api_key": Object {
-        "line": 43,
-      },
-      "http_basic": Object {
-        "line": 44,
-      },
-      "http_bearer": Object {
         "line": 45,
       },
-      "oauth2": Object {
+      "http_basic": Object {
         "line": 46,
+      },
+      "http_bearer": Object {
+        "line": 47,
+      },
+      "oauth2": Object {
+        "line": 48,
       },
     },
   },
@@ -2425,21 +2425,21 @@ exports[`webhooks Ruby snippet generation aws request should match fixture for "
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 31,
-      "start": 17,
+      "end": 33,
+      "start": 18,
     },
     "verification": Object {
-      "end": 15,
+      "end": 16,
       "start": 14,
     },
   },
   "variables": Object {
     "security": Object {
       "basic_auth": Object {
-        "line": 44,
+        "line": 46,
       },
       "petstore_auth": Object {
-        "line": 43,
+        "line": 45,
       },
     },
   },
@@ -2450,26 +2450,26 @@ exports[`webhooks Ruby snippet generation aws request should match fixture for "
 Object {
   "sections": Object {
     "payload": Object {
-      "end": 31,
-      "start": 17,
+      "end": 33,
+      "start": 18,
     },
     "verification": Object {
-      "end": 15,
+      "end": 16,
       "start": 14,
     },
   },
   "variables": Object {
     "security": Object {
       "apiKey": Object {
-        "line": 47,
+        "line": 49,
       },
     },
     "server": Object {
       "name": Object {
-        "line": 43,
+        "line": 45,
       },
       "port": Object {
-        "line": 44,
+        "line": 46,
       },
     },
   },

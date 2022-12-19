@@ -14,15 +14,17 @@ def handler(event, lambda_context):
     error = None
 
     try:
+        # Verify the request is legitimate and came from ReadMe.
         signature = event.get("headers", {}).get("ReadMe-Signature")
         body = json.loads(event.get("body", "{}"))
         VerifyWebhook(body, signature, README_SECRET)
 
+        # Look up the API key associated with the user's email address.
         email = body.get("email")
         client = boto3.client("apigateway")
         keys = client.get_api_keys(nameQuery=email, includeValues=True)
         if len(keys.get("items", [])) > 0:
-            # if multiple API keys are returned for the given email, use the first one
+            # If multiple API keys are returned for the given email, use the first one.
             api_key = keys["items"][0]["value"]
             status_code = 200
         else:
