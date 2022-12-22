@@ -10,7 +10,11 @@ category: 62292aea889520008ed0113b
 
 As [previously described](https://docs.readme.com/main/docs/personalized-docs-webhook), you can customize your users' experience in your docs by to injecting custom user data into your documentation via the **Personalized Docs Webhook**.
 
-If you plan on using AWS Lambda to deploy your webhook and if you already use Amazon API Gateway to manage API credentials for your users, we have dedicated code samples for you, in a number of different programming languages and AWS Lambda runtimes.
+If you plan on using AWS Lambda to deploy your webhook and if you already use Amazon API Gateway to manage API credentials for your users, we have dedicated code samples for you!
+
+## Getting started
+
+To get started, head to [dash.readme.com](https://dash.readme.com) and navigate to your project. Under **Configuration** ➡️ **Personalized Docs** in your project dashboard, select the Amazon API Gateway code sample on the right. You'll see number of different programming languages and AWS Lambda runtimes.
 
 Here's an overview of what each code sample does:
 
@@ -19,13 +23,9 @@ Here's an overview of what each code sample does:
 - If a matching API credentials are found in your API Gateway data, they are sent as a JSON response to ReadMe's webhook request. The credentials will be surfaced on [the Authentication page](https://docs.readme.com/main/docs/reference-core-pages), as well as on any endpoint page in the API Reference so they can make authenticated API requests in a snap 🔑
 - _(Optional)_ New user who hasn't used your API before? No problem! You can automatically provision new API keys for your API Gateway, so that all ReadMe users can try your API from the API Explorer, even if they haven't signed up for anything directly in your service yet 🆕
 
-## Getting started
+Follow the steps below to add the Personalized Docs Webhook endpoint to your API 🚀
 
-To get started, head to [dash.readme.com](https://dash.readme.com) and navigate to your project. Under **Configuration** ➡️ **Personalized Docs** in your project dashboard, select the Amazon API Gateway code sample on the right.
-
-Here are the details you'll need to add this endpoint to your API.
-
-### Installing the required libraries in your application
+### Install the required libraries in your application
 
 To use these code samples, your project will need a copy of the ReadMe SDK along with the compatible AWS SDK for your programming language. Here are the shell commands to install libraries in each supported language:
 
@@ -48,7 +48,7 @@ gem "aws-sdk"
 ```
 <!-- prettier-ignore-end -->
 
-### Copying the code sample to your project
+### Copy the code sample to your project
 
 The code sample is a self-contained Lambda function which should live in its own file in your codebase.
 
@@ -60,7 +60,7 @@ The code sample is a self-contained Lambda function which should live in its own
 >
 > If you've chosen to provision keys for new users, the code sample will include a second constant, `DEFAULT_USAGE_PLAN_ID`. This usage plan will be attached to all new API tokens created by this webhook. You'll need to replace this with a valid usage plan ID in your API Gateway configuration, which you can find from the [API Gateway console](https://console.aws.amazon.com/apigateway/home#/usage-plans). If you want to change this behavior, you'll need to customize the code in the webhook. This ID does not need to be secret, so it's safe to leave in the source code file.
 
-### Configuring an API Gateway endpoint for the webhook
+### Configure an API Gateway endpoint for the webhook
 
 The exact steps to configure this Lambda function depend on the framework you're using to manage your API Gateway service:
 
@@ -74,7 +74,7 @@ Whatever framework you use, you'll need to create a new path in your API that se
 - Python: tested on `python3.9`
 - Ruby: tested on `ruby2.7`
 
-### Required permissions for the webhook Lambda function
+### Configure the required permissions for the webhook Lambda function
 
 You'll also need to write a policy document to grant permissions to the Lambda function so that it's allowed to interact with the API Gateway data. Depending on the framework you use, this may need to be written in JSON or YAML.
 
