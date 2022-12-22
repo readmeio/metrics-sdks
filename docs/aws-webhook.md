@@ -16,7 +16,7 @@ If you plan on using AWS Lambda to deploy your webhook and if you already use Am
 
 To get started, head to [dash.readme.com](https://dash.readme.com) and navigate to your project. Under **Configuration** ➡️ **Personalized Docs** in your project dashboard, select the Amazon API Gateway code sample on the right. You'll see a number of different programming languages and AWS Lambda runtimes.
 
-![Amazon API Gateway in Personalized Docs] (https://imgur.com/a/3Qo4pLw)
+![Amazon API Gateway in Personalized Docs](https://i.imgur.com/eJhv695.png)
 
 Here's an overview of what each code sample does:
 
