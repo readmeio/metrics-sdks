@@ -10,7 +10,7 @@ category: 62292aea889520008ed0113b
 
 As [previously described](https://docs.readme.com/main/docs/personalized-docs-webhook), you can customize your users' experience in your docs by to injecting custom user data into your documentation via the **Personalized Docs Webhook**.
 
-If you plan on using AWS Lambda to deploy your webhook and if you already use Amazon API Gateway to manage API credentials for your users, we have dedicated code samples just for you, in a number of different programming languages and AWS Lambda runtimes.
+If you plan on using AWS Lambda to deploy your webhook and if you already use Amazon API Gateway to manage API credentials for your users, we have dedicated code samples for you, in a number of different programming languages and AWS Lambda runtimes.
 
 Here's an overview of what each code sample does:
 
@@ -133,6 +133,6 @@ If you _are_ using the webhook to provision new API Gateway tokens, you will nee
 
 ## Configuring in ReadMe & Testing
 
-Under **Configuration** ➡️ **Personalized Docs** in your project dashboard, you will be able to test the Personalized Docs Webhook you just created and save it to your project. Once everything is working, ReadMe will make the request to this endpoint every time a user logs into your ReadMe docs.
+Under **Configuration** ➡️ **Personalized Docs** in your project dashboard, you will be able to test your Personalized Docs Webhook and save it to your project. Once everything is working, ReadMe will make the request to this endpoint every time a user logs into your ReadMe docs.
 
 For customers on our Enterprise plan, you can configure your Personalized Docs Webhook in the Enterprise dashboard in the **End Users** section.
