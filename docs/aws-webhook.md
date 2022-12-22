@@ -1,6 +1,6 @@
 ---
 title: Using Amazon API Gateway with the Personalized Docs Webhook
-slug: using-amazon-api-gateway-with-the-personalized-docs-webhook
+slug: amazon-api-gateway-webhook
 category: 62292aea889520008ed0113b
 ---
 
@@ -16,7 +16,7 @@ If you plan on using AWS Lambda to deploy your webhook and if you already use Am
 
 To get started, head to [dash.readme.com](https://dash.readme.com) and navigate to your project. Under **Configuration** ➡️ **Personalized Docs** in your project dashboard, select the Amazon API Gateway code sample on the right. You'll see a number of different programming languages and AWS Lambda runtimes.
 
-![Amazon API Gateway in Personalized Docs](https://i.imgur.com/eJhv695.png)
+![Amazon API Gateway in Personalized Docs] (https://imgur.com/a/3Qo4pLw)
 
 Here's an overview of what each code sample does:
 
@@ -50,19 +50,19 @@ gem "aws-sdk"
 ```
 <!-- prettier-ignore-end -->
 
-### Copy the code sample to your project
+### Copy the Code Sample to Your Project
 
 The code sample is a self-contained Lambda function which should live in its own file in your codebase.
 
 > ❗
 >
-> The code sample contains a constant called `README_SECRET` which is the signing secret for your ReadMe project. We recommend storing the secret in AWS Secrets Manager and loading it at runtime, as opposed to leaving this directly in the source code. If you're not able to use AWS Secrets Manager, you could also move it to an environment variable in your project.
+> The code sample contains a constant called `README_SECRET` which is the signing secret for your ReadMe project. We recommend storing the secret in AWS Secrets Manager and loading it at runtime, as opposed to leaving this directly in the source code. If you're not able to use AWS Secrets Manager, you can also move it to an environment variable in your project.
 
 > 🚧
 >
 > If you've chosen to provision keys for new users, the code sample will include a second constant, `DEFAULT_USAGE_PLAN_ID`. This usage plan will be attached to all new API tokens created by this webhook. You'll need to replace this with a valid usage plan ID in your API Gateway configuration, which you can find from the [API Gateway console](https://console.aws.amazon.com/apigateway/home#/usage-plans). If you want to change this behavior, you'll need to customize the code in the webhook. This ID does not need to be secret, so it's safe to leave in the source code file.
 
-### Configure an API Gateway endpoint for the webhook
+### Configure an API Gateway Endpoint for the Webhook
 
 The exact steps to configure this Lambda function depend on the framework you're using to manage your API Gateway service:
 
@@ -76,7 +76,7 @@ Whatever framework you use, you'll need to create a new path in your API that se
 - Python: tested on `python3.9`
 - Ruby: tested on `ruby2.7`
 
-### Configure the required permissions for the webhook Lambda function
+### Configure the Required Permissions for the Webhook Lambda Function
 
 You'll also need to write a policy document to grant permissions to the Lambda function so that it's allowed to interact with the API Gateway data. Depending on the framework you use, this may need to be written in JSON or YAML.
 
@@ -138,3 +138,5 @@ If you _are_ using the webhook to provision new API Gateway tokens, you will nee
 Under **Configuration** ➡️ **Personalized Docs** in your project dashboard, you will be able to test your Personalized Docs Webhook and save it to your project. Once everything is working, ReadMe will make the request to this endpoint every time a user logs into your ReadMe docs.
 
 For customers on our Enterprise plan, you can configure your Personalized Docs Webhook in the Enterprise dashboard in the **End Users** section.
+
+To use this Personalized Docs Webhook to set up the Getting Started and Authentication pages in your developer hub where your developers will easily be able to locate their API keys and make sample requests, head to [this page](https://docs.readme.com/main/docs/reference-core-pages).
