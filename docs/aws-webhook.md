@@ -1,3 +1,9 @@
+---
+title: Using Amazon API Gateway with the Personalized Docs Webhook
+slug: using-amazon-api-gateway-with-the-personalized-docs-webhook
+category: 62292aea889520008ed0113b
+---
+
 The Personalized Docs feature requires you to publish a webhook that ReadMe will hit to load metadata about the currently logged in user. For Amazon API Gateway users we've provided sample code for this webhook, in a number of different programming languages and AWS Lambda runtimes. This sample code automatically looks up the user by their email address. If a matching API token is found in your API Gateway data, their API token is sent to ReadMe and will be available to requests made from the API Explorer. You can even choose to automatically provision new API keys for your API Gateway, so that all ReadMe users can try your API from the API Explorer, even if they haven't signed up for anything directly in your service yet.
 
 ## Getting started
