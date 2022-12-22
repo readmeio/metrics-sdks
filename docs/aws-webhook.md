@@ -8,11 +8,11 @@ category: 62292aea889520008ed0113b
 >
 > This document describes the **Personalized Docs Webhook** setup process for Amazon API Gateway customers. If you manage your API users through other means, check out our [standard Personalized Docs Webhook setup guidance](https://docs.readme.com/main/docs/personalized-docs-webhook).
 
-As [previously described](https://docs.readme.com/main/docs/personalized-docs-webhook), you can customize your users' experience in your docs by injecting custom user data into your documentation via the **Personalized Docs Webhook**.
+As [previously described](https://docs.readme.com/main/docs/personalized-docs-webhook), you can customize your users' experience in your docs by injecting custom user data into your documentation via the **Personalized Docs Webhook**. This means your developers will be able to easiily locate their API keys within your developer hub and, in this case, you'll also be able to provision API keys for new users.
 
 If you plan on using AWS Lambda to deploy your webhook and if you already use Amazon API Gateway to manage API credentials for your users, we have dedicated code samples for you!
 
-## Getting started
+## Getting Started
 
 To get started, head to [dash.readme.com](https://dash.readme.com) and navigate to your project. Under **Configuration** ➡️ **Personalized Docs** in your project dashboard, select the Amazon API Gateway code sample on the right. You'll see a number of different programming languages and AWS Lambda runtimes.
 
@@ -25,7 +25,7 @@ Here's an overview of what each code sample does:
 
 Follow the steps below to add the Personalized Docs Webhook endpoint to your API 🚀
 
-### Install the required libraries in your application
+### Install the Required Libraries in your Application
 
 To use these code samples, your project will need a copy of the ReadMe SDK along with the compatible AWS SDK for your programming language. Here are the shell commands to install libraries in each supported language:
 
