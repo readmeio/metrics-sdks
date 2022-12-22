@@ -1,0 +1,127 @@
+The Personalized Docs feature requires you to publish a webhook that ReadMe will hit to load metadata about the currently logged in user. For Amazon API Gateway users we've provided sample code for this webhook, in a number of different programming languages and AWS Lambda runtimes. This sample code automatically looks up the user by their email address. If a matching API token is found in your API Gateway data, their API token is sent to ReadMe and will be available to requests made from the API Explorer. You can even choose to automatically provision new API keys for your API Gateway, so that all ReadMe users can try your API from the API Explorer, even if they haven't signed up for anything directly in your service yet.
+
+## Getting started
+
+To get started, head to dash.readme.com and navigate to your project. Click the "Personalized Docs" link in the sidebar and select the Amazon API Gateway code sample on the right. The code sample includes code automatically lookup the current user by their email address, and return their API token in the webhook response. you can optionally choose. You can optionally choose to "provision keys for new users," which will create a new API Gateway token when a matching token is not found in your API Gateway data.
+
+Here's more details you'll need to add this endpoint to your API.
+
+### Installing the required libraries in your application
+
+To use these code samples, your project will need a copy of the ReadMe SDK along with the compatible AWS SDK for your programming language. Here are the shell commands to install libraries in each supported language:
+
+```shell C#
+dotnet add package ReadMe.Metrics
+dotnet add package AWSSDK.APIGateway
+```
+```shell Node
+npm install --save readmeio
+npm install --save @aws-sdk/client-api-gateway
+```
+```shell Python
+pip install readme-metrics
+pip install boto3
+```
+```shell Ruby
+gem "readme-metrics"
+gem "aws-sdk"
+```
+
+
+
+### Copying the code sample to your project
+
+The code sample is a self-contained Lambda function which should live in its own file in your codebase.
+
+> ❗ 
+> 
+> The code sample contains a constant called `README_SECRET` which is the signing secret for your ReadMe project. It's not a good idea to leave this directly in the source code. We recommend storing the secret in AWS Secrets Manager and loading it at runtime. If you're not able to use AWS Secrets Manager you could also move it to an environment variable in your project, or leave it as a constant in the Lambda function, although that's strongly discouraged.
+
+> 🚧 
+> 
+> If you've chosen to provision keys for new users, the code sample will include a second constant, `DEFAULT_USAGE_PLAN_ID`. This usage plan will be attached to all new API tokens created by this webhook. You'll need to replace this with a valid usage plan ID in your API Gateway configuration, which you can find from the [API Gateway console](https://console.aws.amazon.com/apigateway/home#/usage-plans). If you want to change this behavior, you'll need to customize the code in the webhook. This ID does not need to be secret, so it's safe to leave in the source code file.
+
+### Configuring an API Gateway endpoint for the webhook
+
+The exact steps to configure this Lambda function depend on the framework you're using to manage your API Gateway service. If you're using the AWS Cloud Development Kit, you'll need to add a new `AWS::Serverless::Function` stanza to your `template.yaml` file. If you're using Serverless, you'll want to add a function to the `functions` array in your `serverless.yaml`. Whatever framework you use, you'll need to create a new path in your API that serves this webhook. Our webhook requests are HTTP `POST`s so that's the only that you need to support. Depending on the language you chose, you'll need to configure this to use the appropriate AWS Lambda runtime:
+
+- C# (.NET): tested on the `dotnet6` Lambda runtime
+- Node: tested on `nodejs16.x`
+- Python: tested on `python3.9`
+- Ruby: tested on `ruby2.7`
+
+### Required permissions for the webhook Lambda function
+
+You'll also need to write a policy document to grant permissions to the Lambda function so that it's allowed to interact with the API Gateway data. Depending on the framework you use this may need to be written in JSON or YAML.
+
+If you are not using the webhook to automatically provision new API users, you can attach this policy to the Lambda function:
+
+```json Read-Only Policy (JSON)
+{
+    "Sid": "APIGatewayReadPolicy",
+    "Effect": "Allow",
+    "Action":
+    [
+        "apigateway:GET"
+    ],
+    "Resource":
+    [
+        "arn:aws:apigateway:*::/apikeys",
+        "arn:aws:apigateway:*::/apikeys/*"
+    ]
+}
+```
+```yaml Read-Only Policy (YAML)
+- Statement:
+    - Sid: APIGatewayReadWritePolicy
+      Effect: Allow
+      Action:
+        - "apigateway:GET"
+      Resource:
+        - "arn:aws:apigateway:*::/apikeys"
+        - "arn:aws:apigateway:*::/apikeys/*"
+```
+
+
+
+If you _are_ using the webhook to provision new API Gateway tokens, you will need to use this policy:
+
+```json Read-Write Policy (JSON)
+{
+    "Sid": "APIGatewayReadPolicy",
+    "Effect": "Allow",
+    "Action":
+    [
+        "apigateway:GET",
+        "apigateway:POST",
+        "apigateway:PUT"
+    ],
+    "Resource":
+    [
+        "arn:aws:apigateway:*::/apikeys",
+        "arn:aws:apigateway:*::/apikeys/*",
+        "arn:aws:apigateway:*::/usageplans/*/keys",
+        "arn:aws:apigateway:*::/tags/*"
+    ]
+}
+```
+```yaml Read-Write Policy (YAML)
+- Statement:
+    - Sid: APIGatewayReadPolicy
+      Effect: Allow
+      Action:
+        - "apigateway:GET"
+      Resource:
+        - "arn:aws:apigateway:*::/apikeys"
+        - "arn:aws:apigateway:*::/apikeys/*"
+        - "arn:aws:apigateway:*::/usageplans/*/keys"
+        - "arn:aws:apigateway:*::/tags/*"
+```
+
+
+
+## Configuring in ReadMe & Testing
+
+Under **Configuration** ➡️ **Personalized Docs** in your project dashboard, you will be able to test the Personalized Docs Webhook you just created and save it to your project. Once everything is working, ReadMe will make the request to this endpoint every time a user logs into your ReadMe docs.
+
+For customers on our Enterprise plan, you can configure your Personalized Docs Webhook in the Enterprise dashboard in the **End Users** section.
