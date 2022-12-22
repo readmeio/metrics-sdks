@@ -56,6 +56,7 @@ You'll also need to write a policy document to grant permissions to the Lambda f
 
 If you are not using the webhook to automatically provision new API users, you can attach this policy to the Lambda function:
 
+<!-- prettier-ignore-start -->
 ```json Read-Only Policy (JSON)
 {
   "Sid": "APIGatewayReadPolicy",
@@ -64,7 +65,6 @@ If you are not using the webhook to automatically provision new API users, you c
   "Resource": ["arn:aws:apigateway:*::/apikeys", "arn:aws:apigateway:*::/apikeys/*"]
 }
 ```
-
 ```yaml Read-Only Policy (YAML)
 - Statement:
     - Sid: APIGatewayReadWritePolicy
@@ -75,9 +75,11 @@ If you are not using the webhook to automatically provision new API users, you c
         - 'arn:aws:apigateway:*::/apikeys'
         - 'arn:aws:apigateway:*::/apikeys/*'
 ```
+<!-- prettier-ignore-end -->
 
 If you _are_ using the webhook to provision new API Gateway tokens, you will need to use this policy:
 
+<!-- prettier-ignore-start -->
 ```json Read-Write Policy (JSON)
 {
   "Sid": "APIGatewayReadPolicy",
@@ -91,7 +93,6 @@ If you _are_ using the webhook to provision new API Gateway tokens, you will nee
   ]
 }
 ```
-
 ```yaml Read-Write Policy (YAML)
 - Statement:
     - Sid: APIGatewayReadPolicy
@@ -104,6 +105,7 @@ If you _are_ using the webhook to provision new API Gateway tokens, you will nee
         - 'arn:aws:apigateway:*::/usageplans/*/keys'
         - 'arn:aws:apigateway:*::/tags/*'
 ```
+<!-- prettier-ignore-end -->
 
 ## Configuring in ReadMe & Testing
 
