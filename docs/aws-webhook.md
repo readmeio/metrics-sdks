@@ -16,12 +16,14 @@ If you plan on using AWS Lambda to deploy your webhook and if you already use Am
 
 To get started, head to [dash.readme.com](https://dash.readme.com) and navigate to your project. Under **Configuration** ➡️ **Personalized Docs** in your project dashboard, select the Amazon API Gateway code sample on the right. You'll see a number of different programming languages and AWS Lambda runtimes.
 
+![Amazon API Gateway in Personalized Docs](https://imgur.com/a/3Qo4pLw)
+
 Here's an overview of what each code sample does:
 
 - Validates the signature on the incoming webhook request to ensure that it's coming from ReadMe 🦉
 - Automatically looks up the user by their email address, which is contained in the request payload 👀
-- If a matching API credentials are found in your API Gateway data, they are sent as a JSON response to ReadMe's webhook request. The credentials will be surfaced on [the Authentication page](https://docs.readme.com/main/docs/reference-core-pages), as well as on any endpoint page in the API Reference so they can make authenticated API requests in a snap 🔑
-- _(Optional)_ New user who hasn't used your API before? No problem! You can automatically provision new API keys for your API Gateway, so that all ReadMe users can try your API from the API Explorer, even if they haven't signed up for anything directly in your service yet 🆕
+- If matching API credentials are found in your API Gateway data, they are sent as a JSON response to ReadMe's webhook request. The credentials will be surfaced on [the Authentication page](https://docs.readme.com/main/docs/reference-core-pages), as well as on any endpoint page in the API Reference so they can make authenticated API requests in a snap 🔑
+- _(Optional)_ Have a new user who hasn't used your API before? No problem! You can automatically provision new API keys for your API Gateway, so that all ReadMe users can try your API from the API Explorer, even if they haven't signed up for anything directly in your service yet 🆕
 
 Follow the steps below to add the Personalized Docs Webhook endpoint to your API 🚀
 
