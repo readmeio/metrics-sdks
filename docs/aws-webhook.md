@@ -139,4 +139,4 @@ Under **Configuration** ➡️ **Personalized Docs** in your project dashboard, 
 
 For customers on our Enterprise plan, you can configure your Personalized Docs Webhook in the Enterprise dashboard in the **End Users** section.
 
-To use this Personalized Docs Webhook to set up the Getting Started and Authentication pages in your developer hub where your developers will easily be able to locate their API keys and make sample requests, head to [this page](https://docs.readme.com/main/docs/reference-core-pages).
+To use this Personalized Docs Webhook to set up the Getting Started and Authentication pages in your developer hub where your developers will be able to locate their API keys and make sample requests, head to [this page](https://docs.readme.com/main/docs/reference-core-pages).
