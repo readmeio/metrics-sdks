@@ -67,7 +67,7 @@ The exact steps to configure this Lambda function depend on the framework you're
 - If you're using the AWS Cloud Development Kit, you'll need to add a new `AWS::Serverless::Function` stanza to your `template.yaml` file.
 - If you're using Serverless, you'll want to add a function to the `functions` array in your `serverless.yaml`.
 
-Whatever framework you use, you'll need to create a new path in your API that serves this webhook. Our webhook requests are HTTP `POST`s so that's the only method that you need to support. Depending on the language you chose, you'll need to configure this to use the appropriate AWS Lambda runtime:
+Whatever framework you use, you'll need to create a new path in your API that serves this webhook. Our webhook requests are HTTP `POST`s so that's the only method that you need to support. Depending on the language you choose, you'll need to configure this to use the appropriate AWS Lambda runtime:
 
 - C# (.NET): tested on the `dotnet6` Lambda runtime
 - Node: tested on `nodejs16.x`
