@@ -10,6 +10,7 @@ Here's more details you'll need to add this endpoint to your API.
 
 To use these code samples, your project will need a copy of the ReadMe SDK along with the compatible AWS SDK for your programming language. Here are the shell commands to install libraries in each supported language:
 
+<!-- prettier-ignore-start -->
 ```shell C#
 dotnet add package ReadMe.Metrics
 dotnet add package AWSSDK.APIGateway
@@ -26,19 +27,18 @@ pip install boto3
 gem "readme-metrics"
 gem "aws-sdk"
 ```
-
-
+<!-- prettier-ignore-end -->
 
 ### Copying the code sample to your project
 
 The code sample is a self-contained Lambda function which should live in its own file in your codebase.
 
-> ❗ 
-> 
+> ❗
+>
 > The code sample contains a constant called `README_SECRET` which is the signing secret for your ReadMe project. It's not a good idea to leave this directly in the source code. We recommend storing the secret in AWS Secrets Manager and loading it at runtime. If you're not able to use AWS Secrets Manager you could also move it to an environment variable in your project, or leave it as a constant in the Lambda function, although that's strongly discouraged.
 
-> 🚧 
-> 
+> 🚧
+>
 > If you've chosen to provision keys for new users, the code sample will include a second constant, `DEFAULT_USAGE_PLAN_ID`. This usage plan will be attached to all new API tokens created by this webhook. You'll need to replace this with a valid usage plan ID in your API Gateway configuration, which you can find from the [API Gateway console](https://console.aws.amazon.com/apigateway/home#/usage-plans). If you want to change this behavior, you'll need to customize the code in the webhook. This ID does not need to be secret, so it's safe to leave in the source code file.
 
 ### Configuring an API Gateway endpoint for the webhook
@@ -58,67 +58,52 @@ If you are not using the webhook to automatically provision new API users, you c
 
 ```json Read-Only Policy (JSON)
 {
-    "Sid": "APIGatewayReadPolicy",
-    "Effect": "Allow",
-    "Action":
-    [
-        "apigateway:GET"
-    ],
-    "Resource":
-    [
-        "arn:aws:apigateway:*::/apikeys",
-        "arn:aws:apigateway:*::/apikeys/*"
-    ]
+  "Sid": "APIGatewayReadPolicy",
+  "Effect": "Allow",
+  "Action": ["apigateway:GET"],
+  "Resource": ["arn:aws:apigateway:*::/apikeys", "arn:aws:apigateway:*::/apikeys/*"]
 }
 ```
+
 ```yaml Read-Only Policy (YAML)
 - Statement:
     - Sid: APIGatewayReadWritePolicy
       Effect: Allow
       Action:
-        - "apigateway:GET"
+        - 'apigateway:GET'
       Resource:
-        - "arn:aws:apigateway:*::/apikeys"
-        - "arn:aws:apigateway:*::/apikeys/*"
+        - 'arn:aws:apigateway:*::/apikeys'
+        - 'arn:aws:apigateway:*::/apikeys/*'
 ```
-
-
 
 If you _are_ using the webhook to provision new API Gateway tokens, you will need to use this policy:
 
 ```json Read-Write Policy (JSON)
 {
-    "Sid": "APIGatewayReadPolicy",
-    "Effect": "Allow",
-    "Action":
-    [
-        "apigateway:GET",
-        "apigateway:POST",
-        "apigateway:PUT"
-    ],
-    "Resource":
-    [
-        "arn:aws:apigateway:*::/apikeys",
-        "arn:aws:apigateway:*::/apikeys/*",
-        "arn:aws:apigateway:*::/usageplans/*/keys",
-        "arn:aws:apigateway:*::/tags/*"
-    ]
+  "Sid": "APIGatewayReadPolicy",
+  "Effect": "Allow",
+  "Action": ["apigateway:GET", "apigateway:POST", "apigateway:PUT"],
+  "Resource": [
+    "arn:aws:apigateway:*::/apikeys",
+    "arn:aws:apigateway:*::/apikeys/*",
+    "arn:aws:apigateway:*::/usageplans/*/keys",
+    "arn:aws:apigateway:*::/tags/*"
+  ]
 }
 ```
+
 ```yaml Read-Write Policy (YAML)
 - Statement:
     - Sid: APIGatewayReadPolicy
       Effect: Allow
       Action:
-        - "apigateway:GET"
+        - 'apigateway:GET'
       Resource:
-        - "arn:aws:apigateway:*::/apikeys"
-        - "arn:aws:apigateway:*::/apikeys/*"
-        - "arn:aws:apigateway:*::/usageplans/*/keys"
-        - "arn:aws:apigateway:*::/tags/*"
+        - 'arn:aws:apigateway:*::/apikeys'
+        - 'arn:aws:apigateway:*::/apikeys/*'
+        - 'arn:aws:apigateway:*::/usageplans/*/keys'
+        - 'arn:aws:apigateway:*::/tags/*'
 ```
-
-
 
 ## Configuring in ReadMe & Testing
 
