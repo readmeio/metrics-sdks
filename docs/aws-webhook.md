@@ -6,24 +6,35 @@ category: 62292aea889520008ed0113b
 
 > 📘 Don't use Amazon API Gateway?
 >
-> This document describes the **Personalized Docs Webhook** setup process for Amazon API Gateway customers. If you manage your API users through other means, check out our [standard Personalized Docs Webhook setup guidance](https://docs.readme.com/main/docs/personalized-docs-webhook).
+> This document describes the **Personalized Docs Webhook** setup process for Amazon API Gateway customers. If you deploy your API or provision your users’ API keys through other means, check out our [standard Personalized Docs Webhook setup guidance](https://docs.readme.com/main/docs/personalized-docs-webhook).
 
-As [previously described](https://docs.readme.com/main/docs/personalized-docs-webhook), you can customize your users' experience in your docs by injecting custom user data into your documentation via the **Personalized Docs Webhook**. This means your developers will be able to easiily locate their API keys within your developer hub and, in this case, you'll also be able to provision API keys for new users.
+As [previously described](https://docs.readme.com/main/docs/personalized-docs-webhook), you can customize your users' experience in your docs via the **Personalized Docs Webhook**. ReadMe’s **Personalized Docs** functionality allows you to surface custom data for your logged-in users (e.g., API keys, server variables, and more), so they can be successful with your API even faster. 🎉
 
-If you plan on using AWS Lambda to deploy your webhook and if you already use Amazon API Gateway to manage API credentials for your users, we have dedicated code samples for you!
+By deploying the Personalized Docs Webhook, your developers will be able to easily locate and toggle between their API keys across the API endpoint pages in your developer hub and, thanks to the power of Amazon API Gateway, you'll also be able to automatically provision API keys for new users.
+
+![ReadMe API Reference endpoint page](https://user-images.githubusercontent.com/8854718/211632962-797b26cd-eb75-4e7d-b9ad-81038575275a.png)
+
+Additionally, once you deploy the Personalized Docs Webhook, you can move on to setting up the [Getting Started and Authentication pages in your hub](https://docs.readme.com/main/docs/reference-core-pages) which will allow your logged-in developers to conveniently see the authentication credentials for all of their available API keys from the comfort of your hub. Using the Try It playground in these top pages of your hub, they’re able to make an authenticated request, and instantly see a response, with their real API keys.
+
+![Getting Started Page in the ReadMe API Reference](https://user-images.githubusercontent.com/8854718/211632966-6bad4eaf-b997-4309-93dc-09ec3e1fab22.gif)
+
+If you plan on using AWS Lambda to deploy your webhook and if you already use Amazon API Gateway to manage API credentials for your users, we have dedicated code samples for you below!
 
 ## Getting Started
 
 To get started, head to [dash.readme.com](https://dash.readme.com) and navigate to your project. Under **Configuration** ➡️ **Personalized Docs** in your project dashboard, select the Amazon API Gateway code sample on the right. You'll see a number of different programming languages and AWS Lambda runtimes.
 
-![Amazon API Gateway in Personalized Docs](https://i.imgur.com/eJhv695.png)
+![Amazon API Gateway in Personalized Docs](https://user-images.githubusercontent.com/8854718/211632968-cf79fc4b-559d-4880-bf03-043e872713fb.png)
 
 Here's an overview of what each code sample does:
 
 - Validates the signature on the incoming webhook request to ensure that it's coming from ReadMe 🦉
 - Automatically looks up the user by their email address, which is contained in the request payload 👀
 - If matching API credentials are found in your API Gateway data, they are sent as a JSON response to ReadMe's webhook request. The credentials will be surfaced on [the Authentication page](https://docs.readme.com/main/docs/reference-core-pages), as well as on any endpoint page in the API Reference so they can make authenticated API requests in a snap 🔑
-- _(Optional)_ Have a new user who hasn't used your API before? No problem! You can automatically provision new API keys for your API Gateway, so that all ReadMe users can try your API from the API Explorer, even if they haven't signed up for anything directly in your service yet 🆕
+
+Have a new user who hasn't used your API before? No problem! You can automatically provision new API keys in your API Gateway, so that anybody can try your API from the API Explorer, even if they haven't signed up for anything directly in your service yet. Just enable the “Provision keys for new users” toggle to add that logic to the code sample.
+
+![“Provision keys for new users” toggle](https://user-images.githubusercontent.com/8854718/211632969-1935241b-dcd8-4e65-ae51-a68313f5ee02.gif)
 
 Follow the steps below to add the Personalized Docs Webhook endpoint to your API 🚀
 
