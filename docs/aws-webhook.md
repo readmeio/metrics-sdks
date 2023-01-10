@@ -10,7 +10,7 @@ category: 62292aea889520008ed0113b
 
 As [previously described](https://docs.readme.com/main/docs/personalized-docs-webhook), you can customize your users' experience in your docs via the **Personalized Docs Webhook**. ReadMe’s **Personalized Docs** functionality allows you to surface custom data for your logged-in users (e.g., API keys, server variables, and more), so they can be successful with your API even faster. 🎉
 
-By deploying the Personalized Docs Webhook, your developers will be able to easily locate and toggle between their API keys across the API endpoint pages in your developer hub and, thanks to the power of Amazon API Gateway, you'll also be able to automatically provision API keys for new users.
+By deploying the Personalized Docs Webhook, your developers will be able to quickly locate and toggle between their API keys across the API endpoint pages in your developer hub and, thanks to the power of Amazon API Gateway, you'll also be able to automatically provision API keys for new users.
 
 ![ReadMe API Reference endpoint page](https://user-images.githubusercontent.com/8854718/211632962-797b26cd-eb75-4e7d-b9ad-81038575275a.png)
 
@@ -32,7 +32,7 @@ Here's an overview of what each code sample does:
 - Automatically looks up the user by their email address, which is contained in the request payload 👀
 - If matching API credentials are found in your API Gateway data, they are sent as a JSON response to ReadMe's webhook request. The credentials will be surfaced on [the Authentication page](https://docs.readme.com/main/docs/reference-core-pages), as well as on any endpoint page in the API Reference so they can make authenticated API requests in a snap 🔑
 
-Have a new user who hasn't used your API before? No problem! You can automatically provision new API keys in your API Gateway, so that anybody can try your API from the API Explorer, even if they haven't signed up for anything directly in your service yet. Just enable the “Provision keys for new users” toggle to add that logic to the code sample.
+Have a new user who hasn't used your API before? No problem! You can automatically provision new API keys in your API Gateway, so that anybody can try your API from the API Explorer, even if they haven't signed up for anything directly in your service yet. Enable the “Provision keys for new users” toggle to add that logic to the code sample.
 
 ![“Provision keys for new users” toggle](https://user-images.githubusercontent.com/8854718/211632969-1935241b-dcd8-4e65-ae51-a68313f5ee02.gif)
 
