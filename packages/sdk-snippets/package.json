@@ -30,7 +30,7 @@
     "watch": "mocha \"src/**/*.test.ts\" -w"
   },
   "dependencies": {
-    "@readme/httpsnippet": "^4.1.1"
+    "@readme/httpsnippet": "^5.0.0"
   },
   "devDependencies": {
     "@readme/eslint-config": "^10.3.1",
