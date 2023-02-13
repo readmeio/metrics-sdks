@@ -1,6 +1,6 @@
 /* eslint-disable mocha/no-setup-in-describe */
-import type { Variables } from '..';
 import type { ClientId, SnippetType, TargetId } from './targets';
+import type { Variables } from '..';
 
 import { readdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
