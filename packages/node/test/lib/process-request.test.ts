@@ -458,9 +458,9 @@ describe('process-request', function () {
     return (
       request(createApp())
         .post('/path')
-        .set({ 'x-forwarded-host': 'dash.readme.io' })
+        .set({ 'x-forwarded-host': 'dash.readme.com' })
         // This regex is for supertest's random port numbers
-        .expect(({ body }) => expect(body.url).to.equal('http://dash.readme.io/path'))
+        .expect(({ body }) => expect(body.url).to.equal('http://dash.readme.com/path'))
     );
   });
 

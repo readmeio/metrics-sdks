@@ -17,7 +17,7 @@ class Metrics
 {
     protected const PACKAGE_NAME = 'readme/metrics';
     protected const METRICS_SERVER = 'https://metrics.readme.io';
-    protected const README_API = 'https://dash.readme.io';
+    protected const README_API = 'https://dash.readme.com';
 
     private bool $development_mode = false;
     private array $denylist = [];

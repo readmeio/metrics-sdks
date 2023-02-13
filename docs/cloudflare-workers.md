@@ -62,7 +62,7 @@ To install:
 1. Click the blue "Preview on your site" button.
 2. In the page that opens, which allows you to sign in to ReadMe via OAuth:
    - Select your project
-   - Give Cloudflare your doc project's API key (which you can find at `https://dash.readme.io/yourProject/api-key`)
+   - Give Cloudflare your doc project's API key (which you can find at `https://dash.readme.com/yourProject/api-key`)
    - Configure which routes the worker should be applied to, i.e., which API routes you want to get usage metrics about.
 
 ![Cloudflare App installation](https://files.readme.io/5f77c35-readme.png)

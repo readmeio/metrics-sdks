@@ -3,7 +3,7 @@
 return [
     /**
      * Your ReadMe API key. You can find this within your project configuration
-     * on https://dash.readme.io/.
+     * on https://dash.readme.com/.
      */
     'api_key' => 'YOUR README API KEY',
 
