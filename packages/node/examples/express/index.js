@@ -55,7 +55,7 @@ app.post('/webhook', express.json({ type: 'application/json' }), async (req, res
   });
 });
 
-const server = app.listen(port, '0.0.0.0', function () {
+const server = app.listen(port, '0.0.0.0', () => {
   // eslint-disable-next-line no-console
   console.log('Example app listening at http://%s:%s', server.address().address, port);
 });
