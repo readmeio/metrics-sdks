@@ -9,7 +9,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "fastify": "^4.8.1",
+    "fastify": "^4.13.0",
     "readmeio": "file:../.."
   }
 }
