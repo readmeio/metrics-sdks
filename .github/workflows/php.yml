@@ -39,7 +39,6 @@ jobs:
           - 8.2 # EOL: December 8th, 2025
         # https://endoflife.date/laravel
         laravel:
-          - 8.* # EOL: January 24th, 2023
           - 9.* # EOL: February 8th, 2024
           - 10.* # EOL: February 4th, 2025
 
