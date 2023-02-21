@@ -40,6 +40,57 @@ jobs:
         # https://endoflife.date/laravel
         laravel:
           - 9.* # EOL: February 8th, 2024
+
+    name: build (${{ matrix.php }} w/ Laravel ${{ matrix.laravel }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache dependencies
+        uses: actions/cache@v3.2.4
+        with:
+          path: ~/.composer/cache/files
+          key: dependencies-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+
+      # Installing a specific version of Laravel will force us to use compatible versions of
+      # `illuminate/http` and `illuminate/support`. If we didn't do this step then we'd always only
+      # ever test on the latest versions of those two packages.
+      - name: Install dependencies
+        run: |
+          composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
+          composer update --prefer-stable --prefer-dist --no-interaction --no-suggest
+
+      - name: Check code standards
+        run: make lint
+
+      - name: Run static analysis
+        run: |
+          make static-analysis
+          make taint-analysis
+
+      - name: Run tests
+        run: make test
+
+  build-laravel10:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/php
+
+    strategy:
+      fail-fast: true
+      matrix:
+        # https://endoflife.date/php
+        php:
+          - 8.1 # EOL: November 25th, 2024
+          - 8.2 # EOL: December 8th, 2025
+        # https://endoflife.date/laravel
+        laravel:
           - 10.* # EOL: February 4th, 2025
 
     name: build (${{ matrix.php }} w/ Laravel ${{ matrix.laravel }}
