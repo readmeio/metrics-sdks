@@ -226,8 +226,10 @@ describe('#metrics', function () {
   });
 
   describe('#timeout', function () {
+    // eslint-disable-next-line mocha/no-pending-tests, mocha/no-skipped-tests
     it.skip('should silently fail metrics requests if they take longer than the timeout');
 
+    // eslint-disable-next-line mocha/no-pending-tests, mocha/no-skipped-tests
     it.skip('should silently fail baseLogUrl requests if they take longer than the timeout');
   });
 
