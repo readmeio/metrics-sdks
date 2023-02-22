@@ -1,5 +1,6 @@
 import type { Target } from '../targets';
 
+import { aws } from './aws/webhooks/client';
 import { express } from './express/webhooks/client';
 
 export const node: Target = {
@@ -14,6 +15,7 @@ export const node: Target = {
     server: {},
     webhooks: {
       express,
+      aws,
     },
   },
 };

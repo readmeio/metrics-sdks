@@ -1,7 +1,7 @@
 ---
 title: PHP (Laravel) Setup
 slug: sending-logs-to-readme-with-php-laravel
-category: 5f7cefc76b6e5e04c3a4c74c
+category: 62292aea889520008ed0113b
 ---
 
 > 🚀 Upgrading to v2.0?
@@ -62,7 +62,7 @@ protected $middlewareGroups = [
 ```
 
 4. Configure the middleware in the newly created configuration file from step 2: `config/readme.php`:
-   - Change `YOUR README API KEY` to <<user>>. If you're currently logged into these docs, you can see your ReadMe API key in the preceding sentence; otherwise, you can find it at `https://dash.readme.io/project/YOUR PROJECT/api-key`.
+   - Change `YOUR README API KEY` to <<user>>. If you're currently logged into these docs, you can see your ReadMe API key in the preceding sentence; otherwise, you can find it at `https://dash.readme.com/project/YOUR PROJECT/api-key`.
 5. Modify the `constructGroup` function in the newly created `app/Handler/ReadMe.php` handler to return data specific to your API. See [Identfying the API Caller](#section-identifying-the-api-caller) for detailed instructions.
 
 ## Identifying the API Caller

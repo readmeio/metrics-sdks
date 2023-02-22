@@ -31,13 +31,13 @@ export function patchRequest(req: ExtendedIncomingMessage) {
   if (isRequest(req, 'text/*')) {
     req._text = '';
     req.setEncoding('utf8');
-    req.on('data', function (chunk) {
+    req.on('data', chunk => {
       if (chunk) req._text += chunk;
     });
   } else if (isRequest(req, '+json')) {
     req._json = '';
     req.setEncoding('utf8');
-    req.on('data', function (chunk) {
+    req.on('data', chunk => {
       if (chunk) req._json += chunk;
     });
   } else if (isRequest(req, 'application/x-www-form-urlencoded')) {

@@ -1,7 +1,7 @@
 ---
 title: .NET Setup
 slug: net-setup
-category: 5f7cefc76b6e5e04c3a4c74c
+category: 62292aea889520008ed0113b
 ---
 
 > 🚧 Any issues?

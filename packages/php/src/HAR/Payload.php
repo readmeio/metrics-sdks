@@ -78,6 +78,9 @@ class Payload
      *
      * @psalm-suppress PossiblyInvalidArgument Psalm doesn't like our `$request->post()` and
      *      `$request->query()` calls as it thinks they need arguments. They don't.
+     * @psalm-suppress DeprecatedMethod `Request::getContentType()` is deprecated and we should use
+     *      `Request::getContentTypeFormat()` instead but `getContentTypeFormat` isn't available
+     *      in all versions of Laravel that we support.
      * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#request}
      */
     private function processRequest(Request $request): array

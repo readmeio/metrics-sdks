@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://pypi.org/project/readme-metrics/"><img src="https://img.shields.io/pypi/v/readme-metrics.svg?style=for-the-badge" alt="Latest release"></a>
-  <a href="https://github.com/readmeio/metrics-sdks"><img src="https://img.shields.io/github/workflow/status/readmeio/metrics-sdks/python.svg?style=for-the-badge" alt="Build status"></a>
+  <a href="https://github.com/readmeio/metrics-sdks"><img src="https://img.shields.io/github/actions/workflow/status/readmeio/metrics-sdks/python.yml?branch=main&style=for-the-badge" alt="Build status"></a>
 </p>
 
 With [ReadMe's Metrics API](https://readme.com/metrics) your team can get deep insights into your API's usage. If you're a developer, it takes a few small steps to send your API logs to [ReadMe](http://readme.com). Here's an overview of how the integration works:

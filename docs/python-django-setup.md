@@ -1,7 +1,7 @@
 ---
 title: Python (Django) Setup
 slug: python-django-api-metrics
-category: 5f7cefc76b6e5e04c3a4c74c
+category: 62292aea889520008ed0113b
 ---
 
 > 🚧 Any issues?
@@ -55,7 +55,7 @@ README_METRICS_CONFIG = MetricsApiConfig(
 
 The `MetricsApiConfig` object takes the following parameters:
 
-- Your ReadMe API Key. If you're [logged in](https://dash.readme.io/to/metrics) to these docs, this string is automatically populated in the preceeding code.
+- Your ReadMe API Key. If you're [logged in](https://dash.readme.com/to/metrics) to these docs, this string is automatically populated in the preceeding code.
 - A function that takes the `Request` object and returns a `dict` describing the user, or `None` if the request should not be logged
 - Additional options: see details [below](#section-configuration-options)
 
