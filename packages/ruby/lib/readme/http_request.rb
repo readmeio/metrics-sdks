@@ -15,6 +15,7 @@ module Readme
 
     def initialize(env)
       @request = Rack::Request.new(env)
+      @input = Rack::RewindableInput.new(@request.body)
     end
 
     def url
@@ -64,7 +65,9 @@ module Readme
     end
 
     def body
-      @request.body.read
+      body = @input.read
+      @input.rewind
+      body
     end
 
     def parsed_form_data
