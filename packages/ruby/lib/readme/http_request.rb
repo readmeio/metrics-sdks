@@ -64,8 +64,7 @@ module Readme
     end
 
     def body
-      input = Rack::RewindableInput.new(@request)
-      input.rewind
+      @request.body.read
     end
 
     def parsed_form_data
