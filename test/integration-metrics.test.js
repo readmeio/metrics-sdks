@@ -44,9 +44,12 @@ function isListening(port, attempt = 0) {
   });
 }
 
-describe('Metrics SDK Integration Tests', function () {
-  // this.retries(2);
+function sleep(ms) {
+  // eslint-disable-next-line no-promise-executor-return
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
+describe('Metrics SDK Integration Tests', function () {
   const sockets = new Set();
 
   let server;
@@ -55,24 +58,14 @@ describe('Metrics SDK Integration Tests', function () {
     body: {},
   };
 
-  async function getBody(response) {
-    let responseBody = '';
-    for await (const chunk of response) {
-      responseBody += chunk;
-    }
-
-    expect(responseBody).not.to.equal('');
-    return JSON.parse(responseBody);
-  }
-
   async function getRequest() {
-    if (process.env.HAS_HTTP_QUIRKS) {
-      return [sdkCall.req, sdkCall.body];
+    // Make sure the request has completed and the body has been
+    // parsed before returning
+    if (!sdkCall.req.complete) {
+      await sleep(300);
+      return getRequest();
     }
-
-    const [req] = await once(server, 'request');
-    const body = await getBody(req);
-    return [req, body];
+    return [sdkCall.req, sdkCall.body];
   }
 
   beforeEach(function () {
@@ -87,28 +80,18 @@ describe('Metrics SDK Integration Tests', function () {
 
     server = http
       .createServer((req, res) => {
-        // Frameworks are funny. If we run this test suite with PHP we can access our Metrics
-        // request payload via a `request` event immediately on the HTTP server however if we run
-        // this same suite with Python, the `request` event sometimes gets emitted **after** we've
-        // already returned a response and closed the connection, resulting in our request payload
-        // being empty and the SDK in question crapping out with a connection read error.
-        //
-        // This quirk doesn't make sense and this logic here is extremely yikes but hey this test
-        // suite works now across all of our SDKs and is no longer flaky.
-        if (process.env.HAS_HTTP_QUIRKS) {
-          sdkCall.req = req;
+        sdkCall.req = req;
 
-          let body = '';
-          req.on('data', chunk => {
-            body += chunk;
-          });
+        let body = '';
+        req.on('data', chunk => {
+          body += chunk;
+        });
 
-          req.on('end', () => {
-            sdkCall.body = JSON.parse(body);
-            res.writeHead(200);
-            res.end();
-          });
-        }
+        req.on('end', () => {
+          sdkCall.body = JSON.parse(body);
+          res.writeHead(200);
+          res.end();
+        });
       })
       .listen(8001, '0.0.0.0');
 
