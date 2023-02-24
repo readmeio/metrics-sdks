@@ -12,6 +12,7 @@ RUN apk add php81 \
     php81-opcache \
     php81-openssl \
     php81-phar \
+    php81-session \
     php81-simplexml \
     php81-tokenizer \
     php81-xml \
