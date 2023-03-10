@@ -8,13 +8,14 @@ module Readme
 
     HTTP_NON_HEADERS = [
       Rack::HTTP_COOKIE,
-      Rack::HTTP_VERSION,
+      Rack::SERVER_PROTOCOL,
       Rack::HTTP_HOST,
       Rack::HTTP_PORT
     ].freeze
 
     def initialize(env)
       @request = Rack::Request.new(env)
+      @input = Rack::RewindableInput.new(@request.body)
     end
 
     def url
@@ -30,7 +31,7 @@ module Readme
     end
 
     def http_version
-      @request.get_header(Rack::HTTP_VERSION)
+      @request.get_header(Rack::SERVER_PROTOCOL)
     end
 
     def request_method
@@ -64,11 +65,9 @@ module Readme
     end
 
     def body
-      @request.body.rewind
-      content = @request.body.read
-      @request.body.rewind
-
-      content
+      body = @input.read
+      @input.rewind
+      body
     end
 
     def parsed_form_data
