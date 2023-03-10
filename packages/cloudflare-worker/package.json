@@ -27,7 +27,7 @@
     "url": "git@github.com:readmeio/metrics-sdks.git"
   },
   "devDependencies": {
-    "@readme/eslint-config": "^10.0.0",
+    "@readme/eslint-config": "^10.5.1",
     "chai": "^4.3.6",
     "eslint": "^8.21.0",
     "mocha": "^10.0.0",
