@@ -77,6 +77,8 @@ GEM
     crass (1.0.6)
     date (3.3.3)
     debug (1.7.1)
+      irb (>= 1.5.0)
+      reline (>= 0.3.1)
     erubi (1.12.0)
     globalid (1.1.0)
       activesupport (>= 5.0)
@@ -85,6 +87,9 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.12.0)
       concurrent-ruby (~> 1.0)
+    io-console (0.6.0)
+    irb (1.6.3)
+      reline (>= 0.3.0)
     loofah (2.19.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -147,6 +152,8 @@ GEM
       thor (~> 1.0)
       zeitwerk (~> 2.5)
     rake (13.0.6)
+    reline (0.3.2)
+      io-console (~> 0.5)
     sqlite3 (1.6.1)
       mini_portile2 (~> 2.8.0)
     sqlite3 (1.6.1-arm64-darwin)
@@ -170,9 +177,6 @@ DEPENDENCIES
   readme-metrics!
   sqlite3 (~> 1.4)
   tzinfo-data
-
-RUBY VERSION
-   ruby 3.2.1p31
 
 BUNDLED WITH
    2.3.11
