@@ -94,7 +94,7 @@ class Payload
                     static::convertFileObjectForArray($this->sanitizeInputPerConfig($request->allFiles()))
                 ),
             ];
-        } elseif ($request->getContentTypeFormat() === 'form') {
+        } elseif (in_array($content_type, ['application/x-www-form-urlencoded', 'multipart/form-data'])) {
             $post_data = [
                 'mimeType' => $content_type,
                 'params' => static::convertObjectToArray(
