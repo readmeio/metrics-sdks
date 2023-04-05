@@ -68,12 +68,12 @@ test-webhooks-php-laravel: ## Run webhooks tests against the PHP SDK + Laravel
 
 test-metrics-python-django: ## Run Metrics tests against the Python SDK + Django
 	docker-compose up --build --detach integration_metrics_python_django
-	npm run test:integration-metrics || make cleanup-failure
+	HAS_HTTP_QUIRKS=true npm run test:integration-metrics || make cleanup-failure
 	@make cleanup
 
 test-metrics-python-flask: ## Run Metrics tests against the Python SDK + Flask
 	docker-compose up --build --detach integration_python_flask_metrics
-	npm run test:integration-metrics || make cleanup-failure
+	HAS_HTTP_QUIRKS=true npm run test:integration-metrics || make cleanup-failure
 	@make cleanup
 
 test-webhooks-python-flask: ## Run webhooks tests against the Python SDK + Flask
