@@ -6,11 +6,19 @@ require 'securerandom'
 # rubocop:disable Lint/UnusedMethodArgument
 class JsonApp
   def call(env)
-    [
-      200,
-      { 'Content-Type' => 'application/json', 'Content-Length' => '15' },
-      [{ key: 'value' }.to_json]
-    ]
+    if Readme::HttpRequest::IS_RACK_V3
+      [
+        200,
+        { 'content-type' => 'application/json', 'content-length' => '15' },
+        [{ key: 'value' }.to_json]
+      ]
+    else
+      [
+        200,
+        { 'Content-Type' => 'application/json', 'Content-Length' => '15' },
+        [{ key: 'value' }.to_json]
+      ]
+    end
   end
 end
 
@@ -112,9 +120,10 @@ RSpec.describe Readme::Metrics do
     it "doesn't modify the response" do
       post '/'
 
+      response_without_middleware = noop_app.call(double)
       response_with_middleware = mock_response_to_raw(last_response)
 
-      expect(response_with_middleware).to eq [200, { 'content-length' => '15', 'content-type' => 'application/json' }, ['{"key":"value"}']]
+      expect(response_with_middleware).to eq response_without_middleware
     end
 
     it 'submits to the Readme API for POST requests with a JSON body' do
