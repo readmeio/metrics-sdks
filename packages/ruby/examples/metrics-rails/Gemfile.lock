@@ -157,18 +157,11 @@ GEM
       thor (~> 1.0)
       zeitwerk (~> 2.5)
     rake (13.0.6)
-<<<<<<< HEAD
     reline (0.3.2)
       io-console (~> 0.5)
     sqlite3 (1.6.1)
       mini_portile2 (~> 2.8.0)
     sqlite3 (1.6.1-arm64-darwin)
-=======
-    reline (0.3.1)
-      io-console (~> 0.5)
-    sqlite3 (1.4.4)
-    strscan (3.0.4)
->>>>>>> parent of f894736 (chore: update Gemfile and Gemfile.lock)
     thor (1.2.1)
     timeout (0.3.0)
     tzinfo (2.0.5)
@@ -190,11 +183,5 @@ DEPENDENCIES
   sqlite3 (~> 1.4)
   tzinfo-data
 
-<<<<<<< HEAD
-=======
-RUBY VERSION
-   ruby 3.1.2p20
-
->>>>>>> parent of f894736 (chore: update Gemfile and Gemfile.lock)
 BUNDLED WITH
    2.3.11
