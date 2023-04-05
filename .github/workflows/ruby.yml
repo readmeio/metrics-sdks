@@ -37,6 +37,11 @@ jobs:
           - 2.7 # EOL: March 31st, 2023
           - '3.0' # EOL: March 31st, 2024
           - 3.1 # EOL: December 25th, 2025
+        rack-version:
+          - 2.x
+          - 3.x
+
+    name: build (${{ matrix.ruby-version }} w/ Rack ${{ matrix.rack-version }}
 
     steps:
       - uses: actions/checkout@v3
@@ -45,7 +50,9 @@ jobs:
           ruby-version: ${{ matrix.ruby-version }}
 
       - name: Install dependencies
-        run: make install
+        run: |
+          make install
+          gem install rack -v ${{ matrix.rack-version }}
 
       - name: Run linter
         run: make lint
