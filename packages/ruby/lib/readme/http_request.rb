@@ -6,13 +6,15 @@ module Readme
   class HttpRequest
     include ContentTypeHelper
 
-    IS_RACK_V3 = Gem.loaded_specs["rack"].version > Gem::Version.create('3.0')
+    IS_RACK_V3 = Gem.loaded_specs['rack'].version > Gem::Version.create('3.0')
 
+    # rubocop:disable Style/MutableConstant
     HTTP_NON_HEADERS = [
       Rack::HTTP_COOKIE,
       Rack::HTTP_HOST,
       Rack::HTTP_PORT
     ]
+    # rubocop:enable Style/MutableConstant
 
     if IS_RACK_V3
       HTTP_NON_HEADERS.push(Rack::SERVER_PROTOCOL)
@@ -24,9 +26,9 @@ module Readme
 
     def initialize(env)
       @request = Rack::Request.new(env)
-      if IS_RACK_V3
-        @input = Rack::RewindableInput.new(@request.body)
-      end
+      return unless IS_RACK_V3
+
+      @input = Rack::RewindableInput.new(@request.body)
     end
 
     def url

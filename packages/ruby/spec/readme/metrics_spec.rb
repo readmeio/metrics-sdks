@@ -44,11 +44,11 @@ class SetHttpVersion
   end
 
   def call(env)
-    if Readme::HttpRequest::IS_RACK_V3
-      new_env = env.merge({ 'SERVER_PROTOCOL' => 'HTTP/1.1' })
-    else
-      new_env = env.merge({ 'HTTP_VERSION' => 'HTTP/1.1' })
-    end
+    new_env = if Readme::HttpRequest::IS_RACK_V3
+                env.merge({ 'SERVER_PROTOCOL' => 'HTTP/1.1' })
+              else
+                env.merge({ 'HTTP_VERSION' => 'HTTP/1.1' })
+              end
 
     @app.call(new_env)
   end
