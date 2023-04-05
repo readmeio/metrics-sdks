@@ -26,19 +26,19 @@ RSpec.describe Readme::Har::RequestSerializer do
       expect(json.dig(:postData, :mimeType)).to eq http_request.content_type
       expect(json[:headersSize]).to eq(-1)
       expect(json[:bodySize]).to eq http_request.content_length
-      expect(json[:headers]).to contain_exactly(
+      expect(json[:headers]).to match_array(
         [
           { name: 'Authorization', value: 'Basic abc123' },
           { name: 'X-Custom', value: 'custom' }
         ]
       )
-      expect(json[:queryString]).to contain_exactly(
+      expect(json[:queryString]).to match_array(
         [
           { name: 'id', value: '1' },
           { name: 'name', value: 'joel' }
         ]
       )
-      expect(json[:cookies]).to contain_exactly(
+      expect(json[:cookies]).to match_array(
         [
           { name: 'cookie1', value: 'value1' },
           { name: 'cookie2', value: 'value2' }
@@ -88,7 +88,7 @@ RSpec.describe Readme::Har::RequestSerializer do
 
       expect(json[:postData]).not_to have_key(:text)
       expect(json.dig(:postData, :mimeType)).to eq http_request.content_type
-      expect(json.dig(:postData, :params)).to contain_exactly(
+      expect(json.dig(:postData, :params)).to match_array(
         [
           { name: 'item', value: '1' },
           { name: 'other', value: '2' },
