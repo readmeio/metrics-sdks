@@ -6,15 +6,29 @@ module Readme
   class HttpRequest
     include ContentTypeHelper
 
+    IS_RACK_V3 = Gem.loaded_specs['rack'].version > Gem::Version.create('3.0')
+
+    # rubocop:disable Style/MutableConstant
     HTTP_NON_HEADERS = [
       Rack::HTTP_COOKIE,
-      Rack::HTTP_VERSION,
       Rack::HTTP_HOST,
       Rack::HTTP_PORT
-    ].freeze
+    ]
+    # rubocop:enable Style/MutableConstant
+
+    if IS_RACK_V3
+      HTTP_NON_HEADERS.push(Rack::SERVER_PROTOCOL)
+    else
+      HTTP_NON_HEADERS.push(Rack::HTTP_VERSION)
+    end
+
+    HTTP_NON_HEADERS.freeze
 
     def initialize(env)
       @request = Rack::Request.new(env)
+      return unless IS_RACK_V3
+
+      @input = Rack::RewindableInput.new(@request.body)
     end
 
     def url
@@ -30,7 +44,11 @@ module Readme
     end
 
     def http_version
-      @request.get_header(Rack::HTTP_VERSION)
+      if IS_RACK_V3
+        @request.get_header(Rack::SERVER_PROTOCOL)
+      else
+        @request.get_header(Rack::HTTP_VERSION)
+      end
     end
 
     def request_method
@@ -64,11 +82,17 @@ module Readme
     end
 
     def body
-      @request.body.rewind
-      content = @request.body.read
-      @request.body.rewind
+      if IS_RACK_V3
+        body = @input.read
+        @input.rewind
+        body
+      else
+        @request.body.rewind
+        content = @request.body.read
+        @request.body.rewind
 
-      content
+        content
+      end
     end
 
     def parsed_form_data
