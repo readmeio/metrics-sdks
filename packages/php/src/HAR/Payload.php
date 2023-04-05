@@ -79,6 +79,11 @@ class Payload
      * @psalm-suppress PossiblyInvalidArgument Psalm doesn't like our `$request->post()` and
      *      `$request->query()` calls as it thinks they need arguments. They don't.
      * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#request}
+     * 
+     * @psalm-suppress DeprecatedMethod `$request->getContentType()` is deprecated 
+     *      but the alternative isn't supported in some of the older versions that
+     *      we support. Just going to ignore this for now until we can remove
+     *      support for older versions and move over to the new function.
      */
     private function processRequest(Request $request): array
     {
@@ -94,7 +99,7 @@ class Payload
                     static::convertFileObjectForArray($this->sanitizeInputPerConfig($request->allFiles()))
                 ),
             ];
-        } elseif (in_array($content_type, ['application/x-www-form-urlencoded', 'multipart/form-data'])) {
+        } elseif ($request->getContentType() === 'form') {
             $post_data = [
                 'mimeType' => $content_type,
                 'params' => static::convertObjectToArray(
