@@ -82,6 +82,11 @@ class Payload
      *      `Request::getContentTypeFormat()` instead but `getContentTypeFormat` isn't available
      *      in all versions of Laravel that we support.
      * @see {@link https://github.com/ahmadnassri/har-spec/blob/master/versions/1.2.md#request}
+     *
+     * @psalm-suppress DeprecatedMethod `$request->getContentType()` is deprecated
+     *      but the alternative isn't supported in some of the older versions that
+     *      we support. Just going to ignore this for now until we can remove
+     *      support for older versions and move over to the new function.
      */
     private function processRequest(Request $request): array
     {
