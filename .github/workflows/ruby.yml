@@ -38,8 +38,8 @@ jobs:
           - '3.0' # EOL: March 31st, 2024
           - 3.1 # EOL: December 25th, 2025
         rack-version:
-          - 2.x
-          - 3.x
+          - 2
+          - 3
 
     name: build (${{ matrix.ruby-version }} w/ Rack ${{ matrix.rack-version }}
 
