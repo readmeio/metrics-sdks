@@ -27,22 +27,16 @@ RSpec.describe Readme::Har::RequestSerializer do
       expect(json[:headersSize]).to eq(-1)
       expect(json[:bodySize]).to eq http_request.content_length
       expect(json[:headers]).to contain_exactly(
-        [
-          { name: 'Authorization', value: 'Basic abc123' },
-          { name: 'X-Custom', value: 'custom' }
-        ]
+        { name: 'Authorization', value: 'Basic abc123' },
+        { name: 'X-Custom', value: 'custom' }
       )
       expect(json[:queryString]).to contain_exactly(
-        [
-          { name: 'id', value: '1' },
-          { name: 'name', value: 'joel' }
-        ]
+        { name: 'id', value: '1' },
+        { name: 'name', value: 'joel' }
       )
       expect(json[:cookies]).to contain_exactly(
-        [
-          { name: 'cookie1', value: 'value1' },
-          { name: 'cookie2', value: 'value2' }
-        ]
+        { name: 'cookie1', value: 'value1' },
+        { name: 'cookie2', value: 'value2' }
       )
     end
 
@@ -89,11 +83,9 @@ RSpec.describe Readme::Har::RequestSerializer do
       expect(json[:postData]).not_to have_key(:text)
       expect(json.dig(:postData, :mimeType)).to eq http_request.content_type
       expect(json.dig(:postData, :params)).to contain_exactly(
-        [
-          { name: 'item', value: '1' },
-          { name: 'other', value: '2' },
-          { name: 'reject', value: '[REDACTED 1]' }
-        ]
+        { name: 'item', value: '1' },
+        { name: 'other', value: '2' },
+        { name: 'reject', value: '[REDACTED 1]' }
       )
     end
 

@@ -64,7 +64,11 @@ RSpec.describe Readme::HttpRequest do
 
   describe '#http_version' do
     it 'gets the version from the proper Rack header' do
-      env = { 'HTTP_VERSION' => 'HTTP/1.1' }
+      if Readme::HttpRequest::IS_RACK_V3
+        env = { 'SERVER_PROTOCOL' => 'HTTP/1.1' }
+      else
+        env = { 'HTTP_VERSION' => 'HTTP/1.1' }
+      end
       request = described_class.new(env)
 
       expect(request.http_version).to eq 'HTTP/1.1'
@@ -133,7 +137,6 @@ RSpec.describe Readme::HttpRequest do
     it 'is the normalized Rack HTTP_ keys minus a few non-header ones plus content type and length' do
       env = {
         'HTTP_COOKIE' => 'cookie1=value1; cookie2=value2',
-        'HTTP_VERSION' => 'HTTP/1.1',
         'HTTP_X_CUSTOM' => 'custom',
         'HTTP_ACCEPT' => 'text/plain',
         'HTTP_PORT' => '8080',
@@ -141,6 +144,11 @@ RSpec.describe Readme::HttpRequest do
         'CONTENT_TYPE' => 'application/json',
         'CONTENT_LENGTH' => '10'
       }
+
+      if not Readme::HttpRequest::IS_RACK_V3
+        env['HTTP_VERSION'] = 'HTTP/1.1'
+      end
+
       request = described_class.new(env)
 
       expect(request.headers).to eq(
@@ -157,18 +165,31 @@ RSpec.describe Readme::HttpRequest do
 
   describe '#body' do
     it 'reads the body from the rack.input key' do
-      env = {
-        'rack.input' => Rack::Lint::InputWrapper.new(StringIO.new('[BODY]'))
-      }
+      if Readme::HttpRequest::IS_RACK_V3
+        env = {
+          'rack.input' => Rack::Lint::Wrapper::InputWrapper.new(StringIO.new('[BODY]'))
+        }
+      else
+        env = {
+          'rack.input' => Rack::Lint::InputWrapper.new(StringIO.new('[BODY]'))
+        }
+      end
+
       request = described_class.new(env)
 
       expect(request.body).to eq '[BODY]'
     end
 
     it 'can be read safely multiple times' do
-      env = {
-        'rack.input' => Rack::Lint::InputWrapper.new(StringIO.new('[BODY]'))
-      }
+      if Readme::HttpRequest::IS_RACK_V3
+        env = {
+          'rack.input' => Rack::Lint::Wrapper::InputWrapper.new(StringIO.new('[BODY]'))
+        }
+      else
+        env = {
+          'rack.input' => Rack::Lint::InputWrapper.new(StringIO.new('[BODY]'))
+        }
+      end
       request = described_class.new(env)
 
       expect(request.body).to eq '[BODY]'
@@ -178,10 +199,17 @@ RSpec.describe Readme::HttpRequest do
 
   describe '#parsed_form_data' do
     it 'returns the parsed form-encoded body as a hash' do
-      env = {
-        'CONTENT_TYPE' => 'application/x-www-form-urlencoded',
-        'rack.input' => Rack::Lint::InputWrapper.new(StringIO.new('first=1&second=2'))
-      }
+      if Readme::HttpRequest::IS_RACK_V3
+        env = {
+          'CONTENT_TYPE' => 'application/x-www-form-urlencoded',
+          'rack.input' => Rack::Lint::Wrapper::InputWrapper.new(StringIO.new('first=1&second=2'))
+        }
+      else
+        env = {
+          'CONTENT_TYPE' => 'application/x-www-form-urlencoded',
+          'rack.input' => Rack::Lint::InputWrapper.new(StringIO.new('first=1&second=2'))
+        }
+      end
 
       request = described_class.new(env)
 

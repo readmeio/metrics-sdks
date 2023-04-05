@@ -16,7 +16,7 @@ end
 
 class TextApp
   def call(env)
-    [200, { 'Content-Type' => 'text/plain', 'Content-Lengt' => '2' }, ['OK']]
+    [200, { 'Content-Type' => 'text/plain', 'Content-Length' => '2' }, ['OK']]
   end
 end
 
@@ -27,7 +27,7 @@ class EmptyApp
 end
 # rubocop:enable Lint/UnusedMethodArgument
 
-# Rack::Test doesn't set the HTTP_VERSION header on requests, even though
+# Rack::Test doesn't set the SERVER_PROTOCOL header on requests, even though
 # real-world implementations of Rack servers do so. This middleware adds the
 # proper header to the env.
 class SetHttpVersion
@@ -36,7 +36,12 @@ class SetHttpVersion
   end
 
   def call(env)
-    new_env = env.merge({ 'HTTP_VERSION' => 'HTTP/1.1' })
+    if Readme::HttpRequest::IS_RACK_V3
+      new_env = env.merge({ 'SERVER_PROTOCOL' => 'HTTP/1.1' })
+    else
+      new_env = env.merge({ 'HTTP_VERSION' => 'HTTP/1.1' })
+    end
+
     @app.call(new_env)
   end
 end
@@ -107,10 +112,9 @@ RSpec.describe Readme::Metrics do
     it "doesn't modify the response" do
       post '/'
 
-      response_without_middleware = noop_app.call(double)
       response_with_middleware = mock_response_to_raw(last_response)
 
-      expect(response_with_middleware).to eq response_without_middleware
+      expect(response_with_middleware).to eq [200, { 'content-length' => '15', 'content-type' => 'application/json' }, ['{"key":"value"}']]
     end
 
     it 'submits to the Readme API for POST requests with a JSON body' do
