@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 
 class VerifyWebhook:
-    def __init__(self, body, signature, secret):
+    def __init__(self, body: dict, signature: str, secret: str):
         if signature is None:
             raise Exception("Missing Signature")
 
@@ -22,7 +22,7 @@ class VerifyWebhook:
 
         unsigned = time + "." + json.dumps(body, separators=(",", ":"))
         verify_signature = hmac.new(
-            secret,
+            secret.encode("utf-8", errors="ignore"),
             unsigned.encode("utf8"),
             "sha256",
         ).hexdigest()
