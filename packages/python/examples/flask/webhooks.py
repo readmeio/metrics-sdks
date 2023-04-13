@@ -11,7 +11,7 @@ if os.getenv("README_API_KEY") is None:
 app = Flask(__name__)
 
 # Your ReadMe secret
-secret = os.getenv("README_API_KEY").encode("utf8")
+secret = os.getenv("README_API_KEY")
 
 
 @app.post("/webhook")
@@ -20,7 +20,7 @@ def webhook():
     signature = request.headers.get("readme-signature", None)
 
     try:
-        VerifyWebhook(request.get_json(), signature, bytes(secret, encoding="utf-8"))
+        VerifyWebhook(request.get_json(), signature, secret)
     except Exception as error:
         return (
             {"error": str(error)},
