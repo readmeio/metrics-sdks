@@ -20,7 +20,7 @@ def webhook():
     signature = request.headers.get("readme-signature", None)
 
     try:
-        VerifyWebhook(request.get_json(), signature, bytes(secret,encoding='utf-8'))
+        VerifyWebhook(request.get_json(), signature, bytes(secret, encoding="utf-8"))
     except Exception as error:
         return (
             {"error": str(error)},
