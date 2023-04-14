@@ -11,7 +11,7 @@ if os.getenv("README_API_KEY") is None:
 app = Flask(__name__)
 
 # Your ReadMe secret
-secret = os.getenv("README_API_KEY").encode("utf8")
+secret = os.getenv("README_API_KEY")
 
 
 @app.post("/webhook")
