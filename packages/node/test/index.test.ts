@@ -12,6 +12,7 @@ import pkg from '../package.json';
 import * as readmeio from '../src';
 import config from '../src/config';
 import { getCache } from '../src/lib/get-project-base-url';
+import { setBackoff } from '../src/lib/metrics-log';
 
 import chaiPlugins from './helpers/chai-plugins';
 import { getReadMeApiMock } from './lib/get-project-base-url.test';
@@ -91,37 +92,76 @@ describe('#metrics', function () {
       });
   });
 
-  it('should send a request to the metrics server', function () {
-    const mock = nock(config.host, {
-      reqheaders: {
-        'Content-Type': 'application/json',
-        'User-Agent': `${pkg.name}/${pkg.version}`,
-      },
-    })
-      .post('/v1/request', ([body]) => {
-        expect(body._version).to.equal(3);
-        expect(body.group).to.deep.equal(outgoingGroup);
-        expect(typeof body.request.log.entries[0].startedDateTime).to.equal('string');
-        return true;
+  describe('tests for sending requests to the metrics server', function () {
+    let mock;
+    let metricsServerRequests;
+    let app;
+    let metricsServerResponseCode = 202;
+
+    beforeEach(function () {
+      metricsServerRequests = 0;
+      mock = nock(config.host, {
+        reqheaders: {
+          'Content-Type': 'application/json',
+          'User-Agent': `${pkg.name}/${pkg.version}`,
+        },
       })
-      .basicAuth({ user: apiKey })
-      .reply(200);
+        .post('/v1/request', ([body]) => {
+          metricsServerRequests += 1;
+          expect(body._version).to.equal(3);
+          expect(body.group).to.deep.equal(outgoingGroup);
+          expect(typeof body.request.log.entries[0].startedDateTime).to.equal('string');
+          return true;
+        })
+        .basicAuth({ user: apiKey })
+        .reply(() => {
+          return [metricsServerResponseCode, ''];
+        })
+        .persist();
 
-    const app = express();
-    app.use((req, res, next) => {
-      const logId = readmeio.log(apiKey, req, res, incomingGroup);
-      res.setHeader('x-log-id', logId);
-      return next();
-    });
-    app.get('/test', (req, res) => res.sendStatus(200));
-
-    return request(app)
-      .get('/test')
-      .expect(200)
-      .expect('x-log-id', /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
-      .then(() => {
-        mock.done();
+      app = express();
+      app.use((req, res, next) => {
+        const logId = readmeio.log(apiKey, req, res, incomingGroup);
+        res.setHeader('x-log-id', logId);
+        return next();
       });
+      app.get('/test', (req, res) => res.sendStatus(200));
+    });
+
+    afterEach(function () {
+      mock.done();
+      setBackoff(undefined);
+      metricsServerResponseCode = 202;
+    });
+
+    function makeRequest() {
+      return request(app)
+        .get('/test')
+        .expect(200)
+        .expect('x-log-id', /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+    }
+
+    it('should send requests to the metrics server', async function () {
+      for (let i = 0; i < 3; i += 1) {
+        await makeRequest(); // eslint-disable-line no-await-in-loop
+      }
+      expect(metricsServerRequests).to.equal(3);
+    });
+
+    it('should stop sending requests to the metrics server after the metrics server returns an error', async function () {
+      metricsServerResponseCode = 401;
+      for (let i = 0; i < 3; i += 1) {
+        await makeRequest(); // eslint-disable-line no-await-in-loop
+      }
+      // first request goes to the server, server returns a 401, subsequent requests are skipped
+      expect(metricsServerRequests).to.equal(1);
+    });
+
+    it('should send a request to the metrics server after the backoff time has expired', async function () {
+      setBackoff(new Date(2022, 12, 31));
+      await makeRequest();
+      expect(metricsServerRequests).to.equal(1);
+    });
   });
 
   it('should set `pageref` correctly based on `req.route`', function () {
