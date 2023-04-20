@@ -123,6 +123,7 @@ module.exports.metrics = function readme(apiKey, group, req, har) {
     headers: {
       authorization: `Basic ${btoa(`${apiKey}:`)}`,
       'content-type': 'application/json',
+      'User-Agent': `@readme/cloudflare-worker@${version}`,
     },
     body: JSON.stringify([
       {
