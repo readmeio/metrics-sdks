@@ -5,6 +5,7 @@ packages/node/dist/
 packages/php/examples/
 packages/php/vendor/
 packages/python/.pytest_cache/
+packages/python/.venv/
 packages/sdk-snippets/src/targets/**/fixtures/
 CHANGELOG.md
 dist
