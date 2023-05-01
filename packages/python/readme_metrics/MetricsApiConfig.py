@@ -1,4 +1,5 @@
 # pylint: disable=too-many-instance-attributes
+import logging
 from typing import List, Any, Callable
 
 from readme_metrics.util import util_build_logger
@@ -65,6 +66,7 @@ class MetricsApiConfig:
         whitelist: List[str] = None,
         allowed_http_hosts: List[str] = None,
         timeout: int = 3,
+        logger: logging.Logger = None,
     ):
         """Initializes an instance of the MetricsApiConfig object
 
@@ -109,6 +111,8 @@ class MetricsApiConfig:
                 whose Host header matches one of the allowed hosts.
             timeout (int): Timeout (in seconds) for calls back to the ReadMe Metrics API.
                 Default 3 seconds.
+            logger (logging.Logger): A logger to use for this middleware.
+                Defaults to a logger with log level CRITICAL
         """
         self.README_API_KEY = api_key
         self.GROUPING_FUNCTION = grouping_function
@@ -119,4 +123,4 @@ class MetricsApiConfig:
         self.ALLOWLIST = allowlist or whitelist or []
         self.ALLOWED_HTTP_HOSTS = allowed_http_hosts
         self.METRICS_API_TIMEOUT = timeout
-        self.LOGGER = util_build_logger()
+        self.LOGGER = logger or util_build_logger()

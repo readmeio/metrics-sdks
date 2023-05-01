@@ -2,7 +2,7 @@ import logging
 from logging import Formatter, StreamHandler
 
 
-def util_build_logger():
+def util_build_logger() -> logging.Logger:
     logger = logging.getLogger(__package__)
     logger.setLevel(logging.CRITICAL)
     formatter = Formatter(fmt="%(asctime)s [%(levelname)s] %(message)s")
