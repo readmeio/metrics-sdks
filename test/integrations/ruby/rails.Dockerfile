@@ -1,7 +1,5 @@
 FROM ruby:3.1.2
 
-RUN bundle config --global frozen 1
-
 WORKDIR /usr/src/app
 
 COPY packages/ruby .
