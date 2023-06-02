@@ -41,6 +41,8 @@ export async function getProjectBaseUrl(readmeApiKey: string, requestTimeout = c
         Authorization: `Basic ${encodedApiKey}`,
         'User-Agent': `${pkg.name}/${pkg.version}`,
       },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       signal,
     })
       .then(res => {
