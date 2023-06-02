@@ -104,6 +104,8 @@ export function metricsAPICall(
         'Content-Type': 'application/json',
         'User-Agent': `${pkg.name}/${pkg.version}`,
       },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       signal,
     })
       .then(response => {
