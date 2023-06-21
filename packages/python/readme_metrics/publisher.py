@@ -15,6 +15,10 @@ BACKOFF_SECONDS = 15
 backoff_expires_at = None
 
 
+class HTTPError(Exception):
+    pass
+
+
 def start_backoff():
     global backoff_expires_at  # pylint: disable=global-statement
     # Backoff for a few seconds, but not if another concurrent request has
@@ -95,7 +99,7 @@ def publish_batch(config, queue):
 
         if not readme_result.ok:
             config.LOGGER.exception(readme_result.text)
-            raise Exception(f"POST to {url} returned {readme_result.status_code}")
+            raise HTTPError(f"POST to {url} returned {readme_result.status_code}")
     except Exception as e:
         # Errors in the Metrics SDK should never cause the application to
         # throw an error. Log it but don't re-raise.

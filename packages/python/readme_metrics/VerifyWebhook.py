@@ -3,10 +3,14 @@ import hmac
 from datetime import datetime, timedelta
 
 
+class VerificationError(Exception):
+    pass
+
+
 class VerifyWebhook:
     def __init__(self, body: dict, signature: str, secret: str):
         if signature is None:
-            raise Exception("Missing Signature")
+            raise VerificationError("Missing Signature")
 
         parsed_input = dict(
             (x.strip(), y.strip())
@@ -18,7 +22,7 @@ class VerifyWebhook:
         if datetime.now() - datetime.fromtimestamp(
             int(parsed_input["t"]) / 1000
         ) > timedelta(minutes=30):
-            raise Exception("Expired Signature")
+            raise VerificationError("Expired Signature")
 
         unsigned = time + "." + json.dumps(body, separators=(",", ":"))
         verify_signature = hmac.new(
@@ -33,4 +37,4 @@ class VerifyWebhook:
             )
             is False
         ):
-            raise Exception("Invalid Signature")
+            raise VerificationError("Invalid Signature")

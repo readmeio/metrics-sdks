@@ -13,6 +13,14 @@ import uuid
 from readme_metrics import ResponseInfoWrapper
 
 
+class QueryNotFound(Exception):
+    pass
+
+
+class BaseURLError(Exception):
+    pass
+
+
 class PayloadBuilder:
     """
     Internal builder class that handles the construction of the request and response
@@ -263,7 +271,7 @@ class PayloadBuilder:
             # works for Django, and possibly other request objects too
             result = request.environ["QUERY_STRING"]
         else:
-            raise Exception(
+            raise QueryNotFound(
                 "Don't know how to retrieve query string from this type of request"
             )
 
@@ -312,7 +320,7 @@ class PayloadBuilder:
                 return f"{scheme}://{host}{path}?{query_string}"
             return f"{scheme}://{host}{path}"
 
-        raise Exception("Don't know how to build URL from this type of request")
+        raise BaseURLError("Don't know how to build URL from this type of request")
 
     # always returns a dict with some of these fields: text, mimeType, params
     def _process_body(self, content_type, body):
