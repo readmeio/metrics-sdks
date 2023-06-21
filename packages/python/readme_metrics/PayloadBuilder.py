@@ -3,7 +3,6 @@ import importlib
 import json
 from json import JSONDecodeError
 from logging import Logger
-import os
 import platform
 import time
 
@@ -101,7 +100,7 @@ class PayloadBuilder:
             platform.machine()
             + "-"
             + platform.system().lower()
-            + os.uname().release
+            + platform.uname().release
             + "/"
             + platform.python_version()
         )

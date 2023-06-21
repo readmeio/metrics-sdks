@@ -25,19 +25,24 @@ jobs:
         run: docker-compose down
 
   build:
-    runs-on: ubuntu-latest
+    name: ${{ matrix.python-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         working-directory: packages/python
 
     strategy:
       matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
         python-version:
           # https://endoflife.date/python
           - 3.7 # EOL: June 27th, 2023
           - 3.8 # EOL: October 14th, 2024
           - 3.9 # EOL: October 5rd, 2025
           - '3.10' # EOL: October 4rd, 2026
+          # - '3.11' # EOL: October 24th, 2027
 
     steps:
       - uses: actions/checkout@v3
