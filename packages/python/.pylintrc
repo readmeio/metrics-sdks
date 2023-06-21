@@ -13,3 +13,4 @@ disable=
     R0913, # too-many-arguments
     W0201, # attribute-defined-outside-init
     W0703, # broad-except
+    W0719, # broad-exception-raised (see https://github.com/readmeio/metrics-sdks/issues/849)
