@@ -9,7 +9,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "@hapi/hapi": "^21.2.2",
+    "@hapi/hapi": "^21.3.2",
     "readmeio": "file:../.."
   }
 }

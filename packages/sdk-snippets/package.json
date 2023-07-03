@@ -30,7 +30,7 @@
     "watch": "mocha \"src/**/*.test.ts\" -w"
   },
   "dependencies": {
-    "@readme/httpsnippet": "^5.0.0"
+    "@readme/httpsnippet": "^6.2.1"
   },
   "devDependencies": {
     "@readme/eslint-config": "^10.5.1",
@@ -43,7 +43,7 @@
     "nyc": "^15.1.0",
     "prettier": "^2.8.1",
     "ts-node": "^10.9.1",
-    "type-fest": "^3.5.7",
+    "type-fest": "^3.12.0",
     "typescript": "^4.9.4"
   },
   "prettier": "@readme/eslint-config/prettier"

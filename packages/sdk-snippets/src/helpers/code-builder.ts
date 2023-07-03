@@ -6,8 +6,8 @@ export type { CodeBuilderOptions };
 
 export class CodeBuilder extends HTTPSnippetCodeBuilder {
   sections: {
-    payload?: { start: number; end: number };
-    verification?: { start: number; end: number };
+    payload?: { end: number; start: number };
+    verification?: { end: number; start: number };
   } = {};
 
   variables: {
@@ -40,8 +40,8 @@ export class CodeBuilder extends HTTPSnippetCodeBuilder {
   pushVariable = (
     line: string,
     opts: {
-      name: string;
       indentationLevel?: number;
+      name: string;
       type: 'security' | 'server';
     }
   ) => {

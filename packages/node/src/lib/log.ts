@@ -32,6 +32,7 @@ function doSend(readmeApiKey, options) {
 // Make sure we flush the queue if the process is exited
 process.on('exit', doSend);
 
+/* eslint-disable typescript-sort-keys/interface */
 export interface ExtendedIncomingMessage extends IncomingMessage {
   /*
    * This is where most body-parsers put the parsed HTTP body
@@ -44,6 +45,7 @@ export interface ExtendedIncomingMessage extends IncomingMessage {
   route?: {
     path: string;
   };
+
   protocol?: string;
   baseUrl?: string;
   hostname?: string;
@@ -55,14 +57,15 @@ export interface ExtendedIncomingMessage extends IncomingMessage {
   _json?: string;
   _form_encoded?: string;
 }
+/* eslint-enable typescript-sort-keys/interface */
 
 interface ExtendedResponse extends ServerResponse {
   _body?: string;
 }
 
 export interface Options extends LogOptions {
-  bufferLength?: number;
   baseLogUrl?: string;
+  bufferLength?: number;
 }
 
 function setDocumentationHeader(res, baseLogUrl, logId) {
