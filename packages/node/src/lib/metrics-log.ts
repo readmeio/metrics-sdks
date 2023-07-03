@@ -9,21 +9,26 @@ import config from '../config';
 
 export interface GroupingObject {
   /**
-   * API Key used to make the request. Note that this is different from the `readmeAPIKey` described above and should be a value from your API that is unique to each of your users.
+   * API Key used to make the request. Note that this is different from the `readmeAPIKey`
+   * described above and should be a value from your API that is unique to each of your users.
    */
   apiKey: string;
+
   /**
-   * @deprecated use apiKey instead
-   */
-  id?: string;
-  /**
-   * This will be the user's display name in the API Metrics Dashboard, since it's much easier to remember a name than an API key.
-   */
-  label?: string;
-  /**
-   * Email of the user that is making the call
+   * Email of the user that is making the call.
    */
   email?: string;
+
+  /**
+   * @deprecated use `apiKey` instead
+   */
+  id?: string;
+
+  /**
+   * This will be the user's display name in the API Metrics Dashboard, since it's much easier to
+   * remember a name than an API key.
+   */
+  label?: string;
 }
 
 export interface OutgoingLogBody {
@@ -37,8 +42,8 @@ export interface OutgoingLogBody {
 }
 
 export interface LogResponse {
-  response?: Response;
   ids: string | string[];
+  response?: Response;
 }
 
 const BACKOFF_SECONDS = 15; // when we need to backoff HTTP requests, pause for seconds
