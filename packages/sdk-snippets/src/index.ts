@@ -5,17 +5,17 @@ import { targets } from './targets/targets';
 export { availableServerTargets, availableWebhookTargets, extname } from './helpers/utils';
 
 export interface ServerVariable {
-  name: string;
   default?: string;
+  name: string;
   source: 'server';
 }
 
 export interface SecurityVariable {
-  name: string;
   default?: string;
+  name: string;
+  scheme?: 'basic' | 'bearer';
   source: 'security';
   type: 'apiKey' | 'http' | 'oauth';
-  scheme?: 'basic' | 'bearer';
 }
 
 export type Variables = (ServerVariable | SecurityVariable)[];
