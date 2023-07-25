@@ -1,7 +1,12 @@
 import type { LogOptions } from './lib/construct-payload';
 
+import flatted from 'flatted';
+
 import { getProjectBaseUrl } from './lib/get-project-base-url';
 import { log } from './lib/log';
+import { buildSetupView } from './lib/setup-readme-view';
+import { testMetrics } from './lib/test-metrics';
+import { testVerifyWebhook } from './lib/test-verify-webhook';
 import verifyWebhook from './lib/verify-webhook';
 
 const env = process.env.NODE_ENV || 'development';
@@ -38,12 +43,22 @@ const splitIntoUserAndConfig = (inputObject: GroupingObject | LogOptions): Split
 // Do we actually want to do it this way?
 // A function to get the api key from the request could be error prone
 // and we probably need a backup config option
-const findApiKey = req => {
-  const apiKey = req.query.apiKey;
-  if (!apiKey) {
-    throw new Error('No API key provided');
+
+// TODO:
+// 1. Caching? This might be slow
+// 2. Testing a bunch of cases for how api keys can be passed in
+const findApiKey = (req, keys) => {
+  const requestString = flatted.stringify(req);
+  const key = keys.find(key => {
+    if (requestString.includes(key.apiKey) || requestString.includes(btoa(`${key.apiKey}:`))) {
+      return true;
+    }
+    return false;
+  });
+  if (key) {
+    return { apiKey: undefined };
   }
-  return { apiKey };
+  return { apiKey: key.apiKey };
 };
 
 // See comment at the auth definition below
@@ -52,29 +67,46 @@ let apiKey = '';
 const readme = userFunction => {
   // IDK if this is the best thing to do, but feels
   // like we should notify the user somehow this is happening
+  // TODO: this is confusing since the actual url depends on the path it's mounted on
+  // TODO: is there a way to automatically open the page
   if (env === 'development') {
-    console.log('Adding ReadMe Webhook Url at /readme-webhook');
-    console.log('View docs: https://docs.readme.com/guides/docs/webhooks');
+    console.log('Verify ReadMe is configured correctly /readme-setup');
   }
   return async (req, res, next) => {
-    if (req.path === '/readme-webhook') {
+    const baseUrl = `${req.protocol}://${req.get('host')}${req.baseUrl}`;
+    if (req.path === '/readme-webhook' && req.method === 'POST') {
       try {
         // TODO: This needs to use jwt secret right now, we should probably consolidate
         // We probably want a new header that is an array of possible signatures given all of their api keys?
         // then we can just loop through and verify each one and make sure one matches
-        verifyWebhook(req.body, req.headers['x-readme-signature'], apiKey);
+        verifyWebhook(req.body, req.headers['readme-signature'], apiKey);
       } catch (e) {
         return res.status(401).send(e.message);
       }
       req.readme = { email: req.body.email };
       const user = await userFunction(req, res);
+
+      if (!user) return res.json({});
+
       const { grouping } = splitIntoUserAndConfig(user);
       return res.send(grouping);
+    } else if (req.path === '/readme-setup' && env === 'development') {
+      const setupHtml = buildSetupView({ baseUrl });
+      return res.send(setupHtml);
+    } else if (req.path === '/webhook-test' && env === 'development') {
+      const email = req.query.email;
+      const webhookData = await testVerifyWebhook(baseUrl, email, apiKey);
+      return res.json({ ...webhookData });
+    } else if (req.path === '/metrics-test' && env === 'development') {
+      // TODO: not implemented yet
+      const metricsData = await testMetrics(apiKey);
+      return res.json({ ...metricsData });
     }
 
-    req.readme = findApiKey(req);
-
     const user = await userFunction(req, res);
+    if (!user || !Object.keys(user).length) return next();
+    req.readme = findApiKey(req, user.keys);
+
     const { grouping, config } = splitIntoUserAndConfig(user);
     const filteredKey = grouping.keys.find(key => key.apiKey === req.readme.apiKey);
 
