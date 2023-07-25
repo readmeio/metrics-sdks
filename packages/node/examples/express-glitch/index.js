@@ -50,7 +50,7 @@ app.get('/hello', (req, res) => {
   res.json({ message: 'Hello World!' });
 });
 
-app.get('/name/:name', (req, res) => {
+app.get('/hello/:name', (req, res) => {
   res.json({ message: `Hello ${req.params.name}!` });
 });
 
