@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "name": "readme-metrics-glitch-demo",
+  "version": "0.0.1",
+  "main": "index.js",
+  "engines": {
+    "node": "16.x"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "express": "^4.17.3",
+    "readmeio": "^6.1.0"
+  }
+}
