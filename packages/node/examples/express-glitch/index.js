@@ -2,20 +2,29 @@
 import express from 'express';
 import readme from 'readmeio';
 
-if (!process.env.README_API_KEY) {
-  // eslint-disable-next-line no-console
-  console.error('Missing `README_API_KEY` environment variable!');
-  process.exit(1);
-}
-
-if (!process.env.README_SECRET) {
-  // eslint-disable-next-line no-console
-  console.error('Missing `README_SECRET` environment variable!');
-  process.exit(1);
-}
-
 const app = express();
 const port = process.env.PORT || 8000;
+
+// Small error handling to ensure both environment variables are present
+app.use((req, res, next) => {
+  if (!process.env.README_API_KEY) {
+    const error =
+      "This app requires the `README_API_KEY` environment variable! Grab this from the 'API Keys' section in the dashboard.";
+    // eslint-disable-next-line no-console
+    console.error(error);
+    return res.status(500).json({ error });
+  }
+
+  if (!process.env.README_SECRET) {
+    const error =
+      "This app requires the `README_SECRET` environment variable! Grab this from the 'Set up API keys' section in the dashboard.";
+    // eslint-disable-next-line no-console
+    console.error(error);
+    return res.status(500).json({ error });
+  }
+
+  return next();
+});
 
 // API logging middleware
 app.use((req, res, next) => {
