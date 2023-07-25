@@ -80,7 +80,9 @@ app.post('/webhook', express.json({ type: 'application/json' }), async (req, res
 const server = app.listen(port, '0.0.0.0', () => {
   let url = `http://${server.address().address}:${port}`;
   // Logic for constructing URL in Glitch environment
-  if (process.env.PROJECT_DOMAIN) url = `https://${process.env.PROJECT_DOMAIN}.glitch.me`;
+  if (process.env.PROJECT_DOMAIN) {
+    url = `https://${process.env.PROJECT_DOMAIN}.glitch.me`;
+  }
   // eslint-disable-next-line no-console
   console.log(`🦉 ReadMe Metrics Demo app listening at ${url}`);
 });
