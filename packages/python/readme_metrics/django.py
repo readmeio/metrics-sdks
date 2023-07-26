@@ -19,8 +19,8 @@ class MetricsMiddleware:
         try:
             request.rm_start_dt = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
             request.rm_start_ts = int(time.time() * 1000)
-            if request.headers["Content-Length"] or request.body:
-                request.rm_content_length = request.headers["Content-Length"] or "0"
+            if request.headers.get("Content-Length") or request.body:
+                request.rm_content_length = request.headers.get("Content-Length") or "0"
                 request.rm_body = request.body or ""
         except Exception as e:
             # Errors in the Metrics SDK should never cause the application to
