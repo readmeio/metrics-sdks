@@ -24,9 +24,10 @@ class TestDjangoMiddleware:
         assert middleware.get_response == get_response
         middleware.metrics_core = Mock()
 
-        # the middleware should call get_response(request)
         request = Mock()
+        request.headers = {"Content-Length": "123"}
         middleware(request)
+        # the middleware should call get_response(request)
         get_response.assert_called_once_with(request)
 
         # the middleware should set request.rm_start_dt to roughly the current
@@ -52,3 +53,13 @@ class TestDjangoMiddleware:
         assert call_args[0][0] == request
         assert isinstance(call_args[0][1], ResponseInfoWrapper)
         assert call_args[0][1].headers.get("X-Header") == "X Value!"
+        assert (
+            getattr(request, "rm_content_length") == request.headers["Content-Length"]
+        )
+
+    def test_missing_content_length(self):
+        middleware = MetricsMiddleware(Mock(), config=mock_config)
+        request = Mock()
+        request.headers = {}
+        middleware(request)
+        assert getattr(request, "rm_content_length") == "0"
