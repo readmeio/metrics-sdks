@@ -47,6 +47,8 @@ const splitIntoUserAndConfig = (inputObject: GroupingObject | LogOptions): Split
 // TODO:
 // 1. Caching? This might be slow
 // 2. Testing a bunch of cases for how api keys can be passed in
+
+// What if we do this work in the metrics backend?
 const findApiKey = (req, keys) => {
   const requestString = flatted.stringify(req);
   const key = keys.find(key => {
@@ -55,7 +57,7 @@ const findApiKey = (req, keys) => {
     }
     return false;
   });
-  if (key) {
+  if (!key) {
     return { apiKey: undefined };
   }
   return { apiKey: key.apiKey };
@@ -79,6 +81,8 @@ const readme = userFunction => {
         // TODO: This needs to use jwt secret right now, we should probably consolidate
         // We probably want a new header that is an array of possible signatures given all of their api keys?
         // then we can just loop through and verify each one and make sure one matches
+        // Dom's Idea: what if we have a special metrics api key with special treatment in the dash?
+        // we might already do this for some stuff
         verifyWebhook(req.body, req.headers['readme-signature'], apiKey);
       } catch (e) {
         return res.status(401).send(e.message);
