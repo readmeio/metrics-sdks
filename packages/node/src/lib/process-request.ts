@@ -157,8 +157,8 @@ export default function processRequest(
   if (mimeType === 'application/x-www-form-urlencoded') {
     postData = {
       mimeType,
-      // By being an `application/x-www-form-urlencoded` request `reqBody` will always be an object.
-      params: objectToArray(reqBody as Record<string, unknown>),
+      // `reqBody` is likely to be an object, but can be empty if no HTTP body sent
+      params: objectToArray((reqBody || {}) as Record<string, unknown>),
     };
   } else if (isApplicationJson(mimeType)) {
     postData = {
