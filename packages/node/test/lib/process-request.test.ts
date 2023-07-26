@@ -29,7 +29,10 @@ function createApp(reqOptions?: LogOptions, shouldPreParse = false, bodyOverride
         body = JSON.parse(body);
       }
 
-      res.end(JSON.stringify(processRequest(req, bodyOverride || body, reqOptions)));
+      res.end(
+        // This typeof check allows us to override the body with `null`
+        JSON.stringify(processRequest(req, typeof bodyOverride !== 'undefined' ? bodyOverride : body, reqOptions))
+      );
     });
   };
 
@@ -509,6 +512,13 @@ describe('process-request', function () {
             { name: 'b', value: '2' },
           ])
         );
+    });
+
+    it('should not error with no body', function () {
+      return request(createApp({}, false, null))
+        .post('/')
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .expect(res => expect(res.body.postData.params).to.deep.equal([]));
     });
 
     it('#mimeType should properly parse content-type header', function () {
