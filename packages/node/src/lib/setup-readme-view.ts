@@ -126,7 +126,9 @@ export function buildSetupView({ baseUrl }) {
 
   return `
 <!DOCTYPE html>
+<html lang="en">
 <meta charset="UTF-8" />
+<meta content="width=device-width, initial-scale=1" name="viewport">
 <title>ReadMe Setup</title>
 <style>
   :root {
@@ -327,7 +329,7 @@ ${metricsVerifiedHtml}
 <section class="content">
   <h1>What is this?</h1>
   <p>If you’ve made it this far and still need help, feel free to email us at <a href="mailto:devdash@readme.io">devdash@readme.io</a>. That email goes directly to
-    <a class="tooltip" role="button">
+    <a class="tooltip" role="button" tabindex="0">
       <span>the engineers who built this</span>
       <img alt="Bill Gates on a desk with a computer" class="tooltip-img" src="//readmeio.github.io/pix/bill.jpg">
     </a>. Also, check out <a href="//docs.readme.com/main/docs/sending-api-logs">the docs</a>!
