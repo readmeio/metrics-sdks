@@ -152,6 +152,7 @@ class Metrics
             return;
         }
 
+        /** @psalm-suppress PossiblyInvalidArgument */
         $ex = new MetricsException(str_replace($json->_message, $json->name, $json->message));
         $ex->setErrors((array)$json->errors);
         throw $ex;
