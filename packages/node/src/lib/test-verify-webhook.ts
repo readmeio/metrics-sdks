@@ -36,7 +36,14 @@ async function verifyWebhook(url, email, secret, opts) {
 }
 
 export async function testVerifyWebhook(baseUrl, email, apiKey) {
-  const signed = await verifyWebhook(`${baseUrl}/readme-webhook`, email, apiKey, {});
+  let signed;
+  try {
+    signed = await verifyWebhook(`${baseUrl}/readme-webhook`, email, apiKey, {});
+  } catch (e) {
+    return {
+      webhookVerified: false,
+    };
+  }
   // TODO: error case if this is an empty object
   try {
     const unsigned = await verifyWebhook(`${baseUrl}/readme-webhook`, email, apiKey, { unsigned: true });

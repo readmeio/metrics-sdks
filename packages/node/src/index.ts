@@ -1,5 +1,6 @@
 import type { LogOptions } from './lib/construct-payload';
 
+import sdk from 'api';
 import flatted from 'flatted';
 
 import { getProjectBaseUrl } from './lib/get-project-base-url';
@@ -10,6 +11,8 @@ import { testVerifyWebhook } from './lib/test-verify-webhook';
 import verifyWebhook from './lib/verify-webhook';
 
 const env = process.env.NODE_ENV || 'development';
+
+const readmeSDK = sdk('@developers/v2.0#19j1xdalksmothi');
 
 interface ApiKey {
   apiKey: string;
@@ -49,10 +52,10 @@ const splitIntoUserAndConfig = (inputObject: GroupingObject | LogOptions): Split
 // 2. Testing a bunch of cases for how api keys can be passed in
 
 // What if we do this work in the metrics backend?
-const findApiKey = (req, keys) => {
+const findApiKey = (req, keys: [ApiKey]) => {
   const requestString = flatted.stringify(req);
-  const key = keys.find(key => {
-    if (requestString.includes(key.apiKey) || requestString.includes(btoa(`${key.apiKey}:`))) {
+  const key = keys.find(apiKey => {
+    if (requestString.includes(apiKey.apiKey) || requestString.includes(btoa(`${apiKey.apiKey}:`))) {
       return true;
     }
     return false;
@@ -75,15 +78,19 @@ const readme = userFunction => {
     console.log('Verify ReadMe is configured correctly /readme-setup');
   }
   return async (req, res, next) => {
+    readmeSDK.auth(apiKey);
+    let readmeProject;
+    try {
+      readmeProject = (await readmeSDK.getProject()).data;
+    } catch (e) {
+      // TODO: better way of handling this error
+      console.log('Error fetching project, is your ReadMe API key correct');
+      console.log(e);
+    }
     const baseUrl = `${req.protocol}://${req.get('host')}${req.baseUrl}`;
     if (req.path === '/readme-webhook' && req.method === 'POST') {
       try {
-        // TODO: This needs to use jwt secret right now, we should probably consolidate
-        // We probably want a new header that is an array of possible signatures given all of their api keys?
-        // then we can just loop through and verify each one and make sure one matches
-        // Dom's Idea: what if we have a special metrics api key with special treatment in the dash?
-        // we might already do this for some stuff
-        verifyWebhook(req.body, req.headers['readme-signature'], apiKey);
+        verifyWebhook(req.body, req.headers['readme-signature'], readmeProject.jwtSecret);
       } catch (e) {
         return res.status(401).send(e.message);
       }
@@ -99,7 +106,7 @@ const readme = userFunction => {
       return res.send(setupHtml);
     } else if (req.path === '/webhook-test' && env === 'development') {
       const email = req.query.email;
-      const webhookData = await testVerifyWebhook(baseUrl, email, apiKey);
+      const webhookData = await testVerifyWebhook(baseUrl, email, readmeProject.jwtSecret);
       return res.json({ ...webhookData });
     } else if (req.path === '/metrics-test' && env === 'development') {
       // TODO: not implemented yet

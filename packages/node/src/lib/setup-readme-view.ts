@@ -39,6 +39,19 @@ export function buildSetupView({ baseUrl }) {
           Webhook running at:
           <a href="${baseUrl}/readme-webhook">${baseUrl}/readme-webhook</a>
       </div>
+      <div class="hidden" id="webhook-warning">
+        <h2 class="card-heading">
+          <span>
+            <span class="card-status card-status_warning"></span>
+            Verified, but missing data
+          </span>
+          <span class="card-badge">Webhook</span>
+        </h2>
+        <p id="userObject"></p>
+        <p>
+          Webhook running at:
+          <a href="${baseUrl}/readme-webhook">${baseUrl}/readme-webhook</a>
+      </div>
     </section>
   `;
 
@@ -72,7 +85,7 @@ export function buildSetupView({ baseUrl }) {
           </span>
           <span class="card-badge">API Calls</span>
         </h2>
-        <p>API calls verified! 👌
+        <p>API calls are being recieved by ReadMe! 👌
       </div>
     </section>
     `;
@@ -93,7 +106,8 @@ export function buildSetupView({ baseUrl }) {
           if (!webhookVerified) {
             document.getElementById('webhook-fail').classList.remove('hidden');
           } else if (JSON.stringify(user) === '{}') {
-            document.getElementById('webhook-success').classList.remove('hidden');
+            const webhookSuccess = document.getElementById('webhook-warning').classList.remove('hidden');
+
             document.getElementById('userObject').innerHTML = 'Recieved empty object, does that user exist?';
             window.webhooksSuccess = true;
           } else {
@@ -135,6 +149,7 @@ export function buildSetupView({ baseUrl }) {
     --blue: hsl(205, 99%, 48%);
     --blue-hsl: 205, 99%, 48%;
     --green: #12ca93;
+    --yellow: #f5a623;
     --red: #e95f6a;
     --font-family: system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
     --font-family-mono: "SF Mono", SFMono-Regular, ui-monospace, "DejaVu Sans Mono", Menlo, Consolas, monospace;
@@ -261,6 +276,14 @@ export function buildSetupView({ baseUrl }) {
           display: none;
         }
       }
+
+      &.card-status_warning {
+        --status-color: var(--yellow);
+
+        &::after {
+          display: none;
+        }
+      }
     }
   }
   .tooltip {
@@ -332,7 +355,7 @@ ${metricsVerifiedHtml}
     <a class="tooltip" role="button" tabindex="0">
       <span>the engineers who built this</span>
       <img alt="Bill Gates on a desk with a computer" class="tooltip-img" src="//readmeio.github.io/pix/bill.jpg">
-    </a>. Also, check out <a href="//docs.readme.com/main/docs/sending-api-logs">the docs</a>!
+    </a>. Also, check out <a target="blank" href="//docs.readme.com/main/docs/sending-api-logs">the docs</a>!
 </section>
 
 <footer class="footer">
