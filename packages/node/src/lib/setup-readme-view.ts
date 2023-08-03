@@ -1,4 +1,6 @@
-export function buildSetupView({ baseUrl }) {
+import sha512 from 'crypto-js/sha512';
+
+export function buildSetupView({ baseUrl, apiKey, subdomain }) {
   const webhookVerifiedHtml = `
     <section class="card">
       <div id="webhook-test">
@@ -124,18 +126,16 @@ export function buildSetupView({ baseUrl }) {
   `;
 
   const metricsScriptHtml = `
-    fetch('${baseUrl}/metrics-test')
-      .then(response => response.json())
-      .then(data => {
-        const { metricsVerified } = data;
-        document.getElementById('metrics-test').classList.add('hidden');
-        if (!metricsVerified) {
-          document.getElementById('metrics-fail').classList.remove('hidden');
-        } else {
-          document.getElementById('metrics-success').classList.remove('hidden');
-          window.metricsSuccess = true;
-        }
-      });
+    const token = '${sha512(apiKey).toString()}';
+    const query = new URLSearchParams(\`token=\${token}&subdomain=${subdomain}\`);
+    const socket = new WebSocket(new URL(\`?\${query}\`, 'wss://m.readme.io'));
+    socket.addEventListener('message', async ({ data }) => {
+      document.getElementById('metrics-test').classList.add('hidden');
+      document.getElementById('metrics-success').classList.remove('hidden');
+    });
+
+    // TODO: should we do something here if it takes too long? 
+    // Maybe show some trouble shooting steps?
   `;
 
   return `

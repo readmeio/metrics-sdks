@@ -6,7 +6,6 @@ import flatted from 'flatted';
 import { getProjectBaseUrl } from './lib/get-project-base-url';
 import { log } from './lib/log';
 import { buildSetupView } from './lib/setup-readme-view';
-import { testMetrics } from './lib/test-metrics';
 import { testVerifyWebhook } from './lib/test-verify-webhook';
 import verifyWebhook from './lib/verify-webhook';
 
@@ -68,6 +67,7 @@ const findApiKey = (req, keys: [ApiKey]) => {
 
 // See comment at the auth definition below
 let apiKey = '';
+let readmeProject;
 
 const readme = userFunction => {
   // IDK if this is the best thing to do, but feels
@@ -79,12 +79,11 @@ const readme = userFunction => {
   }
   return async (req, res, next) => {
     readmeSDK.auth(apiKey);
-    let readmeProject;
     try {
       readmeProject = (await readmeSDK.getProject()).data;
     } catch (e) {
       // TODO: better way of handling this error
-      console.log('Error fetching project, is your ReadMe API key correct');
+      console.log('Error fetching project, is your ReadMe API key correct?');
       console.log(e);
     }
     const baseUrl = `${req.protocol}://${req.get('host')}${req.baseUrl}`;
@@ -102,16 +101,12 @@ const readme = userFunction => {
       const { grouping } = splitIntoUserAndConfig(user);
       return res.send(grouping);
     } else if (req.path === '/readme-setup' && env === 'development') {
-      const setupHtml = buildSetupView({ baseUrl });
+      const setupHtml = buildSetupView({ baseUrl, subdomain: readmeProject.subdomain, apiKey });
       return res.send(setupHtml);
     } else if (req.path === '/webhook-test' && env === 'development') {
       const email = req.query.email;
       const webhookData = await testVerifyWebhook(baseUrl, email, readmeProject.jwtSecret);
       return res.json({ ...webhookData });
-    } else if (req.path === '/metrics-test' && env === 'development') {
-      // TODO: not implemented yet
-      const metricsData = await testMetrics(apiKey);
-      return res.json({ ...metricsData });
     }
 
     const user = await userFunction(req, res);
@@ -134,6 +129,8 @@ const readme = userFunction => {
 // readme.auth('api-key');
 function auth(key) {
   apiKey = key;
+  // Reset the cache for the ReadMe project if the api key changes
+  readmeProject = undefined;
   return readme;
 }
 
