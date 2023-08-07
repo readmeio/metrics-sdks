@@ -69,25 +69,39 @@ const findApiKey = (req, keys: [ApiKey]) => {
 let apiKey = '';
 let readmeProject;
 
-const readme = userFunction => {
-  // IDK if this is the best thing to do, but feels
-  // like we should notify the user somehow this is happening
-  // TODO: this is confusing since the actual url depends on the path it's mounted on
-  // TODO: is there a way to automatically open the page
-  if (env === 'development') {
-    console.log('Verify ReadMe is configured correctly /readme-setup');
+const readme = (
+  userFunction,
+  { disableWebhook, disableMetrics } = {
+    disableWebhook: false,
+    disableMetrics: false,
   }
+) => {
   return async (req, res, next) => {
-    readmeSDK.auth(apiKey);
-    try {
-      readmeProject = (await readmeSDK.getProject()).data;
-    } catch (e) {
-      // TODO: better way of handling this error
-      console.log('Error fetching project, is your ReadMe API key correct?');
-      console.log(e);
-    }
     const baseUrl = `${req.protocol}://${req.get('host')}${req.baseUrl}`;
-    if (req.path === '/readme-webhook' && req.method === 'POST') {
+
+    // Really want to make sure we only show setup on development
+    // not sure how reliable node_env is
+    const isDevelopment =
+      env === 'development' || baseUrl.includes('localhost') || baseUrl.includes('.local') || baseUrl.includes('.dev');
+
+    if (!readmeProject) {
+      readmeSDK.auth(apiKey);
+      try {
+        readmeProject = (await readmeSDK.getProject()).data;
+      } catch (e) {
+        // TODO: Maybe send this to sentry?
+        if (e.status === 401) {
+          console.error('Invalid ReadMe API key. Contact support@readme.io for help!');
+          console.error(e.data);
+        } else {
+          console.error('Error calling ReadMe API. Contact support@readme.io for help!');
+          console.error(e.data);
+        }
+        // Don't want to cause an error in their API
+        return next();
+      }
+    }
+    if (req.path === '/readme-webhook' && req.method === 'POST' && !disableWebhook) {
       try {
         verifyWebhook(req.body, req.headers['readme-signature'], readmeProject.jwtSecret);
       } catch (e) {
@@ -100,17 +114,23 @@ const readme = userFunction => {
 
       const { grouping } = splitIntoUserAndConfig(user);
       return res.send(grouping);
-    } else if (req.path === '/readme-setup' && env === 'development') {
-      const setupHtml = buildSetupView({ baseUrl, subdomain: readmeProject.subdomain, apiKey });
+    } else if (req.path === '/readme-setup' && isDevelopment) {
+      const setupHtml = buildSetupView({
+        baseUrl,
+        subdomain: readmeProject.subdomain,
+        apiKey,
+        disableMetrics,
+        disableWebhook,
+      });
       return res.send(setupHtml);
-    } else if (req.path === '/webhook-test' && env === 'development') {
+    } else if (req.path === '/webhook-test' && isDevelopment) {
       const email = req.query.email;
       const webhookData = await testVerifyWebhook(baseUrl, email, readmeProject.jwtSecret);
       return res.json({ ...webhookData });
     }
 
     const user = await userFunction(req, res);
-    if (!user || !Object.keys(user).length) return next();
+    if (!user || !Object.keys(user).length || disableMetrics) return next();
     req.readme = findApiKey(req, user.keys);
 
     const { grouping, config } = splitIntoUserAndConfig(user);

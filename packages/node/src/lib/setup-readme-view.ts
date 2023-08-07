@@ -1,7 +1,55 @@
 import sha512 from 'crypto-js/sha512';
 
-export function buildSetupView({ baseUrl, apiKey, subdomain }) {
-  const webhookVerifiedHtml = `
+export function buildSetupView({ baseUrl, apiKey, subdomain, disableWebhook, disableMetrics }) {
+  const dashUrl = `https://dash.readme.com/project/${subdomain}/v1.0/metrics/developers`;
+  let webhookScriptHtml = `
+    var form = document.getElementById("testWebhookForm");
+    form.addEventListener('submit', testWebhook);
+
+    function testWebhook(e) {
+      e.preventDefault();
+      // make request to /webhook-test with email in input
+      const email = document.querySelector('#email').value;
+      fetch('${baseUrl}/webhook-test?email=' + email)
+        .then(response => response.json())
+        .then(data => {
+          const { webhookVerified, user } = data;
+          document.getElementById('webhook-test').classList.add('hidden');
+          if (!webhookVerified) {
+            document.getElementById('webhook-fail').classList.remove('hidden');
+          } else if (JSON.stringify(user) === '{}') {
+            const webhookSuccess = document.getElementById('webhook-warning').classList.remove('hidden');
+
+            document.getElementById('userObject').innerHTML = 'Recieved empty object, does that user exist?';
+            window.webhookSuccess = true;
+          } else {
+            document.getElementById('webhook-success').classList.remove('hidden');
+            document.getElementById('userObject').innerHTML = JSON.stringify(user, null, 2);
+            window.webhookSuccess = true;
+          }
+        })
+        .catch(error => {
+          // Handle errors while making the request
+          console.error('Error:', error);
+        });
+    }
+  `;
+
+  let metricsScriptHtml = `
+    const token = '${sha512(apiKey).toString()}';
+    const query = new URLSearchParams(\`token=\${token}&subdomain=${subdomain}\`);
+    const socket = new WebSocket(new URL(\`?\${query}\`, 'wss://m.readme.io'));
+    socket.addEventListener('message', async ({ data }) => {
+      document.getElementById('metrics-test').classList.add('hidden');
+      document.getElementById('metrics-success').classList.remove('hidden');
+      window.metricsSuccess = true;
+    });
+
+    // TODO: should we do something here if it takes too long? 
+    // Maybe show some trouble shooting steps?
+  `;
+
+  let webhookVerifiedHtml = `
     <section class="card">
       <div id="webhook-test">
         <h2 class="card-heading">
@@ -11,7 +59,8 @@ export function buildSetupView({ baseUrl, apiKey, subdomain }) {
           </span>
           <span class="card-badge">Webhook</span>
         </h2>
-        <p>Test the webhook configuration by entering an email in your database.
+        <p class='info'>When a user logs into ReadMe, we make a request to this API to retrieve data about the logged-in user. This data is used to prefill their API keys in the documentation and display their API logs.</p>
+        <p>Test this configuration by entering an email in your database.
         <form id="testWebhookForm">
           <input id="email" name="email" placeholder="owlbert@readme.io" required type="email" />
           <button>Submit</button>
@@ -25,7 +74,7 @@ export function buildSetupView({ baseUrl, apiKey, subdomain }) {
             </span>
             <span class="card-badge">Webhook</span>
           </h2>
-          <p>We couldn’t verify your webhook. Make sure you’ve set up your webhook correctly.
+          <p>We couldn’t verify your webhook. Send us an email at <a href="mailto:devdash@readme.io">devdash@readme.io</a> and we'll help you out!
         </div>
       </div>
       <div class="hidden" id="webhook-success">
@@ -36,10 +85,15 @@ export function buildSetupView({ baseUrl, apiKey, subdomain }) {
           </span>
           <span class="card-badge">Webhook</span>
         </h2>
-        <p id="userObject"></p>
+        <p className='success'></p>
         <p>
-          Webhook running at:
-          <a href="${baseUrl}/readme-webhook">${baseUrl}/readme-webhook</a>
+          We recieved a user that appears valid!<br>
+          Webhook running locally at:
+          <a href="${baseUrl}/readme-webhook">${baseUrl}/readme-webhook</a><br>
+          Enter the production version of that URL in your ReadMe dashboard.
+        </p>
+        <p>User we recieved:</p>
+        <pre id="userObject"></p>
       </div>
       <div class="hidden" id="webhook-warning">
         <h2 class="card-heading">
@@ -49,7 +103,7 @@ export function buildSetupView({ baseUrl, apiKey, subdomain }) {
           </span>
           <span class="card-badge">Webhook</span>
         </h2>
-        <p id="userObject"></p>
+        <p class='warning'>It seems like an empty object was returned for this user. Is that expected?</p>
         <p>
           Webhook running at:
           <a href="${baseUrl}/readme-webhook">${baseUrl}/readme-webhook</a>
@@ -57,17 +111,38 @@ export function buildSetupView({ baseUrl, apiKey, subdomain }) {
     </section>
   `;
 
-  const metricsVerifiedHtml = `
+  if (disableWebhook) {
+    webhookVerifiedHtml = `
+      <section class="card">
+        <div id="webhook-success">
+          <h2 class="card-heading">
+            <span>
+              <span class="card-status"></span>
+              Webhook Disabled
+            </span>
+            <span class="card-badge">Webhook</span>
+          </h2>
+          <p>
+            The webhook has been disabled. You can re-enable it by removing "webhookDisabled: true" from your configuration.
+        </div>
+        <script>window.webhookSuccess = true;</script>
+      </section>`;
+
+    webhookScriptHtml = '';
+  }
+
+  let metricsVerifiedHtml = `
     <section class="card">
       <div id="metrics-test">
         <h2 class="card-heading">
           <span>
             <span class="card-status card-status_pending"></span>
-            Listening
+            Listening for API Calls
           </span>
           <span class="card-badge">API Calls</span>
         </h2>
-        <p>Make a call to your API locally to verify your installation.
+        <p class='info'>We send API logs to ReadMe so you know who is using your API, the errors they are receiving, and even allow them to view their own logs directly in the documentation.</p>
+        <p>Make a call to your API locally to verify everything is set up properly.
       </div>
       <div id="metrics-fail" class="hidden">
         <h2 class="card-heading">
@@ -92,51 +167,26 @@ export function buildSetupView({ baseUrl, apiKey, subdomain }) {
     </section>
     `;
 
-  const webhookScriptHtml = `
-    var form = document.getElementById("testWebhookForm");
-    form.addEventListener('submit', testWebhook);
+  if (disableMetrics) {
+    metricsVerifiedHtml = `
+      <section class="card">
+        <div id="metrics-test">
+          <h2 class="card-heading">
+            <span>
+              <span class="card-status"></span>
+              Metrics Disabled
+            </span>
+            <span class="card-badge">Metrics</span>
+          </h2>
+          <p id="userObject"></p>
+          <p>
+            Developer Metrics has been disabled. You can re-enable it by removing "disableMetrics: true" from your configuration.
+        </div>
+        <script>window.metricsSuccess = true;</script>
+      </section>`;
 
-    function testWebhook(e) {
-      e.preventDefault();
-      // make request to /webhook-test with email in input
-      const email = document.querySelector('#email').value;
-      fetch('${baseUrl}/webhook-test?email=' + email)
-        .then(response => response.json())
-        .then(data => {
-          const { webhookVerified, user } = data;
-          document.getElementById('webhook-test').classList.add('hidden');
-          if (!webhookVerified) {
-            document.getElementById('webhook-fail').classList.remove('hidden');
-          } else if (JSON.stringify(user) === '{}') {
-            const webhookSuccess = document.getElementById('webhook-warning').classList.remove('hidden');
-
-            document.getElementById('userObject').innerHTML = 'Recieved empty object, does that user exist?';
-            window.webhooksSuccess = true;
-          } else {
-            document.getElementById('webhook-success').classList.remove('hidden');
-            document.getElementById('userObject').innerHTML = JSON.stringify(user, null, 2);
-            window.webhooksSuccess = true;
-          }
-        })
-        .catch(error => {
-          // Handle errors while making the request
-          console.error('Error:', error);
-        });
-    }
-  `;
-
-  const metricsScriptHtml = `
-    const token = '${sha512(apiKey).toString()}';
-    const query = new URLSearchParams(\`token=\${token}&subdomain=${subdomain}\`);
-    const socket = new WebSocket(new URL(\`?\${query}\`, 'wss://m.readme.io'));
-    socket.addEventListener('message', async ({ data }) => {
-      document.getElementById('metrics-test').classList.add('hidden');
-      document.getElementById('metrics-success').classList.remove('hidden');
-    });
-
-    // TODO: should we do something here if it takes too long? 
-    // Maybe show some trouble shooting steps?
-  `;
+    metricsScriptHtml = '';
+  }
 
   return `
 <!DOCTYPE html>
@@ -333,13 +383,28 @@ export function buildSetupView({ baseUrl, apiKey, subdomain }) {
       transform: scale(1);
     }
   }
+
+  /* TODO: tony plz make this pretty */
+  .info {
+    background: #e3edf2;
+    border-left: 5px solid #5bc0de;
+    border-radius: 3px;
+    padding: 10px;
+  }
+
+  .warning {
+    background: #fcf8e3;
+    border-left: 5px solid #f0ad4e;
+    border-radius: 3px;
+    padding: 10px;
+  }
 </style>
 <main>
 
 <div id="success" class="hidden">
   <section class="content">
     <h1>Everything seems to be working! 🙂</h1>
-    <p>Visit your Developer Dashboard at <a href="/">https://dash.readme.com/sfjldjfs</a>
+    <p>Visit your Developer Dashboard at <a href="${dashUrl}">${dashUrl}</a>
   </section>
 </div>
 
@@ -372,7 +437,7 @@ ${metricsVerifiedHtml}
   ${metricsScriptHtml}
 
   setInterval(() => {
-    if (window.webhooksSuccess && window.metricsSuccess) {
+    if (window.webhookSuccess && window.metricsSuccess) {
       document.getElementById('success').classList.remove('hidden');
     }
   }, 1000);
