@@ -1,4 +1,7 @@
 {
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  },
   "search.exclude": {
     // Hide generated output
     "**/package-lock.json": true,

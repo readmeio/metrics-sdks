@@ -3,6 +3,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace ReadMe.HarJsonObjectModels
 {
@@ -47,63 +50,21 @@ namespace ReadMe.HarJsonObjectModels
       postData.mimeType = this.request.ContentType;
       if (this.request.ContentType == "application/x-www-form-urlencoded")
       {
-        List<Params> @params = new List<Params>();
-        if (this.request.Form.Keys.Count > 0)
-        {
-          foreach (string key in this.request.Form.Keys)
-          {
-            if (!this.configValues.options.isAllowListEmpty)
-            {
-              if (this.CheckAllowList(key))
-              {
-                @params.Add(new Params { name = key, value = this.request.Form[key] });
-              }
-            }
-            else if (!this.configValues.options.isDenyListEmpty)
-            {
-              if (!this.CheckDenyList(key))
-              {
-                @params.Add(new Params { name = key, value = this.request.Form[key] });
-              }
-            }
-            else
-            {
-              @params.Add(new Params { name = key, value = this.request.Form[key] });
-            }
-          }
-        }
-
-        postData.@params = @params;
+        postData.@params = this.RedactPayload(this.request.Form);
       }
       else if (this.request.HasFormContentType)
       {
-        List<Params> @params = new List<Params>();
-        if (this.request.Form.Keys.Count > 0)
-        {
-          foreach (string key in this.request.Form.Keys)
-          {
-            if (!this.configValues.options.isAllowListEmpty)
-            {
-              if (this.CheckAllowList(key))
-              {
-                @params.Add(new Params { name = key, value = this.request.Form[key] });
-              }
-            }
-            else if (!this.configValues.options.isDenyListEmpty)
-            {
-              if (!this.CheckDenyList(key))
-              {
-                @params.Add(new Params { name = key, value = this.request.Form[key] });
-              }
-            }
-            else
-            {
-              @params.Add(new Params { name = key, value = this.request.Form[key] });
-            }
-          }
-        }
+        postData.@params = this.RedactPayload(this.request.Form);
+      }
+      else if (this.request.ContentType == "application/json")
+      {
+        string requestBody = await this.GetRequestBodyData();
+        JObject parsedBody = JsonConvert.DeserializeObject<JObject>(requestBody);
+        IFormCollection formCollection = new FormCollection(parsedBody.Properties().ToDictionary(p => p.Name, p => new StringValues(p.Value.ToString())));
 
-        postData.@params = @params;
+        // List<Params> @params = this.RedactPayload(formCollection);
+        // postData.text = JsonConvert.SerializeObject(@params);
+        postData.text = await this.GetRequestBodyData();
       }
       else if (this.request.ContentType != null)
       {
@@ -121,6 +82,51 @@ namespace ReadMe.HarJsonObjectModels
     private bool CheckDenyList(string key)
     {
       return this.configValues.options.denyList.Any(v => v.Trim().ToLower() == key.Trim().ToLower()) ? true : false;
+    }
+
+    private string RedactValue(string value)
+    {
+      string redactedVal = value.GetType() == typeof(string) ? $" {value.Length}" : string.Empty;
+      return $"[REDACTED{redactedVal}]";
+    }
+
+    private List<Params> RedactPayload(Microsoft.AspNetCore.Http.IFormCollection payload)
+    {
+      List<Params> @params = new List<Params>();
+        if (payload.Keys.Count > 0)
+        {
+          foreach (string key in this.request.Form.Keys)
+          {
+            if (!this.configValues.options.isAllowListEmpty)
+            {
+              if (this.CheckAllowList(key))
+              {
+                @params.Add(new Params { name = key, value = payload[key] });
+              }
+              else
+              {
+                @params.Add(new Params { name = key, value = this.RedactValue(payload[key]) });
+              }
+            }
+            else if (!this.configValues.options.isDenyListEmpty)
+            {
+              if (!this.CheckDenyList(key))
+              {
+                @params.Add(new Params { name = key, value = payload[key] });
+              }
+              else
+              {
+                 @params.Add(new Params { name = key, value = this.RedactValue(payload[key]) });
+              }
+            }
+            else
+            {
+              @params.Add(new Params { name = key, value = payload[key] });
+            }
+          }
+        }
+
+      return @params;
     }
 
     private async Task<string> GetRequestBodyData()

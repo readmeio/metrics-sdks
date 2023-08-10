@@ -15,14 +15,22 @@ const port = process.env.PORT || 8000;
 const secret = process.env.README_API_KEY;
 
 app.use((req, res, next) => {
-  readme.log(process.env.README_API_KEY, req, res, {
-    // User's API Key
-    apiKey: 'owlbert-api-key',
-    // Username to show in the dashboard
-    label: 'Owlbert',
-    // User's email address
-    email: 'owlbert@example.com',
-  });
+  readme.log(
+    process.env.README_API_KEY,
+    req,
+    res,
+    {
+      // User's API Key
+      apiKey: 'owlbert-api-key',
+      // Username to show in the dashboard
+      label: 'Owlbert',
+      // User's email address
+      email: 'owlbert@example.com',
+    },
+    {
+      denylist: ['secretKey'],
+    }
+  );
 
   return next();
 });

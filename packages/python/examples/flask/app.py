@@ -27,6 +27,7 @@ def grouping_function(request):
 metrics_extension = ReadMeMetrics(
     MetricsApiConfig(
         api_key=os.getenv("README_API_KEY"),
+        denylist=["secretKey"],
         grouping_function=grouping_function,
         background_worker_mode=False,
         buffer_length=1,
