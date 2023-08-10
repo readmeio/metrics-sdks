@@ -1,0 +1,245 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "The OpenAPI description for the Developer Dashboard example server.",
+    "version": "1.0.0",
+    "title": "Example Server 📊",
+    "contact": {
+      "email": "support@readme.io"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  },
+  "servers": [
+    {
+      "url": "https://{subdomain}.glitch.me",
+      "description": "Glitch App server",
+      "variables": {
+        "subdomain": {
+          "default": "readme-metrics-demo"
+        }
+      }
+    },
+    {
+      "url": "http://localhost:{port}",
+      "description": "localhost",
+      "variables": {
+        "port": {
+          "default": "8000"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Get homepage",
+        "description": "Returns HTML for the homepage",
+        "operationId": "getHomepage",
+        "responses": {
+          "200": {
+            "description": "HTML response"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          },
+          {}
+        ]
+      },
+      "post": {
+        "summary": "Simon Says",
+        "description": "Responds with a stringified version of the request body",
+        "operationId": "simonSays",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Simon"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "successful response"
+          }
+        },
+        "security": [
+          {
+            "petstore_auth": ["write:pets", "read:pets"]
+          },
+          {}
+        ]
+      }
+    },
+    "/hello": {
+      "get": {
+        "summary": "Hello!",
+        "description": "Replies by greeting you!",
+        "operationId": "hello",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "description": "The message response",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "successful response"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          },
+          {}
+        ]
+      }
+    },
+    "/hello/{name}": {
+      "get": {
+        "summary": "Hello, {your name here}!",
+        "description": "Replies by greeting you!",
+        "operationId": "helloName",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Your name",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "description": "The message response",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "successful response"
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          },
+          {}
+        ]
+      }
+    },
+    "/webhook": {
+      "post": {
+        "summary": "Personalized Docs Webhook",
+        "description": "Used by ReadMe for surfacing API keys and other user data in the docs",
+        "operationId": "webhook",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "example": "owlbert@example.com" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Simon"
+                }
+              }
+            }
+          },
+          "401": { "description": "unauthorized" },
+          "default": {
+            "description": "successful response"
+          }
+        },
+        "security": [
+          {
+            "petstore_auth": ["write:pets", "read:pets"]
+          },
+          {}
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "petstore_auth": {
+        "type": "oauth2",
+        "flows": {
+          "implicit": {
+            "authorizationUrl": "http://petstore.swagger.io/oauth/dialog",
+            "scopes": {
+              "write:pets": "modify pets in your account",
+              "read:pets": "read your pets"
+            }
+          }
+        }
+      },
+      "api_key": {
+        "type": "apiKey",
+        "name": "api_key",
+        "in": "header"
+      }
+    },
+    "schemas": {
+      "Simon": {
+        "type": "object",
+        "description": "A stringified object",
+        "properties": {
+          "simonSays": {
+            "type": "string",
+            "example": "{\"owl\":\"hoot\"}"
+          }
+        }
+      }
+    }
+  }
+}
