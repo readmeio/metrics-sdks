@@ -45,7 +45,7 @@ export function buildSetupView({ baseUrl, apiKey, subdomain, disableWebhook, dis
       window.metricsSuccess = true;
     });
 
-    // TODO: should we do something here if it takes too long? 
+    // TODO: should we do something here if it takes too long?
     // Maybe show some trouble shooting steps?
   `;
 
@@ -59,12 +59,14 @@ export function buildSetupView({ baseUrl, apiKey, subdomain, disableWebhook, dis
           </span>
           <span class="card-badge">Webhook</span>
         </h2>
-        <p class='info'>When a user logs into ReadMe, we make a request to this API to retrieve data about the logged-in user. This data is used to prefill their API keys in the documentation and display their API logs.</p>
         <p>Test this configuration by entering an email in your database.
         <form id="testWebhookForm">
-          <input id="email" name="email" placeholder="owlbert@readme.io" required type="email" />
-          <button>Submit</button>
+        <input id="email" name="email" placeholder="owlbert@readme.io" required type="email" />
+        <button>Submit</button>
         </form>
+        <p class="info">
+          <span class="info-header">WHAT IS THIS?</span>
+          When a user logs into your docs, we make a request to this API to retrieve data about that user to fill in their API keys in your docs and display their logs.</p>
       </div>
       <div class="hidden" id="webhook-fail">
         <h2 class="card-heading">
@@ -103,7 +105,7 @@ export function buildSetupView({ baseUrl, apiKey, subdomain, disableWebhook, dis
           </span>
           <span class="card-badge">Webhook</span>
         </h2>
-        <p class='warning'>It seems like an empty object was returned for this user. Is that expected?</p>
+        <p class="warning">It seems like an empty object was returned for this user. Is that expected?</p>
         <p>
           Webhook running at:
           <a href="${baseUrl}/readme-webhook">${baseUrl}/readme-webhook</a>
@@ -141,8 +143,10 @@ export function buildSetupView({ baseUrl, apiKey, subdomain, disableWebhook, dis
           </span>
           <span class="card-badge">API Calls</span>
         </h2>
-        <p class='info'>We send API logs to ReadMe so you know who is using your API, the errors they are receiving, and even allow them to view their own logs directly in the documentation.</p>
         <p>Make a call to your API locally to verify everything is set up properly.
+        <p class="info">
+          <span class="info-header">WHAT IS THIS?</span>
+          Sending API logs to ReadMe lets you know who’s using your API, the errors they’re receiving, and allow them to view their own logs directly in your docs.</p>
       </div>
       <div id="metrics-fail" class="hidden">
         <h2 class="card-heading">
@@ -263,10 +267,45 @@ export function buildSetupView({ baseUrl, apiKey, subdomain, disableWebhook, dis
     background: var(--color-text-default);
     border: 0;
     color: var(--color-bg-page);
+    font-weight: 600;
+    text-transform: uppercase;
   }
+
+  a {
+    color: currentcolor;
+  }
+
+  ol {
+    padding: 0;
+
+    .card-badge {
+      margin-left: 5px;
+    }
+  }
+
+  pre {
+    background: var(--color-text-default);
+    border-radius: 5px;
+    color: var(--color-bg-page);
+    font-family: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro", "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
+    font-size: 12px;
+    overflow: auto;
+    padding: 10px;
+  }
+
   .card,
   .content {
     padding: 1.5em;
+
+    .card-badge {
+      border: 1px solid var(--color-decor);
+      border-radius: 0.5em;
+      color: var(--color-text-minimum);
+      display: inline-flex;
+      font-size: 11px;
+      font-weight: 400;
+      padding: 0.2em 0.5em;
+    }
   }
 
   .card {
@@ -280,14 +319,6 @@ export function buildSetupView({ baseUrl, apiKey, subdomain, disableWebhook, dis
       justify-content: space-between;
       gap: 0.5em;
 
-    }
-
-    .card-badge {
-      border: 1px solid var(--color-decor);
-      border-radius: 0.5em;
-      color: var(--color-text-minimum);
-      font-size: 11px;
-      padding: 0.2em 0.5em;
     }
 
     .card-status {
@@ -384,12 +415,24 @@ export function buildSetupView({ baseUrl, apiKey, subdomain, disableWebhook, dis
     }
   }
 
-  /* TODO: tony plz make this pretty */
   .info {
-    background: #e3edf2;
-    border-left: 5px solid #5bc0de;
-    border-radius: 3px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 5px;
+    font-size: 14px;
+    margin: 20px 0 0;
     padding: 10px;
+
+    .info-header {
+      color: var(--color-text-minimum);
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      background: rgba(255,255,255,0.05);
+    }
   }
 
   .warning {
@@ -415,12 +458,31 @@ ${metricsVerifiedHtml}
 <hr>
 
 <section class="content">
-  <h1>What is this?</h1>
+  <h1>I need help getting setup!</h1>
   <p>If you’ve made it this far and still need help, feel free to email us at <a href="mailto:devdash@readme.io">devdash@readme.io</a>. That email goes directly to
     <a class="tooltip" role="button" tabindex="0">
       <span>the engineers who built this</span>
       <img alt="Bill Gates on a desk with a computer" class="tooltip-img" src="//readmeio.github.io/pix/bill.jpg">
     </a>. Also, check out <a target="blank" href="//docs.readme.com/main/docs/sending-api-logs">the docs</a>!
+  <hr>
+  <h2>Do I need to setup both, webhooks and API calls?</h2>
+  <p>No, you can have partial functionality:
+  <ol>
+    <li>Get API keys and logs in your docs<div class="card-badge">Webhooks</div>
+    <li>Admin UI for your API<div class="card-badge">API Calls</div>
+  </ol>
+  <pre>
+readme(async (req) => {
+  const user = getUser({ email: req.body.email, apiKey: req.query.apiKey });
+
+  return {
+    email: user.email,
+    keys: user.apiKeys,
+    name: user.name,
+    sendApiLogs: false // disable sending api logs to ReadMe
+    webhooks: false // disable webhooks functionality to get keys and logs in the docs
+  };
+})</pre>
 </section>
 
 <footer class="footer">
