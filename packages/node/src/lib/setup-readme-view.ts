@@ -146,7 +146,7 @@ export function buildSetupView({ baseUrl, apiKey, subdomain, disableWebhook, dis
         <p>Make a call to your API locally to verify everything is set up properly.
         <p class="info">
           <span class="info-header">WHAT IS THIS?</span>
-          Sending API logs to ReadMe lets you know who’s using your API, the errors they’re receiving, and allow them to view their own logs directly in your docs.</p>
+          Sending API logs to ReadMe lets you know who’s using your API, the errors they’re receiving, and allow them to view their own logs directly in your docs when logged in.</p>
       </div>
       <div id="metrics-fail" class="hidden">
         <h2 class="card-heading">
@@ -441,6 +441,39 @@ export function buildSetupView({ baseUrl, apiKey, subdomain, disableWebhook, dis
     border-radius: 3px;
     padding: 10px;
   }
+
+  /* Syntax Highlighting */
+  .cm-variable {
+    color: #f07178;
+  }
+
+  .cm-keyword { 
+    color: #c792ea;
+  }
+
+  .cm-def {
+    color: #82aaff;
+  }
+
+  .cm-operator {
+    color: #89ddff;
+  }
+
+  .cm-variable-2 {
+    color: #eff;
+  }
+
+  .cm-property {
+    color: #c792ea;
+  }
+
+  .cm-atom {
+    color: #f78c6c;
+  }
+
+  .cm-comment {
+    color: #676e95;
+  }
 </style>
 <main>
 
@@ -472,17 +505,19 @@ ${metricsVerifiedHtml}
     <li>Admin UI for your API<div class="card-badge">API Calls</div>
   </ol>
   <pre>
-readme(async (req) => {
-  const user = getUser({ email: req.body.email, apiKey: req.query.apiKey });
+<div class="cm-s-neo"><span class="cm-variable">readme</span>(<span class="cm-keyword">async</span> (<span class="cm-def">req</span>) <span class="cm-operator">=&gt;</span> {
+  <span class="cm-keyword">const</span> <span class="cm-def">user</span> <span class="cm-operator">=</span> <span class="cm-variable">getUser</span>({ <span class="cm-property">email</span>: <span class="cm-variable-2">req</span>.<span class="cm-property">body</span>.<span class="cm-property">email</span>, <span class="cm-property">apiKey</span>: <span class="cm-variable-2">req</span>.<span class="cm-property">query</span>.<span class="cm-property">apiKey</span> });
 
-  return {
-    email: user.email,
-    keys: user.apiKeys,
-    name: user.name,
-    sendApiLogs: false // disable sending api logs to ReadMe
-    webhooks: false // disable webhooks functionality to get keys and logs in the docs
+  <span class="cm-keyword">return</span> {
+    <span class="cm-property">email</span>: <span class="cm-variable-2">user</span>.<span class="cm-property">email</span>,
+    <span class="cm-property">keys</span>: <span class="cm-variable-2">user</span>.<span class="cm-property">apiKeys</span>,
+    <span class="cm-property">name</span>: <span class="cm-variable-2">user</span>.<span class="cm-property">name</span>,
   };
-})</pre>
+}, {
+    <span class="cm-property">disableMetrics</span>: <span class="cm-atom">false</span>, <span class="cm-comment">// disable sending api logs to ReadMe</span>
+    <span class="cm-property">disableWebhook</span>: <span class="cm-atom">false</span> <span class="cm-comment">// disable webhooks functionality to get keys and logs in the docs</span>
+});
+</div></pre>
 </section>
 
 <footer class="footer">
