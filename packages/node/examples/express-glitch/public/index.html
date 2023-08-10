@@ -27,23 +27,61 @@
     -->
     <div class="wrapper">
       <div class="content" role="main">
-        <h1 class="title">Hello Developer!</h1>
+        <h1 class="title">Hello World!</h1>
         <img
           src="https://cdn.glitch.global/b42e1780-77d0-4250-82ac-128d1ed94be9/popper.gif?v=1690307195001"
           class="illustration"
           alt="Owlbert Party Popper"
         />
         <div class="instructions">
-          <h2>Getting started with ReadMe Developer Dashboard 🚀</h2>
           <p>
-            This is ReadMe's <strong>Developer Dashboard</strong> starter project. You can use it to deploy a
-            Node.js/Express server that integrates with ReadMe's Developer Dashboard.
+            This starter project is a
+            <a href="https://docs.readme.com/main/docs/sending-logs-to-readme-with-nodejs" target="_blank"
+              >Node.js/Express</a
+            >
+            API that integrates with
+            <a href="https://readme.com/developer-dashboard" target="_blank">ReadMe's Developer Dashboard</a>.
           </p>
+          <h2>Your API is live 🚀</h2>
 
           <p>
-            Check out the code in the editor and open the
-            <a class="fileopener" href="" target="_blank">README</a>
-            for next steps!
+            If you're seeing this page, that means your API is live and (hopefully!) connected to your Developer
+            Dashboard 🎊
+          </p>
+
+          <p>Let's confirm this by making an API request! Open up your command line and run some cURL commands:</p>
+
+          <!-- TODO: code block styling -->
+          <pre>curl --request GET https://<span class="glitch-subdomain">readme-metrics-demo</span>.glitch.me/hello</pre>
+
+          <pre>curl --request GET https://<span class="glitch-subdomain">readme-metrics-demo</span>.glitch.me/hello/owlbert</pre>
+
+          <pre>
+curl --request POST \
+     --url https://<span class="glitch-subdomain">readme-metrics-demo</span>.glitch.me \
+     --header 'content-type: application/json' \
+     --data '{"name":"owlivia"}'</pre>
+
+          <p>
+            If everything is set up properly, you should see the corresponding API logs in your Developer Dashboard 📈
+          </p>
+
+          <h2>What's Next? 👀</h2>
+
+          <p>
+            If you're looking to integrate an actual production API with Developer Dashboard, check out the
+            <a
+              class="fileopener glitch-href"
+              href="https://glitch.com/edit/#!/readme-metrics-demo?path=README.md"
+              target="_blank"
+              >README</a
+            >
+            for more information!
+          </p>
+          <p>
+            If you have any questions at all, we're here to help! Feel free to drop us a line at
+            <a href="mailto:support@readme.io" target="_blank">support@readme.io</a>
+            💌
           </p>
         </div>
       </div>
@@ -60,6 +98,20 @@
       </a>
     </footer>
   </body>
+  <script>
+    // this script replaces all instances of the glitch subdomain with the current app's subdomain
+    const glitchSubdomain = window.location.hostname.replace('.glitch.me', '');
+    if (glitchSubdomain) {
+      // update code samples
+      document.querySelectorAll('span.glitch-subdomain').forEach(el => {
+        el.innerText = glitchSubdomain;
+      });
+      // update links
+      document.querySelectorAll('a.glitch-href').forEach(el => {
+        el.href = el.href.replace('readme-metrics-demo', glitchSubdomain);
+      });
+    }
+  </script>
   <style>
     /******************************************************************************
 START Glitch hello-app default styles
