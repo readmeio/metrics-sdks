@@ -57,6 +57,7 @@ namespace ReadMe
         await this.next(context);
       }
     }
+      
 
     private ConfigValues GetConfigValues()
     {
@@ -73,26 +74,12 @@ namespace ReadMe
       configValues.group = this.group;
 
       var options = readme.GetSection("options");
-      var denyList = options.GetSection("denyList").GetChildren();
-      var allowList = options.GetSection("allowList").GetChildren();
-
-      List<string> denyListList = new List<string>();
-      foreach (IConfigurationSection section in denyList)
-      {
-        denyListList.Add(section.Value);
-      }
-
-      List<string> allowListList = new List<string>();
-      foreach (IConfigurationSection section in allowList)
-      {
-        allowListList.Add(section.Value);
-      }
 
       Options optionsObj = new Options();
-      optionsObj.denyList = denyListList;
-      optionsObj.isDenyListEmpty = (denyListList.Count == 0) ? true : false;
-      optionsObj.allowList = allowListList;
-      optionsObj.isAllowListEmpty = (allowListList.Count == 0) ? true : false;
+      optionsObj.denyList = options.GetSection("denyList").Get<List<string>>();
+      // optionsObj.isDenyListEmpty = (denyListList.Count == 0) ? true : false;
+      optionsObj.allowList =  options.GetSection("allowList").Get<List<string>>();
+      // optionsObj.isAllowListEmpty = (allowListList.Count == 0) ? true : false;
       if (options.GetSection("development").Value != null)
       {
         optionsObj.development = bool.Parse(options.GetSection("development").Value);
