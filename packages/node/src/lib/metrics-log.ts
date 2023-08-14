@@ -42,7 +42,7 @@ export interface OutgoingLogBody {
 }
 
 export interface LogResponse {
-  ids: string | string[];
+  ids?: string | string[];
   response?: Response;
 }
 
@@ -130,9 +130,9 @@ export function metricsAPICall(
 
   if (fireAndForget) {
     makeRequest();
-    return Promise.resolve({
+    return Promise.resolve<LogResponse>({
       ids: getLogIds(body),
-    } as LogResponse);
+    });
   }
 
   return makeRequest().then(response => {
