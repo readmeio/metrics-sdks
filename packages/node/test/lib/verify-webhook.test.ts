@@ -47,7 +47,7 @@ describe('verifyWebhook', function () {
   it('should throw an error if signature is missing', function () {
     const body = { email: 'marc@readme.io' };
     const secret = 'docs4dayz';
-    const signature = undefined;
+    const signature = '';
 
     expect(() => {
       verifyWebhook(body, signature, secret);

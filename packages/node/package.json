@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@readme/eslint-config": "^10.5.1",
+    "@types/caseless": "^0.12.2",
     "@types/chai": "^4.3.4",
     "@types/content-type": "^1.1.5",
     "@types/find-cache-dir": "^3.2.1",
@@ -48,6 +49,7 @@
     "@types/multer": "^1.4.7",
     "@types/node": "^20.2.5",
     "@types/ssri": "^7.1.1",
+    "@types/supertest": "^2.0.12",
     "@types/type-is": "^1.6.3",
     "@types/uuid": "^9.0.2",
     "caseless": "^0.12.0",
