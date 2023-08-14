@@ -145,7 +145,7 @@ export default function processRequest(
   } catch (e) {} // eslint-disable-line no-empty
 
   let reqBody = typeof requestBody === 'string' ? parseRequestBody(requestBody, mimeType) : requestBody;
-  let postData: PostData;
+  let postData: PostData = null as unknown as PostData;
 
   if (denylist) {
     reqBody = typeof reqBody === 'object' ? redactProperties(reqBody, denylist) : reqBody;
@@ -216,7 +216,9 @@ export default function processRequest(
   };
 
   if (requestData.postData === null) {
-    delete requestData.postData;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { postData: postDataToBeOmitted, ...remainingRequestData } = requestData;
+    return remainingRequestData as Request;
   }
 
   return requestData as Request;
