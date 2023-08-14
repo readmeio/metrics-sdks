@@ -31,6 +31,10 @@ test-webhooks-dotnet: ## Run webhooks tests against the .NET SDK
 test-metrics-node-express: ## Run Metrics tests against the Node SDK + Express
 	docker-compose up --build --detach integration_node_express
 	SUPPORTS_HASHING=true npm run test:integration-metrics || make cleanup-failure
+	README_ALLOWLIST=true docker-compose up --build --detach integration_node_express
+	README_ALLOWLIST=true npm run test:integration-metrics-redaction || make cleanup-failure
+	README_DENYLIST=true docker-compose up --build --detach integration_node_express
+	README_DENYLIST=true npm run test:integration-metrics-redaction || make cleanup-failure
 	@make cleanup
 
 test-webhooks-node-express: ## Run webhooks tests against the Node SDK + Express

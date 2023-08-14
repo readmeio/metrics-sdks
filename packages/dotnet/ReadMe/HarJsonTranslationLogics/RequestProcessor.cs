@@ -50,14 +50,7 @@ namespace ReadMe.HarJsonTranslationLogics
         {
             PostData postData = new PostData();
             postData.mimeType = this.request.ContentType;
-            if (this.request.ContentType == "application/x-www-form-urlencoded")
-            {
-                postData.@params = RedactionHelper.RedactFormCollection(
-                    this.request.Form,
-                    this.configValues.options.allowList,
-                    this.configValues.options.denyList);
-            }
-            else if (this.request.HasFormContentType)
+            if (this.request.ContentType == "application/x-www-form-urlencoded" || this.request.HasFormContentType)
             {
                 postData.@params = RedactionHelper.RedactFormCollection(
                     this.request.Form,

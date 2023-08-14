@@ -13,6 +13,8 @@ const port = process.env.PORT || 8000;
 
 // Your ReadMe secret
 const secret = process.env.README_API_KEY;
+const allowlist = process.env.README_ALLOWLIST === "true" ? ['publicKey', 'public-header', 'x-header-2']: null;
+const denylist = process.env.README_DENYLIST === "true" ? ['privateKey', 'private-header', 'x-header-1'] : null;
 
 app.use((req, res, next) => {
   readme.log(
@@ -28,7 +30,8 @@ app.use((req, res, next) => {
       email: 'owlbert@example.com',
     },
     {
-      denylist: ['secretKey'],
+      denylist,
+      allowlist
     }
   );
 
@@ -36,11 +39,18 @@ app.use((req, res, next) => {
 });
 
 app.get('/', (req, res) => {
+  res.set('x-header-1', 'header-1');
+  res.set('x-header-2', 'header-2');
   res.json({ message: 'hello world' });
 });
 
 app.post('/', express.json(), (req, res) => {
-  res.status(200).send();
+  res.set('x-header-1', 'header-1');
+  res.set('x-header-2', 'header-2');
+  res.status(200).send({
+    privateKey: 'myPrivateValue',
+    publicKey: 'myPublicValue',
+  });
 });
 
 app.post('/webhook', express.json({ type: 'application/json' }), async (req, res) => {

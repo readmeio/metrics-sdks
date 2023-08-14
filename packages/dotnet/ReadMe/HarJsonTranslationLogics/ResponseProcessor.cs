@@ -33,7 +33,6 @@ namespace ReadMe.HarJsonObjectModels
             return responseObj;
         }
 
-
         private long GetHeadersSize()
         {
             long headersSize = 0;

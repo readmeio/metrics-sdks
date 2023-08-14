@@ -350,35 +350,6 @@ describe('Metrics SDK Integration Tests', function () {
     expect(response.status).to.equal(200);
   });
 
-  it('should respect denyLIst', async function () {
-    const content = JSON.stringify({ secretKey: 'mySecretKey', user: { email: 'dom@readme.io' } });
-    await fetch(`http://localhost:${PORT}/`, {
-      method: 'post',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: content,
-    });
-
-    const [, body] = await getRequest();
-    const [payload] = body;
-
-    const har = payload.request;
-    await expect(har).to.have.a.har.request;
-    await expect(har).to.have.a.har.response;
-
-    const { request, response } = har.log.entries[0];
-
-    expect(request.method).to.equal('POST');
-    expect(request.headers).to.have.header('content-type', 'application/json');
-    expect(request.postData).to.deep.equal({
-      mimeType: 'application/json',
-      text: JSON.stringify({ secretKey: '[REDACTED 11]', user: { email: 'dom@readme.io' } }),
-    });
-
-    expect(response.status).to.equal(200);
-  });
-
   /**
    * We should eventually support returning the raw POST payload to Metrics in this case but Express
    * has a fun quirk where if you declare the `express.json()` middleware on a route to identify
@@ -427,7 +398,6 @@ describe('Metrics SDK Integration Tests', function () {
   it('should process an `application/x-www-url-formencoded` POST payload', async function () {
     const params = new URLSearchParams();
     params.append('email', 'dom@readme.io');
-    params.append('secretKey', 'helloWorld');
 
     await fetch(`http://localhost:${PORT}/`, {
       method: 'post',
@@ -451,8 +421,7 @@ describe('Metrics SDK Integration Tests', function () {
     expect(request.postData).to.deep.equal({
       mimeType: 'application/x-www-form-urlencoded',
       params: [
-        { name: 'email', value: 'dom@readme.io' },
-        { name: 'secretKey', value: '[REDACTED 10]' },
+        { name: 'email', value: 'dom@readme.io' }
       ],
     });
 

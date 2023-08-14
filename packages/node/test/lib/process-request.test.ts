@@ -312,9 +312,11 @@ describe('process-request', function () {
         .post('/')
         .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
         .set('x-ratelimit-limit', '10')
+        .set('privateKey', 'secret')
         .expect(({ body }) => {
           expect(body.url).to.be.a.url;
           expect(body.headers).to.have.header('host', '[REDACTED 15]');
+          expect(body.headers).to.have.header('privateKey', '[REDACTED 13]');
           expect(body.headers).to.have.header('accept-encoding', '[REDACTED 13]');
           expect(body.headers).to.have.header('content-type', 'application/json');
           expect(body.headers).to.have.header('x-ratelimit-limit', '10');

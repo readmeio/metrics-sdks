@@ -11,7 +11,9 @@ namespace ReadMe.HarJsonTranslationLogics
     {
         public static List<Headers> RedactHeaderDictionary(
             IHeaderDictionary headerDictionary,
-            List<string> allowList = null, List<string> denyList = null)
+            List<string> allowList = null,
+            List<string> denyList = null
+        )
         {
             var redactedHeaders = new List<Headers>();
 
@@ -34,8 +36,11 @@ namespace ReadMe.HarJsonTranslationLogics
             return redactedHeaders;
         }
 
-        public static List<Params> RedactFormCollection(IFormCollection formCollection, List<string> allowList = null,
-            List<string> denyList = null)
+        public static List<Params> RedactFormCollection(
+            IFormCollection formCollection,
+            List<string> allowList = null,
+            List<string> denyList = null
+        )
         {
             var redactedParams = new List<Params>();
 
@@ -43,20 +48,23 @@ namespace ReadMe.HarJsonTranslationLogics
             {
                 if (ShouldRedactKey(key, allowList, denyList))
                 {
-                    var values = formCollection[key];
-                    foreach (var value in values)
-                    {
-                        var redactedValue = RedactValue(value);
-                        redactedParams.Add(new Params { name = key, value = redactedValue });
-                    }
+                    var redactedValue = RedactValue(formCollection[key]);
+                    redactedParams.Add(new Params { name = key, value = redactedValue });
+                }
+                else
+                {
+                    redactedParams.Add(new Params { name = key, value = formCollection[key] });
                 }
             }
 
             return redactedParams;
         }
 
-        public static JObject RedactJson(JObject jsonObject, List<string> allowList = null,
-            List<string> denyList = null)
+        public static JObject RedactJson(
+            JObject jsonObject,
+            List<string> allowList = null,
+            List<string> denyList = null
+        )
         {
             var redactedObject = RedactJsonRecursive(jsonObject, allowList, denyList);
             return redactedObject;
