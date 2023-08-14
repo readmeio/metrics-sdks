@@ -41,8 +41,10 @@ export interface OutgoingLogBody {
   request: Har;
 }
 
+type LogId = string | string[] | undefined;
+
 export interface LogResponse {
-  ids?: string | string[];
+  ids: LogId;
   response?: Response;
 }
 
@@ -77,7 +79,7 @@ function shouldBackoff(response: Response) {
   }
 }
 
-function getLogIds(body: OutgoingLogBody | OutgoingLogBody[]): string | string[] | undefined {
+function getLogIds(body: OutgoingLogBody | OutgoingLogBody[]): LogId {
   if (Array.isArray(body)) {
     return body.map(value => value._id) as string[];
   }
