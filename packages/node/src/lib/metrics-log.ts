@@ -139,6 +139,6 @@ export function metricsAPICall(
     return {
       response,
       ids: getLogIds(body),
-    };
+    } as LogResponse;
   });
 }

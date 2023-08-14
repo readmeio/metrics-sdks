@@ -123,7 +123,7 @@ export interface PayloadData {
  *
  * With the last 4 digits on the end for us to use to identify it later in a list.
  */
-export function mask(apiKey) {
+export function mask(apiKey: string) {
   return ssri
     .fromData(apiKey, {
       algorithms: ['sha512'],

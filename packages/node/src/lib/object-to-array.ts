@@ -22,7 +22,7 @@ export function objectToArray(
 }
 
 export function searchToArray(search: URLSearchParams): { name: string; value: string }[] {
-  const final = [];
+  const final: { name: string; value: string }[] = [];
 
   search.forEach((value, name) => {
     final.push({ name, value });

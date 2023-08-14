@@ -38,7 +38,7 @@ export function fixHeader(header: string | number | string[]): string | undefine
  * @param value the value to be redacted
  * @returns A redacted string potentially containing the length of the original value, if it was a string
  */
-function redactValue(value: string) {
+function redactValue(value: unknown) {
   const redactedVal = typeof value === 'string' ? ` ${value.length}` : '';
   return `[REDACTED${redactedVal}]`;
 }
@@ -50,7 +50,7 @@ function redactValue(value: string) {
  * @param redactedPaths a list of paths that point values which should be redacted
  * @returns An object with the redacted values
  */
-function redactProperties<T extends Record<string, unknown>>(obj: T, redactedPaths = []): T {
+function redactProperties<T extends Record<string, unknown>>(obj: T, redactedPaths: string[] = []): T {
   const nextObj = { ...obj };
   return redactedPaths.reduce((acc, path) => {
     const value = get(acc, path);
@@ -61,19 +61,22 @@ function redactProperties<T extends Record<string, unknown>>(obj: T, redactedPat
 
 /**
  * @param obj The data object that is operated upon
- * @param cb A callback that is invoked for each value found, the return value being the next value that is set in the returned object
+ * @param replaceCb A callback that is invoked for each value found, the return value being the next value that is set in the returned object
  * @returns An object with the replaced values
  */
-function replaceEach(obj, cb): Record<string, unknown> {
+function replaceEach<T extends Record<string, unknown>>(
+  obj: T,
+  replaceCb: (input: unknown) => string
+): Record<string, unknown> {
   return Object.keys(obj).reduce((acc, key) => {
     const value = obj[key];
     if (typeof value === 'object' && value !== null) {
-      acc[key] = replaceEach(value, cb);
+      acc[key] = replaceEach(value as Record<string, unknown>, replaceCb);
     } else if (value !== undefined) {
-      acc[key] = cb(value);
+      acc[key] = replaceCb(value);
     }
     return acc;
-  }, {});
+  }, {} as Record<string, unknown>);
 }
 
 /**
@@ -83,13 +86,13 @@ function replaceEach(obj, cb): Record<string, unknown> {
  * @param nonRedactedPaths A list of all object paths that shouldn't be redacted
  * @returns A merged objects that is entirely redacted except for the values of the nonRedactedPaths
  */
-function redactOtherProperties<T extends Record<string, unknown>>(obj: T, nonRedactedPaths): T {
+function redactOtherProperties<T extends Record<string, unknown>>(obj: T, nonRedactedPaths: string[]): T {
   const allowedFields = pick(obj, nonRedactedPaths);
   const redactedFields = obj ? replaceEach(obj, redactValue) : obj;
-  return merge(redactedFields, allowedFields);
+  return merge(redactedFields, allowedFields) as T;
 }
 
-function isApplicationJson(mimeType) {
+function isApplicationJson(mimeType: string) {
   if (!mimeType) {
     return false;
   }
@@ -207,6 +210,7 @@ export default function processRequest(
     queryString: searchToArray(reqUrl.searchParams),
     postData,
     // TODO: When readme starts accepting these, send the correct values
+    // @ts-expect-error we don't support cookies at the moment
     cookies: [],
     headersSize: -1,
     bodySize: -1,

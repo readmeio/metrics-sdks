@@ -6,6 +6,7 @@
     "esModuleInterop": true,
     "inlineSourceMap": true,
     "lib": ["es2019"],
+    "noImplicitAny": true,
     "outDir": "./dist",
     "resolveJsonModule": true
   },
