@@ -53,4 +53,13 @@ describe('verifyWebhook', function () {
       verifyWebhook(body, signature, secret);
     }).to.throw(/Missing Signature/);
   });
+
+  it('should throw an error if signature is undefined', function () {
+    const body = { email: 'marc@readme.io' };
+    const secret = 'docs4dayz';
+
+    expect(() => {
+      verifyWebhook(body, undefined, secret);
+    }).to.throw(/Missing Signature/);
+  });
 });
