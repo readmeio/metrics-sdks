@@ -163,7 +163,7 @@ export function constructPayload(
           {
             pageref: payloadData.routePath
               ? payloadData.routePath
-              : new URL(req.url, `${getProto(req)}://${req.headers.host}`).toString(),
+              : new URL(req.url || '', `${getProto(req)}://${req.headers.host}`).toString(),
             startedDateTime: payloadData.startedDateTime.toISOString(),
             time: serverTime,
             request: processRequest(req, payloadData.requestBody, logOptions),

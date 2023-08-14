@@ -34,7 +34,7 @@ export interface GroupingObject {
 export interface OutgoingLogBody {
   _id?: string;
   _version: number;
-  clientIPAddress: string;
+  clientIPAddress?: string;
   development: boolean;
   // API Key is currently a mapping to ID. Eventually we will support this server side. The omit and readdition of ID is to remove the deprecated warning in the meanwhile
   group: Omit<GroupingObject, 'apiKey' | 'id'> & { id: string };
@@ -48,7 +48,7 @@ export interface LogResponse {
 
 const BACKOFF_SECONDS = 15; // when we need to backoff HTTP requests, pause for seconds
 
-let backoffExpiresAt: Date;
+let backoffExpiresAt: Date | undefined;
 
 // Exported for use in unit tests
 export function setBackoff(expiresAt: Date | undefined) {
@@ -77,9 +77,9 @@ function shouldBackoff(response: Response) {
   }
 }
 
-function getLogIds(body: OutgoingLogBody | OutgoingLogBody[]): string | string[] {
+function getLogIds(body: OutgoingLogBody | OutgoingLogBody[]): string | string[] | undefined {
   if (Array.isArray(body)) {
-    return body.map(value => value._id);
+    return body.map(value => value._id) as string[];
   }
 
   return body._id;
@@ -132,7 +132,7 @@ export function metricsAPICall(
     makeRequest();
     return Promise.resolve({
       ids: getLogIds(body),
-    });
+    } as LogResponse);
   }
 
   return makeRequest().then(response => {

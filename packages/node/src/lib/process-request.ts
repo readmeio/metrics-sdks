@@ -1,6 +1,6 @@
 import type { LogOptions } from './construct-payload';
 import type { ExtendedIncomingMessage } from './log';
-import type { Entry } from 'har-format';
+import type { Cookie, Param, PostData, Request } from 'har-format';
 
 import * as qs from 'querystring';
 import url, { URL } from 'url';
@@ -132,20 +132,20 @@ export default function processRequest(
   req: ExtendedIncomingMessage,
   requestBody?: Record<string, unknown> | string,
   options?: LogOptions
-): Entry['request'] {
-  const protocol = fixHeader(req.headers['x-forwarded-proto'])?.toLowerCase() || getProto(req);
-  const host = fixHeader(req.headers['x-forwarded-host']) || req.headers.host;
+): Request {
+  const protocol = fixHeader(req.headers['x-forwarded-proto'] as string)?.toLowerCase() || getProto(req);
+  const host = fixHeader(req.headers['x-forwarded-host'] as string) || req.headers.host;
 
   const denylist = options?.denylist || options?.blacklist;
   const allowlist = options?.allowlist || options?.whitelist;
 
-  let mimeType: string = null;
+  let mimeType = '';
   try {
-    mimeType = contentType.parse(req.headers['content-type']).type;
+    mimeType = contentType.parse(req.headers['content-type'] as string).type;
   } catch (e) {} // eslint-disable-line no-empty
 
   let reqBody = typeof requestBody === 'string' ? parseRequestBody(requestBody, mimeType) : requestBody;
-  let postData: Entry['request']['postData'] = null;
+  let postData: PostData;
 
   if (denylist) {
     reqBody = typeof reqBody === 'object' ? redactProperties(reqBody, denylist) : reqBody;
@@ -161,13 +161,13 @@ export default function processRequest(
     postData = {
       mimeType,
       // `reqBody` is likely to be an object, but can be empty if no HTTP body sent
-      params: objectToArray((reqBody || {}) as Record<string, unknown>),
+      params: objectToArray((reqBody || {}) as Record<string, unknown>) as Param[],
     };
   } else if (isApplicationJson(mimeType)) {
     postData = {
       mimeType,
       text: typeof reqBody === 'object' || Array.isArray(reqBody) ? JSON.stringify(reqBody) : reqBody,
-    };
+    } as PostData;
   } else if (mimeType) {
     let stringBody = '';
 
@@ -187,7 +187,7 @@ export default function processRequest(
   // We use a fake host here because we rely on the host header which could be redacted.
   // We only ever use this reqUrl with the fake hostname for the pathname and querystring.
   // req.originalUrl is express specific, req.url is node.js
-  const reqUrl = new URL(req.originalUrl || req.url, 'https://readme.io');
+  const reqUrl = new URL(req.originalUrl || req.url || '', 'https://readme.io');
 
   if (req.headers.authorization) {
     req.headers.authorization = mask(req.headers.authorization);
@@ -210,8 +210,7 @@ export default function processRequest(
     queryString: searchToArray(reqUrl.searchParams),
     postData,
     // TODO: When readme starts accepting these, send the correct values
-    // @ts-expect-error we don't support cookies at the moment
-    cookies: [],
+    cookies: [] as Cookie[],
     headersSize: -1,
     bodySize: -1,
   };
@@ -220,5 +219,5 @@ export default function processRequest(
     delete requestData.postData;
   }
 
-  return requestData;
+  return requestData as Request;
 }

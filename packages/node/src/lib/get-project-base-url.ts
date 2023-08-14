@@ -34,7 +34,7 @@ export async function getProjectBaseUrl(readmeApiKey: string, requestTimeout = c
   ) {
     const signal = timeoutSignal(requestTimeout);
 
-    let baseUrl;
+    let baseUrl = '';
     await fetch(`${config.readmeApiUrl}/v1/`, {
       method: 'get',
       headers: {

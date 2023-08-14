@@ -2,12 +2,17 @@ import type { URLSearchParams } from 'url';
 
 export function objectToArray(
   object: Record<string, unknown>,
+  opts: { castToString: true }
+): { name: string; value: string }[];
+export function objectToArray(object: Record<string, unknown>): { name: string; value: unknown }[];
+export function objectToArray(
+  object: Record<string, unknown>,
   opts: {
     castToString: boolean;
   } = {
     castToString: false,
   }
-): { name: string; value: string }[] {
+): { name: string; value: unknown }[] {
   return Object.entries(object).reduce((prev, [name, value]) => {
     if (Array.isArray(value)) {
       value.forEach(val => {
@@ -18,7 +23,7 @@ export function objectToArray(
     }
 
     return prev;
-  }, []);
+  }, [] as { name: string; value: unknown }[]);
 }
 
 export function searchToArray(search: URLSearchParams): { name: string; value: string }[] {
