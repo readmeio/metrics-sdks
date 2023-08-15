@@ -1,3 +1,5 @@
+using System.Linq;
+using Microsoft.Extensions.Primitives;
 using ReadMe.HarJsonObjectModels;
 
 namespace ReadMe.HarJsonTranslationLogics
@@ -124,8 +126,9 @@ namespace ReadMe.HarJsonTranslationLogics
 
         private static string RedactValue<T>(T value)
         {
-            if (value is string strValue)
+            if (value is string || value is StringValues)
             {
+                string strValue = value.ToString(); // Convert value to string
                 return $"[REDACTED {strValue.Length}]";
             }
             else

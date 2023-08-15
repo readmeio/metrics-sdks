@@ -38,15 +38,17 @@ app.use((req, res, next) => {
   return next();
 });
 
-app.get('/', (req, res) => {
+app.use((req, res, next) => {
   res.set('x-header-1', 'header-1');
   res.set('x-header-2', 'header-2');
+  return next();
+});
+
+app.get('/', (req, res) => {
   res.json({ message: 'hello world' });
 });
 
 app.post('/', express.json(), (req, res) => {
-  res.set('x-header-1', 'header-1');
-  res.set('x-header-2', 'header-2');
   res.status(200).send({
     privateKey: 'myPrivateValue',
     publicKey: 'myPublicValue',

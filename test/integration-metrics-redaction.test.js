@@ -172,12 +172,10 @@ describe('Metrics SDK Integration Redaction Tests', function () {
 
           expect(request.method).to.equal('POST');
           expect(request.headers).to.have.header('content-type', 'application/json');
-          expect(request.postData).to.deep.equal({
-            mimeType: 'application/json',
-            text: JSON.stringify({
-              privateKey: '[REDACTED 14]',
-              user: { email: 'dom@readme.io' },
-            }),
+          expect(request.postData.mimeType).to.equal('application/json');
+          expect(JSON.parse(request.postData.text)).to.deep.equal({
+            privateKey: '[REDACTED 14]',
+            user: { email: 'dom@readme.io' },
           });
         });
 
@@ -199,9 +197,10 @@ describe('Metrics SDK Integration Redaction Tests', function () {
 
           expect(request.method).to.equal('POST');
           expect(request.headers).to.have.header('content-type', 'application/vnd.api+json');
-          expect(request.postData).to.deep.equal({
-            mimeType: 'application/vnd.api+json',
-            text: '{"privateKey":"[REDACTED 14]","user":{"email":"dom@readme.io"}}',
+          expect(request.postData.mimeType).to.equal('application/vnd.api+json');
+          expect(JSON.parse(request.postData.text)).to.deep.equal({
+            privateKey: '[REDACTED 14]',
+            user: { email: 'dom@readme.io' },
           });
         });
 
@@ -291,7 +290,7 @@ describe('Metrics SDK Integration Redaction Tests', function () {
           expect(response.headers).to.have.header('x-header-2', 'header-2');
         });
 
-        it('removes the body fields', async function () {
+        it('redacts the body fields', async function () {
           const content = JSON.stringify({ privateKey: 'myPrivateKey', user: { email: 'dom@readme.io' } });
           await fetch(`http://localhost:${PORT}/`, {
             method: 'post',
@@ -307,12 +306,11 @@ describe('Metrics SDK Integration Redaction Tests', function () {
 
           const har = payload.request;
           const { response } = har.log.entries[0];
-
-          expect(response.content.text).to.equal(
-            JSON.stringify({
-              publicKey: 'myPublicValue',
-            })
-          );
+          
+          expect(JSON.parse(response.content.text)).to.deep.equal({
+            privateKey: '[REDACTED 14]',
+            publicKey: 'myPublicValue',
+          });
         });
       });
     }
@@ -363,17 +361,19 @@ describe('Metrics SDK Integration Redaction Tests', function () {
 
           expect(request.method).to.equal('POST');
           expect(request.headers).to.have.header('content-type', '[REDACTED 16]');
-          expect(request.postData).to.deep.equal({
-            mimeType: 'application/json',
-            text: JSON.stringify({
-              publicKey: 'myPublicValue',
-              user: { email: '[REDACTED 13]', nestedKey: '[REDACTED 11]' },
-            }),
+          expect(request.postData.mimeType).to.equal('application/json');
+          const jsonBody = JSON.parse(request.postData.text);
+          expect(jsonBody).to.deep.equal({
+            publicKey: 'myPublicValue',
+            user: { email: '[REDACTED 13]', nestedKey: '[REDACTED 11]' },
           });
         });
 
         it('redacts a vendored `+json` POST payload', async function () {
-          const content = JSON.stringify({ publicKey: 'myPublicValue', user: { email: 'dom@readme.io' } });
+          const content = JSON.stringify({
+            publicKey: 'myPublicValue',
+            user: { email: 'dom@readme.io', nestedKey: 'nestedValue' },
+          });
           await fetch(`http://localhost:${PORT}/`, {
             method: 'post',
             headers: {
@@ -390,9 +390,12 @@ describe('Metrics SDK Integration Redaction Tests', function () {
 
           expect(request.method).to.equal('POST');
           expect(request.headers).to.have.header('content-type', '[REDACTED 24]');
-          expect(request.postData).to.deep.equal({
-            mimeType: 'application/vnd.api+json',
-            text: '{"publicKey":"myPublicValue","user":{"email":"[REDACTED 13]"}}',
+
+          expect(request.postData.mimeType).to.equal('application/vnd.api+json');
+          const jsonBody = JSON.parse(request.postData.text);
+          expect(jsonBody).to.deep.equal({
+            publicKey: 'myPublicValue',
+            user: { email: '[REDACTED 13]', nestedKey: '[REDACTED 11]' },
           });
         });
 
@@ -482,7 +485,7 @@ describe('Metrics SDK Integration Redaction Tests', function () {
           expect(response.headers).to.have.header('x-header-2', 'header-2');
         });
 
-        it('removes the body fields', async function () {
+        it('redacts the body fields', async function () {
           const content = JSON.stringify({ privateKey: 'myPrivateKey', user: { email: 'dom@readme.io' } });
           await fetch(`http://localhost:${PORT}/`, {
             method: 'post',
@@ -499,11 +502,10 @@ describe('Metrics SDK Integration Redaction Tests', function () {
           const har = payload.request;
           const { response } = har.log.entries[0];
 
-          expect(response.content.text).to.equal(
-            JSON.stringify({
-              publicKey: 'myPublicValue',
-            })
-          );
+          expect(JSON.parse(response.content.text)).to.deep.equal({
+            privateKey: '[REDACTED 14]',
+            publicKey: 'myPublicValue',
+          });
         });
       });
     }

@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json.Linq;
 using ReadMe.HarJsonTranslationLogics;
 
 namespace ReadMe.HarJsonObjectModels
@@ -50,9 +52,24 @@ namespace ReadMe.HarJsonObjectModels
         private Content GetContent()
         {
             Content content = new Content();
-            content.text = this.responseBodyData;
-            content.size = this.responseBodyData.Length;
             content.mimeType = this.response.ContentType ??= "text/plain";
+            content.size = this.responseBodyData.Length;
+
+            try
+            {
+                JObject parsedBody = JObject.Parse(this.responseBodyData);
+                JObject redactedJson = RedactionHelper.RedactJson(
+                    parsedBody,
+                    this.configValues.options.allowList,
+                    this.configValues.options.denyList);
+
+                content.text = redactedJson.ToString();
+            }
+            catch (Exception ex)
+            {
+                content.text = this.responseBodyData;
+            }
+
             return content;
         }
 

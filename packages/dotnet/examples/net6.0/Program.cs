@@ -5,13 +5,32 @@ if (readmeApiKey == null)
   System.Environment.Exit(1);
 }
 
+var allowList = Environment.GetEnvironmentVariable("README_ALLOWLIST");
+var denyList = Environment.GetEnvironmentVariable("README_DENYLIST");
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
 {
   config.AddInMemoryCollection(new Dictionary<string, string> {
-    {"readme:apiKey", readmeApiKey},
+    {"readme:apiKey", readmeApiKey}
   });
+  if (allowList ==  "true")
+  {
+    config.AddInMemoryCollection(new Dictionary<string, string> {
+      {"readme:options:allowList:0", "publicKey" },
+      {"readme:options:allowList:1", "public-header" },
+      {"readme:options:allowList:2", "x-header-2" },
+    });
+  }
+  if (denyList ==  "true")
+  {
+    config.AddInMemoryCollection(new Dictionary<string, string> {
+      {"readme:options:denyList:0", "privateKey" },
+      {"readme:options:denyList:1", "private-header" },
+      {"readme:options:denyList:2", "x-header-1" },
+    });
+  }
 });
 
 var app = builder.Build();
@@ -36,6 +55,13 @@ app.MapGet("/", async context =>
 
 app.MapPost("/", async context =>
 {
+  context.Response.Headers.Add("x-header-1", "header-1");
+  context.Response.Headers.Add("x-header-2", "header-2");
+  await context.Response.WriteAsJsonAsync(new
+  {
+    privateKey = "myPrivateValue",
+    publicKey = "myPublicValue"
+  });
   context.Response.StatusCode = 200;
   await context.Response.CompleteAsync();
 });

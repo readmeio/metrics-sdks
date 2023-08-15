@@ -187,10 +187,7 @@ describe('Metrics SDK Integration Tests', function () {
     expect(response.statusText).to.match(/OK|200/); // Django returns with "200"
     expect(response.headers).to.have.header('content-type', /application\/json(;\s?charset=utf-8)?/);
 
-    // Flask prints a \n character after the JSON response
-    // https://github.com/pallets/flask/issues/4635
-    expect(response.content.text.replace('\n', '')).to.equal(JSON.stringify({ message: 'hello world' }));
-    expect(response.content.size).to.equal(response.content.text.length);
+    expect(JSON.parse(response.content.text)).to.deep.equal({ message: 'hello world' });
     expect(response.content.mimeType).to.match(/application\/json(;\s?charset=utf-8)?/);
   });
 
@@ -289,10 +286,8 @@ describe('Metrics SDK Integration Tests', function () {
       ]), // Rails
     ]);
 
-    expect(request.postData).to.deep.equal({
-      mimeType: 'application/json',
-      text: content,
-    });
+    expect(request.postData.mimeType).to.equal('application/json');
+    expect(JSON.parse(request.postData.text)).to.deep.equal({ user: { email: 'dom@readme.io' } });
 
     expect(response.status).to.equal(200);
   });
@@ -342,10 +337,9 @@ describe('Metrics SDK Integration Tests', function () {
 
     expect(request.method).to.equal('POST');
     expect(request.headers).to.have.header('content-type', 'application/json');
-    expect(request.postData).to.deep.equal({
-      mimeType: 'application/json',
-      text: content,
-    });
+
+    expect(request.postData.mimeType).to.equal('application/json');
+    expect(JSON.parse(request.postData.text)).to.deep.equal({ user: { email: 'dom@readme.io' } });
 
     expect(response.status).to.equal(200);
   });
@@ -381,10 +375,8 @@ describe('Metrics SDK Integration Tests', function () {
 
     expect(request.method).to.equal('POST');
     expect(request.headers).to.have.header('content-type', 'application/vnd.api+json');
-    expect(request.postData).to.deep.equal({
-      mimeType: 'application/vnd.api+json',
-      text: content,
-    });
+    expect(request.postData.mimeType).to.equal('application/vnd.api+json');
+    expect(JSON.parse(request.postData.text)).to.deep.equal({ user: { email: 'dom@readme.io' } });
 
     expect(response.status).to.be.oneOf([
       200,

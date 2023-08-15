@@ -57,7 +57,7 @@ namespace ReadMe.HarJsonTranslationLogics
                     this.configValues.options.allowList,
                     this.configValues.options.denyList);
             }
-            else if (this.request.ContentType == "application/json")
+            else if (RedactionHelper.IsApplicationJson(this.request.ContentType))
             {
                 string requestBody = await this.GetRequestBodyData();
                 JObject parsedBody = JObject.Parse(requestBody);
