@@ -13,7 +13,7 @@ export function objectToArray(
     castToString: false,
   }
 ): { name: string; value: unknown }[] {
-  return Object.entries(object).reduce((prev, [name, value]) => {
+  return Object.entries(object).reduce<{ name: string; value: unknown }[]>((prev, [name, value]) => {
     if (Array.isArray(value)) {
       value.forEach(val => {
         prev.push({ name, value: opts.castToString ? String(val) : val });
@@ -23,7 +23,7 @@ export function objectToArray(
     }
 
     return prev;
-  }, [] as { name: string; value: unknown }[]);
+  }, []);
 }
 
 export function searchToArray(search: URLSearchParams): { name: string; value: string }[] {

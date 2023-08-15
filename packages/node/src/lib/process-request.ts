@@ -68,7 +68,7 @@ function replaceEach<T extends Record<string, unknown>>(
   obj: T,
   cb: (input: unknown) => string
 ): Record<string, unknown> {
-  return Object.keys(obj).reduce((acc, key) => {
+  return Object.keys(obj).reduce<Record<string, unknown>>((acc, key) => {
     const value = obj[key];
     if (typeof value === 'object' && value !== null) {
       acc[key] = replaceEach(value as Record<string, unknown>, cb);
@@ -76,7 +76,7 @@ function replaceEach<T extends Record<string, unknown>>(
       acc[key] = cb(value);
     }
     return acc;
-  }, {} as Record<string, unknown>);
+  }, {});
 }
 
 /**
@@ -141,7 +141,7 @@ export default function processRequest(
 
   let mimeType = '';
   try {
-    mimeType = contentType.parse(req.headers['content-type'] as string).type;
+    mimeType = contentType.parse(req.headers['content-type'] || '').type;
   } catch (e) {} // eslint-disable-line no-empty
 
   let reqBody = typeof requestBody === 'string' ? parseRequestBody(requestBody, mimeType) : requestBody;
@@ -166,8 +166,8 @@ export default function processRequest(
   } else if (isApplicationJson(mimeType)) {
     postData = {
       mimeType,
-      text: typeof reqBody === 'object' || Array.isArray(reqBody) ? JSON.stringify(reqBody) : reqBody,
-    } as PostData;
+      text: typeof reqBody === 'object' || Array.isArray(reqBody) ? JSON.stringify(reqBody) : reqBody || '',
+    };
   } else if (mimeType) {
     let stringBody = '';
 
