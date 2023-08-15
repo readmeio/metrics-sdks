@@ -61,19 +61,19 @@ function redactProperties<T extends Record<string, unknown>>(obj: T, redactedPat
 
 /**
  * @param obj The data object that is operated upon
- * @param replaceCb A callback that is invoked for each value found, the return value being the next value that is set in the returned object
+ * @param cb A callback that is invoked for each value found, the return value being the next value that is set in the returned object
  * @returns An object with the replaced values
  */
 function replaceEach<T extends Record<string, unknown>>(
   obj: T,
-  replaceCb: (input: unknown) => string
+  cb: (input: unknown) => string
 ): Record<string, unknown> {
   return Object.keys(obj).reduce((acc, key) => {
     const value = obj[key];
     if (typeof value === 'object' && value !== null) {
-      acc[key] = replaceEach(value as Record<string, unknown>, replaceCb);
+      acc[key] = replaceEach(value as Record<string, unknown>, cb);
     } else if (value !== undefined) {
-      acc[key] = replaceCb(value);
+      acc[key] = cb(value);
     }
     return acc;
   }, {} as Record<string, unknown>);
