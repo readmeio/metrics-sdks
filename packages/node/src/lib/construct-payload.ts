@@ -123,7 +123,7 @@ export interface PayloadData {
  *
  * With the last 4 digits on the end for us to use to identify it later in a list.
  */
-export function mask(apiKey) {
+export function mask(apiKey: string) {
   return ssri
     .fromData(apiKey, {
       algorithms: ['sha512'],
@@ -148,7 +148,7 @@ export function constructPayload(
       label: payloadData.label,
       email: payloadData.email,
     },
-    clientIPAddress: req.socket.remoteAddress,
+    clientIPAddress: req.socket.remoteAddress || '',
     development: !!logOptions?.development,
     request: {
       log: {
@@ -163,7 +163,7 @@ export function constructPayload(
           {
             pageref: payloadData.routePath
               ? payloadData.routePath
-              : new URL(req.url, `${getProto(req)}://${req.headers.host}`).toString(),
+              : new URL(req.url || '', `${getProto(req)}://${req.headers.host}`).toString(),
             startedDateTime: payloadData.startedDateTime.toISOString(),
             time: serverTime,
             request: processRequest(req, payloadData.requestBody, logOptions),

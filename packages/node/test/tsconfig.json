@@ -1,7 +1,9 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "noImplicitAny": true,
+    "strict": false
   },
   "include": ["./index.test.ts", "./lib/*.ts"]
 }
