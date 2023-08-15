@@ -148,7 +148,7 @@ export function constructPayload(
       label: payloadData.label,
       email: payloadData.email,
     },
-    clientIPAddress: req.socket.remoteAddress,
+    clientIPAddress: req.socket.remoteAddress || '',
     development: !!logOptions?.development,
     request: {
       log: {

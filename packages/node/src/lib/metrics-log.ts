@@ -34,7 +34,7 @@ export interface GroupingObject {
 export interface OutgoingLogBody {
   _id?: string;
   _version: number;
-  clientIPAddress?: string;
+  clientIPAddress: string;
   development: boolean;
   // API Key is currently a mapping to ID. Eventually we will support this server side. The omit and readdition of ID is to remove the deprecated warning in the meanwhile
   group: Omit<GroupingObject, 'apiKey' | 'id'> & { id: string };
