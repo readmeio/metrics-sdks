@@ -10,13 +10,17 @@ export function patchResponse(res: ExtendedResponse) {
 
   res._body = '';
 
-  // @ts-expect-error this feels scary to mess with further
+  // @ts-expect-error these lines are messing with Node internals and
+  // I'm not sure what exactly typing fix is needed here that doesn't have
+  // some sort of adverse impact on our response handling.
   res.write = (chunk, encoding, cb) => {
     res._body += chunk;
     write.call(res, chunk, encoding, cb);
   };
 
-  // @ts-expect-error this feels scary to mess with further
+  // @ts-expect-error these lines are messing with Node internals and
+  // I'm not sure what exactly typing fix is needed here that doesn't have
+  // some sort of adverse impact on our response handling.
   res.end = (chunk, encoding, cb) => {
     // Chunk is optional in res.end
     // http://nodejs.org/dist/latest/docs/api/http.html#http_response_end_data_encoding_callback
