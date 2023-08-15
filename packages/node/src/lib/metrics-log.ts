@@ -98,7 +98,7 @@ export function metricsAPICall(
   const makeRequest = () => {
     if (backoffExpiresAt) {
       if (backoffExpiresAt > new Date()) {
-        return Promise.resolve();
+        return Promise.resolve(undefined);
       }
       // after the backoff expires, erase the old expiration time
       backoffExpiresAt = undefined;
@@ -141,6 +141,6 @@ export function metricsAPICall(
     return {
       response,
       ids: getLogIds(body),
-    } as LogResponse;
+    };
   });
 }
