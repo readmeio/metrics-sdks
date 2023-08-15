@@ -145,7 +145,7 @@ export default function processRequest(
   } catch (e) {} // eslint-disable-line no-empty
 
   let reqBody = typeof requestBody === 'string' ? parseRequestBody(requestBody, mimeType) : requestBody;
-  let postData: PostData = null as unknown as PostData;
+  let postData: PostData | undefined;
 
   if (denylist) {
     reqBody = typeof reqBody === 'object' ? redactProperties(reqBody, denylist) : reqBody;
@@ -215,11 +215,11 @@ export default function processRequest(
     bodySize: -1,
   };
 
-  if (requestData.postData === null) {
+  if (typeof requestData.postData === 'undefined') {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { postData: postDataToBeOmitted, ...remainingRequestData } = requestData;
     return remainingRequestData as Request;
   }
 
-  return requestData as Request;
+  return requestData;
 }
