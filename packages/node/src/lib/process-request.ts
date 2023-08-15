@@ -221,5 +221,5 @@ export default function processRequest(
     return remainingRequestData as Request;
   }
 
-  return requestData;
+  return requestData as Request;
 }
