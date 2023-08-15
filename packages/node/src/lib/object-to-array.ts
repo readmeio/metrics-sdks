@@ -1,10 +1,15 @@
 import type { URLSearchParams } from 'url';
 
+type ParamArray = {
+  name: string;
+  value: unknown;
+}[];
+
 export function objectToArray(
   object: Record<string, unknown>,
   opts: { castToString: true }
 ): { name: string; value: string }[];
-export function objectToArray(object: Record<string, unknown>): { name: string; value: unknown }[];
+export function objectToArray(object: Record<string, unknown>): ParamArray;
 export function objectToArray(
   object: Record<string, unknown>,
   opts: {
@@ -12,8 +17,8 @@ export function objectToArray(
   } = {
     castToString: false,
   }
-): { name: string; value: unknown }[] {
-  return Object.entries(object).reduce<{ name: string; value: unknown }[]>((prev, [name, value]) => {
+): ParamArray {
+  return Object.entries(object).reduce<ParamArray>((prev, [name, value]) => {
     if (Array.isArray(value)) {
       value.forEach(val => {
         prev.push({ name, value: opts.castToString ? String(val) : val });
