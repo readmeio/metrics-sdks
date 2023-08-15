@@ -58,12 +58,12 @@ export default function processResponse(res: ServerResponse, responseBody?: stri
     //
     // This is the same thing that Node.js does internally:
     // https://github.com/nodejs/node/blob/9b8ba2536044ae08a1cd747a3aa52df7d1815e7e/lib/_http_server.js#L318
-    statusText: (res.statusMessage || STATUS_CODES[res.statusCode]) as string,
+    statusText: res.statusMessage || STATUS_CODES[res.statusCode] || '',
     headers: objectToArray(headers, { castToString: true }),
     content: {
       text: JSON.stringify(body),
       size: Number(fixHeader(res.getHeader('content-length') || 0)),
-      mimeType: fixHeader(res.getHeader('content-type') as string) || 'text/plain',
+      mimeType: fixHeader(res.getHeader('content-type') || '') || 'text/plain',
     },
     // TODO: Once readme starts accepting these, send the correct values
     httpVersion: '',

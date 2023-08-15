@@ -133,8 +133,8 @@ export default function processRequest(
   requestBody?: Record<string, unknown> | string,
   options?: LogOptions
 ): Request {
-  const protocol = fixHeader(req.headers['x-forwarded-proto'] as string)?.toLowerCase() || getProto(req);
-  const host = fixHeader(req.headers['x-forwarded-host'] as string) || req.headers.host;
+  const protocol = fixHeader(req.headers['x-forwarded-proto'] || '')?.toLowerCase() || getProto(req);
+  const host = fixHeader(req.headers['x-forwarded-host'] || '') || req.headers.host;
 
   const denylist = options?.denylist || options?.blacklist;
   const allowlist = options?.allowlist || options?.whitelist;
