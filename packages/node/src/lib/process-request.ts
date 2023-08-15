@@ -194,7 +194,7 @@ export default function processRequest(
   }
 
   const requestData = {
-    method: req.method,
+    method: req.method || '',
     url: url.format({
       // Handle cases where some reverse proxies put two protocols into x-forwarded-proto
       // This line does the following: "https,http" -> "https"
@@ -206,20 +206,20 @@ export default function processRequest(
       query: qs.parse(reqUrl.search.substring(1)),
     }),
     httpVersion: `${getProto(req).toUpperCase()}/${req.httpVersion}`,
-    headers: objectToArray(req.headers),
+    headers: objectToArray(req.headers, { castToString: true }),
     queryString: searchToArray(reqUrl.searchParams),
     postData,
     // TODO: When readme starts accepting these, send the correct values
     cookies: [] as Cookie[],
     headersSize: -1,
     bodySize: -1,
-  };
+  } as const;
 
   if (typeof requestData.postData === 'undefined') {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { postData: postDataToBeOmitted, ...remainingRequestData } = requestData;
-    return remainingRequestData as Request;
+    return remainingRequestData;
   }
 
-  return requestData as Request;
+  return requestData;
 }
