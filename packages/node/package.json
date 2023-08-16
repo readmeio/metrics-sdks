@@ -29,7 +29,6 @@
     "@types/node-fetch": "^2.6.2",
     "api": "^6.1.0",
     "content-type": "^1.0.5",
-    "crypto-js": "^4.1.1",
     "find-cache-dir": "^3.3.2",
     "flat-cache": "^3.0.4",
     "flatted": "^3.2.7",

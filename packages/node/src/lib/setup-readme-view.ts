@@ -1,6 +1,20 @@
-import sha512 from 'crypto-js/sha512';
+import { createHash } from 'crypto';
 
-export function buildSetupView({ baseUrl, apiKey, subdomain, disableWebhook, disableMetrics }) {
+const hashToken = (token: string): string => createHash('sha512').update(token).digest('hex');
+
+export function buildSetupView({
+  baseUrl,
+  apiKey,
+  subdomain,
+  disableWebhook,
+  disableMetrics,
+}: {
+  baseUrl: string;
+  apiKey: string;
+  subdomain: string;
+  disableWebhook?: boolean;
+  disableMetrics?: boolean;
+}) {
   const dashUrl = `https://dash.readme.com/project/${subdomain}/v1.0/metrics/developers`;
   let webhookScriptHtml = `
     var form = document.getElementById("testWebhookForm");
@@ -36,7 +50,7 @@ export function buildSetupView({ baseUrl, apiKey, subdomain, disableWebhook, dis
   `;
 
   let metricsScriptHtml = `
-    const token = '${sha512(apiKey).toString()}';
+    const token = '${hashToken(apiKey)}';
     const query = new URLSearchParams(\`token=\${token}&subdomain=${subdomain}\`);
     const socket = new WebSocket(new URL(\`?\${query}\`, 'wss://m.readme.io'));
     socket.addEventListener('message', async ({ data }) => {
