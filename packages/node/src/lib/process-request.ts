@@ -1,14 +1,15 @@
-import type {LogOptions} from './construct-payload';
-import {getProto, mask} from './construct-payload';
-import type {ExtendedIncomingMessage} from './log';
-import type {Entry} from 'har-format';
+import type { LogOptions } from './construct-payload';
+import type { ExtendedIncomingMessage } from './log';
+import type { Entry } from 'har-format';
 
 import * as qs from 'querystring';
-import url, {URL} from 'url';
+import url, { URL } from 'url';
 
 import * as contentType from 'content-type';
-import {objectToArray, searchToArray} from './object-to-array';
-import {redactOtherProperties, redactProperties } from './redaction';
+
+import { getProto, mask } from './construct-payload';
+import { objectToArray, searchToArray } from './object-to-array';
+import { redactOtherProperties, redactProperties } from './redaction';
 
 /**
  * Ensure we have a string or undefined response for any header.

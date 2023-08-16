@@ -1,36 +1,7 @@
-import pick from "lodash/pick";
-import merge from "lodash/merge";
-import get from "lodash/get";
-import set from "lodash/set";
-
-/**
- * Redacts everything but the provided fields
- *
- * @param obj The data object with fields to redact
- * @param nonRedactedPaths A list of all object paths that shouldn't be redacted
- * @returns A merged objects that is entirely redacted except for the values of the nonRedactedPaths
- */
-export function redactOtherProperties<T extends Record<string, unknown>>(obj: T, nonRedactedPaths): T {
-  const allowedFields = pick(obj, nonRedactedPaths);
-  const redactedFields = obj ? replaceEach(obj, redactValue) : obj;
-  return merge(redactedFields, allowedFields);
-}
-
-/**
- * Redacts all the properties in an object
- *
- * @param obj The data object that is operated upon
- * @param redactedPaths a list of paths that point values which should be redacted
- * @returns An object with the redacted values
- */
-export function redactProperties<T extends Record<string, unknown>>(obj: T, redactedPaths = []): T {
-  const nextObj = {...obj};
-  return redactedPaths.reduce((acc, path) => {
-    const value = get(acc, path);
-    if (value !== undefined) set(acc, path, redactValue(value));
-    return acc;
-  }, nextObj);
-}
+import get from 'lodash/get';
+import merge from 'lodash/merge';
+import pick from 'lodash/pick';
+import set from 'lodash/set';
 
 /**
  * Redacts a value by replacing it with a string like [REDACTED 6]
@@ -58,4 +29,33 @@ function replaceEach(obj, cb): Record<string, unknown> {
     }
     return acc;
   }, {});
+}
+
+/**
+ * Redacts everything but the provided fields
+ *
+ * @param obj The data object with fields to redact
+ * @param nonRedactedPaths A list of all object paths that shouldn't be redacted
+ * @returns A merged objects that is entirely redacted except for the values of the nonRedactedPaths
+ */
+export function redactOtherProperties<T extends Record<string, unknown>>(obj: T, nonRedactedPaths): T {
+  const allowedFields = pick(obj, nonRedactedPaths);
+  const redactedFields = obj ? replaceEach(obj, redactValue) : obj;
+  return merge(redactedFields, allowedFields);
+}
+
+/**
+ * Redacts all the properties in an object
+ *
+ * @param obj The data object that is operated upon
+ * @param redactedPaths a list of paths that point values which should be redacted
+ * @returns An object with the redacted values
+ */
+export function redactProperties<T extends Record<string, unknown>>(obj: T, redactedPaths = []): T {
+  const nextObj = { ...obj };
+  return redactedPaths.reduce((acc, path) => {
+    const value = get(acc, path);
+    if (value !== undefined) set(acc, path, redactValue(value));
+    return acc;
+  }, nextObj);
 }

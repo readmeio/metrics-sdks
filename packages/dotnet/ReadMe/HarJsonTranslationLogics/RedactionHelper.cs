@@ -14,8 +14,7 @@ namespace ReadMe.HarJsonTranslationLogics
         public static List<Headers> RedactHeaderDictionary(
             IHeaderDictionary headerDictionary,
             List<string> allowList = null,
-            List<string> denyList = null
-        )
+            List<string> denyList = null)
         {
             var redactedHeaders = new List<Headers>();
 
@@ -41,8 +40,7 @@ namespace ReadMe.HarJsonTranslationLogics
         public static List<Params> RedactFormCollection(
             IFormCollection formCollection,
             List<string> allowList = null,
-            List<string> denyList = null
-        )
+            List<string> denyList = null)
         {
             var redactedParams = new List<Params>();
 
@@ -62,11 +60,23 @@ namespace ReadMe.HarJsonTranslationLogics
             return redactedParams;
         }
 
+        public static bool IsApplicationJson(string mimeType)
+        {
+            if (string.IsNullOrEmpty(mimeType))
+            {
+                return false;
+            }
+
+            string[] jsonMimeTypes = { "application/json", "application/x-json", "text/json", "text/x-json" };
+
+            return jsonMimeTypes.Contains(mimeType) ||
+                   mimeType.IndexOf("+json", StringComparison.OrdinalIgnoreCase) != -1;
+        }
+
         public static JObject RedactJson(
             JObject jsonObject,
             List<string> allowList = null,
-            List<string> denyList = null
-        )
+            List<string> denyList = null)
         {
             var redactedObject = RedactJsonRecursive(jsonObject, allowList, denyList);
             return redactedObject;

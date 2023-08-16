@@ -13,8 +13,8 @@ const port = process.env.PORT || 8000;
 
 // Your ReadMe secret
 const secret = process.env.README_API_KEY;
-const allowlist = process.env.README_ALLOWLIST === "true" ? ['publicKey', 'public-header', 'x-header-2']: null;
-const denylist = process.env.README_DENYLIST === "true" ? ['privateKey', 'private-header', 'x-header-1'] : null;
+const allowlist = process.env.README_ALLOWLIST === 'true' ? ['publicKey', 'public-header', 'x-header-2'] : null;
+const denylist = process.env.README_DENYLIST === 'true' ? ['privateKey', 'private-header', 'x-header-1'] : null;
 
 app.use((req, res, next) => {
   readme.log(
@@ -31,7 +31,7 @@ app.use((req, res, next) => {
     },
     {
       denylist,
-      allowlist
+      allowlist,
     }
   );
 

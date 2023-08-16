@@ -4,12 +4,9 @@ import type { ServerResponse } from 'http';
 
 import { STATUS_CODES } from 'http';
 
-import removeProperties from 'lodash/omit';
-import removeOtherProperties from 'lodash/pick';
-
 import { objectToArray } from './object-to-array';
 import { fixHeader } from './process-request';
-import {redactOtherProperties, redactProperties } from './redaction';
+import { redactOtherProperties, redactProperties } from './redaction';
 
 /**
  * Transforms the provided ServerResponse and additional information into the appropriate HAR structure

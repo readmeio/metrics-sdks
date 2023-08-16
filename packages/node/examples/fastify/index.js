@@ -32,7 +32,7 @@ fastify.addHook('onSend', async (request, reply, payload) => {
   // Fastify uses `writeHead` for performance reasons, which means those header values
   // are not accessible via `reply.raw`
   Object.entries(reply.getHeaders()).forEach(([name, val]) => reply.raw.setHeader(name, val));
-  readmeio.log(process.env.README_API_KEY, req, res, payloadData, { denylist: ['secretKey'] });
+  readmeio.log(process.env.README_API_KEY, req, res, payloadData);
   return payload;
 });
 

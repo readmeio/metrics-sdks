@@ -65,7 +65,7 @@ namespace ReadMe.HarJsonObjectModels
 
                 content.text = redactedJson.ToString();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 content.text = this.responseBodyData;
             }

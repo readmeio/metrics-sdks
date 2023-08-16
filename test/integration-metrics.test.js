@@ -412,9 +412,7 @@ describe('Metrics SDK Integration Tests', function () {
     expect(request.headers).to.have.header('content-type', 'application/x-www-form-urlencoded');
     expect(request.postData).to.deep.equal({
       mimeType: 'application/x-www-form-urlencoded',
-      params: [
-        { name: 'email', value: 'dom@readme.io' }
-      ],
+      params: [{ name: 'email', value: 'dom@readme.io' }],
     });
 
     expect(response.status).to.be.oneOf([

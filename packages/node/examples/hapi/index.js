@@ -25,7 +25,7 @@ const init = async () => {
     };
 
     req.body = request.payload;
-    readmeio.log(process.env.README_API_KEY, req, res, payloadData, { denylist: ['secretKey'] });
+    readmeio.log(process.env.README_API_KEY, req, res, payloadData);
 
     return h.continue;
   });
