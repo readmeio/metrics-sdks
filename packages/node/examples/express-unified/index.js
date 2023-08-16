@@ -55,10 +55,14 @@ const getUser = ({ apiKey, email }) => {
 };
 
 app.use(
-  readme(async req => {
+  readme.readme(async req => {
     // You'll need a function that can look up a user by either email or api_key
     // const user = await getUser(req.readme.email || req.readme.api_key);
-    const user = getUser({ email: req.body.email, apiKey: req.query.apiKey });
+    const user = getUser({ email: req?.body?.email, apiKey: req.query.apiKey });
+
+    if (!user) {
+      return {};
+    }
 
     return {
       email: user.email, // The user associated here
