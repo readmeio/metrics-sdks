@@ -1,8 +1,10 @@
 import type { LogOptions } from './lib/construct-payload';
+import type { GetProjectResponse200 } from '@api/developers';
 import type { NextFunction, Request, Response } from 'express';
 
-import sdk from 'api';
 import flatted from 'flatted';
+
+import readmeSdk from '@api/developers';
 
 import { getProjectBaseUrl } from './lib/get-project-base-url';
 import { log } from './lib/log';
@@ -11,8 +13,6 @@ import { testVerifyWebhook } from './lib/test-verify-webhook';
 import verifyWebhook from './lib/verify-webhook';
 
 const env = process.env.NODE_ENV || 'development';
-
-const readmeSDK = sdk('@developers/v2.0#19j1xdalksmothi');
 
 interface ApiKey {
   apiKey: string;
@@ -66,14 +66,9 @@ const findApiKey = (req: Request, keys: [ApiKey]) => {
   return { apiKey: key.apiKey };
 };
 
-interface ReadmeApiResponse {
-  jwtSecret: string;
-  subdomain: string;
-}
-
 // See comment at the auth definition below
 let apiKey = '';
-let readmeProject: ReadmeApiResponse | undefined;
+let readmeProjectData: GetProjectResponse200 | undefined;
 
 const readme = (
   userFunction: (req: Request, res: Response) => unknown,
@@ -90,10 +85,10 @@ const readme = (
     const isDevelopment =
       env === 'development' || baseUrl.includes('localhost') || baseUrl.includes('.local') || baseUrl.includes('.dev');
 
-    if (!readmeProject) {
-      readmeSDK.auth(apiKey);
+    if (!readmeProjectData) {
+      readmeSdk.auth(apiKey);
       try {
-        readmeProject = (await readmeSDK.getProject()).data;
+        readmeProjectData = (await readmeSdk.getProject()).data;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
         // TODO: Maybe send this to sentry?
@@ -109,7 +104,7 @@ const readme = (
       }
     } else if (req.path === '/readme-webhook' && req.method === 'POST' && !disableWebhook) {
       try {
-        verifyWebhook(req.body, req.headers['readme-signature'] as string, readmeProject.jwtSecret);
+        verifyWebhook(req.body, req.headers['readme-signature'] as string, readmeProjectData.jwtSecret);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
         return res.status(401).send(e.message);
@@ -124,7 +119,7 @@ const readme = (
     } else if (req.path === '/readme-setup' && isDevelopment) {
       const setupHtml = buildSetupView({
         baseUrl,
-        subdomain: readmeProject.subdomain,
+        subdomain: readmeProjectData.subdomain,
         apiKey,
         disableMetrics,
         disableWebhook,
@@ -132,7 +127,7 @@ const readme = (
       return res.send(setupHtml);
     } else if (req.path === '/webhook-test' && isDevelopment) {
       const email = req.query.email as string;
-      const webhookData = await testVerifyWebhook(baseUrl, email, readmeProject.jwtSecret);
+      const webhookData = await testVerifyWebhook(baseUrl, email, readmeProjectData.jwtSecret);
       return res.json({ ...webhookData });
     }
 
@@ -157,7 +152,7 @@ const readme = (
 function auth(key: string) {
   apiKey = key;
   // Reset the cache for the ReadMe project if the api key changes
-  readmeProject = undefined;
+  readmeProjectData = undefined;
   return readme;
 }
 
