@@ -9,11 +9,11 @@ export function buildSetupView({
   disableWebhook,
   disableMetrics,
 }: {
-  baseUrl: string;
   apiKey: string;
-  subdomain: string;
-  disableWebhook?: boolean;
+  baseUrl: string;
   disableMetrics?: boolean;
+  disableWebhook?: boolean;
+  subdomain: string;
 }) {
   const dashUrl = `https://dash.readme.com/project/${subdomain}/v1.0/metrics/developers`;
   let webhookScriptHtml = `
