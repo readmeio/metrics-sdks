@@ -1,5 +1,6 @@
 import type { LogOptions } from './construct-payload';
 import type { GroupingObject, OutgoingLogBody } from './metrics-log';
+import type { UUID } from 'node:crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
 import * as url from 'url';
@@ -17,7 +18,7 @@ import { patchRequest } from './patch-request';
 import { patchResponse } from './patch-response';
 
 let queue: OutgoingLogBody[] = [];
-function doSend(readmeApiKey, options) {
+function doSend(readmeApiKey: string, options: Options) {
   // Copy the queue so we can send all the requests in one batch
   const json = [...queue];
   // Clear out the queue so we don't resend any data in the future
@@ -58,7 +59,7 @@ export interface ExtendedIncomingMessage extends IncomingMessage {
 }
 /* eslint-enable typescript-sort-keys/interface */
 
-interface ExtendedResponse extends ServerResponse {
+export interface ExtendedResponse extends ServerResponse {
   _body?: string;
 }
 
@@ -67,7 +68,7 @@ export interface Options extends LogOptions {
   bufferLength?: number;
 }
 
-function setDocumentationHeader(res, baseLogUrl, logId) {
+function setDocumentationHeader(res: ServerResponse, baseLogUrl: string, logId: string) {
   // This is to catch the potential race condition where `getProjectBaseUrl()`
   // takes longer to respond than the original req/res to finish. Without this
   // we would get an error that would be very difficult to trace. This could
@@ -105,7 +106,7 @@ export function log(
   const bufferLength = clamp(options.bufferLength || config.bufferLength, 1, 30);
 
   const startedDateTime = new Date();
-  const logId = uuidv4();
+  const logId = uuidv4() as UUID;
 
   // baseLogUrl can be provided, but if it isn't then we
   // attempt to fetch it from the ReadMe API

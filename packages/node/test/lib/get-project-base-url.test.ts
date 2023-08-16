@@ -10,7 +10,7 @@ const apiKey = 'mockReadMeApiKey';
 const baseLogUrl = 'https://docs.example.com';
 
 // eslint-disable-next-line mocha/no-exports
-export function getReadMeApiMock(numberOfTimes, baseUrl = baseLogUrl) {
+export function getReadMeApiMock(numberOfTimes: number, baseUrl = baseLogUrl) {
   return nock(config.readmeApiUrl, {
     reqheaders: {
       'User-Agent': `${pkg.name}/${pkg.version}`,
@@ -22,7 +22,7 @@ export function getReadMeApiMock(numberOfTimes, baseUrl = baseLogUrl) {
     .reply(200, { baseUrl });
 }
 
-function hydrateCache(lastUpdated) {
+function hydrateCache(lastUpdated: number) {
   const cache = getCache(apiKey);
 
   cache.setKey('lastUpdated', lastUpdated);

@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+// @ts-expect-error I am for some reason unable to declare a module properly for this package
 import MockReq from 'mock-req';
 
 import isRequest from '../../src/lib/is-request';

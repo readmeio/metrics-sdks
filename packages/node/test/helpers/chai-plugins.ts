@@ -40,13 +40,13 @@ declare global {
  *    connection: 'close'
  *  }
  */
-function arrayToObject(array) {
+function arrayToObject(array: { name: string; value: string }[]) {
   return array.reduce((prev, next) => {
     return Object.assign(prev, { [next.name]: next.value });
   }, {});
 }
 
-export default function chaiPlugins(_chai, utils) {
+export default function chaiPlugins(_chai: Chai.ChaiStatic, utils: Chai.ChaiUtils) {
   /**
    * Assert that a request has our `x-documentation-url` header and that contains a valid v4 UUID.
    *
@@ -55,7 +55,7 @@ export default function chaiPlugins(_chai, utils) {
    *
    * @param {string} baseLogUrl
    */
-  utils.addMethod(chai.Assertion.prototype, 'documentationHeader', function (baseLogUrl) {
+  utils.addMethod(chai.Assertion.prototype, 'documentationHeader', function (baseLogUrl: string) {
     const headers = utils.flag(this, 'object');
 
     // eslint-disable-next-line chai-friendly/no-unused-expressions
@@ -82,11 +82,11 @@ export default function chaiPlugins(_chai, utils) {
    * @param {string} header
    * @param {string|RegExp} expected
    */
-  utils.addMethod(chai.Assertion.prototype, 'header', function (header, expected) {
+  utils.addMethod(chai.Assertion.prototype, 'header', function (header: string, expected: RegExp | string[] | string) {
     const obj = utils.flag(this, 'object');
     const headers = caseless(arrayToObject(obj));
 
-    if (expected.constructor.name === 'RegExp') {
+    if (expected instanceof RegExp) {
       new chai.Assertion(headers.get(header)).to.match(expected);
     } else if (Array.isArray(expected)) {
       new chai.Assertion(headers.get(header)).to.oneOf(expected.map(e => e.toString()));
