@@ -305,7 +305,16 @@ describe('process-request', function () {
 
     it('should strip denylisted properties in body and headers', function () {
       const app = createApp({
-        denylist: ['host', 'accept-encoding', 'user-agent', 'connection', 'content-length', 'password', 'apiKey'],
+        denylist: [
+          'host',
+          'accept-encoding',
+          'user-agent',
+          'connection',
+          'content-length',
+          'password',
+          'apiKey',
+          'privatekey',
+        ],
       });
 
       return request(app)
@@ -316,7 +325,7 @@ describe('process-request', function () {
         .expect(({ body }) => {
           expect(body.url).to.be.a.url;
           expect(body.headers).to.have.header('host', '[REDACTED 15]');
-          expect(body.headers).to.have.header('privateKey', '[REDACTED 13]');
+          expect(body.headers).to.have.header('privatekey', '[REDACTED 6]');
           expect(body.headers).to.have.header('accept-encoding', '[REDACTED 13]');
           expect(body.headers).to.have.header('content-type', 'application/json');
           expect(body.headers).to.have.header('x-ratelimit-limit', '10');

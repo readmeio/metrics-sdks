@@ -45,14 +45,20 @@ describe('processResponse()', function () {
         return testResponse(res => {
           expect(
             processResponse(res, res.__bodyCache, { blacklist: ['password', 'apiKey'] }).content.text
-          ).to.deep.equal(JSON.stringify({ another: 'Hello world' }));
+          ).to.deep.equal(
+            JSON.stringify({
+              password: '[REDACTED 6]',
+              apiKey: '[REDACTED 6]',
+              another: 'Hello world',
+            })
+          );
         }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
       });
 
       it('should strip blacklisted nested properties in body', function () {
         return testResponse(res => {
           expect(processResponse(res, res.__bodyCache, { blacklist: ['a.b.c'] }).content.text).to.deep.equal(
-            JSON.stringify({ a: { b: {} } })
+            JSON.stringify({ a: { b: { c: '[REDACTED]' } } })
           );
         }, JSON.stringify({ a: { b: { c: 1 } } }));
       });
@@ -61,14 +67,20 @@ describe('processResponse()', function () {
         return testResponse(res => {
           expect(
             processResponse(res, res.__bodyCache, { whitelist: ['password', 'apiKey'] }).content.text
-          ).to.deep.equal(JSON.stringify({ password: '123456', apiKey: 'abcdef' }));
+          ).to.deep.equal(
+            JSON.stringify({
+              password: '123456',
+              apiKey: 'abcdef',
+              another: '[REDACTED 11]',
+            })
+          );
         }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
       });
 
       it('should only send whitelisted nested properties in body', function () {
         return testResponse(res => {
           expect(processResponse(res, res.__bodyCache, { whitelist: ['a.b.c'] }).content.text).to.deep.equal(
-            JSON.stringify({ a: { b: { c: 1 } } })
+            JSON.stringify({ a: { b: { c: 1 } }, d: '[REDACTED]' })
           );
         }, JSON.stringify({ a: { b: { c: 1 } }, d: 2 }));
       });
@@ -80,7 +92,13 @@ describe('processResponse()', function () {
               blacklist: ['password', 'apiKey'],
               whitelist: ['password', 'apiKey'],
             }).content.text
-          ).to.deep.equal(JSON.stringify({ another: 'Hello world' }));
+          ).to.deep.equal(
+            JSON.stringify({
+              password: '[REDACTED 6]',
+              apiKey: '[REDACTED 6]',
+              another: 'Hello world',
+            })
+          );
         }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
       });
     });
@@ -89,7 +107,18 @@ describe('processResponse()', function () {
       it('should strip blacklisted properties in headers', function () {
         return testResponse(res => {
           expect(processResponse(res, res.__bodyCache, { blacklist: ['etag', 'content-type'] }).headers).to.deep.equal([
-            { name: 'last-modified', value: 'Thu, 01 Jan 1970 00:00:00 GMT' },
+            {
+              name: 'content-type',
+              value: '[REDACTED 16]',
+            },
+            {
+              name: 'etag',
+              value: '[REDACTED 27]',
+            },
+            {
+              name: 'last-modified',
+              value: 'Thu, 01 Jan 1970 00:00:00 GMT',
+            },
           ]);
         });
       });
@@ -97,7 +126,18 @@ describe('processResponse()', function () {
       it('should only send whitelisted properties in headers', function () {
         return testResponse(res => {
           expect(processResponse(res, res.__bodyCache, { whitelist: ['last-modified'] }).headers).to.deep.equal([
-            { name: 'last-modified', value: 'Thu, 01 Jan 1970 00:00:00 GMT' },
+            {
+              name: 'content-type',
+              value: '[REDACTED 16]',
+            },
+            {
+              name: 'etag',
+              value: '[REDACTED 27]',
+            },
+            {
+              name: 'last-modified',
+              value: 'Thu, 01 Jan 1970 00:00:00 GMT',
+            },
           ]);
         });
       });
@@ -109,8 +149,31 @@ describe('processResponse()', function () {
           const processed = processResponse(res, res.__bodyCache, {
             blacklist: ['content-length', 'etag', 'content-type', 'password', 'apiKey'],
           });
-          expect(processed.headers).to.deep.equal([{ name: 'last-modified', value: 'Thu, 01 Jan 1970 00:00:00 GMT' }]);
-          expect(processed.content.text).to.deep.equal(JSON.stringify({ another: 'Hello world' }));
+          expect(processed.headers).to.deep.equal([
+            {
+              name: 'content-type',
+              value: '[REDACTED 16]',
+            },
+            {
+              name: 'etag',
+              value: '[REDACTED 27]',
+            },
+            {
+              name: 'last-modified',
+              value: 'Thu, 01 Jan 1970 00:00:00 GMT',
+            },
+            {
+              name: 'content-length',
+              value: '[REDACTED]',
+            },
+          ]);
+          expect(processed.content.text).to.deep.equal(
+            JSON.stringify({
+              password: '[REDACTED 6]',
+              apiKey: '[REDACTED 6]',
+              another: 'Hello world',
+            })
+          );
         }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
       });
 
@@ -119,8 +182,31 @@ describe('processResponse()', function () {
           const processed = processResponse(res, res.__bodyCache, {
             whitelist: ['last-modified', 'another'],
           });
-          expect(processed.headers).to.deep.equal([{ name: 'last-modified', value: 'Thu, 01 Jan 1970 00:00:00 GMT' }]);
-          expect(processed.content.text).to.deep.equal(JSON.stringify({ another: 'Hello world' }));
+          expect(processed.headers).to.deep.equal([
+            {
+              name: 'content-type',
+              value: '[REDACTED 16]',
+            },
+            {
+              name: 'etag',
+              value: '[REDACTED 27]',
+            },
+            {
+              name: 'last-modified',
+              value: 'Thu, 01 Jan 1970 00:00:00 GMT',
+            },
+            {
+              name: 'content-length',
+              value: '[REDACTED]',
+            },
+          ]);
+          expect(processed.content.text).to.deep.equal(
+            JSON.stringify({
+              password: '[REDACTED 6]',
+              apiKey: '[REDACTED 6]',
+              another: 'Hello world',
+            })
+          );
         }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
       });
 
@@ -130,8 +216,31 @@ describe('processResponse()', function () {
             blacklist: ['content-length', 'etag', 'content-type', 'password', 'apiKey'],
             whitelist: ['content-length', 'etag', 'content-type', 'password', 'apiKey'],
           });
-          expect(processed.headers).to.deep.equal([{ name: 'last-modified', value: 'Thu, 01 Jan 1970 00:00:00 GMT' }]);
-          expect(processed.content.text).to.deep.equal(JSON.stringify({ another: 'Hello world' }));
+          expect(processed.headers).to.deep.equal([
+            {
+              name: 'content-type',
+              value: '[REDACTED 16]',
+            },
+            {
+              name: 'etag',
+              value: '[REDACTED 27]',
+            },
+            {
+              name: 'last-modified',
+              value: 'Thu, 01 Jan 1970 00:00:00 GMT',
+            },
+            {
+              name: 'content-length',
+              value: '[REDACTED]',
+            },
+          ]);
+          expect(processed.content.text).to.deep.equal(
+            JSON.stringify({
+              password: '[REDACTED 6]',
+              apiKey: '[REDACTED 6]',
+              another: 'Hello world',
+            })
+          );
         }, JSON.stringify({ password: '123456', apiKey: 'abcdef', another: 'Hello world' }));
       });
     });
