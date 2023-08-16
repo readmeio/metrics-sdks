@@ -55,8 +55,7 @@ describe('#metrics', function () {
   it('should throw an error if `apiKey` is missing', function () {
     const app = express();
     app.use((req, res, next) => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+      // @ts-expect-error deliberately passing in bad data
       readmeio.log('', req, res, {});
       return next();
     });
@@ -76,8 +75,7 @@ describe('#metrics', function () {
   it('should throw an error if `group` is missing', function () {
     const app = express();
     app.use((req, res, next) => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+      // @ts-expect-error deliberately passing in bad data
       readmeio.log(apiKey, req, res);
       return next();
     });
