@@ -1,4 +1,5 @@
 import type { LogOptions } from './lib/construct-payload';
+import type { NextFunction, Request, Response } from 'express';
 
 import sdk from 'api';
 import flatted from 'flatted';
@@ -51,7 +52,7 @@ const splitIntoUserAndConfig = (inputObject: GroupingObject | LogOptions): Split
 // 2. Testing a bunch of cases for how api keys can be passed in
 
 // What if we do this work in the metrics backend?
-const findApiKey = (req, keys: [ApiKey]) => {
+const findApiKey = (req: Request, keys: [ApiKey]) => {
   const requestString = flatted.stringify(req);
   const key = keys.find(apiKey => {
     if (requestString.includes(apiKey.apiKey) || requestString.includes(btoa(`${apiKey.apiKey}:`))) {
@@ -65,18 +66,23 @@ const findApiKey = (req, keys: [ApiKey]) => {
   return { apiKey: key.apiKey };
 };
 
+interface ReadmeApiResponse {
+  jwtSecret: string;
+  subdomain: string;
+}
+
 // See comment at the auth definition below
 let apiKey = '';
-let readmeProject;
+let readmeProject: ReadmeApiResponse | undefined;
 
 const readme = (
-  userFunction,
+  userFunction: (req: Request, res: Response) => unknown,
   { disableWebhook, disableMetrics } = {
     disableWebhook: false,
     disableMetrics: false,
   }
 ) => {
-  return async (req, res, next) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     const baseUrl = `${req.protocol}://${req.get('host')}${req.baseUrl}`;
 
     // Really want to make sure we only show setup on development
@@ -88,7 +94,8 @@ const readme = (
       readmeSDK.auth(apiKey);
       try {
         readmeProject = (await readmeSDK.getProject()).data;
-      } catch (e) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e: any) {
         // TODO: Maybe send this to sentry?
         if (e.status === 401) {
           console.error('Invalid ReadMe API key. Contact support@readme.io for help!');
@@ -100,11 +107,11 @@ const readme = (
         // Don't want to cause an error in their API
         return next();
       }
-    }
-    if (req.path === '/readme-webhook' && req.method === 'POST' && !disableWebhook) {
+    } else if (req.path === '/readme-webhook' && req.method === 'POST' && !disableWebhook) {
       try {
-        verifyWebhook(req.body, req.headers['readme-signature'], readmeProject.jwtSecret);
-      } catch (e) {
+        verifyWebhook(req.body, req.headers['readme-signature'] as string, readmeProject.jwtSecret);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e: any) {
         return res.status(401).send(e.message);
       }
       req.readme = { email: req.body.email };
@@ -124,7 +131,7 @@ const readme = (
       });
       return res.send(setupHtml);
     } else if (req.path === '/webhook-test' && isDevelopment) {
-      const email = req.query.email;
+      const email = req.query.email as string;
       const webhookData = await testVerifyWebhook(baseUrl, email, readmeProject.jwtSecret);
       return res.json({ ...webhookData });
     }
@@ -147,7 +154,7 @@ const readme = (
 // I don't like this as much but not sure how else we can do it
 // import { readme } from 'readmeio';
 // readme.auth('api-key');
-function auth(key) {
+function auth(key: string) {
   apiKey = key;
   // Reset the cache for the ReadMe project if the api key changes
   readmeProject = undefined;
