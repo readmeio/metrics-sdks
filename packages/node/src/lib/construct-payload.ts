@@ -1,4 +1,5 @@
 import type { OutgoingLogBody } from './metrics-log';
+import type { UUID } from 'node:crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { TLSSocket } from 'tls';
 
@@ -83,7 +84,7 @@ export interface PayloadData {
    *
    * @example {base_url}/logs/{logId}
    */
-  logId?: string;
+  logId?: UUID;
 
   /**
    * Object or string | The incoming request body. You should provide this function a parsed object,
@@ -141,7 +142,7 @@ export function constructPayload(
   const serverTime = payloadData.responseEndDateTime.getTime() - payloadData.startedDateTime.getTime();
 
   return {
-    _id: payloadData.logId || uuidv4(),
+    _id: payloadData.logId || (uuidv4() as UUID),
     _version: 3,
     group: {
       id: mask(payloadData.apiKey),

@@ -1,3 +1,4 @@
+import type { UUID } from 'crypto';
 import type { Har } from 'har-format';
 import type { Response } from 'node-fetch';
 
@@ -32,7 +33,7 @@ export interface GroupingObject {
 }
 
 export interface OutgoingLogBody {
-  _id?: string;
+  _id?: UUID;
   _version: number;
   clientIPAddress: string;
   development: boolean;
@@ -41,7 +42,7 @@ export interface OutgoingLogBody {
   request: Har;
 }
 
-type LogId = string | string[] | undefined;
+type LogId = UUID | UUID[] | undefined;
 
 export interface LogResponse {
   ids: LogId;
@@ -81,7 +82,7 @@ function shouldBackoff(response: Response) {
 
 function getLogIds(body: OutgoingLogBody | OutgoingLogBody[]): LogId {
   if (Array.isArray(body)) {
-    return body.map(value => value._id) as string[];
+    return body.map(value => value._id) as UUID[];
   }
 
   return body._id;
