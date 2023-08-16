@@ -193,7 +193,7 @@ export default function processRequest(
     req.headers.authorization = mask(req.headers.authorization);
   }
 
-  const requestData = {
+  const requestData: Request = {
     method: req.method || '',
     url: url.format({
       // Handle cases where some reverse proxies put two protocols into x-forwarded-proto
