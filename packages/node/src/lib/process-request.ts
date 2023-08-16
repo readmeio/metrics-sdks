@@ -210,7 +210,7 @@ export default function processRequest(
     queryString: searchToArray(reqUrl.searchParams),
     postData,
     // TODO: When readme starts accepting these, send the correct values
-    cookies: [] as Cookie[],
+    cookies: [] satisfies Cookie[],
     headersSize: -1,
     bodySize: -1,
   } as const;
