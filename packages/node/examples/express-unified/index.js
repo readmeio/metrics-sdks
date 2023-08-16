@@ -14,18 +14,62 @@ const port = process.env.PORT || 8000;
 // Your ReadMe secret
 const secret = process.env.README_API_KEY;
 
-app.use((req, res, next) => {
-  readme.log(process.env.README_API_KEY, req, res, {
-    // User's API Key
-    apiKey: 'owlbert-api-key',
-    // Username to show in the dashboard
-    label: 'Owlbert',
-    // User's email address
-    email: 'owlbert@example.com',
-  });
+readme.auth(secret);
 
-  return next();
-});
+const users = [
+  {
+    email: '1@test.com',
+    name: 'User 1',
+    apiKeys: [
+      {
+        apiKey: '123',
+        name: 'project 1',
+      },
+      {
+        apiKey: '456',
+        name: 'project 2',
+      },
+    ],
+  },
+  {
+    email: '2@test.com',
+    name: 'User 1',
+    apiKeys: [
+      {
+        apiKey: '123',
+        name: 'project 1',
+      },
+      {
+        apiKey: '789',
+        name: 'project 3',
+      },
+    ],
+  },
+];
+
+const getUser = ({ apiKey, email }) => {
+  if (apiKey) {
+    return users.find(user => user.apiKeys.find(key => key.apiKey === apiKey));
+  }
+  return users.find(user => user.email === email);
+};
+
+app.use(
+  readme(async req => {
+    // You'll need a function that can look up a user by either email or api_key
+    // const user = await getUser(req.readme.email || req.readme.api_key);
+    const user = getUser({ email: req.body.email, apiKey: req.query.apiKey });
+
+    return {
+      email: user.email, // The user associated here
+      keys: user.apiKeys,
+      name: user.name,
+
+      // There's a lot more options!
+      // Check out https://docs.readme.com/docs/metrics-setup
+    };
+  })
+);
 
 app.get('/', (req, res) => {
   res.json({ message: 'hello world' });
@@ -33,26 +77,6 @@ app.get('/', (req, res) => {
 
 app.post('/', express.json(), (req, res) => {
   res.status(200).send();
-});
-
-app.post('/webhook', express.json({ type: 'application/json' }), async (req, res) => {
-  // Verify the request is legitimate and came from ReadMe
-  const signature = req.headers['readme-signature'];
-
-  try {
-    readme.verifyWebhook(req.body, signature, secret);
-  } catch (e) {
-    // Handle invalid requests
-    return res.status(401).json({ error: e.message });
-  }
-
-  // Fetch the user from the database and return their data for use with OpenAPI variables.
-  // const user = await db.find({ email: req.body.email })
-  return res.json({
-    // OAS Security variables
-    petstore_auth: 'default-key',
-    basic_auth: { user: 'user', pass: 'pass' },
-  });
 });
 
 const server = app.listen(port, '0.0.0.0', () => {
