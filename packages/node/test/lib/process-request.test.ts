@@ -12,7 +12,7 @@ import chaiPlugins from '../helpers/chai-plugins';
 
 chai.use(chaiPlugins);
 
-function createApp(reqOptions?: LogOptions, shouldPreParse = false, bodyOverride?) {
+function createApp(reqOptions?: LogOptions, shouldPreParse = false, bodyOverride?: Record<string, unknown>) {
   const requestListener = function (req: IncomingMessage, res: ServerResponse) {
     let body = '';
 
@@ -120,7 +120,7 @@ describe('process-request', function () {
   });
 
   it('should fail gracefully with circular json objects', function () {
-    const obj = { foo: null };
+    const obj: Record<string, unknown> = { foo: null };
     obj.foo = obj;
 
     const app = createApp({ denylist: ['password'] }, false, obj);
@@ -489,8 +489,8 @@ describe('process-request', function () {
       .post('/')
       .set('a', '1')
       .expect(({ body }) => {
-        expect(body.headers.find(header => header.name === 'host').value).to.match(/127.0.0.1:\d+/);
-        expect(body.headers.filter(header => header.name !== 'host')).to.deep.equal([
+        expect(body.headers.find((header: { name: string }) => header.name === 'host').value).to.match(/127.0.0.1:\d+/);
+        expect(body.headers.filter((header: { name: string }) => header.name !== 'host')).to.deep.equal([
           { name: 'accept-encoding', value: 'gzip, deflate' },
           { name: 'a', value: '1' },
           { name: 'connection', value: 'close' },

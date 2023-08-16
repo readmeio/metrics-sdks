@@ -7,7 +7,8 @@
     "inlineSourceMap": true,
     "lib": ["es2019"],
     "outDir": "./dist",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "strict": true
   },
   "include": [
     "src/**/*",
