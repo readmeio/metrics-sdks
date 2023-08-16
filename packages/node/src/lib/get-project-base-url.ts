@@ -8,7 +8,7 @@ import timeoutSignal from 'timeout-signal';
 import pkg from '../../package.json';
 import config from '../config';
 
-export function getCache(readmeApiKey) {
+export function getCache(readmeApiKey: string) {
   const encodedApiKey = Buffer.from(`${readmeApiKey}:`).toString('base64');
   const cacheDir = findCacheDir({ name: pkg.name, create: true });
   const fsSafeApikey = crypto.createHash('md5').update(encodedApiKey).digest('hex');
@@ -34,7 +34,7 @@ export async function getProjectBaseUrl(readmeApiKey: string, requestTimeout = c
   ) {
     const signal = timeoutSignal(requestTimeout);
 
-    let baseUrl;
+    let baseUrl = '';
     await fetch(`${config.readmeApiUrl}/v1/`, {
       method: 'get',
       headers: {

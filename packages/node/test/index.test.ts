@@ -1,3 +1,5 @@
+import type { Express } from 'express';
+
 import * as crypto from 'crypto';
 import { createServer } from 'http';
 
@@ -53,8 +55,7 @@ describe('#metrics', function () {
   it('should throw an error if `apiKey` is missing', function () {
     const app = express();
     app.use((req, res, next) => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+      // @ts-expect-error deliberately passing in bad data
       readmeio.log('', req, res, {});
       return next();
     });
@@ -74,8 +75,7 @@ describe('#metrics', function () {
   it('should throw an error if `group` is missing', function () {
     const app = express();
     app.use((req, res, next) => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+      // @ts-expect-error deliberately passing in bad data
       readmeio.log(apiKey, req, res);
       return next();
     });
@@ -93,9 +93,9 @@ describe('#metrics', function () {
   });
 
   describe('tests for sending requests to the metrics server', function () {
-    let mock;
-    let metricsServerRequests;
-    let app;
+    let mock: nock.Scope;
+    let metricsServerRequests: number;
+    let app: Express;
     let metricsServerResponseCode = 202;
 
     beforeEach(function () {
@@ -296,7 +296,7 @@ describe('#metrics', function () {
       app.get('/test', (req, res) => res.sendStatus(200));
 
       // We need to make sure that the logId isn't being preserved between buffered requests.
-      let logUrl;
+      let logUrl: string;
 
       await request(app)
         .get('/test')
@@ -340,7 +340,7 @@ describe('#metrics', function () {
       const numberOfMocks = 4;
       const bufferLength = numberOfLogs / numberOfMocks;
 
-      const seenLogs = [];
+      const seenLogs: string[] = [];
 
       const mocks = [...new Array(numberOfMocks).keys()].map(() =>
         nock(config.host, {
@@ -353,7 +353,7 @@ describe('#metrics', function () {
             expect(body).to.have.lengthOf(bufferLength);
 
             // Ensure that our executed requests and the buffered queue they're in remain unique.
-            body.forEach(req => {
+            body.forEach((req: unknown) => {
               const requestHash = crypto.createHash('md5').update(JSON.stringify(req)).digest('hex');
               expect(seenLogs).not.to.contain(requestHash);
               seenLogs.push(requestHash);
