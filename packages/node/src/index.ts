@@ -1,4 +1,4 @@
-import type { LogOptions } from './lib/construct-payload';
+import type { Options } from './lib/log';
 import type { GetProjectResponse200 } from '@api/developers';
 import type { NextFunction, Request, Response } from 'express';
 
@@ -20,27 +20,37 @@ interface ApiKey {
 }
 
 interface GroupingObject {
+  [x: string]: unknown;
   email: string;
   keys: ApiKey[];
 }
 
 interface SplitOptions {
-  config: LogOptions;
+  config: Options;
   grouping: GroupingObject;
 }
 
-const splitIntoUserAndConfig = (inputObject: GroupingObject | LogOptions): SplitOptions => {
-  const configKeys = ['allowOptions', 'denyList', 'baseLogUrl', 'bufferLength', 'fireAndForget', 'development'];
-  const grouping = {};
-  const config = {};
+const splitIntoUserAndConfig = (inputObject: GroupingObject & Options): SplitOptions => {
+  const configKeys: (keyof Options)[] = [
+    'allowlist',
+    'denylist',
+    'baseLogUrl',
+    'bufferLength',
+    'fireAndForget',
+    'development',
+  ];
+
+  const grouping: GroupingObject = { email: '', keys: [] };
+  const config: Options = {};
   Object.keys(inputObject).forEach(key => {
-    if (configKeys.includes(key)) {
-      config[key] = inputObject[key];
+    const typedKey = key as keyof GroupingObject | keyof Options;
+    if (configKeys.includes(typedKey as keyof Options)) {
+      config[typedKey as keyof Options] = inputObject[typedKey];
     } else {
-      grouping[key] = inputObject[key];
+      grouping[typedKey] = inputObject[typedKey];
     }
   });
-  return { grouping: grouping as GroupingObject, config };
+  return { grouping, config };
 };
 
 // Do we actually want to do it this way?
@@ -52,7 +62,7 @@ const splitIntoUserAndConfig = (inputObject: GroupingObject | LogOptions): Split
 // 2. Testing a bunch of cases for how api keys can be passed in
 
 // What if we do this work in the metrics backend?
-const findApiKey = (req: Request, keys: [ApiKey]) => {
+const findApiKey = (req: Request, keys: ApiKey[]) => {
   const requestString = flatted.stringify(req);
   const key = keys.find(apiKey => {
     if (requestString.includes(apiKey.apiKey) || requestString.includes(btoa(`${apiKey.apiKey}:`))) {
@@ -71,7 +81,7 @@ let apiKey = '';
 let readmeProjectData: GetProjectResponse200 | undefined;
 
 const readme = (
-  userFunction: (req: Request, res: Response) => unknown,
+  userFunction: (req: Request, res: Response) => GroupingObject & Options,
   { disableWebhook, disableMetrics } = {
     disableWebhook: false,
     disableMetrics: false,
@@ -104,22 +114,23 @@ const readme = (
       }
     } else if (req.path === '/readme-webhook' && req.method === 'POST' && !disableWebhook) {
       try {
-        verifyWebhook(req.body, req.headers['readme-signature'] as string, readmeProjectData.jwtSecret);
+        verifyWebhook(req.body, req.headers['readme-signature'] as string, readmeProjectData.jwtSecret as string);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
         return res.status(401).send(e.message);
       }
-      req.readme = { email: req.body.email };
+      // Kanad TODO: this is brutal
+      res.locals.readme = { email: req.body.email };
       const user = await userFunction(req, res);
 
-      if (!user) return res.json({});
+      if (!user || (typeof user === 'object' && !Object.keys(user).length)) return res.json({});
 
       const { grouping } = splitIntoUserAndConfig(user);
       return res.send(grouping);
     } else if (req.path === '/readme-setup' && isDevelopment) {
       const setupHtml = buildSetupView({
         baseUrl,
-        subdomain: readmeProjectData.subdomain,
+        subdomain: readmeProjectData.subdomain as string,
         apiKey,
         disableMetrics,
         disableWebhook,
@@ -127,16 +138,18 @@ const readme = (
       return res.send(setupHtml);
     } else if (req.path === '/webhook-test' && isDevelopment) {
       const email = req.query.email as string;
-      const webhookData = await testVerifyWebhook(baseUrl, email, readmeProjectData.jwtSecret);
+      const webhookData = await testVerifyWebhook(baseUrl, email, readmeProjectData.jwtSecret as string);
       return res.json({ ...webhookData });
     }
 
     const user = await userFunction(req, res);
     if (!user || !Object.keys(user).length || disableMetrics) return next();
-    req.readme = findApiKey(req, user.keys);
+    res.locals.readme = findApiKey(req, user.keys);
 
     const { grouping, config } = splitIntoUserAndConfig(user);
-    const filteredKey = grouping.keys.find(key => key.apiKey === req.readme.apiKey);
+    const filteredKey = grouping.keys.find(key => key.apiKey === res.locals.readme.apiKey);
+
+    if (!filteredKey?.apiKey || !filteredKey?.name) return next();
 
     log(apiKey, req, res, { apiKey: filteredKey.apiKey, label: filteredKey.name, email: grouping.email }, config);
     return next();
