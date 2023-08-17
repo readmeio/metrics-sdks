@@ -1,7 +1,7 @@
 {
   "name": "@api/developers",
   "version": "4.465.0",
-  "main": "./index.ts",
+  "main": "./index.js",
   "types": "./index.d.ts",
   "dependencies": {
     "api": "^6.1.0",

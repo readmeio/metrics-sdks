@@ -1,5 +1,5 @@
 import type { Options } from './lib/log';
-import type { GetProjectResponse200 } from '@api/developers';
+import type { GetProjectResponse200 } from '@api/developers/types';
 import type { NextFunction, Request, Response } from 'express';
 
 import flatted from 'flatted';

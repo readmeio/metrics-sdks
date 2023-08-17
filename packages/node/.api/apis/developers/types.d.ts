@@ -1,15 +1,20 @@
 import type { FromSchema } from 'json-schema-to-ts';
 import * as schemas from './schemas';
-
 export type ApplyToReadMeBodyParam = FromSchema<typeof schemas.ApplyToReadMe.body>;
 export type CreateCategoryBodyParam = FromSchema<typeof schemas.CreateCategory.body>;
 export type CreateCategoryMetadataParam = FromSchema<typeof schemas.CreateCategory.metadata>;
 export type CreateCategoryResponse400 = FromSchema<(typeof schemas.CreateCategory.response)['400']>;
 export type CreateChangelogBodyParam = FromSchema<typeof schemas.CreateChangelog.body>;
 export type CreateCustomPageBodyParam = FromSchema<typeof schemas.CreateCustomPage.body>;
-export type CreateCustomPageResponse400 = FromSchema<(typeof schemas.CreateCustomPage.response)['400']>;
-export type CreateCustomPageResponse401 = FromSchema<(typeof schemas.CreateCustomPage.response)['401']>;
-export type CreateCustomPageResponse403 = FromSchema<(typeof schemas.CreateCustomPage.response)['403']>;
+export type CreateCustomPageResponse400 = FromSchema<
+  (typeof schemas.CreateCustomPage.response)['400']
+>;
+export type CreateCustomPageResponse401 = FromSchema<
+  (typeof schemas.CreateCustomPage.response)['401']
+>;
+export type CreateCustomPageResponse403 = FromSchema<
+  (typeof schemas.CreateCustomPage.response)['403']
+>;
 export type CreateDocBodyParam = FromSchema<typeof schemas.CreateDoc.body>;
 export type CreateDocMetadataParam = FromSchema<typeof schemas.CreateDoc.metadata>;
 export type CreateDocResponse201 = FromSchema<(typeof schemas.CreateDoc.response)['201']>;
@@ -21,18 +26,34 @@ export type CreateVersionResponse400 = FromSchema<(typeof schemas.CreateVersion.
 export type CreateVersionResponse401 = FromSchema<(typeof schemas.CreateVersion.response)['401']>;
 export type CreateVersionResponse403 = FromSchema<(typeof schemas.CreateVersion.response)['403']>;
 export type CreateVersionResponse404 = FromSchema<(typeof schemas.CreateVersion.response)['404']>;
-export type DeleteApiSpecificationMetadataParam = FromSchema<typeof schemas.DeleteApiSpecification.metadata>;
-export type DeleteApiSpecificationResponse400 = FromSchema<(typeof schemas.DeleteApiSpecification.response)['400']>;
-export type DeleteApiSpecificationResponse401 = FromSchema<(typeof schemas.DeleteApiSpecification.response)['401']>;
-export type DeleteApiSpecificationResponse403 = FromSchema<(typeof schemas.DeleteApiSpecification.response)['403']>;
-export type DeleteApiSpecificationResponse404 = FromSchema<(typeof schemas.DeleteApiSpecification.response)['404']>;
+export type DeleteApiSpecificationMetadataParam = FromSchema<
+  typeof schemas.DeleteApiSpecification.metadata
+>;
+export type DeleteApiSpecificationResponse400 = FromSchema<
+  (typeof schemas.DeleteApiSpecification.response)['400']
+>;
+export type DeleteApiSpecificationResponse401 = FromSchema<
+  (typeof schemas.DeleteApiSpecification.response)['401']
+>;
+export type DeleteApiSpecificationResponse403 = FromSchema<
+  (typeof schemas.DeleteApiSpecification.response)['403']
+>;
+export type DeleteApiSpecificationResponse404 = FromSchema<
+  (typeof schemas.DeleteApiSpecification.response)['404']
+>;
 export type DeleteCategoryMetadataParam = FromSchema<typeof schemas.DeleteCategory.metadata>;
 export type DeleteCategoryResponse404 = FromSchema<(typeof schemas.DeleteCategory.response)['404']>;
 export type DeleteChangelogMetadataParam = FromSchema<typeof schemas.DeleteChangelog.metadata>;
 export type DeleteCustomPageMetadataParam = FromSchema<typeof schemas.DeleteCustomPage.metadata>;
-export type DeleteCustomPageResponse401 = FromSchema<(typeof schemas.DeleteCustomPage.response)['401']>;
-export type DeleteCustomPageResponse403 = FromSchema<(typeof schemas.DeleteCustomPage.response)['403']>;
-export type DeleteCustomPageResponse404 = FromSchema<(typeof schemas.DeleteCustomPage.response)['404']>;
+export type DeleteCustomPageResponse401 = FromSchema<
+  (typeof schemas.DeleteCustomPage.response)['401']
+>;
+export type DeleteCustomPageResponse403 = FromSchema<
+  (typeof schemas.DeleteCustomPage.response)['403']
+>;
+export type DeleteCustomPageResponse404 = FromSchema<
+  (typeof schemas.DeleteCustomPage.response)['404']
+>;
 export type DeleteDocMetadataParam = FromSchema<typeof schemas.DeleteDoc.metadata>;
 export type DeleteDocResponse401 = FromSchema<(typeof schemas.DeleteDoc.response)['401']>;
 export type DeleteDocResponse403 = FromSchema<(typeof schemas.DeleteDoc.response)['403']>;
@@ -46,16 +67,30 @@ export type GetApiRegistryMetadataParam = FromSchema<typeof schemas.GetApiRegist
 export type GetApiRegistryResponse200 = FromSchema<(typeof schemas.GetApiRegistry.response)['200']>;
 export type GetApiRegistryResponse404 = FromSchema<(typeof schemas.GetApiRegistry.response)['404']>;
 export type GetApiSchemaResponse200 = FromSchema<(typeof schemas.GetApiSchema.response)['200']>;
-export type GetApiSpecificationMetadataParam = FromSchema<typeof schemas.GetApiSpecification.metadata>;
-export type GetApiSpecificationResponse200 = FromSchema<(typeof schemas.GetApiSpecification.response)['200']>;
-export type GetApiSpecificationResponse400 = FromSchema<(typeof schemas.GetApiSpecification.response)['400']>;
-export type GetApiSpecificationResponse401 = FromSchema<(typeof schemas.GetApiSpecification.response)['401']>;
-export type GetApiSpecificationResponse403 = FromSchema<(typeof schemas.GetApiSpecification.response)['403']>;
-export type GetApiSpecificationResponse404 = FromSchema<(typeof schemas.GetApiSpecification.response)['404']>;
+export type GetApiSpecificationMetadataParam = FromSchema<
+  typeof schemas.GetApiSpecification.metadata
+>;
+export type GetApiSpecificationResponse200 = FromSchema<
+  (typeof schemas.GetApiSpecification.response)['200']
+>;
+export type GetApiSpecificationResponse400 = FromSchema<
+  (typeof schemas.GetApiSpecification.response)['400']
+>;
+export type GetApiSpecificationResponse401 = FromSchema<
+  (typeof schemas.GetApiSpecification.response)['401']
+>;
+export type GetApiSpecificationResponse403 = FromSchema<
+  (typeof schemas.GetApiSpecification.response)['403']
+>;
+export type GetApiSpecificationResponse404 = FromSchema<
+  (typeof schemas.GetApiSpecification.response)['404']
+>;
 export type GetCategoriesMetadataParam = FromSchema<typeof schemas.GetCategories.metadata>;
 export type GetCategoriesResponse200 = FromSchema<(typeof schemas.GetCategories.response)['200']>;
 export type GetCategoryDocsMetadataParam = FromSchema<typeof schemas.GetCategoryDocs.metadata>;
-export type GetCategoryDocsResponse404 = FromSchema<(typeof schemas.GetCategoryDocs.response)['404']>;
+export type GetCategoryDocsResponse404 = FromSchema<
+  (typeof schemas.GetCategoryDocs.response)['404']
+>;
 export type GetCategoryMetadataParam = FromSchema<typeof schemas.GetCategory.metadata>;
 export type GetCategoryResponse404 = FromSchema<(typeof schemas.GetCategory.response)['404']>;
 export type GetChangelogMetadataParam = FromSchema<typeof schemas.GetChangelog.metadata>;
@@ -76,10 +111,18 @@ export type GetDocResponse403 = FromSchema<(typeof schemas.GetDoc.response)['403
 export type GetDocResponse404 = FromSchema<(typeof schemas.GetDoc.response)['404']>;
 export type GetOpenRolesResponse200 = FromSchema<(typeof schemas.GetOpenRoles.response)['200']>;
 export type GetProductionDocMetadataParam = FromSchema<typeof schemas.GetProductionDoc.metadata>;
-export type GetProductionDocResponse200 = FromSchema<(typeof schemas.GetProductionDoc.response)['200']>;
-export type GetProductionDocResponse401 = FromSchema<(typeof schemas.GetProductionDoc.response)['401']>;
-export type GetProductionDocResponse403 = FromSchema<(typeof schemas.GetProductionDoc.response)['403']>;
-export type GetProductionDocResponse404 = FromSchema<(typeof schemas.GetProductionDoc.response)['404']>;
+export type GetProductionDocResponse200 = FromSchema<
+  (typeof schemas.GetProductionDoc.response)['200']
+>;
+export type GetProductionDocResponse401 = FromSchema<
+  (typeof schemas.GetProductionDoc.response)['401']
+>;
+export type GetProductionDocResponse403 = FromSchema<
+  (typeof schemas.GetProductionDoc.response)['403']
+>;
+export type GetProductionDocResponse404 = FromSchema<
+  (typeof schemas.GetProductionDoc.response)['404']
+>;
 export type GetProjectResponse200 = FromSchema<(typeof schemas.GetProject.response)['200']>;
 export type GetProjectResponse401 = FromSchema<(typeof schemas.GetProject.response)['401']>;
 export type GetProjectResponse403 = FromSchema<(typeof schemas.GetProject.response)['403']>;
@@ -92,12 +135,24 @@ export type GetVersionsResponse403 = FromSchema<(typeof schemas.GetVersions.resp
 export type SearchDocsMetadataParam = FromSchema<typeof schemas.SearchDocs.metadata>;
 export type SearchDocsResponse401 = FromSchema<(typeof schemas.SearchDocs.response)['401']>;
 export type SearchDocsResponse403 = FromSchema<(typeof schemas.SearchDocs.response)['403']>;
-export type UpdateApiSpecificationBodyParam = FromSchema<typeof schemas.UpdateApiSpecification.body>;
-export type UpdateApiSpecificationMetadataParam = FromSchema<typeof schemas.UpdateApiSpecification.metadata>;
-export type UpdateApiSpecificationResponse400 = FromSchema<(typeof schemas.UpdateApiSpecification.response)['400']>;
-export type UpdateApiSpecificationResponse401 = FromSchema<(typeof schemas.UpdateApiSpecification.response)['401']>;
-export type UpdateApiSpecificationResponse403 = FromSchema<(typeof schemas.UpdateApiSpecification.response)['403']>;
-export type UpdateApiSpecificationResponse408 = FromSchema<(typeof schemas.UpdateApiSpecification.response)['408']>;
+export type UpdateApiSpecificationBodyParam = FromSchema<
+  typeof schemas.UpdateApiSpecification.body
+>;
+export type UpdateApiSpecificationMetadataParam = FromSchema<
+  typeof schemas.UpdateApiSpecification.metadata
+>;
+export type UpdateApiSpecificationResponse400 = FromSchema<
+  (typeof schemas.UpdateApiSpecification.response)['400']
+>;
+export type UpdateApiSpecificationResponse401 = FromSchema<
+  (typeof schemas.UpdateApiSpecification.response)['401']
+>;
+export type UpdateApiSpecificationResponse403 = FromSchema<
+  (typeof schemas.UpdateApiSpecification.response)['403']
+>;
+export type UpdateApiSpecificationResponse408 = FromSchema<
+  (typeof schemas.UpdateApiSpecification.response)['408']
+>;
 export type UpdateCategoryBodyParam = FromSchema<typeof schemas.UpdateCategory.body>;
 export type UpdateCategoryMetadataParam = FromSchema<typeof schemas.UpdateCategory.metadata>;
 export type UpdateCategoryResponse400 = FromSchema<(typeof schemas.UpdateCategory.response)['400']>;
@@ -106,10 +161,18 @@ export type UpdateChangelogBodyParam = FromSchema<typeof schemas.UpdateChangelog
 export type UpdateChangelogMetadataParam = FromSchema<typeof schemas.UpdateChangelog.metadata>;
 export type UpdateCustomPageBodyParam = FromSchema<typeof schemas.UpdateCustomPage.body>;
 export type UpdateCustomPageMetadataParam = FromSchema<typeof schemas.UpdateCustomPage.metadata>;
-export type UpdateCustomPageResponse400 = FromSchema<(typeof schemas.UpdateCustomPage.response)['400']>;
-export type UpdateCustomPageResponse401 = FromSchema<(typeof schemas.UpdateCustomPage.response)['401']>;
-export type UpdateCustomPageResponse403 = FromSchema<(typeof schemas.UpdateCustomPage.response)['403']>;
-export type UpdateCustomPageResponse404 = FromSchema<(typeof schemas.UpdateCustomPage.response)['404']>;
+export type UpdateCustomPageResponse400 = FromSchema<
+  (typeof schemas.UpdateCustomPage.response)['400']
+>;
+export type UpdateCustomPageResponse401 = FromSchema<
+  (typeof schemas.UpdateCustomPage.response)['401']
+>;
+export type UpdateCustomPageResponse403 = FromSchema<
+  (typeof schemas.UpdateCustomPage.response)['403']
+>;
+export type UpdateCustomPageResponse404 = FromSchema<
+  (typeof schemas.UpdateCustomPage.response)['404']
+>;
 export type UpdateDocBodyParam = FromSchema<typeof schemas.UpdateDoc.body>;
 export type UpdateDocMetadataParam = FromSchema<typeof schemas.UpdateDoc.metadata>;
 export type UpdateDocResponse200 = FromSchema<(typeof schemas.UpdateDoc.response)['200']>;
@@ -123,9 +186,21 @@ export type UpdateVersionResponse400 = FromSchema<(typeof schemas.UpdateVersion.
 export type UpdateVersionResponse401 = FromSchema<(typeof schemas.UpdateVersion.response)['401']>;
 export type UpdateVersionResponse403 = FromSchema<(typeof schemas.UpdateVersion.response)['403']>;
 export type UpdateVersionResponse404 = FromSchema<(typeof schemas.UpdateVersion.response)['404']>;
-export type UploadApiSpecificationBodyParam = FromSchema<typeof schemas.UploadApiSpecification.body>;
-export type UploadApiSpecificationMetadataParam = FromSchema<typeof schemas.UploadApiSpecification.metadata>;
-export type UploadApiSpecificationResponse400 = FromSchema<(typeof schemas.UploadApiSpecification.response)['400']>;
-export type UploadApiSpecificationResponse401 = FromSchema<(typeof schemas.UploadApiSpecification.response)['401']>;
-export type UploadApiSpecificationResponse403 = FromSchema<(typeof schemas.UploadApiSpecification.response)['403']>;
-export type UploadApiSpecificationResponse408 = FromSchema<(typeof schemas.UploadApiSpecification.response)['408']>;
+export type UploadApiSpecificationBodyParam = FromSchema<
+  typeof schemas.UploadApiSpecification.body
+>;
+export type UploadApiSpecificationMetadataParam = FromSchema<
+  typeof schemas.UploadApiSpecification.metadata
+>;
+export type UploadApiSpecificationResponse400 = FromSchema<
+  (typeof schemas.UploadApiSpecification.response)['400']
+>;
+export type UploadApiSpecificationResponse401 = FromSchema<
+  (typeof schemas.UploadApiSpecification.response)['401']
+>;
+export type UploadApiSpecificationResponse403 = FromSchema<
+  (typeof schemas.UploadApiSpecification.response)['403']
+>;
+export type UploadApiSpecificationResponse408 = FromSchema<
+  (typeof schemas.UploadApiSpecification.response)['408']
+>;
