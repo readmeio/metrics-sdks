@@ -15,14 +15,18 @@ import verifyWebhook from './lib/verify-webhook';
 const env = process.env.NODE_ENV || 'development';
 
 interface ApiKey {
-  apiKey: string;
+  [x: string]: unknown;
+  apiKey?: string;
   name: string;
+  pass?: string;
+  user?: string;
 }
 
 interface GroupingObject {
   [x: string]: unknown;
   email: string;
   keys: ApiKey[];
+  name: string;
 }
 
 interface SplitOptions {
@@ -40,11 +44,12 @@ const splitIntoUserAndConfig = (inputObject: GroupingObject & Options): SplitOpt
     'development',
   ];
 
-  const grouping: GroupingObject = { email: '', keys: [] };
+  const grouping: GroupingObject = { email: '', keys: [], name: '' };
   const config: Options = {};
   Object.keys(inputObject).forEach(key => {
     const typedKey = key as keyof GroupingObject | keyof Options;
     if (configKeys.includes(typedKey as keyof Options)) {
+      // @ts-expect-error Kanad TODO: look into if this works properly
       config[typedKey as keyof Options] = inputObject[typedKey];
     } else {
       grouping[typedKey] = inputObject[typedKey];
@@ -65,7 +70,10 @@ const splitIntoUserAndConfig = (inputObject: GroupingObject & Options): SplitOpt
 const findApiKey = (req: Request, keys: ApiKey[]) => {
   const requestString = flatted.stringify(req);
   const key = keys.find(apiKey => {
-    if (requestString.includes(apiKey.apiKey) || requestString.includes(btoa(`${apiKey.apiKey}:`))) {
+    if (
+      (apiKey.apiKey && requestString.includes(apiKey.apiKey)) ||
+      ((apiKey.user || apiKey.pass) && requestString.includes(btoa(`${apiKey.user || ''}:${apiKey.pass || ''}`)))
+    ) {
       return true;
     }
     return false;
@@ -81,7 +89,7 @@ let apiKey = '';
 let readmeProjectData: GetProjectResponse200 | undefined;
 
 const readme = (
-  userFunction: (req: Request, res: Response) => GroupingObject & Options,
+  userFunction: (req?: Request, res?: Response) => GroupingObject & Options,
   { disableWebhook, disableMetrics } = {
     disableWebhook: false,
     disableMetrics: false,
@@ -144,10 +152,11 @@ const readme = (
 
     const user = await userFunction(req, res);
     if (!user || !Object.keys(user).length || disableMetrics) return next();
-    res.locals.readme = findApiKey(req, user.keys);
+    res.locals.readme = findApiKey(req, user.keys || []);
 
     const { grouping, config } = splitIntoUserAndConfig(user);
-    const filteredKey = grouping.keys.find(key => key.apiKey === res.locals.readme.apiKey);
+    const filteredKey =
+      (grouping.keys?.length && grouping.keys.find(key => key.apiKey === res.locals.readme.apiKey)) || undefined;
 
     if (!filteredKey?.apiKey || !filteredKey?.name) return next();
 
