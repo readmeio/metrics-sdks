@@ -249,7 +249,7 @@ describe('#metrics', function () {
     });
     appNest.get('/nested', (req, res) => {
       // We're asserting `req.url` to be `/nested` here because the way that Express does contextual
-      // route loading `req.url` won't include the `/test`. The `/test` is only added later
+      // route loading `req.url` won't include the `/test`. The `/test` is merely added later
       // internally in Express with `req.originalUrl`.
       expect(req.url).to.equal('/nested');
       res.sendStatus(200);
