@@ -1,4 +1,3 @@
-/* eslint-disable mocha/no-setup-in-describe */
 import type { ClientId, SnippetType, TargetId } from './targets';
 import type { Variables } from '..';
 
@@ -52,14 +51,17 @@ const testFilter =
     list.length > 0 ? list.includes(item[property]) : true;
 
 describe('webhooks', function () {
+  // eslint-disable-next-line vitest/require-hook
   availableWebhookTargets()
     .filter(testFilter('key', targetFilter))
     .forEach(({ key: targetId, title, clients }) => {
       const snippetType: SnippetType = 'webhooks';
 
       describe(`${title} snippet generation`, function () {
+        // eslint-disable-next-line vitest/require-hook
         clients.filter(testFilter('key', clientFilter)).forEach(({ key: clientId }) => {
           describe(clientId, function () {
+            // eslint-disable-next-line vitest/require-hook
             fixtures.filter(testFilter(0, fixtureFilter)).forEach(([fixture, variables]) => {
               const fixturePath = path.join(
                 'src',
@@ -114,6 +116,7 @@ describe('webhooks', function () {
 
             if (clientId === 'aws') {
               describe('AWS snippet generation with automatic creation of new API keys', function () {
+                // eslint-disable-next-line vitest/require-hook
                 fixtures.filter(testFilter(0, fixtureFilter)).forEach(([fixture, variables]) => {
                   const createKeys = true;
                   const suffix = createKeys ? '-create' : '';

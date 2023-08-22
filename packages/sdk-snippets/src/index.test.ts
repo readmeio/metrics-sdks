@@ -11,6 +11,6 @@ describe('MetricsSDKSnippet', function () {
     const snippet = new MetricsSDKSnippet(serverVariables as Variables);
     const result = snippet.convert('webhooks', null);
 
-    expect(result).to.be.false;
+    expect(result).toBe(false);
   });
 });
