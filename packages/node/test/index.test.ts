@@ -396,7 +396,7 @@ describe('#metrics', function () {
 
       const baseLogUrl = 'https://docs.example.com';
 
-      const apiMock = getReadMeApiMock(1, baseLogUrl);
+      const apiMock = getReadMeApiMock(baseLogUrl);
       const mock = nock(config.host, {
         reqheaders: {
           'Content-Type': 'application/json',
