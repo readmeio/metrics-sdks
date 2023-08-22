@@ -7,7 +7,8 @@ import config from '../../src/config';
 
 const apiKey = 'mockReadMeApiKey';
 
-function doHeadersMatch(headers: Headers) {
+// TODO: maybe refactor this function so we can specify headers properly?
+export function doHeadersMatch(headers: Headers) {
   const auth = headers.get('authorization');
   const decodedAuth = auth ? Buffer.from(auth.replace(/^Basic /, ''), 'base64').toString('ascii') : '';
   const userAgent = headers.get('user-agent');

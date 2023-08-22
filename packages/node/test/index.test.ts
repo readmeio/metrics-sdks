@@ -198,37 +198,37 @@ describe('#metrics', function () {
   });
 
   describe('unified snippet tests', function () {
-    let metricsMock: nock.Scope;
-    let readmeApiNock: nock.Scope;
     let metricsServerRequests: number;
     let app: Express;
     let metricsServerResponseCode = 202;
 
     beforeEach(function () {
       metricsServerRequests = 0;
-      metricsMock = nock(config.host, {
-        reqheaders: {
-          'Content-Type': 'application/json',
-          'User-Agent': `${pkg.name}/${pkg.version}`,
-        },
-      })
-        .post('/v1/request', ([body]) => {
-          metricsServerRequests += 1;
-          expect(body._version).to.equal(3);
-          expect(body.group).to.deep.equal(outgoingGroup);
-          expect(typeof body.request.log.entries[0].startedDateTime).to.equal('string');
-          return true;
-        })
-        .basicAuth({ user: apiKey })
-        .reply(() => {
-          return [metricsServerResponseCode, ''];
-        })
-        .persist();
+      server.use(
+        ...[
+          rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
+            const body: OutgoingLogBody[] = await req.json();
+            if (doMetricsHeadersMatch(req.headers)) {
+              metricsServerRequests += 1;
+              expect(body[0]._version).to.equal(3);
+              expect(body[0].group).to.deep.equal(outgoingGroup);
+              expect(typeof body[0].request.log.entries[0].startedDateTime).to.equal('string');
+              return res(ctx.status(metricsServerResponseCode), ctx.text(''));
+            }
 
-      readmeApiNock = nock('https://dash.readme.com').get('/api/v1/').reply(200, {
-        jwtSecret: '123',
-        subdomain: 'subdomain',
-      });
+            return res(ctx.status(500));
+          }),
+          rest.get(`${config.readmeApiUrl}/v1`, (req, res, ctx) => {
+            return res(
+              ctx.status(200),
+              ctx.json({
+                jwtSecret: '123',
+                subdomain: 'subdomain',
+              })
+            );
+          }),
+        ]
+      );
 
       readmeio.auth(apiKey);
       app = express();
@@ -247,7 +247,6 @@ describe('#metrics', function () {
     });
 
     afterEach(function () {
-      readmeApiNock.done();
       setBackoff(undefined);
       metricsServerResponseCode = 202;
     });
@@ -257,14 +256,15 @@ describe('#metrics', function () {
     }
 
     it('should send requests to the metrics server', async function () {
+      chai.Assertion.expectExpects(10);
       for (let i = 0; i < 3; i += 1) {
         await makeRequest(`?api_key=${endUserApiKey}`); // eslint-disable-line no-await-in-loop
       }
       expect(metricsServerRequests).to.equal(3);
-      metricsMock.done();
     });
 
     it('should send not requests to the metrics server if no api key is included', async function () {
+      chai.Assertion.expectExpects(1);
       for (let i = 0; i < 3; i += 1) {
         await makeRequest(); // eslint-disable-line no-await-in-loop
       }
