@@ -5,13 +5,10 @@ import type { Variables } from '..';
 import { readdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 
-import chai, { expect } from 'chai';
-import { jestSnapshotPlugin } from 'mocha-chai-jest-snapshot';
+import { describe, it, expect } from 'vitest';
 
 import { MetricsSDKSnippet } from '..';
 import { availableWebhookTargets, extname } from '../helpers/utils';
-
-chai.use(jestSnapshotPlugin());
 
 const expectedBasePath = ['src', 'fixtures', 'webhooks'];
 
@@ -71,7 +68,7 @@ describe('webhooks', function () {
                 clientId,
                 snippetType,
                 'fixtures',
-                `${fixture}${extname(targetId)}`
+                `${fixture}${extname(targetId)}`,
               );
 
               let expectedOutput: string;
@@ -84,7 +81,7 @@ describe('webhooks', function () {
                 }
 
                 throw new Error(
-                  `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${fixturePath}\``
+                  `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${fixturePath}\``,
                 );
               }
 
@@ -127,7 +124,7 @@ describe('webhooks', function () {
                     clientId,
                     snippetType,
                     'fixtures',
-                    `${fixture}${suffix}${extname(targetId)}`
+                    `${fixture}${suffix}${extname(targetId)}`,
                   );
 
                   let expectedOutput: string;
@@ -139,7 +136,7 @@ describe('webhooks', function () {
                       return;
                     }
                     throw new Error(
-                      `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${fixturePath}\``
+                      `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${fixturePath}\``,
                     );
                   }
 

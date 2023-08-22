@@ -49,7 +49,7 @@ export class CodeBuilder extends HTTPSnippetCodeBuilder {
       indentationLevel?: number;
       name: string;
       type: 'security' | 'server';
-    }
+    },
   ) => {
     this.push(line, opts.indentationLevel);
 

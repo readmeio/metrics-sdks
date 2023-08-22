@@ -45,7 +45,7 @@ export type Converter<T extends Record<string, any>> = (
     security: SecurityVariable[];
     server: ServerVariable[];
   },
-  options?: Merge<CodeBuilder, T>
+  options?: Merge<CodeBuilder, T>,
 ) => {
   ranges: ClientRanges;
   snippet: string;

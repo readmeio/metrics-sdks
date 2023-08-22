@@ -1,6 +1,6 @@
 import type { Variables } from '.';
 
-import { expect } from 'chai';
+import { describe, it, expect } from 'vitest';
 
 import serverVariables from './fixtures/webhooks/server-variables';
 

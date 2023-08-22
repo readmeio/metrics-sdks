@@ -46,7 +46,7 @@ export const aws: Client = {
     blank();
     push("// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.");
     push(
-      '[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]'
+      '[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]',
     );
     blank();
     push('namespace WebhookHandler');
@@ -65,7 +65,7 @@ export const aws: Client = {
     }
     push(
       'public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest apigProxyEvent, ILambdaContext context)',
-      2
+      2,
     );
     push('{', 2);
     blank();
@@ -154,13 +154,13 @@ export const aws: Client = {
       server.forEach(data => {
         pushVariable(
           `output.Add("${escapeForDoubleQuotes(data.name)}", "${escapeForDoubleQuotes(
-            data.default || data.default === '' ? data.default : data.name
+            data.default || data.default === '' ? data.default : data.name,
           )}");`,
           {
             type: 'server',
             name: data.name,
             indentationLevel: 4,
-          }
+          },
         );
       });
       blank();
@@ -174,13 +174,13 @@ export const aws: Client = {
           if (data.scheme === 'basic') {
             pushVariable(
               `output.Add("${escapeForDoubleQuotes(
-                data.name
+                data.name,
               )}", new Dictionary<string, string> { { "user", email }, { "pass", apiKey } });`,
               {
                 type: 'security',
                 name: data.name,
                 indentationLevel: 4,
-              }
+              },
             );
             return;
           }
