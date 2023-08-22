@@ -1,33 +1,14 @@
-import type { Headers } from 'headers-polyfill';
-
 import { expect } from 'chai';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 
-import pkg from '../../package.json';
 import { getProjectBaseUrl } from '../../src';
 import config from '../../src/config';
 import { getCache } from '../../src/lib/get-project-base-url';
+import getReadMeApiMock from '../helpers/getReadMeApiMock';
 
 const apiKey = 'mockReadMeApiKey';
 const baseLogUrl = 'https://docs.example.com';
-
-function doHeadersMatch(headers: Headers) {
-  const auth = headers.get('authorization');
-  const decodedAuth = Buffer.from(auth.replace(/^Basic /, ''), 'base64').toString('ascii');
-  const userAgent = headers.get('user-agent');
-  return decodedAuth === `${apiKey}:` && userAgent === `${pkg.name}/${pkg.version}`;
-}
-
-// eslint-disable-next-line mocha/no-exports
-export function getReadMeApiMock(baseUrl: string) {
-  return rest.get(`${config.readmeApiUrl}/v1`, (req, res, ctx) => {
-    if (doHeadersMatch(req.headers)) {
-      return res(ctx.status(200), ctx.json({ baseUrl }));
-    }
-    return null;
-  });
-}
 
 const restHandlers = [getReadMeApiMock(baseLogUrl)];
 

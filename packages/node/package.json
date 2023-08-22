@@ -54,6 +54,7 @@
     "@types/uuid": "^9.0.2",
     "caseless": "^0.12.0",
     "chai": "^4.3.7",
+    "chai-assertions-count": "^1.0.2",
     "eslint": "^8.34.0",
     "express": "^4.18.2",
     "form-data": "^4.0.0",
