@@ -66,7 +66,7 @@ function redactProperties<T extends Record<string, unknown>>(obj: T, redactedPat
  */
 function replaceEach<T extends Record<string, unknown>>(
   obj: T,
-  cb: (input: unknown) => string
+  cb: (input: unknown) => string,
 ): Record<string, unknown> {
   return Object.keys(obj).reduce<Record<string, unknown>>((acc, key) => {
     const value = obj[key];
@@ -131,7 +131,7 @@ function parseRequestBody(body: string, mimeType: string): Record<string, unknow
 export default function processRequest(
   req: ExtendedIncomingMessage,
   requestBody?: Record<string, unknown> | string,
-  options?: LogOptions
+  options?: LogOptions,
 ): Request {
   const protocol = fixHeader(req.headers['x-forwarded-proto'] || '')?.toLowerCase() || getProto(req);
   const host = fixHeader(req.headers['x-forwarded-host'] || '') || req.headers.host;

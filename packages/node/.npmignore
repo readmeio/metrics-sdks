@@ -3,5 +3,4 @@ coverage/
 examples/
 test/
 .eslint*
-.mocha*
 .prettier*

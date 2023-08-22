@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-import { expect } from 'chai';
+import { describe, it, expect } from 'vitest';
 
 import verifyWebhook from '../../src/lib/verify-webhook';
 
@@ -14,7 +14,7 @@ describe('verifyWebhook', function () {
     const signature = `t=${time},v0=${hmac.update(unsigned).digest('hex')}`;
 
     const verifiedBody = verifyWebhook(body, signature, secret);
-    expect(verifiedBody).to.deep.equal(body);
+    expect(verifiedBody).toStrictEqual(body);
   });
 
   it('should throw an error if signature is invalid', function () {
@@ -27,7 +27,7 @@ describe('verifyWebhook', function () {
 
     expect(() => {
       verifyWebhook(body, signature, secret);
-    }).to.throw(/Invalid Signature/);
+    }).toThrow(/Invalid Signature/);
   });
 
   it('should throw an error if timestamp is too old', function () {
@@ -41,7 +41,7 @@ describe('verifyWebhook', function () {
 
     expect(() => {
       verifyWebhook(body, signature, secret);
-    }).to.throw(/Expired Signature/);
+    }).toThrow(/Expired Signature/);
   });
 
   it('should throw an error if signature is missing', function () {
@@ -51,7 +51,7 @@ describe('verifyWebhook', function () {
 
     expect(() => {
       verifyWebhook(body, signature, secret);
-    }).to.throw(/Missing Signature/);
+    }).toThrow(/Missing Signature/);
   });
 
   it('should throw an error if signature is undefined', function () {
@@ -60,6 +60,6 @@ describe('verifyWebhook', function () {
 
     expect(() => {
       verifyWebhook(body, undefined, secret);
-    }).to.throw(/Missing Signature/);
+    }).toThrow(/Missing Signature/);
   });
 });
