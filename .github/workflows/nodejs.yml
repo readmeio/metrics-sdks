@@ -32,6 +32,7 @@ jobs:
         working-directory: packages/node
 
     strategy:
+      fail-fast: false
       matrix:
         node-version:
           - 14
