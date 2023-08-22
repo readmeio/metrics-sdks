@@ -4,11 +4,9 @@ import type { ServerResponse } from 'http';
 
 import { STATUS_CODES } from 'http';
 
-import removeProperties from 'lodash/omit';
-import removeOtherProperties from 'lodash/pick';
-
 import { objectToArray } from './object-to-array';
 import { fixHeader } from './process-request';
+import { redactOtherProperties, redactProperties } from './redaction';
 
 /**
  * Transforms the provided ServerResponse and additional information into the appropriate HAR structure
@@ -28,11 +26,11 @@ export default function processResponse(res: ServerResponse, responseBody?: stri
 
     // Only apply blacklist/whitelist if it's an object
     if (denylist) {
-      body = removeProperties(body, denylist);
+      body = typeof body === 'object' ? redactProperties(body, denylist) : body;
     }
 
     if (allowlist && !denylist) {
-      body = removeOtherProperties(body, allowlist);
+      body = typeof body === 'object' ? redactOtherProperties(body, allowlist) : body;
     }
   } catch (e) {
     // Non JSON body
@@ -42,11 +40,11 @@ export default function processResponse(res: ServerResponse, responseBody?: stri
   let headers = res.getHeaders();
 
   if (denylist) {
-    headers = removeProperties(headers, denylist);
+    headers = redactProperties(headers, denylist);
   }
 
   if (allowlist && !denylist) {
-    headers = removeOtherProperties(headers, allowlist);
+    headers = redactOtherProperties(headers, allowlist);
   }
 
   return {

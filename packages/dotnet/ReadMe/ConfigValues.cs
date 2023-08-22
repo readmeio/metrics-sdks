@@ -16,11 +16,7 @@ namespace ReadMe
   {
     public List<string> allowList { get; set; }
 
-    public bool isAllowListEmpty { get; set; }
-
     public List<string> denyList { get; set; }
-
-    public bool isDenyListEmpty { get; set; }
 
     public bool development { get; set; } = false;
 

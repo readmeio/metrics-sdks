@@ -1,6 +1,6 @@
 ﻿namespace ReadMe.HarJsonObjectModels
 {
-  class Headers
+  public class Headers
   {
     public string name { get; set; }
 
