@@ -47,3 +47,12 @@ jobs:
 
       - run: npm ci --ignore-scripts
       - run: npm test
+        if: ${{ matrix.node-version }} < 18
+
+      # Nock doesn't support native Node 18+ fetch, see https://github.com/nock/nock/issues/2397
+      # We should probably use a different mocking library at some point, but
+      # we're temporarily disabling native Node 18+ fetch to get tests passing.
+      - run: npm test
+        if: ${{ matrix.node-version }} >= 18
+        env:
+          NODE_OPTIONS: --no-experimental-fetch
