@@ -10,10 +10,10 @@
     "prettier:write": "prettier --list-different --write \"./**/**.{js,ts,md}\"",
     "publish": "npx lerna publish",
     "test": "npm test --workspaces",
-    "test:integration-metrics": "NODE_OPTIONS=--experimental-vm-modules npx mocha test/integration-metrics.test.js",
-    "test:integration-metrics-watch": "NODE_OPTIONS=--experimental-vm-modules npx nodemon --exec mocha test/integration-metrics.test.js",
-    "test:integration-webhooks": "NODE_OPTIONS=--experimental-vm-modules npx mocha test/integration-webhooks.test.js",
-    "test:integration-webhooks-watch": "NODE_OPTIONS=--experimental-vm-modules npx nodemon --exec mocha test/integration-webhooks.test.js",
+    "test:integration-metrics": "npx vitest test/integration-metrics.test.js",
+    "test:integration-metrics-watch": "npx vitest run test/integration-metrics.test.js",
+    "test:integration-webhooks": "npx vitest test/integration-webhooks.test.js",
+    "test:integration-webhooks-watch": "npx vitest run test/integration-webhooks.test.js",
     "version": "npx conventional-changelog-cli --pkg lerna.json -i CHANGELOG.md -s && git add CHANGELOG.md"
   },
   "repository": {
@@ -31,18 +31,17 @@
   "devDependencies": {
     "@commitlint/cli": "^17.4.3",
     "@commitlint/config-conventional": "^17.4.3",
-    "@readme/eslint-config": "^10.5.1",
+    "@readme/eslint-config": "^12.1.0",
     "alex": "^11.0.0",
     "caseless": "^0.12.0",
-    "chai": "^4.3.6",
     "eslint": "^8.27.0",
     "form-data-encoder": "^2.1.0",
     "formdata-node": "^5.0.0",
     "har-validator": "^5.1.5",
     "husky": "^8.0.3",
     "isomorphic-fetch": "^3.0.0",
-    "mocha": "^10.1.0",
-    "prettier": "^2.7.1"
+    "prettier": "^3.0.2",
+    "vitest": "^0.34.2"
   },
   "type": "module",
   "prettier": "@readme/eslint-config/prettier"

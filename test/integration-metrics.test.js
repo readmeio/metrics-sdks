@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 /* eslint-disable no-restricted-syntax */
 import { once } from 'node:events';
 import fs from 'node:fs/promises';
@@ -5,10 +6,11 @@ import http from 'node:http';
 import net from 'node:net';
 import { Readable } from 'node:stream';
 
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import { FormDataEncoder } from 'form-data-encoder';
 import { File, FormData } from 'formdata-node';
 import 'isomorphic-fetch';
+import { describe, beforeAll, beforeEach, afterAll, expect, it } from 'vitest';
 
 import chaiPlugins from './helpers/chai-plugins.js';
 
@@ -53,6 +55,7 @@ describe('Metrics SDK Integration Tests', function () {
   const sockets = new Set();
 
   let server;
+  // eslint-disable-next-line vitest/require-hook
   let sdkCall = {
     req: {},
     body: {},
@@ -68,14 +71,7 @@ describe('Metrics SDK Integration Tests', function () {
     return [sdkCall.req, sdkCall.body];
   }
 
-  beforeEach(function () {
-    sdkCall = {
-      req: {},
-      body: {},
-    };
-  });
-
-  before(async function () {
+  beforeAll(async function () {
     await isListening(PORT);
 
     server = http
@@ -102,7 +98,14 @@ describe('Metrics SDK Integration Tests', function () {
     return once(server, 'listening');
   });
 
-  after(function () {
+  beforeEach(function () {
+    sdkCall = {
+      req: {},
+      body: {},
+    };
+  });
+
+  afterAll(function () {
     // The mock server will sometimes hang after we're done when we're trying to close it down,
     // this will forcefull kill everything and prevent our tests from crashing out from Mocha "you
     // didn't call done()" errors.
@@ -144,7 +147,7 @@ describe('Metrics SDK Integration Tests', function () {
     expect(payload.group.label).to.equal('Owlbert');
 
     expect(payload.clientIPAddress).to.match(/\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}/);
-    expect(payload.development).to.be.false;
+    expect(payload.development).toBe.be.false;
 
     const har = payload.request;
     await expect(har).to.have.a.har.request;
@@ -357,8 +360,7 @@ describe('Metrics SDK Integration Tests', function () {
    * wipes out `req.body` and replaces it with an empty JSON object -- eliminating all access for
    * us to the what the original payload was.
    */
-  // eslint-disable-next-line mocha/no-pending-tests, mocha/no-skipped-tests
-  it.skip('should process an `application/JSON POST payload containing unparseable JSON');
+  it.todo('should process an `application/JSON POST payload containing unparseable JSON');
 
   it('should process a vendored `+json` POST payload', async function () {
     const content = JSON.stringify({ user: { email: 'dom@readme.io' } });

@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 
-import { expect } from 'chai';
 import 'isomorphic-fetch';
+import { describe, it, expect } from 'vitest';
 
 const PORT = 8000; // SDK HTTP server port
 const randomAPIKey = 'rdme_abcdefghijklmnopqrstuvwxyz'; // This must match what's in `docker-compose.yml`.
