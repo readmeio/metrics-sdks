@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-interface */
 import caseless from 'caseless';
 import { isValidUUIDV4 } from 'is-valid-uuid-v4';
 import { expect } from 'vitest';
