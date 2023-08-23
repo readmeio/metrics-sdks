@@ -126,11 +126,11 @@ describe('#metrics', function () {
   describe('tests for sending requests to the metrics server', function () {
     let metricsServerRequests: number;
     let app: Express;
-    // eslint-disable-next-line vitest/require-hook
-    let metricsServerResponseCode = 202;
+    let metricsServerResponseCode: number;
 
     beforeEach(function () {
       metricsServerRequests = 0;
+      metricsServerResponseCode = 202;
       server.use(
         rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
           const body: OutgoingLogBody[] = await req.json();
@@ -196,10 +196,11 @@ describe('#metrics', function () {
   describe('unified snippet tests', function () {
     let metricsServerRequests: number;
     let app: Express;
-    let metricsServerResponseCode = 202;
+    let metricsServerResponseCode: number;
 
     beforeEach(function () {
       metricsServerRequests = 0;
+      metricsServerResponseCode = 202;
       server.use(
         ...[
           rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
@@ -220,10 +221,10 @@ describe('#metrics', function () {
               ctx.json({
                 jwtSecret: '123',
                 subdomain: 'subdomain',
-              })
+              }),
             );
           }),
-        ]
+        ],
       );
 
       readmeio.auth(apiKey);
@@ -235,7 +236,7 @@ describe('#metrics', function () {
             name: 'First Last',
             email: 'test@example.com',
           };
-        })
+        }),
       );
       app.get('/test', (req, res) => {
         return res.sendStatus(200);
@@ -252,7 +253,7 @@ describe('#metrics', function () {
     }
 
     it('should send requests to the metrics server', async function () {
-      chai.Assertion.expectExpects(10);
+      expect.assertions(10);
       for (let i = 0; i < 3; i += 1) {
         await makeRequest(`?api_key=${endUserApiKey}`); // eslint-disable-line no-await-in-loop
       }
@@ -260,7 +261,7 @@ describe('#metrics', function () {
     });
 
     it('should send not requests to the metrics server if no api key is included', async function () {
-      chai.Assertion.expectExpects(1);
+      expect.assertions(1);
       for (let i = 0; i < 3; i += 1) {
         await makeRequest(); // eslint-disable-line no-await-in-loop
       }
