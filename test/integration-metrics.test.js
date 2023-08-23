@@ -473,57 +473,58 @@ describe('Metrics SDK Integration Tests', function () {
     expect(request.postData.text).toBeUndefined();
   });
 
-  it('should process a `multipart/form-data` POST payload containing files', async function () {
-    if (!supportsMultipart()) {
-      this.skip();
-    }
-    const owlbert = await fs.readFile('./test/__datasets__/owlbert.png');
+  // eslint-disable-next-line vitest/require-hook
+  it.skipIf(!supportsMultipart())(
+    'should process a `multipart/form-data` POST payload containing files',
+    async function () {
+      const owlbert = await fs.readFile('./test/__datasets__/owlbert.png');
 
-    const formData = new FormData();
-    formData.append('password', 123456);
-    formData.append('apiKey', 'abcdef');
-    formData.append('another', 'Hello world');
-    formData.append('buster', [1234, 5678]);
-    formData.append('owlbert.png', new File([owlbert], 'owlbert.png', { type: 'image/png' }), 'owlbert.png');
+      const formData = new FormData();
+      formData.append('password', 123456);
+      formData.append('apiKey', 'abcdef');
+      formData.append('another', 'Hello world');
+      formData.append('buster', [1234, 5678]);
+      formData.append('owlbert.png', new File([owlbert], 'owlbert.png', { type: 'image/png' }), 'owlbert.png');
 
-    const encoder = new FormDataEncoder(formData);
+      const encoder = new FormDataEncoder(formData);
 
-    await fetch(`http://localhost:${PORT}/`, {
-      method: 'post',
-      headers: encoder.headers,
-      body: Readable.from(encoder),
-    });
+      await fetch(`http://localhost:${PORT}/`, {
+        method: 'post',
+        headers: encoder.headers,
+        body: Readable.from(encoder),
+      });
 
-    const [, body] = await getRequest();
-    const [payload] = body;
+      const [, body] = await getRequest();
+      const [payload] = body;
 
-    const har = payload.request;
-    await expect(har).to.have.a.har.request;
-    await expect(har).to.have.a.har.response;
+      const har = payload.request;
+      await expect(har).to.have.a.har.request;
+      await expect(har).to.have.a.har.response;
 
-    const { request } = har.log.entries[0];
+      const { request } = har.log.entries[0];
 
-    expect(request.method).toBe('POST');
-    expect(request.headers).to.have.header('content-type', /multipart\/form-data; boundary=(.*)/);
-    expect(request.headers).to.have.header('content-length', 982);
-    expect(request.postData.mimeType).toMatch(/multipart\/form-data; boundary=(.*)/);
+      expect(request.method).toBe('POST');
+      expect(request.headers).to.have.header('content-type', /multipart\/form-data; boundary=(.*)/);
+      expect(request.headers).to.have.header('content-length', 982);
+      expect(request.postData.mimeType).toMatch(/multipart\/form-data; boundary=(.*)/);
 
-    const owlbertDataURL = await fs.readFile('./test/__datasets__/owlbert.dataurl.json').then(JSON.parse);
-    expect(request.postData.params).toStrictEqual([
-      { name: 'password', value: '123456' },
-      { name: 'apiKey', value: 'abcdef' },
-      { name: 'another', value: 'Hello world' },
-      { name: 'buster', value: '1234,5678' },
-      {
-        name: 'owlbert_png',
-        value: owlbertDataURL,
-        fileName: 'owlbert.png',
-        contentType: 'image/png',
-      },
-    ]);
+      const owlbertDataURL = await fs.readFile('./test/__datasets__/owlbert.dataurl.json').then(JSON.parse);
+      expect(request.postData.params).toStrictEqual([
+        { name: 'password', value: '123456' },
+        { name: 'apiKey', value: 'abcdef' },
+        { name: 'another', value: 'Hello world' },
+        { name: 'buster', value: '1234,5678' },
+        {
+          name: 'owlbert_png',
+          value: owlbertDataURL,
+          fileName: 'owlbert.png',
+          contentType: 'image/png',
+        },
+      ]);
 
-    expect(request.postData.text).toBeUndefined();
-  });
+      expect(request.postData.text).toBeUndefined();
+    },
+  );
 
   it('should process a `text/plain` payload', async function () {
     await fetch(`http://localhost:${PORT}/`, {
