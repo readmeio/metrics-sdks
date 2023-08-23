@@ -91,7 +91,7 @@ function getLogIds(body: OutgoingLogBody | OutgoingLogBody[]): LogId {
 export function metricsAPICall(
   readmeAPIKey: string,
   body: OutgoingLogBody[],
-  fireAndForget = false
+  fireAndForget = false,
 ): Promise<LogResponse> {
   const signal = timeoutSignal(config.timeout);
   const encodedKey = Buffer.from(`${readmeAPIKey}:`).toString('base64');

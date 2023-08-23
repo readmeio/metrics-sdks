@@ -5,9 +5,9 @@ import { createServer } from 'http';
 import os from 'os';
 import * as qs from 'querystring';
 
-import { expect } from 'chai';
 import { isValidUUIDV4 } from 'is-valid-uuid-v4';
 import request from 'supertest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 
 import pkg from '../../package.json';
 import { constructPayload, mask } from '../../src/lib/construct-payload';
@@ -53,8 +53,8 @@ describe('constructPayload()', function () {
     return request(createApp(undefined, group))
       .post('/')
       .expect(({ body }) => {
-        expect(body.group.id).to.equal(mask(group.apiKey));
-        expect(body.group.apiKey).to.be.undefined;
+        expect(body.group.id).toBe(mask(group.apiKey));
+        expect(body.group.apiKey).toBeUndefined();
       });
   });
 
@@ -70,8 +70,8 @@ describe('constructPayload()', function () {
     return request(createApp(undefined, groupAlt))
       .post('/')
       .expect(({ body }) => {
-        expect(body.group.id).to.equal(mask(group.apiKey));
-        expect(body.group.apiKey).to.be.undefined;
+        expect(body.group.id).toBe(mask(group.apiKey));
+        expect(body.group.apiKey).toBeUndefined();
       });
   });
 
@@ -80,10 +80,10 @@ describe('constructPayload()', function () {
       .post('/')
       .send({ password: '123456' })
       .expect(({ body }) => {
-        expect(isValidUUIDV4(body._id)).to.equal(true);
-        expect(body.request.log.entries[0].request).to.be.a('object');
-        expect(body.request.log.entries[0].response).to.be.a('object');
-        expect(body.request.log.entries[0].request.postData).to.deep.equal({
+        expect(isValidUUIDV4(body._id)).toBe(true);
+        expectTypeOf(body.request.log.entries[0].request).toBeObject();
+        expectTypeOf(body.request.log.entries[0].response).toBeObject();
+        expect(body.request.log.entries[0].request.postData).toStrictEqual({
           mimeType: 'application/json',
           text: '{"password":"[REDACTED 6]"}',
         });
@@ -94,7 +94,7 @@ describe('constructPayload()', function () {
     return request(createApp(undefined, group))
       .post('/')
       .expect(({ body }) => {
-        expect(body.request.log.creator).to.deep.equal({
+        expect(body.request.log.creator).toStrictEqual({
           name: 'readme-metrics (node)',
           version: pkg.version,
           comment: `${os.arch()}-${os.platform()}${os.release()}/${process.versions.node}`,
@@ -106,7 +106,7 @@ describe('constructPayload()', function () {
     return request(createApp(undefined, group))
       .post('/')
       .expect(({ body }) => {
-        expect(body.clientIPAddress).to.equal('::ffff:127.0.0.1');
+        expect(body.clientIPAddress).toBe('::ffff:127.0.0.1');
       });
   });
 
@@ -114,7 +114,7 @@ describe('constructPayload()', function () {
     return request(createApp(undefined, group))
       .post('/')
       .expect(({ body }) => {
-        expect(body.request.log.entries[0].pageref).to.match(/http:\/\/127.0.0.1:\d+\//);
+        expect(body.request.log.entries[0].pageref).toMatch(/http:\/\/127.0.0.1:\d+\//);
       });
   });
 
@@ -122,7 +122,7 @@ describe('constructPayload()', function () {
     return request(createApp(undefined, group))
       .post('/test-base-path/a')
       .expect(({ body }) => {
-        expect(body.request.log.entries[0].pageref).to.match(/http:\/\/127.0.0.1:\d+\/test-base-path\/a/);
+        expect(body.request.log.entries[0].pageref).toMatch(/http:\/\/127.0.0.1:\d+\/test-base-path\/a/);
       });
   });
 
@@ -130,8 +130,8 @@ describe('constructPayload()', function () {
     return request(createApp(undefined, group))
       .post('/')
       .expect(({ body }) => {
-        expect(new Date(body.request.log.entries[0].startedDateTime).toISOString()).to.equal(
-          group.startedDateTime.toISOString()
+        expect(new Date(body.request.log.entries[0].startedDateTime).toISOString()).toBe(
+          group.startedDateTime.toISOString(),
         );
       });
   });
@@ -140,8 +140,8 @@ describe('constructPayload()', function () {
     return request(createApp(undefined, group))
       .post('/')
       .expect(({ body }) => {
-        expect(body.request.log.entries[0].time).to.be.a('number');
-        expect(body.request.log.entries[0].time).to.equal(20000);
+        expectTypeOf(body.request.log.entries[0].time).toBeNumber();
+        expect(body.request.log.entries[0].time).toBe(20000);
       });
   });
 });

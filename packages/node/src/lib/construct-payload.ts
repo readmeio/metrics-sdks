@@ -137,7 +137,7 @@ export function constructPayload(
   req: IncomingMessage,
   res: ServerResponse,
   payloadData: PayloadData,
-  logOptions: LogOptions
+  logOptions: LogOptions,
 ): OutgoingLogBody {
   const serverTime = payloadData.responseEndDateTime.getTime() - payloadData.startedDateTime.getTime();
 

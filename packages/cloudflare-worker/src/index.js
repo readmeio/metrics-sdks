@@ -141,6 +141,6 @@ module.exports.metrics = function readme(apiKey, group, req, har) {
       /* istanbul ignore next */ err => {
         if (process.env.NODE_ENV !== 'test') console.error('Error saving log to readme', err);
         throw err;
-      }
+      },
     );
 };

@@ -29,7 +29,7 @@ export class MetricsSDKSnippet {
     input: Variables,
     data: {
       secret?: string;
-    } = {}
+    } = {},
   ) {
     this.variables = input;
     this.secret = data.secret ?? 'my-readme-secret';
@@ -54,7 +54,7 @@ export class MetricsSDKSnippet {
         prev[next.source].push(next);
         return prev;
       },
-      { server: [], security: [] }
+      { server: [], security: [] },
     );
 
     return convert({ secret: this.secret, server, security }, options);
