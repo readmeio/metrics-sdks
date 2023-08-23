@@ -13,6 +13,7 @@
   },
   "include": [
     "src/**/*",
+    "src/.api/**/*",
     // We have to explicitly list these config files
     // due to the dynamic require in certain envs
     "src/config/*.json"

@@ -1,11 +1,10 @@
+import type { GetProjectResponse200 } from './.api/apis/developers/types';
 import type { Options } from './lib/log';
-import type { GetProjectResponse200 } from '../.api/apis/developers/types';
 import type { NextFunction, Request, Response } from 'express';
 
 import flatted from 'flatted';
 
-import readmeSdk from '../.api/apis/developers';
-
+import readmeSdk from './.api/apis/developers';
 import { getProjectBaseUrl } from './lib/get-project-base-url';
 import { log } from './lib/log';
 import { buildSetupView } from './lib/setup-readme-view';
