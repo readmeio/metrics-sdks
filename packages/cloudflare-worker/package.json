@@ -12,7 +12,6 @@
     "build": "HOST=https://metrics.readme.io webpack",
     "lint": "eslint .",
     "prepublishOnly": "npm run build",
-    "pretest": "npm run lint",
     "prettier": "prettier --list-different \"./**/**.js\"",
     "test": "vitest --coverage"
   },
