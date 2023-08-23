@@ -1,3 +1,5 @@
+/* eslint-disable vitest/no-conditional-expect */
+/* eslint-disable vitest/no-standalone-expect */
 import type { OutgoingLogBody } from '../src/lib/metrics-log';
 import type { Express } from 'express';
 import type { Headers } from 'headers-polyfill';
@@ -5,14 +7,13 @@ import type { Headers } from 'headers-polyfill';
 import * as crypto from 'crypto';
 import { createServer } from 'http';
 
-import chai, { expect } from 'chai';
-import chaiAssertionsCount from 'chai-assertions-count';
 import express from 'express';
 import FormData from 'form-data';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 import multer from 'multer';
 import request from 'supertest';
+import { describe, afterAll, beforeEach, afterEach, expect, it } from 'vitest';
 
 import pkg from '../package.json';
 import * as readmeio from '../src';
@@ -20,11 +21,7 @@ import config from '../src/config';
 import { getCache } from '../src/lib/get-project-base-url';
 import { setBackoff } from '../src/lib/metrics-log';
 
-import chaiPlugins from './helpers/chai-plugins';
 import getReadMeApiMock from './helpers/getReadMeApiMock';
-
-chai.use(chaiPlugins);
-chai.use(chaiAssertionsCount);
 
 const upload = multer();
 
@@ -51,7 +48,7 @@ const server = setupServer(
       return req.passthrough();
     }),
     getReadMeApiMock(baseLogUrl),
-  ]
+  ],
 );
 
 function doMetricsHeadersMatch(headers: Headers) {
@@ -72,22 +69,20 @@ describe('#metrics', function () {
     cache.setKey('lastUpdated', Date.now());
     cache.setKey('baseUrl', 'https://docs.example.com');
     cache.save();
-    chai.Assertion.resetAssertsCheck();
-  });
-
-  //  Close server after all tests
-  after(function () {
-    server.close();
   });
 
   afterEach(function () {
     server.resetHandlers();
     getCache(apiKey).destroy();
-    chai.Assertion.checkExpectsCount();
+  });
+
+  // Close server after all tests
+  afterAll(function () {
+    server.close();
   });
 
   it('should throw an error if `apiKey` is missing', function () {
-    chai.Assertion.expectExpects(1);
+    expect.assertions(1);
     const app = express();
     app.use((req, res, next) => {
       // @ts-expect-error deliberately passing in bad data
@@ -103,12 +98,12 @@ describe('#metrics', function () {
       .get('/test')
       .expect(500)
       .then(res => {
-        expect(res.text).to.match(/Error: You must provide your ReadMe API key/);
+        expect(res.text).toMatch(/Error: You must provide your ReadMe API key/);
       });
   });
 
   it('should throw an error if `group` is missing', function () {
-    chai.Assertion.expectExpects(1);
+    expect.assertions(1);
     const app = express();
     app.use((req, res, next) => {
       // @ts-expect-error deliberately passing in bad data
@@ -124,13 +119,14 @@ describe('#metrics', function () {
       .get('/test')
       .expect(500)
       .then(res => {
-        expect(res.text).to.match(/Error: You must provide a group/);
+        expect(res.text).toMatch(/Error: You must provide a group/);
       });
   });
 
   describe('tests for sending requests to the metrics server', function () {
     let metricsServerRequests: number;
     let app: Express;
+    // eslint-disable-next-line vitest/require-hook
     let metricsServerResponseCode = 202;
 
     beforeEach(function () {
@@ -140,14 +136,14 @@ describe('#metrics', function () {
           const body: OutgoingLogBody[] = await req.json();
           if (doMetricsHeadersMatch(req.headers)) {
             metricsServerRequests += 1;
-            expect(body[0]._version).to.equal(3);
-            expect(body[0].group).to.deep.equal(outgoingGroup);
-            expect(typeof body[0].request.log.entries[0].startedDateTime).to.equal('string');
+            expect(body[0]._version).toBe(3);
+            expect(body[0].group).toStrictEqual(outgoingGroup);
+            expect(typeof body[0].request.log.entries[0].startedDateTime).toBe('string');
             return res(ctx.status(metricsServerResponseCode), ctx.text(''));
           }
 
           return res(ctx.status(500));
-        })
+        }),
       );
 
       app = express();
@@ -172,28 +168,28 @@ describe('#metrics', function () {
     }
 
     it('should send requests to the metrics server', async function () {
-      chai.Assertion.expectExpects(10);
+      expect.assertions(10);
       for (let i = 0; i < 3; i += 1) {
         await makeRequest(); // eslint-disable-line no-await-in-loop
       }
-      expect(metricsServerRequests).to.equal(3);
+      expect(metricsServerRequests).toBe(3);
     });
 
     it('should stop sending requests to the metrics server after the metrics server returns an error', async function () {
-      chai.Assertion.expectExpects(4);
+      expect.assertions(4);
       metricsServerResponseCode = 401;
       for (let i = 0; i < 3; i += 1) {
         await makeRequest(); // eslint-disable-line no-await-in-loop
       }
       // first request goes to the server, server returns a 401, subsequent requests are skipped
-      expect(metricsServerRequests).to.equal(1);
+      expect(metricsServerRequests).toBe(1);
     });
 
     it('should send a request to the metrics server after the backoff time has expired', async function () {
-      chai.Assertion.expectExpects(4);
+      expect.assertions(4);
       setBackoff(new Date(2022, 12, 31));
       await makeRequest();
-      expect(metricsServerRequests).to.equal(1);
+      expect(metricsServerRequests).toBe(1);
     });
   });
 
@@ -273,17 +269,17 @@ describe('#metrics', function () {
   });
 
   it('should set `pageref` correctly based on `req.route`', function () {
-    chai.Assertion.expectExpects(1);
+    expect.assertions(1);
     server.use(
       rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
         const body: OutgoingLogBody[] = await req.json();
         if (doMetricsHeadersMatch(req.headers)) {
-          expect(body[0].request.log.entries[0].pageref).to.equal('http://127.0.0.1/test/:id');
+          expect(body[0].request.log.entries[0].pageref).toBe('http://127.0.0.1/test/:id');
           return res(ctx.status(200));
         }
 
         return res(ctx.status(500));
-      })
+      }),
     );
 
     const app = express();
@@ -301,17 +297,17 @@ describe('#metrics', function () {
   // This is due to us using `req.hostname` to construct the URL vs just
   // req.headers.host which has not been parsed.
   it('should set `pageref` without express', function () {
-    chai.Assertion.expectExpects(1);
+    expect.assertions(1);
     server.use(
       rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
         const body: OutgoingLogBody[] = await req.json();
         if (doMetricsHeadersMatch(req.headers)) {
-          expect(body[0].request.log.entries[0].pageref).to.match(/^http:\/\/127.0.0.1:\d.*\/test\/hello/);
+          expect(body[0].request.log.entries[0].pageref).toMatch(/^http:\/\/127.0.0.1:\d.*\/test\/hello/);
           return res(ctx.status(200));
         }
 
         return res(ctx.status(500));
-      })
+      }),
     );
 
     const app = createServer((req, res) => {
@@ -324,18 +320,18 @@ describe('#metrics', function () {
   });
 
   it('express should log the full request url with nested express apps', function () {
-    chai.Assertion.expectExpects(3);
+    expect.assertions(3);
     server.use(
       rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
         const body: OutgoingLogBody[] = await req.json();
         if (doMetricsHeadersMatch(req.headers)) {
-          expect(body[0].group).to.deep.equal(outgoingGroup);
-          expect(body[0].request.log.entries[0].request.url).to.contain('/test/nested');
+          expect(body[0].group).toStrictEqual(outgoingGroup);
+          expect(body[0].request.log.entries[0].request.url).toContain('/test/nested');
           return res(ctx.status(200));
         }
 
         return res(ctx.status(500));
-      })
+      }),
     );
 
     const app = express();
@@ -349,7 +345,7 @@ describe('#metrics', function () {
       // We're asserting `req.url` to be `/nested` here because the way that Express does contextual
       // route loading `req.url` won't include the `/test`. The `/test` is merely added later
       // internally in Express with `req.originalUrl`.
-      expect(req.url).to.equal('/nested');
+      expect(req.url).toBe('/nested');
       res.sendStatus(200);
     });
 
@@ -359,26 +355,24 @@ describe('#metrics', function () {
   });
 
   describe('#timeout', function () {
-    // eslint-disable-next-line mocha/no-pending-tests, mocha/no-skipped-tests
-    it.skip('should silently fail metrics requests if they take longer than the timeout');
+    it.todo('should silently fail metrics requests if they take longer than the timeout');
 
-    // eslint-disable-next-line mocha/no-pending-tests, mocha/no-skipped-tests
-    it.skip('should silently fail baseLogUrl requests if they take longer than the timeout');
+    it.todo('should silently fail baseLogUrl requests if they take longer than the timeout');
   });
 
   describe('#bufferLength', function () {
     it('should send requests when number hits `bufferLength` size', async function test() {
-      chai.Assertion.expectExpects(9);
+      expect.assertions(9);
       server.use(
         rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
           const body: OutgoingLogBody[] = await req.json();
           if (doMetricsHeadersMatch(req.headers)) {
-            expect(body).to.have.lengthOf(3);
+            expect(body).toHaveLength(3);
             return res(ctx.status(200));
           }
 
           return res(ctx.status(500));
-        })
+        }),
       );
 
       const app = express();
@@ -395,34 +389,34 @@ describe('#metrics', function () {
         .get('/test')
         .expect(200)
         .expect(res => {
-          expect(res.headers).to.have.a.documentationHeader(baseLogUrl);
+          expect(res.headers).toHaveADocumentationHeader(baseLogUrl);
           logUrl = res.headers['x-documentation-url'];
-          expect(logUrl).not.to.be.undefined;
+          expect(logUrl).not.toBeUndefined();
         });
 
       await request(app)
         .get('/test')
         .expect(200)
         .expect(res => {
-          expect(res.headers).to.have.a.documentationHeader(baseLogUrl);
-          expect(res.headers['x-documentation-url']).not.to.equal(logUrl);
+          expect(res.headers).toHaveADocumentationHeader(baseLogUrl);
+          expect(res.headers['x-documentation-url']).not.toBe(logUrl);
           logUrl = res.headers['x-documentation-url'];
-          expect(logUrl).not.to.be.undefined;
+          expect(logUrl).not.toBeUndefined();
         });
 
       return request(app)
         .get('/test')
         .expect(200)
         .expect(res => {
-          expect(res.headers).to.have.a.documentationHeader(baseLogUrl);
-          expect(res.headers['x-documentation-url']).not.to.equal(logUrl);
+          expect(res.headers).toHaveADocumentationHeader(baseLogUrl);
+          expect(res.headers['x-documentation-url']).not.toBe(logUrl);
           logUrl = res.headers['x-documentation-url'];
-          expect(logUrl).not.to.be.undefined;
+          expect(logUrl).not.toBeUndefined();
         });
     });
 
     it('should clear out the queue when sent', function () {
-      chai.Assertion.expectExpects(24);
+      expect.assertions(24);
       const numberOfLogs = 20;
       const numberOfMocks = 4;
       const bufferLength = numberOfLogs / numberOfMocks;
@@ -433,12 +427,12 @@ describe('#metrics', function () {
         rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
           const body: OutgoingLogBody[] = await req.json();
           if (doMetricsHeadersMatch(req.headers)) {
-            expect(body).to.have.lengthOf(bufferLength);
+            expect(body).toHaveLength(bufferLength);
 
             // Ensure that our executed requests and the buffered queue they're in remain unique.
             body.forEach((log: unknown) => {
               const requestHash = crypto.createHash('md5').update(JSON.stringify(log)).digest('hex');
-              expect(seenLogs).not.to.contain(requestHash);
+              expect(seenLogs).not.toContain(requestHash);
               seenLogs.push(requestHash);
             });
 
@@ -446,7 +440,7 @@ describe('#metrics', function () {
           }
 
           return res(ctx.status(500));
-        })
+        }),
       );
 
       const app = express();
@@ -459,7 +453,7 @@ describe('#metrics', function () {
       return Promise.all(
         [...new Array(numberOfLogs).keys()].map(i => {
           return request(app).get(`/test?log=${i}`).expect(200);
-        })
+        }),
       );
     });
   });
@@ -473,12 +467,12 @@ describe('#metrics', function () {
           }
 
           return res(ctx.status(500));
-        })
+        }),
       );
     });
 
     it('should fetch the `baseLogUrl` if not passed', function () {
-      chai.Assertion.expectExpects(1);
+      expect.assertions(1);
       // Invalidating the cache so we do a fetch from the API
       const cache = getCache(apiKey);
       const lastUpdated = new Date();
@@ -495,7 +489,7 @@ describe('#metrics', function () {
         // We have to delay the response here so that the request to fetch
         // the base url has a chance to resolve. We may have to figure out
         // a better way to do this in future
-        return setTimeout(() => {
+        return setTimeout(function () {
           res.sendStatus(200);
         }, 50);
       });
@@ -504,12 +498,12 @@ describe('#metrics', function () {
         .get('/test')
         .expect(200)
         .expect(res => {
-          expect(res.headers).to.have.a.documentationHeader(baseLogUrl);
+          expect(res.headers).toHaveADocumentationHeader(baseLogUrl);
         });
     });
 
     it('should set x-documentation-url if `baseLogUrl` is passed', function () {
-      chai.Assertion.expectExpects(1);
+      expect.assertions(1);
       const app = express();
       app.use((req, res, next) => {
         readmeio.log(apiKey, req, res, incomingGroup, { baseLogUrl });
@@ -520,7 +514,7 @@ describe('#metrics', function () {
       return request(app)
         .get('/test')
         .expect(200)
-        .expect(res => expect(res.headers).to.have.a.documentationHeader(baseLogUrl));
+        .expect(res => expect(res.headers).toHaveADocumentationHeader(baseLogUrl));
     });
   });
 
@@ -531,17 +525,17 @@ describe('#metrics', function () {
         rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
           const body: OutgoingLogBody[] = await req.json();
           if (doMetricsHeadersMatch(req.headers)) {
-            expect(body[0].request.log.entries[0].response.content.text).to.equal(JSON.stringify(responseBody));
+            expect(body[0].request.log.entries[0].response.content.text).toStrictEqual(JSON.stringify(responseBody));
             return res(ctx.status(200));
           }
 
           return res(ctx.status(500));
-        })
+        }),
       );
     }
 
     it('should buffer up res.write() calls', function () {
-      chai.Assertion.expectExpects(1);
+      expect.assertions(1);
       createMock();
       const app = express();
       app.use((req, res, next) => {
@@ -559,7 +553,7 @@ describe('#metrics', function () {
     });
 
     it('should buffer up res.end() calls', function () {
-      chai.Assertion.expectExpects(1);
+      expect.assertions(1);
       createMock();
       const app = express();
       app.use((req, res, next) => {
@@ -572,7 +566,7 @@ describe('#metrics', function () {
     });
 
     it('should work for res.send() calls', function () {
-      chai.Assertion.expectExpects(1);
+      expect.assertions(1);
       createMock();
       const app = express();
       app.use((req, res, next) => {
@@ -591,17 +585,17 @@ describe('#metrics', function () {
         rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
           const body: OutgoingLogBody[] = await req.json();
           if (doMetricsHeadersMatch(req.headers)) {
-            expect(body[0].request.log.entries[0].request.postData[checkLocation]).to.equal(requestBody);
+            expect(body[0].request.log.entries[0].request.postData[checkLocation]).toStrictEqual(requestBody);
             return res(ctx.status(200));
           }
 
           return res(ctx.status(500));
-        })
+        }),
       );
     }
 
     it('should accept multipart/form-data', function () {
-      chai.Assertion.expectExpects(1);
+      expect.assertions(1);
       const form = new FormData();
       form.append('password', '123456');
       form.append('apiKey', 'abc');

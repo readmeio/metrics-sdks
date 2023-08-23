@@ -123,13 +123,13 @@ export const aws: Client = {
       server.forEach(data => {
         pushVariable(
           `${escapeForObjectKey(data.name)}: '${escapeForSingleQuotes(
-            data.default || data.default === '' ? data.default : data.name
+            data.default || data.default === '' ? data.default : data.name,
           )}',`,
           {
             type: 'server',
             name: data.name,
             indentationLevel: 3,
-          }
+          },
         );
       });
       blank();

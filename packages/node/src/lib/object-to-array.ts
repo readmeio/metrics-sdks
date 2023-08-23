@@ -7,7 +7,7 @@ type ParamArray = {
 
 export function objectToArray(
   object: Record<string, unknown>,
-  opts: { castToString: true }
+  opts: { castToString: true },
 ): { name: string; value: string }[];
 export function objectToArray(object: Record<string, unknown>): ParamArray;
 export function objectToArray(
@@ -16,7 +16,7 @@ export function objectToArray(
     castToString: boolean;
   } = {
     castToString: false,
-  }
+  },
 ): ParamArray {
   return Object.entries(object).reduce<ParamArray>((prev, [name, value]) => {
     if (Array.isArray(value)) {

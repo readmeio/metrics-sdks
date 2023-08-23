@@ -2,7 +2,7 @@
   "extends": [
     "@readme/eslint-config",
     "@readme/eslint-config/typescript",
-    "@readme/eslint-config/testing-mocha"
+    "@readme/eslint-config/testing/vitest"
   ],
   "root": true,
   "rules": {

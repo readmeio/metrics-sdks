@@ -1,9 +1,6 @@
-import chai, { expect } from 'chai';
-import { jestSnapshotPlugin } from 'mocha-chai-jest-snapshot';
+import { describe, it, expect } from 'vitest';
 
 import codeConverter from './code-converter';
-
-chai.use(jestSnapshotPlugin());
 
 const codeSample = `
 import express from 'express';
