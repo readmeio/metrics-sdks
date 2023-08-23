@@ -21,7 +21,7 @@
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
     "clean": "rm -rf dist/",
-    "lint": "eslint .",
+    "lint": "eslint . --ext js,ts",
     "prebuild": "npm run clean",
     "prepack": "npm run build",
     "pretest": "npm run lint",
