@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`code-converter should convert code to a CodeBuilder instance 1`] = `
+exports[`code-converter > should convert code to a CodeBuilder instance 1`] = `
 "
 blank()
 

@@ -1,6 +1,6 @@
-import { expect } from 'chai';
 // @ts-expect-error I am for some reason unable to declare a module properly for this package
 import MockReq from 'mock-req';
+import { describe, it, expect } from 'vitest';
 
 import isRequest from '../../src/lib/is-request';
 
@@ -18,7 +18,7 @@ describe('isRequest', function () {
     req.write('buster');
     req.end();
 
-    expect(isRequest(req, 'text/*')).to.be.true;
+    expect(isRequest(req, 'text/*')).toBe(true);
   });
 
   it('should detect vendored json', function () {
@@ -34,8 +34,8 @@ describe('isRequest', function () {
     req.write(JSON.stringify(['buster']));
     req.end();
 
-    expect(isRequest(req, 'json')).to.be.false; // `type-is` doesn't support identifying vendored JSON with this.
-    expect(isRequest(req, '+json')).to.be.true;
+    expect(isRequest(req, 'json')).toBe(false); // `type-is` doesn't support identifying vendored JSON with this.
+    expect(isRequest(req, '+json')).toBe(true);
   });
 
   it('should detect `application/x-www-form-urlencoded`', function () {
@@ -54,6 +54,6 @@ describe('isRequest', function () {
     req.write(payload.toString());
     req.end();
 
-    expect(isRequest(req, 'application/x-www-form-urlencoded')).to.be.true;
+    expect(isRequest(req, 'application/x-www-form-urlencoded')).toBe(true);
   });
 });

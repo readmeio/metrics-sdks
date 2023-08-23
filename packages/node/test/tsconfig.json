@@ -5,5 +5,5 @@
     "noImplicitAny": true,
     "strict": false
   },
-  "include": ["./index.test.ts", "./lib/*.ts"]
+  "include": ["./index.test.ts", "./lib/*.ts", "./global.d.ts"]
 }

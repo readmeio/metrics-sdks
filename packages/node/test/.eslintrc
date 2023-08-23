@@ -1,5 +1,5 @@
 {
-  "extends": "@readme/eslint-config/testing-mocha",
+  "extends": "@readme/eslint-config/testing/vitest",
   "rules": {
     "default-param-last": "off"
   }

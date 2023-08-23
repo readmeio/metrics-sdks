@@ -47,3 +47,16 @@ jobs:
 
       - run: npm ci --ignore-scripts
       - run: npm test
+
+  # This is being run separately since it's not playing nicely with Node 14.
+  # Once we drop Node 14 support we can probably consolidate this again.
+  lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/node
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm ci --ignore-scripts
+      - run: npm run lint

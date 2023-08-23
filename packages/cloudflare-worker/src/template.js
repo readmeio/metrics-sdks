@@ -25,8 +25,8 @@ async function respond(event) {
         label: response.headers.get(CONSTANTS.HEADERS.LABEL),
       },
       event.request,
-      har
-    )
+      har,
+    ),
   );
 
   return response;

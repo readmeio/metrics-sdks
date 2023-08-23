@@ -73,13 +73,13 @@ export const flask: Client = {
       server.forEach(data => {
         pushVariable(
           `"${escapeForDoubleQuotes(data.name)}": "${escapeForDoubleQuotes(
-            data.default || data.default === '' ? data.default : data.name
+            data.default || data.default === '' ? data.default : data.name,
           )}",`,
           {
             type: 'server',
             name: data.name,
             indentationLevel: 3,
-          }
+          },
         );
       });
     }
@@ -105,13 +105,13 @@ export const flask: Client = {
 
         pushVariable(
           `"${escapeForDoubleQuotes(data.name)}": "${escapeForDoubleQuotes(
-            data.default || data.default === '' ? data.default : data.name
+            data.default || data.default === '' ? data.default : data.name,
           )}",`,
           {
             type: 'security',
             name: data.name,
             indentationLevel: 3,
-          }
+          },
         );
       });
     }

@@ -28,7 +28,7 @@ export default function verifyWebhook(body: WebhookBody, signature: string, secr
     {
       time: -1,
       readmeSignature: '',
-    }
+    },
   );
   /* eslint-enable no-param-reassign */
 

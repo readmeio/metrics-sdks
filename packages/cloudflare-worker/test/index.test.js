@@ -1,7 +1,7 @@
-const { expect } = require('chai');
-const nock = require('nock');
+import nock from 'nock';
+import { describe, beforeAll, afterAll, beforeEach, it, expect } from 'vitest';
 
-const globals = require('./service-worker-globals');
+import globals from './service-worker-globals';
 
 function requireWorker() {
   delete require.cache[require.resolve('../src')];
@@ -9,17 +9,17 @@ function requireWorker() {
 }
 
 describe('worker', function () {
-  before(function () {
+  beforeAll(function () {
     nock.disableNetConnect();
     nock.enableNetConnect('127.0.0.1');
   });
 
-  after(function () {
-    return nock.cleanAll();
-  });
-
   beforeEach(function () {
     Object.assign(global, globals());
+  });
+
+  afterAll(function () {
+    return nock.cleanAll();
   });
 
   describe('#fetchAndCollect()', function () {
@@ -181,7 +181,7 @@ describe('worker', function () {
             'x-response-header': 'hello',
             'x-readme-id': 'id',
             'x-readme-label': 'label',
-          }
+          },
         );
 
       const { response } = await requireWorker().fetchAndCollect(request);

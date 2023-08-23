@@ -1,9 +1,9 @@
-const http = require('http');
+import http from 'http';
 
-const { expect } = require('chai');
-const nock = require('nock');
+import nock from 'nock';
+import { describe, beforeAll, afterAll, beforeEach, afterEach, expect, it } from 'vitest';
 
-const globals = require('./service-worker-globals');
+import globals from './service-worker-globals';
 
 function requireTemplate() {
   delete require.cache[require.resolve('../src/template.js')];
@@ -22,14 +22,11 @@ class FetchEvent {
 
 // This test is really flaky with how it tries to load the `template` file that loads
 // `@readme/cloudflare-worker`. There's got to be a cleaner way to do this.
+// eslint-disable-next-line vitest/no-disabled-tests
 describe.skip('template', function () {
-  before(function () {
+  beforeAll(function () {
     nock.disableNetConnect();
     nock.enableNetConnect('127.0.0.1');
-  });
-
-  after(function () {
-    return nock.cleanAll();
   });
 
   beforeEach(function () {
@@ -40,6 +37,11 @@ describe.skip('template', function () {
     delete global.HOST;
   });
 
+  afterAll(function () {
+    return nock.cleanAll();
+  });
+
+  // eslint-disable-next-line vitest/no-done-callback
   it('should send x-readme-* headers through to metrics backend', function (done) {
     const id = 123456;
     const label = 'api-key-label';

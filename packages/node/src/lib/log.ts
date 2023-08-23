@@ -33,7 +33,6 @@ function doSend(readmeApiKey: string, options: Options) {
 // Make sure we flush the queue if the process is exited
 process.on('exit', doSend);
 
-/* eslint-disable typescript-sort-keys/interface */
 export interface ExtendedIncomingMessage extends IncomingMessage {
   /*
    * This is where most body-parsers put the parsed HTTP body
@@ -57,7 +56,6 @@ export interface ExtendedIncomingMessage extends IncomingMessage {
   _json?: string;
   _form_encoded?: string;
 }
-/* eslint-enable typescript-sort-keys/interface */
 
 export interface ExtendedResponse extends ServerResponse {
   _body?: string;
@@ -97,7 +95,7 @@ export function log(
   req: ExtendedIncomingMessage,
   res: ExtendedResponse,
   group: GroupingObject,
-  options: Options = {}
+  options: Options = {},
 ) {
   if (!readmeApiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a group');
@@ -159,7 +157,7 @@ export function log(
         responseBody: res._body,
         requestBody,
       },
-      options
+      options,
     );
 
     queue.push(payload);
