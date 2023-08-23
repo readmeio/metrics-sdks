@@ -2,7 +2,7 @@ import type { GetProjectResponse200 } from './.api/apis/developers';
 import type { Options } from './lib/log';
 import type { NextFunction, Request, Response } from 'express';
 
-import flatted from 'flatted';
+import { stringify } from 'flatted';
 
 import readmeSdk from './.api/apis/developers';
 import { getProjectBaseUrl } from './lib/get-project-base-url';
@@ -67,7 +67,7 @@ const splitIntoUserAndConfig = (inputObject: GroupingObject & Options): SplitOpt
 
 // What if we do this work in the metrics backend?
 const findApiKey = (req: Request, keys: ApiKey[]) => {
-  const requestString = flatted.stringify(req);
+  const requestString = stringify(req);
   const key = keys.find(apiKey => {
     if (
       (apiKey.apiKey && requestString.includes(apiKey.apiKey)) ||
