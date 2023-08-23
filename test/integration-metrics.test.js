@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-expressions */
 /* eslint-disable no-restricted-syntax */
 import { once } from 'node:events';
 import fs from 'node:fs/promises';
@@ -10,10 +9,11 @@ import chai from 'chai';
 import { FormDataEncoder } from 'form-data-encoder';
 import { File, FormData } from 'formdata-node';
 import 'isomorphic-fetch';
-import { describe, beforeAll, beforeEach, afterAll, expect, it } from 'vitest';
+import { describe, beforeAll, beforeEach, afterAll, expect, it, expectTypeOf } from 'vitest';
 
 import chaiPlugins from './helpers/chai-plugins.js';
 
+// eslint-disable-next-line vitest/require-hook
 chai.use(chaiPlugins);
 
 const PORT = 8000; // SDK HTTP server
@@ -136,27 +136,27 @@ describe('Metrics SDK Integration Tests', function () {
     const [req, body] = await getRequest();
     const [payload] = body;
 
-    expect(req.url).to.equal('/v1/request');
-    expect(req.headers.authorization).to.equal(`Basic ${Buffer.from(`${randomAPIKey}:`).toString('base64')}`);
+    expect(req.url).toBe('/v1/request');
+    expect(req.headers.authorization).toBe(`Basic ${Buffer.from(`${randomAPIKey}:`).toString('base64')}`);
 
     // https://uibakery.io/regex-library/uuid
-    expect(payload._id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+    expect(payload._id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 
-    expect(payload.group.id).to.equal(getGroupId());
-    expect(payload.group.email).to.equal('owlbert@example.com');
-    expect(payload.group.label).to.equal('Owlbert');
+    expect(payload.group.id).toBe(getGroupId());
+    expect(payload.group.email).toBe('owlbert@example.com');
+    expect(payload.group.label).toBe('Owlbert');
 
-    expect(payload.clientIPAddress).to.match(/\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}/);
-    expect(payload.development).toBe.be.false;
+    expect(payload.clientIPAddress).toMatch(/\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}/);
+    expect(payload.development).toBe(false);
 
     const har = payload.request;
     await expect(har).to.have.a.har.request;
     await expect(har).to.have.a.har.response;
 
     const { creator } = har.log;
-    expect(creator.name).to.match(/readme-metrics \((dotnet|node|php|python|ruby)\)/);
-    expect(creator.version).not.to.be.empty;
-    expect(creator.comment).not.to.be.empty;
+    expect(creator.name).toMatch(/readme-metrics \((dotnet|node|php|python|ruby)\)/);
+    expectTypeOf(creator.version).toBeString();
+    expectTypeOf(creator.comment).toBeString();
 
     const { request, response, startedDateTime } = har.log.entries[0];
 
@@ -170,12 +170,12 @@ describe('Metrics SDK Integration Tests', function () {
      *  Python: `datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")`
      *    - 2022-06-30T10:31:43Z
      */
-    expect(startedDateTime).to.match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:.\d{3})?Z/);
+    expect(startedDateTime).toMatch(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:.\d{3})?Z/);
 
     // Some frameworks remove the trailing slash from the URL we get.
-    expect(request.url).to.match(new RegExp(`http://localhost:${PORT}(/)?`));
-    expect(request.method).to.equal('GET');
-    expect(request.httpVersion).to.equal('HTTP/1.1');
+    expect(request.url).toMatch(new RegExp(`http://localhost:${PORT}(/)?`));
+    expect(request.method).toBe('GET');
+    expect(request.httpVersion).toBe('HTTP/1.1');
 
     expect(request.headers).to.have.header('connection', [
       'close',
@@ -186,15 +186,15 @@ describe('Metrics SDK Integration Tests', function () {
       'localhost', // rails does not include the port
     ]);
 
-    expect(response.status).to.equal(200);
-    expect(response.statusText).to.match(/OK|200/); // Django returns with "200"
+    expect(response.status).toBe(200);
+    expect(response.statusText).toMatch(/OK|200/); // Django returns with "200"
     expect(response.headers).to.have.header('content-type', /application\/json(;\s?charset=utf-8)?/);
 
     // Flask prints a \n character after the JSON response
     // https://github.com/pallets/flask/issues/4635
-    expect(response.content.text.replace('\n', '')).to.equal(JSON.stringify({ message: 'hello world' }));
-    expect(response.content.size).to.equal(response.content.text.length);
-    expect(response.content.mimeType).to.match(/application\/json(;\s?charset=utf-8)?/);
+    expect(response.content.text.replace('\n', '')).toBe(JSON.stringify({ message: 'hello world' }));
+    expect(response.content.size).toBe(response.content.text.length);
+    expect(response.content.mimeType).toMatch(/application\/json(;\s?charset=utf-8)?/);
   });
 
   it('should mask `Authorization` headers', async function () {
@@ -229,7 +229,7 @@ describe('Metrics SDK Integration Tests', function () {
     const { request } = har.log.entries[0];
 
     // Some frameworks remove the trailing slash from the URL we get.
-    expect(request.url).to.match(new RegExp(`http://localhost:${PORT}(/)?\\?arr%5B1%5D=3&val=1`));
+    expect(request.url).toMatch(new RegExp(`http://localhost:${PORT}(/)?\\?arr%5B1%5D=3&val=1`));
 
     // Some frameworks handle query string arrays slightly differently.
     expect(JSON.stringify(request.queryString)).to.be.oneOf([
@@ -247,7 +247,7 @@ describe('Metrics SDK Integration Tests', function () {
       ]), // Rails
     ]);
 
-    expect(request.postData).to.be.undefined;
+    expect(request.postData).toBeUndefined();
   });
 
   it('should capture query strings that may be supplied in a POST request', async function () {
@@ -269,10 +269,10 @@ describe('Metrics SDK Integration Tests', function () {
 
     const { request, response } = har.log.entries[0];
 
-    expect(request.method).to.equal('POST');
+    expect(request.method).toBe('POST');
 
     // Some frameworks remove the trailing slash from the URL we get.
-    expect(request.url).to.match(new RegExp(`http://localhost:${PORT}(/)?\\?arr%5B1%5D=3&val=1`));
+    expect(request.url).toMatch(new RegExp(`http://localhost:${PORT}(/)?\\?arr%5B1%5D=3&val=1`));
 
     expect(request.headers).to.have.header('content-type', 'application/json');
 
@@ -292,12 +292,12 @@ describe('Metrics SDK Integration Tests', function () {
       ]), // Rails
     ]);
 
-    expect(request.postData).to.deep.equal({
+    expect(request.postData).toStrictEqual({
       mimeType: 'application/json',
       text: content,
     });
 
-    expect(response.status).to.equal(200);
+    expect(response.status).toBe(200);
   });
 
   it('should process a POST payload with no explicit `Content-Type` header', async function () {
@@ -316,12 +316,12 @@ describe('Metrics SDK Integration Tests', function () {
 
     const { request } = har.log.entries[0];
 
-    expect(request.method).to.equal('POST');
+    expect(request.method).toBe('POST');
     expect(request.headers).to.have.header('content-type', 'text/plain;charset=UTF-8');
 
-    expect(request.postData.mimeType).to.match(/text\/plain(;charset=UTF-8)?/);
-    expect(request.postData.params).to.be.undefined;
-    expect(request.postData.text).to.equal(content);
+    expect(request.postData.mimeType).toMatch(/text\/plain(;charset=UTF-8)?/);
+    expect(request.postData.params).toBeUndefined();
+    expect(request.postData.text).toStrictEqual(content);
   });
 
   it('should process an `application/json` POST payload', async function () {
@@ -343,14 +343,14 @@ describe('Metrics SDK Integration Tests', function () {
 
     const { request, response } = har.log.entries[0];
 
-    expect(request.method).to.equal('POST');
+    expect(request.method).toBe('POST');
     expect(request.headers).to.have.header('content-type', 'application/json');
-    expect(request.postData).to.deep.equal({
+    expect(request.postData).toStrictEqual({
       mimeType: 'application/json',
       text: content,
     });
 
-    expect(response.status).to.equal(200);
+    expect(response.status).toBe(200);
   });
 
   /**
@@ -381,9 +381,9 @@ describe('Metrics SDK Integration Tests', function () {
 
     const { request, response } = har.log.entries[0];
 
-    expect(request.method).to.equal('POST');
+    expect(request.method).toBe('POST');
     expect(request.headers).to.have.header('content-type', 'application/vnd.api+json');
-    expect(request.postData).to.deep.equal({
+    expect(request.postData).toStrictEqual({
       mimeType: 'application/vnd.api+json',
       text: content,
     });
@@ -418,9 +418,9 @@ describe('Metrics SDK Integration Tests', function () {
 
     const { request, response } = har.log.entries[0];
 
-    expect(request.method).to.equal('POST');
+    expect(request.method).toBe('POST');
     expect(request.headers).to.have.header('content-type', 'application/x-www-form-urlencoded');
-    expect(request.postData).to.deep.equal({
+    expect(request.postData).toStrictEqual({
       mimeType: 'application/x-www-form-urlencoded',
       params: [{ name: 'email', value: 'dom@readme.io' }],
     });
@@ -435,11 +435,8 @@ describe('Metrics SDK Integration Tests', function () {
     ]);
   });
 
-  it('should process a `multipart/form-data` POST payload', async function () {
-    if (!supportsMultipart()) {
-      this.skip();
-    }
-
+  // eslint-disable-next-line vitest/require-hook
+  it.skipIf(!supportsMultipart())('should process a `multipart/form-data` POST payload', async function () {
     const formData = new FormData();
     formData.append('password', 123456);
     formData.append('apiKey', 'abcdef');
@@ -463,17 +460,17 @@ describe('Metrics SDK Integration Tests', function () {
 
     const { request } = har.log.entries[0];
 
-    expect(request.method).to.equal('POST');
+    expect(request.method).toBe('POST');
     expect(request.headers).to.have.header('content-type', /multipart\/form-data; boundary=(.*)/);
-    expect(request.postData.mimeType).to.match(/multipart\/form-data; boundary=(.*)/);
-    expect(request.postData.params).to.deep.equal([
+    expect(request.postData.mimeType).toMatch(/multipart\/form-data; boundary=(.*)/);
+    expect(request.postData.params).toStrictEqual([
       { name: 'password', value: '123456' },
       { name: 'apiKey', value: 'abcdef' },
       { name: 'another', value: 'Hello world' },
       { name: 'buster', value: '1234,5678' },
     ]);
 
-    expect(request.postData.text).to.be.undefined;
+    expect(request.postData.text).toBeUndefined();
   });
 
   it('should process a `multipart/form-data` POST payload containing files', async function () {
@@ -506,13 +503,13 @@ describe('Metrics SDK Integration Tests', function () {
 
     const { request } = har.log.entries[0];
 
-    expect(request.method).to.equal('POST');
+    expect(request.method).toBe('POST');
     expect(request.headers).to.have.header('content-type', /multipart\/form-data; boundary=(.*)/);
     expect(request.headers).to.have.header('content-length', 982);
-    expect(request.postData.mimeType).to.match(/multipart\/form-data; boundary=(.*)/);
+    expect(request.postData.mimeType).toMatch(/multipart\/form-data; boundary=(.*)/);
 
     const owlbertDataURL = await fs.readFile('./test/__datasets__/owlbert.dataurl.json').then(JSON.parse);
-    expect(request.postData.params).to.deep.equal([
+    expect(request.postData.params).toStrictEqual([
       { name: 'password', value: '123456' },
       { name: 'apiKey', value: 'abcdef' },
       { name: 'another', value: 'Hello world' },
@@ -525,7 +522,7 @@ describe('Metrics SDK Integration Tests', function () {
       },
     ]);
 
-    expect(request.postData.text).to.be.undefined;
+    expect(request.postData.text).toBeUndefined();
   });
 
   it('should process a `text/plain` payload', async function () {
@@ -546,13 +543,13 @@ describe('Metrics SDK Integration Tests', function () {
 
     const { request, response } = har.log.entries[0];
 
-    expect(request.method).to.equal('POST');
+    expect(request.method).toBe('POST');
     expect(request.headers).to.have.header('content-type', 'text/plain');
-    expect(request.postData).to.deep.equal({
+    expect(request.postData).toStrictEqual({
       mimeType: 'text/plain',
       text: 'Hello world',
     });
 
-    expect(response.status).to.equal(200);
+    expect(response.status).toBe(200);
   });
 });
