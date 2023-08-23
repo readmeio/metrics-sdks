@@ -92,7 +92,7 @@ const readme = (
   { disableWebhook, disableMetrics } = {
     disableWebhook: false,
     disableMetrics: false,
-  }
+  },
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const baseUrl = `${req.protocol}://${req.get('host')}${req.baseUrl}`;
