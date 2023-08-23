@@ -1,4 +1,4 @@
-import type { GetProjectResponse200 } from './.api/apis/developers/types';
+import type { GetProjectResponse200 } from './.api/apis/developers';
 import type { Options } from './lib/log';
 import type { NextFunction, Request, Response } from 'express';
 
