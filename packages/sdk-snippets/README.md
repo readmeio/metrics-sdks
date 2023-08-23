@@ -34,7 +34,7 @@ const { convert } = new MetricsSDKSnippet(
       type: 'http',
     },
   ],
-  { secret: 'my-readme-secret' }
+  { secret: 'my-readme-secret' },
 );
 
 console.log(convert('webhooks', 'node', 'express'));
