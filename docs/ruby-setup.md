@@ -16,7 +16,7 @@ If you're a developer, it takes a few small steps to send your API logs to [Read
 <!--alex ignore blacklist whitelist-->
 
 - You add the ReadMe middleware to your Rails application.
-- The middleware sends to ReadMe the request and response objects that your Express server generates each time a user makes a request to your API. The entire objects are sent, unless you blacklist or whitelist keys.
+- The middleware sends to ReadMe the request and response objects that your server generates each time a user makes a request to your API. The entire objects are sent, unless you blacklist or whitelist keys.
 - ReadMe extracts information to display in Metrics, such as which endpoint is being called, response code, and error messages. It also identifies the customer who called your API, using whichever keys in the middleware you call out as containing relevant customer info.
 
 ## Getting Started
