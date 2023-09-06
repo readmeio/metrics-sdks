@@ -31,6 +31,16 @@ interface SplitOptions {
   grouping: GroupingObject;
 }
 
+interface GetUserParams {
+  byAPIKey: (apiKey: string) => unknown;
+  byEmail: (email: string) => unknown;
+  manualAPIKey?: string;
+}
+
+interface GetUserFunction {
+  (params: GetUserParams): unknown;
+}
+
 const splitIntoUserAndConfig = (inputObject: GroupingObject & Options): SplitOptions => {
   const configKeys: (keyof Options)[] = [
     'allowlist',
@@ -55,7 +65,7 @@ const splitIntoUserAndConfig = (inputObject: GroupingObject & Options): SplitOpt
   return { grouping, config };
 };
 
-const guessWhereAPIKeyIs = (req: Request) => {
+const guessWhereAPIKeyIs = (req: Request): string => {
   // Authorization header
   if (req.headers.authorization && req.headers.authorization.includes('Bearer')) {
     return req.headers.authorization.split(' ')[1];
@@ -76,7 +86,7 @@ const guessWhereAPIKeyIs = (req: Request) => {
   );
 
   if (apiKeyHeader) {
-    return req.headers[apiKeyHeader];
+    return req.headers[apiKeyHeader] as string;
   }
 
   // Is it a cookie?
@@ -84,13 +94,13 @@ const guessWhereAPIKeyIs = (req: Request) => {
 
   // Is it a query param?
   if (req.query.api_key) {
-    return req.query.api_key;
+    return req.query.api_key as string;
   } else if (req.query.apiKey) {
-    return req.query.apiKey;
+    return req.query.apiKey as string;
   }
 
   // error case where we tell them to go the manual route
-  return null;
+  throw new Error('test');
 };
 
 // See comment at the auth definition below
@@ -99,14 +109,14 @@ let readmeAPIKey = '';
 let readmeProjectData: GetProjectResponse200 | undefined;
 
 const readme = (
-  userFunction: (req: Request, getUser) => GroupingObject & Options,
+  userFunction: (req: Request, getUser: GetUserFunction) => GroupingObject & Options,
   { disableWebhook, disableMetrics } = {
     disableWebhook: false,
     disableMetrics: false,
   }
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const getUser = ({ byAPIKey, byEmail, manualAPIKey }) => {
+    const getUser = ({ byAPIKey, byEmail, manualAPIKey }: GetUserParams): unknown => {
       if (req.path === '/readme-webhook' && req.method === 'POST' && !disableWebhook) {
         const user = byEmail(req.body.email);
         if (!user) {
@@ -121,11 +131,10 @@ const readme = (
         return byAPIKey(manualAPIKey);
       }
       // Try to figure out where the api key is
-      requestAPIKey = guessWhereAPIKeyIs(req);
-      if (!requestAPIKey) {
-        console.error(
-          'Unable to find API key automatically. Please use the manual method by passing the api key in via `manualAPIKey` to getUser.'
-        );
+      try {
+        requestAPIKey = guessWhereAPIKeyIs(req);
+      } catch (e) {
+        console.error(e);
       }
       return byAPIKey(requestAPIKey);
     };
@@ -188,6 +197,11 @@ const readme = (
 
     const { grouping, config } = splitIntoUserAndConfig(user);
     const filteredKey = grouping.keys.find(key => key.apiKey === requestAPIKey);
+
+    if (!filteredKey || !filteredKey.apiKey) {
+      console.error(`API key ${requestAPIKey} not found`);
+      return next();
+    }
 
     log(readmeAPIKey, req, res, { apiKey: filteredKey.apiKey, label: filteredKey.name, email: grouping.email }, config);
     return next();
