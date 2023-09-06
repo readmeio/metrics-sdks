@@ -64,8 +64,8 @@ export interface ExtendedResponse extends ServerResponse {
 export interface Options extends LogOptions {
   baseLogUrl?: string;
   bufferLength?: number;
-  disableWebhook: boolean;
-  disableMetrics: boolean;
+  disableWebhook?: boolean;
+  disableMetrics?: boolean;
 }
 
 function setDocumentationHeader(res: ServerResponse, baseLogUrl: string, logId: string) {
@@ -97,7 +97,7 @@ export function log(
   req: ExtendedIncomingMessage,
   res: ExtendedResponse,
   group: GroupingObject,
-  options: Options = {},
+  options: Options = {}
 ) {
   if (!readmeApiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a group');
@@ -159,7 +159,7 @@ export function log(
         responseBody: res._body,
         requestBody,
       },
-      options,
+      options
     );
 
     queue.push(payload);
