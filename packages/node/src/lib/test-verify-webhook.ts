@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 
-import fetch from 'node-fetch';
+import fetch, { Headers } from 'node-fetch';
 
-async function verifyWebhook(url, email, secret, opts) {
+async function verifyWebhook(url: string, email: string, secret: string, opts = { unsigned: false }) {
   if (!url || !email || !secret) {
     throw new Error('Missing required params');
   }
@@ -12,15 +12,15 @@ async function verifyWebhook(url, email, secret, opts) {
     email,
   };
 
-  const headers = {
+  const headers = new Headers({
     'User-Agent': 'readme',
     'content-type': 'application/json',
-  };
+  });
 
   if (!opts.unsigned) {
     const unsigned = `${time}.${JSON.stringify(payload)}`;
     const hmac = crypto.createHmac('sha256', secret);
-    headers['ReadMe-Signature'] = `t=${time},v0=${hmac.update(unsigned).digest('hex')}`;
+    headers.set('ReadMe-Signature', `t=${time},v0=${hmac.update(unsigned).digest('hex')}`);
   }
 
   const jwtPacketDecoratorObject = await fetch(url, {
@@ -35,10 +35,10 @@ async function verifyWebhook(url, email, secret, opts) {
   return jwtPacketDecoratorObject;
 }
 
-export async function testVerifyWebhook(baseUrl, email, apiKey) {
+export async function testVerifyWebhook(baseUrl: string, email: string, apiKey: string) {
   let signed;
   try {
-    signed = await verifyWebhook(`${baseUrl}/readme-webhook`, email, apiKey, {});
+    signed = await verifyWebhook(`${baseUrl}/readme-webhook`, email, apiKey);
   } catch (e) {
     return {
       webhookVerified: false,
