@@ -72,13 +72,13 @@ export const dotnet6: Client = {
       server.forEach(data => {
         pushVariable(
           `${escapeForObjectKey(data.name, true)} = "${escapeForDoubleQuotes(
-            data.default || data.default === '' ? data.default : data.name
+            data.default || data.default === '' ? data.default : data.name,
           )}",`,
           {
             type: 'server',
             name: data.name,
             indentationLevel: 2,
-          }
+          },
         );
       });
     }
@@ -104,13 +104,13 @@ export const dotnet6: Client = {
 
         pushVariable(
           `${escapeForObjectKey(data.name, true)} = "${escapeForDoubleQuotes(
-            data.default || data.default === '' ? data.default : data.name
+            data.default || data.default === '' ? data.default : data.name,
           )}",`,
           {
             type: 'security',
             name: data.name,
             indentationLevel: 2,
-          }
+          },
         );
       });
     }

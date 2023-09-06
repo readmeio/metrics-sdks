@@ -82,7 +82,7 @@ class Metrics
         $this->package_version = InstalledVersions::getVersion(self::PACKAGE_NAME);
         $this->cache_dir = Factory::createConfig()->get('cache-dir');
 
-        $this->user_agent = 'readme-metrics-php/' . $this->package_version ?? 'unknown';
+        $this->user_agent = 'readme-metrics-php/' . ($this->package_version ?? 'unknown');
     }
 
     /**
@@ -152,6 +152,7 @@ class Metrics
             return;
         }
 
+        /** @psalm-suppress PossiblyInvalidArgument */
         $ex = new MetricsException(str_replace($json->_message, $json->name, $json->message));
         $ex->setErrors((array)$json->errors);
         throw $ex;

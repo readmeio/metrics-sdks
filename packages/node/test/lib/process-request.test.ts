@@ -3,16 +3,13 @@ import type { LogOptions } from 'src/lib/construct-payload';
 
 import { createServer } from 'http';
 
-import chai, { expect } from 'chai';
 import FormData from 'form-data';
 import request from 'supertest';
+import { describe, expect, it } from 'vitest';
 
 import processRequest from '../../src/lib/process-request';
-import chaiPlugins from '../helpers/chai-plugins';
 
-chai.use(chaiPlugins);
-
-function createApp(reqOptions?: LogOptions, shouldPreParse = false, bodyOverride?) {
+function createApp(reqOptions?: LogOptions, shouldPreParse = false, bodyOverride?: Record<string, unknown>) {
   const requestListener = function (req: IncomingMessage, res: ServerResponse) {
     let body = '';
 
@@ -29,7 +26,10 @@ function createApp(reqOptions?: LogOptions, shouldPreParse = false, bodyOverride
         body = JSON.parse(body);
       }
 
-      res.end(JSON.stringify(processRequest(req, bodyOverride || body, reqOptions)));
+      res.end(
+        // This typeof check allows us to override the body with `null`
+        JSON.stringify(processRequest(req, typeof bodyOverride !== 'undefined' ? bodyOverride : body, reqOptions)),
+      );
     });
   };
 
@@ -44,7 +44,7 @@ describe('process-request', function () {
       .post('/')
       .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
       .expect(({ body }) => {
-        expect(body.postData.text).to.equal('{"password":"123456","apiKey":"abc","another":"Hello world"}');
+        expect(body.postData.text).toBe('{"password":"123456","apiKey":"abc","another":"Hello world"}');
       });
   });
 
@@ -56,7 +56,7 @@ describe('process-request', function () {
       .set('Content-Type', 'application/x-json')
       .send(JSON.stringify({ password: '123456', apiKey: 'abc', another: 'Hello world' }))
       .expect(({ body }) => {
-        expect(body.postData.text).to.equal('{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}');
+        expect(body.postData.text).toBe('{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}');
       });
   });
 
@@ -68,7 +68,7 @@ describe('process-request', function () {
       .set('Content-Type', 'text/json')
       .send(JSON.stringify({ password: '123456', apiKey: 'abc', another: 'Hello world' }))
       .expect(({ body }) => {
-        expect(body.postData.text).to.equal('{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}');
+        expect(body.postData.text).toBe('{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}');
       });
   });
 
@@ -80,7 +80,7 @@ describe('process-request', function () {
       .set('Content-Type', 'text/x-json')
       .send(JSON.stringify({ password: '123456', apiKey: 'abc', another: 'Hello world' }))
       .expect(({ body }) => {
-        expect(body.postData.text).to.equal('{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}');
+        expect(body.postData.text).toBe('{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}');
       });
   });
 
@@ -92,7 +92,7 @@ describe('process-request', function () {
       .set('Content-Type', 'application/vnd.api+json')
       .send(JSON.stringify({ password: '123456', apiKey: 'abc', another: 'Hello world' }))
       .expect(({ body }) => {
-        expect(body.postData.text).to.equal('{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}');
+        expect(body.postData.text).toBe('{"password":"[REDACTED 6]","apiKey":"abc","another":"Hello world"}');
       });
   });
 
@@ -112,12 +112,12 @@ describe('process-request', function () {
       .send(form.getBuffer().toString())
       .expect(({ body }) => {
         // If the request body for multipart form comes in as a string, we record it as is.
-        expect(body.postData.text).to.equal(form.getBuffer().toString());
+        expect(body.postData.text).toBe(form.getBuffer().toString());
       });
   });
 
   it('should fail gracefully with circular json objects', function () {
-    const obj = { foo: null };
+    const obj: Record<string, unknown> = { foo: null };
     obj.foo = obj;
 
     const app = createApp({ denylist: ['password'] }, false, obj);
@@ -128,8 +128,8 @@ describe('process-request', function () {
       .send("this isn't used")
       .expect(({ body }) => {
         // If the request body for multipart form comes in as a string, we record it as is.
-        expect(body.postData.text).to.equal(
-          '[ReadMe is unable to handle circular JSON. Please contact support if you have any questions.]'
+        expect(body.postData.text).toBe(
+          '[ReadMe is unable to handle circular JSON. Please contact support if you have any questions.]',
         );
       });
   });
@@ -141,9 +141,9 @@ describe('process-request', function () {
       .post('/')
       .set('authorization', 'Bearer 123456')
       .expect(({ body }) => {
-        expect(body.headers).to.have.header(
+        expect(body.headers).toHaveHeader(
           'authorization',
-          'sha512-31rXi6lhQcMvMwee0P6yu9xyHuAWDUEuDzcSBQCCUUvlQ6BZXcu67qy1hrD2nbrjeDLKrYrBbQoMOrLnJVmbCw==?3456'
+          'sha512-31rXi6lhQcMvMwee0P6yu9xyHuAWDUEuDzcSBQCCUUvlQ6BZXcu67qy1hrD2nbrjeDLKrYrBbQoMOrLnJVmbCw==?3456',
         );
       });
   });
@@ -157,9 +157,9 @@ describe('process-request', function () {
           .post('/')
           .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
           .expect(({ body }) => {
-            expect(body.url).to.be.a.url;
-            expect(body.postData.text).to.equal(
-              '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}'
+            expect(body.url).toBeAURL();
+            expect(body.postData.text).toBe(
+              '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}',
             );
           });
       });
@@ -172,9 +172,9 @@ describe('process-request', function () {
           .send('password=123456&apiKey=abc&another=Hello world')
           .set('Content-Type', 'application/x-www-form-urlencoded')
           .expect(({ body }) => {
-            expect(body.url).to.be.a.url;
-            expect(body.postData.text).to.be.undefined;
-            expect(body.postData.params).to.deep.equal([
+            expect(body.url).toBeAURL();
+            expect(body.postData.text).toBeUndefined();
+            expect(body.postData.params).toStrictEqual([
               {
                 name: 'password',
                 value: '[REDACTED 6]',
@@ -198,8 +198,8 @@ describe('process-request', function () {
           .post('/')
           .send({ a: { b: { c: {} } } })
           .expect(({ body }) => {
-            expect(body.url).to.be.a.url;
-            expect(body.postData.text).to.equal('{"a":{"b":{"c":"[REDACTED]"}}}');
+            expect(body.url).toBeAURL();
+            expect(body.postData.text).toBe('{"a":{"b":{"c":"[REDACTED]"}}}');
           });
       });
 
@@ -210,8 +210,8 @@ describe('process-request', function () {
           .post('/')
           .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
           .expect(({ body }) => {
-            expect(body.url).to.be.a.url;
-            expect(body.postData.text).to.equal('{"password":"123456","apiKey":"abc","another":"[REDACTED 11]"}');
+            expect(body.url).toBeAURL();
+            expect(body.postData.text).toBe('{"password":"123456","apiKey":"abc","another":"[REDACTED 11]"}');
           });
       });
 
@@ -222,9 +222,9 @@ describe('process-request', function () {
           .post('/')
           .send('password=123456&apiKey=abc&another=Hello world')
           .expect(({ body }) => {
-            expect(body.url).to.be.a.url;
-            expect(body.postData.text).to.be.undefined;
-            expect(body.postData.params).to.deep.equal([
+            expect(body.url).toBeAURL();
+            expect(body.postData.text).toBeUndefined();
+            expect(body.postData.params).toStrictEqual([
               {
                 name: 'password',
                 value: '123456',
@@ -248,8 +248,8 @@ describe('process-request', function () {
           .post('/')
           .send({ a: { b: { c: 1 } }, d: 2 })
           .expect(({ body }) => {
-            expect(body.url).to.be.a.url;
-            expect(body.postData.text).to.equal('{"a":{"b":{"c":1}},"d":"[REDACTED]"}');
+            expect(body.url).toBeAURL();
+            expect(body.postData.text).toBe('{"a":{"b":{"c":1}},"d":"[REDACTED]"}');
           });
       });
 
@@ -260,9 +260,9 @@ describe('process-request', function () {
           .post('/')
           .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
           .expect(({ body }) => {
-            expect(body.url).to.be.a.url;
-            expect(body.postData.text).to.equal(
-              '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}'
+            expect(body.url).toBeAURL();
+            expect(body.postData.text).toBe(
+              '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}',
             );
           });
       });
@@ -274,12 +274,12 @@ describe('process-request', function () {
           .post('/')
           .set('x-ratelimit-limit', '10')
           .expect(({ body }) => {
-            expect(body.url).to.be.a.url;
-            expect(body.headers).to.have.header('host', '[REDACTED 15]');
-            expect(body.headers).to.have.header('accept-encoding', '[REDACTED 13]');
-            expect(body.headers).to.have.header('x-ratelimit-limit', '10');
-            expect(body.headers).to.have.header('connection', '[REDACTED 5]');
-            expect(body.headers).to.have.header('content-length', '0');
+            expect(body.url).toBeAURL();
+            expect(body.headers).toHaveHeader('host', '[REDACTED 15]');
+            expect(body.headers).toHaveHeader('accept-encoding', '[REDACTED 13]');
+            expect(body.headers).toHaveHeader('x-ratelimit-limit', '10');
+            expect(body.headers).toHaveHeader('connection', '[REDACTED 5]');
+            expect(body.headers).toHaveHeader('content-length', '0');
           });
       });
 
@@ -290,12 +290,12 @@ describe('process-request', function () {
           .post('/')
           .set('x-ratelimit-limit', '10')
           .expect(({ body }) => {
-            expect(body.url).to.be.a.url;
-            expect(body.headers).to.have.header('host', '[REDACTED 15]');
-            expect(body.headers).to.have.header('accept-encoding', '[REDACTED 13]');
-            expect(body.headers).to.have.header('x-ratelimit-limit', '10');
-            expect(body.headers).to.have.header('connection', '[REDACTED 5]');
-            expect(body.headers).to.have.header('content-length', '[REDACTED 1]');
+            expect(body.url).toBeAURL();
+            expect(body.headers).toHaveHeader('host', '[REDACTED 15]');
+            expect(body.headers).toHaveHeader('accept-encoding', '[REDACTED 13]');
+            expect(body.headers).toHaveHeader('x-ratelimit-limit', '10');
+            expect(body.headers).toHaveHeader('connection', '[REDACTED 5]');
+            expect(body.headers).toHaveHeader('content-length', '[REDACTED 1]');
           });
       });
     });
@@ -310,16 +310,16 @@ describe('process-request', function () {
         .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
         .set('x-ratelimit-limit', '10')
         .expect(({ body }) => {
-          expect(body.url).to.be.a.url;
-          expect(body.headers).to.have.header('host', '[REDACTED 15]');
-          expect(body.headers).to.have.header('accept-encoding', '[REDACTED 13]');
-          expect(body.headers).to.have.header('content-type', 'application/json');
-          expect(body.headers).to.have.header('x-ratelimit-limit', '10');
-          expect(body.headers).to.have.header('content-length', '[REDACTED 2]');
-          expect(body.headers).to.have.header('connection', '[REDACTED 5]');
+          expect(body.url).toBeAURL();
+          expect(body.headers).toHaveHeader('host', '[REDACTED 15]');
+          expect(body.headers).toHaveHeader('accept-encoding', '[REDACTED 13]');
+          expect(body.headers).toHaveHeader('content-type', 'application/json');
+          expect(body.headers).toHaveHeader('x-ratelimit-limit', '10');
+          expect(body.headers).toHaveHeader('content-length', '[REDACTED 2]');
+          expect(body.headers).toHaveHeader('connection', '[REDACTED 5]');
 
-          expect(body.postData.text).to.equal(
-            '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}'
+          expect(body.postData.text).toBe(
+            '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}',
           );
         });
     });
@@ -334,16 +334,16 @@ describe('process-request', function () {
         .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
         .set('x-ratelimit-limit', '10')
         .expect(({ body }) => {
-          expect(body.url).to.be.a.url;
-          expect(body.headers).to.have.header('host', '[REDACTED 15]');
-          expect(body.headers).to.have.header('accept-encoding', '[REDACTED 13]');
-          expect(body.headers).to.have.header('content-type', 'application/json');
-          expect(body.headers).to.have.header('x-ratelimit-limit', '10');
-          expect(body.headers).to.have.header('content-length', '[REDACTED 2]');
-          expect(body.headers).to.have.header('connection', '[REDACTED 5]');
+          expect(body.url).toBeAURL();
+          expect(body.headers).toHaveHeader('host', '[REDACTED 15]');
+          expect(body.headers).toHaveHeader('accept-encoding', '[REDACTED 13]');
+          expect(body.headers).toHaveHeader('content-type', 'application/json');
+          expect(body.headers).toHaveHeader('x-ratelimit-limit', '10');
+          expect(body.headers).toHaveHeader('content-length', '[REDACTED 2]');
+          expect(body.headers).toHaveHeader('connection', '[REDACTED 5]');
 
-          expect(body.postData.text).to.equal(
-            '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}'
+          expect(body.postData.text).toBe(
+            '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}',
           );
         });
     });
@@ -359,16 +359,16 @@ describe('process-request', function () {
         .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
         .set('x-ratelimit-limit', '10')
         .expect(({ body }) => {
-          expect(body.url).to.be.a.url;
-          expect(body.headers).to.have.header('host', '[REDACTED 15]');
-          expect(body.headers).to.have.header('accept-encoding', '[REDACTED 13]');
-          expect(body.headers).to.have.header('content-type', 'application/json');
-          expect(body.headers).to.have.header('x-ratelimit-limit', '10');
-          expect(body.headers).to.have.header('content-length', '[REDACTED 2]');
-          expect(body.headers).to.have.header('connection', '[REDACTED 5]');
+          expect(body.url).toBeAURL();
+          expect(body.headers).toHaveHeader('host', '[REDACTED 15]');
+          expect(body.headers).toHaveHeader('accept-encoding', '[REDACTED 13]');
+          expect(body.headers).toHaveHeader('content-type', 'application/json');
+          expect(body.headers).toHaveHeader('x-ratelimit-limit', '10');
+          expect(body.headers).toHaveHeader('content-length', '[REDACTED 2]');
+          expect(body.headers).toHaveHeader('connection', '[REDACTED 5]');
 
-          expect(body.postData.text).to.equal(
-            '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}'
+          expect(body.postData.text).toBe(
+            '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}',
           );
         });
     });
@@ -387,9 +387,9 @@ describe('process-request', function () {
         .post('/')
         .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
         .expect(({ body }) => {
-          expect(body.url).to.be.a.url;
-          expect(body.postData.text).to.equal(
-            '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}'
+          expect(body.url).toBeAURL();
+          expect(body.postData.text).toBe(
+            '{"password":"[REDACTED 6]","apiKey":"[REDACTED 3]","another":"Hello world"}',
           );
         });
     });
@@ -402,8 +402,8 @@ describe('process-request', function () {
         .set('content-type', 'application/json')
         .send({ password: '123456', apiKey: 'abc', another: 'Hello world' })
         .expect(({ body }) => {
-          expect(body.url).to.be.a.url;
-          expect(body.postData.text).to.equal('{"password":"123456","apiKey":"abc","another":"[REDACTED 11]"}');
+          expect(body.url).toBeAURL();
+          expect(body.postData.text).toBe('{"password":"123456","apiKey":"abc","another":"[REDACTED 11]"}');
         });
     });
   });
@@ -411,7 +411,7 @@ describe('process-request', function () {
   it('#method', function () {
     return request(createApp())
       .post('/')
-      .expect(({ body }) => expect(body.method).to.equal('POST'));
+      .expect(({ body }) => expect(body.method).toBe('POST'));
   });
 
   it('#url', function () {
@@ -420,7 +420,7 @@ describe('process-request', function () {
         .post('/path')
         .query({ a: 'b' })
         // This regex is for supertest's random port numbers
-        .expect(({ body }) => expect(body.url).to.match(/http:\/\/127.0.0.1:\d+\/path\?a=b/))
+        .expect(({ body }) => expect(body.url).toMatch(/http:\/\/127.0.0.1:\d+\/path\?a=b/))
     );
   });
 
@@ -430,7 +430,7 @@ describe('process-request', function () {
         .post('/')
         .set('x-forwarded-proto', 'https')
         // This regex is for supertest's random port numbers
-        .expect(({ body }) => expect(body.url).to.match(/^https/))
+        .expect(({ body }) => expect(body.url).toMatch(/^https/))
     );
   });
 
@@ -440,7 +440,7 @@ describe('process-request', function () {
         .post('/')
         .set('x-forwarded-proto', 'https,http')
         // This regex is for supertest's random port numbers
-        .expect(({ body }) => expect(body.url).to.match(/^https:\/\/127.0.0.1/))
+        .expect(({ body }) => expect(body.url).toMatch(/^https:\/\/127.0.0.1/))
     );
   });
 
@@ -450,7 +450,7 @@ describe('process-request', function () {
         .post('/test-base-path/a')
         .query({ a: 'b' })
         // This regex is for supertest's random port numbers
-        .expect(({ body }) => expect(body.url).to.match(/http:\/\/127.0.0.1:\d+\/test-base-path\/a\?a=b/))
+        .expect(({ body }) => expect(body.url).toMatch(/http:\/\/127.0.0.1:\d+\/test-base-path\/a\?a=b/))
     );
   });
 
@@ -460,14 +460,14 @@ describe('process-request', function () {
         .post('/path')
         .set({ 'x-forwarded-host': 'dash.readme.com' })
         // This regex is for supertest's random port numbers
-        .expect(({ body }) => expect(body.url).to.equal('http://dash.readme.com/path'))
+        .expect(({ body }) => expect(body.url).toBe('http://dash.readme.com/path'))
     );
   });
 
   it('#httpVersion', function () {
     return request(createApp())
       .post('/')
-      .expect(({ body }) => expect(body.httpVersion).to.equal('HTTP/1.1'));
+      .expect(({ body }) => expect(body.httpVersion).toBe('HTTP/1.1'));
   });
 
   it('#headers', function () {
@@ -475,8 +475,8 @@ describe('process-request', function () {
       .post('/')
       .set('a', '1')
       .expect(({ body }) => {
-        expect(body.headers.find(header => header.name === 'host').value).to.match(/127.0.0.1:\d+/);
-        expect(body.headers.filter(header => header.name !== 'host')).to.deep.equal([
+        expect(body.headers.find((header: { name: string }) => header.name === 'host').value).toMatch(/127.0.0.1:\d+/);
+        expect(body.headers.filter((header: { name: string }) => header.name !== 'host')).toStrictEqual([
           { name: 'accept-encoding', value: 'gzip, deflate' },
           { name: 'a', value: '1' },
           { name: 'connection', value: 'close' },
@@ -490,10 +490,10 @@ describe('process-request', function () {
       .post('/')
       .query({ a: 'b', c: 'd' })
       .expect(({ body }) =>
-        expect(body.queryString).to.deep.equal([
+        expect(body.queryString).toStrictEqual([
           { name: 'a', value: 'b' },
           { name: 'c', value: 'd' },
-        ])
+        ]),
       );
   });
 
@@ -504,11 +504,18 @@ describe('process-request', function () {
         .set({ name: 'content-type', value: 'application/x-www-form-urlencoded' })
         .send('a=1&b=2')
         .expect(res =>
-          expect(res.body.postData.params).to.deep.equal([
+          expect(res.body.postData.params).toStrictEqual([
             { name: 'a', value: '1' },
             { name: 'b', value: '2' },
-          ])
+          ]),
         );
+    });
+
+    it('should not error with no body', function () {
+      return request(createApp({}, false, null))
+        .post('/')
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .expect(res => expect(res.body.postData.params).toStrictEqual([]));
     });
 
     it('#mimeType should properly parse content-type header', function () {
@@ -516,20 +523,20 @@ describe('process-request', function () {
         .post('/')
         .set({ name: 'content-type', value: 'application/x-www-form-urlencoded; charset=UTF-8' })
         .send('a=1&b=2')
-        .expect(res => expect(res.body.postData.mimeType).to.equal('application/x-www-form-urlencoded'));
+        .expect(res => expect(res.body.postData.mimeType).toBe('application/x-www-form-urlencoded'));
     });
   });
 
   it('should be undefined if request has no postData', function () {
     return request(createApp())
       .get('/')
-      .expect(({ body }) => expect(body.postData).to.be.undefined);
+      .expect(({ body }) => expect(body.postData).toBeUndefined());
   });
 
   it('should be missing if req.body is empty', function () {
     return request(createApp())
       .post('/')
-      .expect(({ body }) => expect(body.postData).to.be.undefined);
+      .expect(({ body }) => expect(body.postData).toBeUndefined());
   });
 
   it('#text should contain stringified body', function () {
@@ -539,7 +546,7 @@ describe('process-request', function () {
       .set('Content-Type', 'application/json')
       .send(body)
       .expect(res => {
-        expect(res.body.postData.text).to.equal('{"a":1,"b":2}');
+        expect(res.body.postData.text).toBe('{"a":1,"b":2}');
       });
   });
 
@@ -551,7 +558,7 @@ describe('process-request', function () {
       .set('Content-Type', 'application/json')
       .send(body)
       .expect(res => {
-        expect(res.body.postData.text).to.equal(body);
+        expect(res.body.postData.text).toBe(body);
       });
   });
 
@@ -562,8 +569,8 @@ describe('process-request', function () {
       .set('Content-Type', 'text/html')
       .send(body)
       .expect(res => {
-        expect(res.body.postData.mimeType).to.equal('text/html');
-        expect(res.body.postData.text).to.equal('hellloooo');
+        expect(res.body.postData.mimeType).toBe('text/html');
+        expect(res.body.postData.text).toBe('hellloooo');
       });
   });
 });

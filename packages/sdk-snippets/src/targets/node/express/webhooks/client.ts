@@ -61,13 +61,13 @@ export const express: Client = {
       server.forEach(data => {
         pushVariable(
           `${escapeForObjectKey(data.name)}: '${escapeForSingleQuotes(
-            data.default || data.default === '' ? data.default : data.name
+            data.default || data.default === '' ? data.default : data.name,
           )}',`,
           {
             type: 'server',
             name: data.name,
             indentationLevel: 2,
-          }
+          },
         );
       });
     }
@@ -93,13 +93,13 @@ export const express: Client = {
 
         pushVariable(
           `${escapeForObjectKey(data.name)}: '${escapeForSingleQuotes(
-            data.default || data.default === '' ? data.default : data.name
+            data.default || data.default === '' ? data.default : data.name,
           )}',`,
           {
             type: 'security',
             name: data.name,
             indentationLevel: 2,
-          }
+          },
         );
       });
     }

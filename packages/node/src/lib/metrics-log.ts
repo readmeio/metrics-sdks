@@ -1,3 +1,4 @@
+import type { UUID } from 'crypto';
 import type { Har } from 'har-format';
 import type { Response } from 'node-fetch';
 
@@ -32,7 +33,7 @@ export interface GroupingObject {
 }
 
 export interface OutgoingLogBody {
-  _id?: string;
+  _id?: UUID;
   _version: number;
   clientIPAddress: string;
   development: boolean;
@@ -41,14 +42,16 @@ export interface OutgoingLogBody {
   request: Har;
 }
 
+type LogId = UUID | UUID[] | undefined;
+
 export interface LogResponse {
-  ids: string | string[];
+  ids: LogId;
   response?: Response;
 }
 
 const BACKOFF_SECONDS = 15; // when we need to backoff HTTP requests, pause for seconds
 
-let backoffExpiresAt: Date;
+let backoffExpiresAt: Date | undefined;
 
 // Exported for use in unit tests
 export function setBackoff(expiresAt: Date | undefined) {
@@ -77,9 +80,9 @@ function shouldBackoff(response: Response) {
   }
 }
 
-function getLogIds(body: OutgoingLogBody | OutgoingLogBody[]): string | string[] {
+function getLogIds(body: OutgoingLogBody | OutgoingLogBody[]): LogId {
   if (Array.isArray(body)) {
-    return body.map(value => value._id);
+    return body.map(value => value._id) as UUID[];
   }
 
   return body._id;
@@ -88,7 +91,7 @@ function getLogIds(body: OutgoingLogBody | OutgoingLogBody[]): string | string[]
 export function metricsAPICall(
   readmeAPIKey: string,
   body: OutgoingLogBody[],
-  fireAndForget = false
+  fireAndForget = false,
 ): Promise<LogResponse> {
   const signal = timeoutSignal(config.timeout);
   const encodedKey = Buffer.from(`${readmeAPIKey}:`).toString('base64');
@@ -96,7 +99,7 @@ export function metricsAPICall(
   const makeRequest = () => {
     if (backoffExpiresAt) {
       if (backoffExpiresAt > new Date()) {
-        return Promise.resolve();
+        return Promise.resolve(undefined);
       }
       // after the backoff expires, erase the old expiration time
       backoffExpiresAt = undefined;
@@ -130,7 +133,7 @@ export function metricsAPICall(
 
   if (fireAndForget) {
     makeRequest();
-    return Promise.resolve({
+    return Promise.resolve<LogResponse>({
       ids: getLogIds(body),
     });
   }

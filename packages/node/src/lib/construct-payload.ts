@@ -1,4 +1,5 @@
 import type { OutgoingLogBody } from './metrics-log';
+import type { UUID } from 'node:crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { TLSSocket } from 'tls';
 
@@ -83,7 +84,7 @@ export interface PayloadData {
    *
    * @example {base_url}/logs/{logId}
    */
-  logId?: string;
+  logId?: UUID;
 
   /**
    * Object or string | The incoming request body. You should provide this function a parsed object,
@@ -123,7 +124,7 @@ export interface PayloadData {
  *
  * With the last 4 digits on the end for us to use to identify it later in a list.
  */
-export function mask(apiKey) {
+export function mask(apiKey: string) {
   return ssri
     .fromData(apiKey, {
       algorithms: ['sha512'],
@@ -136,19 +137,19 @@ export function constructPayload(
   req: IncomingMessage,
   res: ServerResponse,
   payloadData: PayloadData,
-  logOptions: LogOptions
+  logOptions: LogOptions,
 ): OutgoingLogBody {
   const serverTime = payloadData.responseEndDateTime.getTime() - payloadData.startedDateTime.getTime();
 
   return {
-    _id: payloadData.logId || uuidv4(),
+    _id: payloadData.logId || (uuidv4() as UUID),
     _version: 3,
     group: {
       id: mask(payloadData.apiKey),
       label: payloadData.label,
       email: payloadData.email,
     },
-    clientIPAddress: req.socket.remoteAddress,
+    clientIPAddress: req.socket.remoteAddress || '',
     development: !!logOptions?.development,
     request: {
       log: {
@@ -163,7 +164,7 @@ export function constructPayload(
           {
             pageref: payloadData.routePath
               ? payloadData.routePath
-              : new URL(req.url, `${getProto(req)}://${req.headers.host}`).toString(),
+              : new URL(req.url || '', `${getProto(req)}://${req.headers.host}`).toString(),
             startedDateTime: payloadData.startedDateTime.toISOString(),
             time: serverTime,
             request: processRequest(req, payloadData.requestBody, logOptions),

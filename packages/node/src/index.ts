@@ -1,7 +1,8 @@
-import type { LogOptions } from './lib/construct-payload';
+import type { GetProjectResponse200 } from './.api/apis/developers';
+import type { Options } from './lib/log';
+import type { NextFunction, Request, Response } from 'express';
 
-import sdk from 'api';
-
+import readmeSdk from './.api/apis/developers';
 import { getProjectBaseUrl } from './lib/get-project-base-url';
 import { log } from './lib/log';
 import { buildSetupView } from './lib/setup-readme-view';
@@ -10,38 +11,51 @@ import verifyWebhook from './lib/verify-webhook';
 
 const env = process.env.NODE_ENV || 'development';
 
-const readmeSDK = sdk('@developers/v2.0#19j1xdalksmothi');
-
 interface ApiKey {
-  apiKey: string;
+  [x: string]: unknown;
+  apiKey?: string;
   name: string;
+  pass?: string;
+  user?: string;
 }
 
 interface GroupingObject {
-  apiKeys: ApiKey[];
+  [x: string]: unknown;
   email: string;
+  keys: ApiKey[];
+  name: string;
 }
 
 interface SplitOptions {
-  config: LogOptions;
+  config: Options;
   grouping: GroupingObject;
 }
 
-const splitIntoUserAndConfig = (inputObject: GroupingObject | LogOptions): SplitOptions => {
-  const configKeys = ['allowOptions', 'denyList', 'baseLogUrl', 'bufferLength', 'fireAndForget', 'development'];
-  const grouping = {};
-  const config = {};
+const splitIntoUserAndConfig = (inputObject: GroupingObject & Options): SplitOptions => {
+  const configKeys: (keyof Options)[] = [
+    'allowlist',
+    'denylist',
+    'baseLogUrl',
+    'bufferLength',
+    'fireAndForget',
+    'development',
+  ];
+
+  const grouping: GroupingObject = { email: '', keys: [], name: '' };
+  const config: Options = {};
   Object.keys(inputObject).forEach(key => {
-    if (configKeys.includes(key)) {
-      config[key] = inputObject[key];
+    const typedKey = key as keyof GroupingObject | keyof Options;
+    if (configKeys.includes(typedKey as keyof Options)) {
+      // @ts-expect-error Kanad TODO: look into if this works properly
+      config[typedKey as keyof Options] = inputObject[typedKey];
     } else {
-      grouping[key] = inputObject[key];
+      grouping[typedKey] = inputObject[typedKey];
     }
   });
-  return { grouping: grouping as GroupingObject, config };
+  return { grouping, config };
 };
 
-const guessWhereAPIKeyIs = req => {
+const guessWhereAPIKeyIs = (req: Request) => {
   // Authorization header
   if (req.headers.authorization && req.headers.authorization.includes('Bearer')) {
     return req.headers.authorization.split(' ')[1];
@@ -80,18 +94,18 @@ const guessWhereAPIKeyIs = req => {
 };
 
 // See comment at the auth definition below
-let apiKey = '';
-let readmeProject;
-let requestAPIKey;
+let requestAPIKey = '';
+let readmeAPIKey = '';
+let readmeProjectData: GetProjectResponse200 | undefined;
 
 const readme = (
-  userFunction,
+  userFunction: (req: Request, getUser) => GroupingObject & Options,
   { disableWebhook, disableMetrics } = {
     disableWebhook: false,
     disableMetrics: false,
   }
 ) => {
-  return async (req, res, next) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     const getUser = ({ byAPIKey, byEmail, manualAPIKey }) => {
       if (req.path === '/readme-webhook' && req.method === 'POST' && !disableWebhook) {
         const user = byEmail(req.body.email);
@@ -123,11 +137,12 @@ const readme = (
     const isDevelopment =
       env === 'development' || baseUrl.includes('localhost') || baseUrl.includes('.local') || baseUrl.includes('.dev');
 
-    if (!readmeProject) {
-      readmeSDK.auth(apiKey);
+    if (!readmeProjectData) {
+      readmeSdk.auth(readmeAPIKey);
       try {
-        readmeProject = (await readmeSDK.getProject()).data;
-      } catch (e) {
+        readmeProjectData = (await readmeSdk.getProject()).data;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e: any) {
         // TODO: Maybe send this to sentry?
         if (e.status === 401) {
           console.error('Invalid ReadMe API key. Contact support@readme.io for help!');
@@ -139,31 +154,32 @@ const readme = (
         // Don't want to cause an error in their API
         return next();
       }
-    }
-    if (req.path === '/readme-webhook' && req.method === 'POST' && !disableWebhook) {
+    } else if (req.path === '/readme-webhook' && req.method === 'POST' && !disableWebhook) {
       try {
-        verifyWebhook(req.body, req.headers['readme-signature'], readmeProject.jwtSecret);
-      } catch (e) {
+        verifyWebhook(req.body, req.headers['readme-signature'] as string, readmeProjectData.jwtSecret as string);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e: any) {
         return res.status(401).send(e.message);
       }
+
       const user = await userFunction(req, getUser);
 
-      if (!user) return res.json({});
+      if (!user || (typeof user === 'object' && !Object.keys(user).length)) return res.json({});
 
       const { grouping } = splitIntoUserAndConfig(user);
       return res.send(grouping);
     } else if (req.path === '/readme-setup' && isDevelopment) {
       const setupHtml = buildSetupView({
         baseUrl,
-        subdomain: readmeProject.subdomain,
-        apiKey,
+        subdomain: readmeProjectData.subdomain as string,
+        readmeAPIKey,
         disableMetrics,
         disableWebhook,
       });
       return res.send(setupHtml);
     } else if (req.path === '/webhook-test' && isDevelopment) {
-      const email = req.query.email;
-      const webhookData = await testVerifyWebhook(baseUrl, email, readmeProject.jwtSecret);
+      const email = req.query.email as string;
+      const webhookData = await testVerifyWebhook(baseUrl, email, readmeProjectData.jwtSecret as string);
       return res.json({ ...webhookData });
     }
 
@@ -171,9 +187,9 @@ const readme = (
     if (!user || !Object.keys(user).length || disableMetrics) return next();
 
     const { grouping, config } = splitIntoUserAndConfig(user);
-    const filteredKey = grouping.apiKeys.find(key => key.apiKey === requestAPIKey);
+    const filteredKey = grouping.keys.find(key => key.apiKey === requestAPIKey);
 
-    log(apiKey, req, res, { apiKey: filteredKey.apiKey, label: filteredKey.name, email: grouping.email }, config);
+    log(readmeAPIKey, req, res, { apiKey: filteredKey.apiKey, label: filteredKey.name, email: grouping.email }, config);
     return next();
   };
 };
@@ -184,10 +200,10 @@ const readme = (
 // I don't like this as much but not sure how else we can do it
 // import { readme } from 'readmeio';
 // readme.auth('api-key');
-function auth(key) {
-  apiKey = key;
+function auth(key: string) {
+  readmeAPIKey = key;
   // Reset the cache for the ReadMe project if the api key changes
-  readmeProject = undefined;
+  readmeProjectData = undefined;
   return readme;
 }
 

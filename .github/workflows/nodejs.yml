@@ -32,11 +32,13 @@ jobs:
         working-directory: packages/node
 
     strategy:
+      fail-fast: false
       matrix:
         node-version:
           - 14
           - 16
           - 18
+          - 20
 
     steps:
       - uses: actions/checkout@v3
@@ -44,11 +46,18 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      # Node 14 still ships with npm@6 so for compatibility reasons we're upping
-      # this to match everything else.
-      - name: Install npm@8
-        if: matrix.node-version == '14'
-        run: npm install -g npm@8
-
       - run: npm ci --ignore-scripts
       - run: npm test
+
+  # This is being run separately since it's not playing nicely with Node 14.
+  # Once we drop Node 14 support we can probably consolidate this again.
+  lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/node
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm ci --ignore-scripts
+      - run: npm run lint

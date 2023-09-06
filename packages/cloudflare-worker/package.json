@@ -1,7 +1,7 @@
 {
   "name": "@readme/cloudflare-worker",
   "description": "Cloudflare worker to get your API log data into ReadMe",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "dependencies": {
     "minimatch": "^9.0.1"
   },
@@ -12,9 +12,8 @@
     "build": "HOST=https://metrics.readme.io webpack",
     "lint": "eslint .",
     "prepublishOnly": "npm run build",
-    "pretest": "npm run lint",
     "prettier": "prettier --list-different \"./**/**.js\"",
-    "test": "nyc mocha"
+    "test": "vitest --coverage"
   },
   "author": "Dom Harrington <dom@readme.io>",
   "license": "ISC",
@@ -27,14 +26,13 @@
     "url": "git@github.com:readmeio/metrics-sdks.git"
   },
   "devDependencies": {
-    "@readme/eslint-config": "^10.5.1",
-    "chai": "^4.3.6",
-    "eslint": "^8.21.0",
-    "mocha": "^10.0.0",
+    "@readme/eslint-config": "^12.1.0",
+    "@vitest/coverage-v8": "^0.34.2",
+    "eslint": "^8.47.0",
     "nock": "^13.2.9",
     "node-fetch": "^2.6.7",
-    "nyc": "^15.1.0",
-    "prettier": "^2.7.1",
+    "prettier": "^3.0.2",
+    "vitest": "^0.34.2",
     "webpack": "^5.74.0",
     "webpack-cli": "^5.0.2"
   },

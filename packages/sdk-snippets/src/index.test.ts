@@ -1,6 +1,6 @@
 import type { Variables } from '.';
 
-import { expect } from 'chai';
+import { describe, it, expect } from 'vitest';
 
 import serverVariables from './fixtures/webhooks/server-variables';
 
@@ -11,6 +11,6 @@ describe('MetricsSDKSnippet', function () {
     const snippet = new MetricsSDKSnippet(serverVariables as Variables);
     const result = snippet.convert('webhooks', null);
 
-    expect(result).to.be.false;
+    expect(result).toBe(false);
   });
 });

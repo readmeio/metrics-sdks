@@ -1,17 +1,13 @@
-/* eslint-disable mocha/no-setup-in-describe */
 import type { ClientId, SnippetType, TargetId } from './targets';
 import type { Variables } from '..';
 
 import { readdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 
-import chai, { expect } from 'chai';
-import { jestSnapshotPlugin } from 'mocha-chai-jest-snapshot';
+import { describe, it, expect } from 'vitest';
 
 import { MetricsSDKSnippet } from '..';
 import { availableWebhookTargets, extname } from '../helpers/utils';
-
-chai.use(jestSnapshotPlugin());
 
 const expectedBasePath = ['src', 'fixtures', 'webhooks'];
 
@@ -55,14 +51,17 @@ const testFilter =
     list.length > 0 ? list.includes(item[property]) : true;
 
 describe('webhooks', function () {
+  // eslint-disable-next-line vitest/require-hook
   availableWebhookTargets()
     .filter(testFilter('key', targetFilter))
     .forEach(({ key: targetId, title, clients }) => {
       const snippetType: SnippetType = 'webhooks';
 
       describe(`${title} snippet generation`, function () {
+        // eslint-disable-next-line vitest/require-hook
         clients.filter(testFilter('key', clientFilter)).forEach(({ key: clientId }) => {
           describe(clientId, function () {
+            // eslint-disable-next-line vitest/require-hook
             fixtures.filter(testFilter(0, fixtureFilter)).forEach(([fixture, variables]) => {
               const fixturePath = path.join(
                 'src',
@@ -71,7 +70,7 @@ describe('webhooks', function () {
                 clientId,
                 snippetType,
                 'fixtures',
-                `${fixture}${extname(targetId)}`
+                `${fixture}${extname(targetId)}`,
               );
 
               let expectedOutput: string;
@@ -84,7 +83,7 @@ describe('webhooks', function () {
                 }
 
                 throw new Error(
-                  `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${fixturePath}\``
+                  `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${fixturePath}\``,
                 );
               }
 
@@ -117,6 +116,7 @@ describe('webhooks', function () {
 
             if (clientId === 'aws') {
               describe('AWS snippet generation with automatic creation of new API keys', function () {
+                // eslint-disable-next-line vitest/require-hook
                 fixtures.filter(testFilter(0, fixtureFilter)).forEach(([fixture, variables]) => {
                   const createKeys = true;
                   const suffix = createKeys ? '-create' : '';
@@ -127,7 +127,7 @@ describe('webhooks', function () {
                     clientId,
                     snippetType,
                     'fixtures',
-                    `${fixture}${suffix}${extname(targetId)}`
+                    `${fixture}${suffix}${extname(targetId)}`,
                   );
 
                   let expectedOutput: string;
@@ -139,7 +139,7 @@ describe('webhooks', function () {
                       return;
                     }
                     throw new Error(
-                      `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${fixturePath}\``
+                      `Missing a ${snippetType} test file for ${targetId}:${clientId} for the ${fixture} fixture.\nExpected to find the output fixture: \`/${fixturePath}\``,
                     );
                   }
 
