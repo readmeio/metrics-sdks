@@ -31,6 +31,7 @@ export function buildSetupView({
           document.getElementById('webhook-test').classList.add('hidden');
           if (!webhookVerified) {
             document.getElementById('webhook-fail').classList.remove('hidden');
+            document.getElementById('userObject').innerHTML = data.error;
           } else if (JSON.stringify(user) === '{}') {
             const webhookSuccess = document.getElementById('webhook-warning').classList.remove('hidden');
 
@@ -91,6 +92,8 @@ export function buildSetupView({
             <span class="card-badge">Webhook</span>
           </h2>
           <p>We couldn’t verify your webhook. Send us an email at <a href="mailto:devdash@readme.io">devdash@readme.io</a> and we'll help you out!
+          <p>Error we recieved:</p>
+          <pre id="userObject"></pre>
         </div>
       </div>
       <div class="hidden" id="webhook-success">

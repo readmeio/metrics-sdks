@@ -3,6 +3,7 @@ import type { Options } from './lib/log';
 import type { NextFunction, Request, Response } from 'express';
 
 import readmeSdk from './.api/apis/developers';
+import findAPIKey from './lib/find-api-key';
 import { getProjectBaseUrl } from './lib/get-project-base-url';
 import { log } from './lib/log';
 import { buildSetupView } from './lib/setup-readme-view';
@@ -38,44 +39,6 @@ interface GetUserFunction {
   (params: GetUserParams): unknown;
 }
 
-const guessWhereAPIKeyIs = (req: Request): string => {
-  // Authorization header
-  if (req.headers.authorization && req.headers.authorization.includes('Bearer')) {
-    return req.headers.authorization.split(' ')[1];
-  } else if (req.headers.authorization && req.headers.authorization.includes('Basic')) {
-    const basicAuth = Buffer.from(req.headers.authorization.split(' ')[1], 'base64').toString().split(':');
-    // TODO: what other types of basic auth are there?
-    // TWilio has a username and a password in their basic auth
-    return basicAuth[0];
-  }
-
-  // Check other headers
-  // iterate over req.headers and see if api_key is in the name
-  const apiKeyHeader = Object.keys(req.headers).find(
-    headerName =>
-      headerName.toLowerCase().includes('api-key') ||
-      headerName.toLowerCase().includes('api_key') ||
-      headerName.toLowerCase().includes('apikey')
-  );
-
-  if (apiKeyHeader) {
-    return req.headers[apiKeyHeader] as string;
-  }
-
-  // Is it a cookie?
-  // Ok idk what to do for this case yet
-
-  // Is it a query param?
-  if (req.query.api_key) {
-    return req.query.api_key as string;
-  } else if (req.query.apiKey) {
-    return req.query.apiKey as string;
-  }
-
-  // error case where we tell them to go the manual route
-  throw new Error('test');
-};
-
 // See comment at the auth definition below
 let requestAPIKey = '';
 let readmeAPIKey = '';
@@ -86,15 +49,22 @@ const readme = (
   options: Options = {
     disableWebhook: false,
     disableMetrics: false,
-  }
+  },
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const getUser = ({ byAPIKey, byEmail, manualAPIKey }: GetUserParams): unknown => {
+      if (!byAPIKey || !byEmail) {
+        // Some kind of error handling here
+        // Would be nice ot use the readme-setup page for this
+        console.error('Missing required definition for byAPIKey or byEmail');
+        console.error('This should be much more useful than it is.');
+        return next();
+      }
+
       if (req.path === '/readme-webhook' && req.method === 'POST' && !options.disableWebhook) {
         const user = byEmail(req.body.email);
         if (!user) {
-          console.error(`User with email ${req.body.email} not found`);
-          return {};
+          throw new Error(`User with email ${req.body.email} not found`);
         }
         return user;
       }
@@ -105,8 +75,14 @@ const readme = (
       }
       // Try to figure out where the api key is
       try {
-        requestAPIKey = guessWhereAPIKeyIs(req);
+        requestAPIKey = findAPIKey(req);
       } catch (e) {
+        // TODO: Better error handling here
+        // The tricky thing is we want to show a nice error on /readme-setup
+        // but I'm not sure how to get this there
+        console.error('Could not automatically find API key in the request');
+        console.error('You should use manualAPIKey in the readme function to pass the API key in');
+        console.error('Obviously we should have better error handling here');
         console.error(e);
       }
       return byAPIKey(requestAPIKey);
@@ -136,19 +112,16 @@ const readme = (
         // Don't want to cause an error in their API
         return next();
       }
-    } else if (req.path === '/readme-webhook' && req.method === 'POST' && !options.disableWebhook) {
+    }
+
+    if (req.path === '/readme-webhook' && req.method === 'POST' && !options.disableWebhook) {
       try {
         verifyWebhook(req.body, req.headers['readme-signature'] as string, readmeProjectData.jwtSecret as string);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (e: any) {
-        return res.status(401).send(e.message);
+        const user = await userFunction(req, getUser);
+        return res.send(user);
+      } catch (e) {
+        return res.status(400).json({ error: (e as Error).message });
       }
-
-      const user = await userFunction(req, getUser);
-
-      if (!user || (typeof user === 'object' && !Object.keys(user).length)) return res.json({});
-
-      return res.send(user);
     } else if (req.path === '/readme-setup' && isDevelopment) {
       const setupHtml = buildSetupView({
         baseUrl,
@@ -160,8 +133,12 @@ const readme = (
       return res.send(setupHtml);
     } else if (req.path === '/webhook-test' && isDevelopment) {
       const email = req.query.email as string;
-      const webhookData = await testVerifyWebhook(baseUrl, email, readmeProjectData.jwtSecret as string);
-      return res.json({ ...webhookData });
+      try {
+        const webhookData = await testVerifyWebhook(baseUrl, email, readmeProjectData.jwtSecret as string);
+        return res.json({ ...webhookData });
+      } catch (e) {
+        return res.status(400).json({ error: (e as Error).message });
+      }
     }
 
     const user = await userFunction(req, getUser);
@@ -171,6 +148,7 @@ const readme = (
 
     if (!filteredKey || !filteredKey.apiKey) {
       console.error(`API key ${requestAPIKey} not found`);
+      console.error('What does that mean? We shoudl probably have a better explainer');
       return next();
     }
 

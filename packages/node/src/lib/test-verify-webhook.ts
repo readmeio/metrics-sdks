@@ -28,7 +28,11 @@ async function verifyWebhook(url: string, email: string, secret: string, opts = 
     body: JSON.stringify(payload),
     headers,
   }).then(res => {
-    if (res.status !== 200) throw res;
+    if (res.status !== 200) {
+      return res.json().then(json => {
+        throw new Error(json.error);
+      });
+    }
     return res.json();
   });
 
@@ -42,6 +46,7 @@ export async function testVerifyWebhook(baseUrl: string, email: string, apiKey: 
   } catch (e) {
     return {
       webhookVerified: false,
+      error: (e as Error).message,
     };
   }
   // TODO: error case if this is an empty object
