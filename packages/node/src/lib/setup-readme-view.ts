@@ -4,12 +4,12 @@ const hashToken = (token: string): string => createHash('sha512').update(token).
 
 export function buildSetupView({
   baseUrl,
-  apiKey,
+  readmeAPIKey,
   subdomain,
   disableWebhook,
   disableMetrics,
 }: {
-  apiKey: string;
+  readmeAPIKey: string;
   baseUrl: string;
   disableMetrics?: boolean;
   disableWebhook?: boolean;
@@ -50,7 +50,7 @@ export function buildSetupView({
   `;
 
   let metricsScriptHtml = `
-    const token = '${hashToken(apiKey)}';
+    const token = '${hashToken(readmeAPIKey)}';
     const query = new URLSearchParams(\`token=\${token}&subdomain=${subdomain}\`);
     const socket = new WebSocket(new URL(\`?\${query}\`, 'wss://m.readme.io'));
     socket.addEventListener('message', async ({ data }) => {
