@@ -26,11 +26,8 @@ interface GroupingObject {
   name: string;
 }
 
-interface SplitOptions {
-  config: Options;
-  grouping: GroupingObject;
-}
-
+// Typing the return as unknown to make it easier to format the user to our format in the middleware
+// This way these functions can just return from their database
 interface GetUserParams {
   byAPIKey: (apiKey: string) => unknown;
   byEmail: (email: string) => unknown;
@@ -40,30 +37,6 @@ interface GetUserParams {
 interface GetUserFunction {
   (params: GetUserParams): unknown;
 }
-
-const splitIntoUserAndConfig = (inputObject: GroupingObject & Options): SplitOptions => {
-  const configKeys: (keyof Options)[] = [
-    'allowlist',
-    'denylist',
-    'baseLogUrl',
-    'bufferLength',
-    'fireAndForget',
-    'development',
-  ];
-
-  const grouping: GroupingObject = { email: '', keys: [], name: '' };
-  const config: Options = {};
-  Object.keys(inputObject).forEach(key => {
-    const typedKey = key as keyof GroupingObject | keyof Options;
-    if (configKeys.includes(typedKey as keyof Options)) {
-      // @ts-expect-error Kanad TODO: look into if this works properly
-      config[typedKey as keyof Options] = inputObject[typedKey];
-    } else {
-      grouping[typedKey] = inputObject[typedKey];
-    }
-  });
-  return { grouping, config };
-};
 
 const guessWhereAPIKeyIs = (req: Request): string => {
   // Authorization header
@@ -109,15 +82,15 @@ let readmeAPIKey = '';
 let readmeProjectData: GetProjectResponse200 | undefined;
 
 const readme = (
-  userFunction: (req: Request, getUser: GetUserFunction) => GroupingObject & Options,
-  { disableWebhook, disableMetrics } = {
+  userFunction: (req: Request, getUser: GetUserFunction) => GroupingObject,
+  options: Options = {
     disableWebhook: false,
     disableMetrics: false,
   }
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const getUser = ({ byAPIKey, byEmail, manualAPIKey }: GetUserParams): unknown => {
-      if (req.path === '/readme-webhook' && req.method === 'POST' && !disableWebhook) {
+      if (req.path === '/readme-webhook' && req.method === 'POST' && !options.disableWebhook) {
         const user = byEmail(req.body.email);
         if (!user) {
           console.error(`User with email ${req.body.email} not found`);
@@ -163,7 +136,7 @@ const readme = (
         // Don't want to cause an error in their API
         return next();
       }
-    } else if (req.path === '/readme-webhook' && req.method === 'POST' && !disableWebhook) {
+    } else if (req.path === '/readme-webhook' && req.method === 'POST' && !options.disableWebhook) {
       try {
         verifyWebhook(req.body, req.headers['readme-signature'] as string, readmeProjectData.jwtSecret as string);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -175,15 +148,14 @@ const readme = (
 
       if (!user || (typeof user === 'object' && !Object.keys(user).length)) return res.json({});
 
-      const { grouping } = splitIntoUserAndConfig(user);
-      return res.send(grouping);
+      return res.send(user);
     } else if (req.path === '/readme-setup' && isDevelopment) {
       const setupHtml = buildSetupView({
         baseUrl,
         subdomain: readmeProjectData.subdomain as string,
         readmeAPIKey,
-        disableMetrics,
-        disableWebhook,
+        disableMetrics: options.disableMetrics,
+        disableWebhook: options.disableWebhook,
       });
       return res.send(setupHtml);
     } else if (req.path === '/webhook-test' && isDevelopment) {
@@ -193,17 +165,16 @@ const readme = (
     }
 
     const user = await userFunction(req, getUser);
-    if (!user || !Object.keys(user).length || disableMetrics) return next();
+    if (!user || !Object.keys(user).length || options.disableMetrics) return next();
 
-    const { grouping, config } = splitIntoUserAndConfig(user);
-    const filteredKey = grouping.keys.find(key => key.apiKey === requestAPIKey);
+    const filteredKey = user.keys.find(key => key.apiKey === requestAPIKey);
 
     if (!filteredKey || !filteredKey.apiKey) {
       console.error(`API key ${requestAPIKey} not found`);
       return next();
     }
 
-    log(readmeAPIKey, req, res, { apiKey: filteredKey.apiKey, label: filteredKey.name, email: grouping.email }, config);
+    log(readmeAPIKey, req, res, { apiKey: filteredKey.apiKey, label: filteredKey.name, email: user.email }, options);
     return next();
   };
 };
