@@ -1,7 +1,6 @@
 import type { LogOptions } from './lib/construct-payload';
 
 import sdk from 'api';
-import flatted from 'flatted';
 
 import { getProjectBaseUrl } from './lib/get-project-base-url';
 import { log } from './lib/log';
@@ -19,8 +18,8 @@ interface ApiKey {
 }
 
 interface GroupingObject {
+  apiKeys: ApiKey[];
   email: string;
-  keys: ApiKey[];
 }
 
 interface SplitOptions {
@@ -42,32 +41,48 @@ const splitIntoUserAndConfig = (inputObject: GroupingObject | LogOptions): Split
   return { grouping: grouping as GroupingObject, config };
 };
 
-// Do we actually want to do it this way?
-// A function to get the api key from the request could be error prone
-// and we probably need a backup config option
-
-// TODO:
-// 1. Caching? This might be slow
-// 2. Testing a bunch of cases for how api keys can be passed in
-
-// What if we do this work in the metrics backend?
-const findApiKey = (req, keys: [ApiKey]) => {
-  const requestString = flatted.stringify(req);
-  const key = keys.find(apiKey => {
-    if (requestString.includes(apiKey.apiKey) || requestString.includes(btoa(`${apiKey.apiKey}:`))) {
-      return true;
-    }
-    return false;
-  });
-  if (!key) {
-    return { apiKey: undefined };
+const guessWhereAPIKeyIs = req => {
+  // Authorization header
+  if (req.headers.authorization && req.headers.authorization.includes('Bearer')) {
+    return req.headers.authorization.split(' ')[1];
+  } else if (req.headers.authorization && req.headers.authorization.includes('Basic')) {
+    const basicAuth = Buffer.from(req.headers.authorization.split(' ')[1], 'base64').toString().split(':');
+    // TODO: what other types of basic auth are there?
+    // TWilio has a username and a password in their basic auth
+    return basicAuth[0];
   }
-  return { apiKey: key.apiKey };
+
+  // Check other headers
+  // iterate over req.headers and see if api_key is in the name
+  const apiKeyHeader = Object.keys(req.headers).find(
+    headerName =>
+      headerName.toLowerCase().includes('api-key') ||
+      headerName.toLowerCase().includes('api_key') ||
+      headerName.toLowerCase().includes('apikey')
+  );
+
+  if (apiKeyHeader) {
+    return req.headers[apiKeyHeader];
+  }
+
+  // Is it a cookie?
+  // Ok idk what to do for this case yet
+
+  // Is it a query param?
+  if (req.query.api_key) {
+    return req.query.api_key;
+  } else if (req.query.apiKey) {
+    return req.query.apiKey;
+  }
+
+  // error case where we tell them to go the manual route
+  return null;
 };
 
 // See comment at the auth definition below
 let apiKey = '';
 let readmeProject;
+let requestAPIKey;
 
 const readme = (
   userFunction,
@@ -77,6 +92,30 @@ const readme = (
   }
 ) => {
   return async (req, res, next) => {
+    const getUser = ({ byAPIKey, byEmail, manualAPIKey }) => {
+      if (req.path === '/readme-webhook' && req.method === 'POST' && !disableWebhook) {
+        const user = byEmail(req.body.email);
+        if (!user) {
+          console.error(`User with email ${req.body.email} not found`);
+          return {};
+        }
+        return user;
+      }
+      if (manualAPIKey) {
+        // we should remember this for later
+        requestAPIKey = manualAPIKey;
+        return byAPIKey(manualAPIKey);
+      }
+      // Try to figure out where the api key is
+      requestAPIKey = guessWhereAPIKeyIs(req);
+      if (!requestAPIKey) {
+        console.error(
+          'Unable to find API key automatically. Please use the manual method by passing the api key in via `manualAPIKey` to getUser.'
+        );
+      }
+      return byAPIKey(requestAPIKey);
+    };
+
     const baseUrl = `${req.protocol}://${req.get('host')}${req.baseUrl}`;
 
     // Really want to make sure we only show setup on development
@@ -107,8 +146,7 @@ const readme = (
       } catch (e) {
         return res.status(401).send(e.message);
       }
-      req.readme = { email: req.body.email };
-      const user = await userFunction(req, res);
+      const user = await userFunction(req, getUser);
 
       if (!user) return res.json({});
 
@@ -129,12 +167,11 @@ const readme = (
       return res.json({ ...webhookData });
     }
 
-    const user = await userFunction(req, res);
+    const user = await userFunction(req, getUser);
     if (!user || !Object.keys(user).length || disableMetrics) return next();
-    req.readme = findApiKey(req, user.keys);
 
     const { grouping, config } = splitIntoUserAndConfig(user);
-    const filteredKey = grouping.keys.find(key => key.apiKey === req.readme.apiKey);
+    const filteredKey = grouping.apiKeys.find(key => key.apiKey === requestAPIKey);
 
     log(apiKey, req, res, { apiKey: filteredKey.apiKey, label: filteredKey.name, email: grouping.email }, config);
     return next();
