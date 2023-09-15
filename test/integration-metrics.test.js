@@ -197,6 +197,25 @@ describe('Metrics SDK Integration Tests', function () {
     expect(response.content.mimeType).toMatch(/application\/json(;\s?charset=utf-8)?/);
   });
 
+  it.only('should include an _id UUID in har payload', async function () {
+    await fetch(`http://localhost:${PORT}`, { method: 'get' });
+
+    const [, body] = await getRequest();
+    const [har] = body;
+    expect(typeof har._id).toBe('string');
+  });
+
+  it.only('should add `x-documentation-url` to response headers', async function () {
+    await fetch(`http://localhost:${PORT}`, { method: 'get' });
+
+    const [, body] = await getRequest();
+    const [har] = body;
+
+    const { response } = har.request.log.entries[0];
+    const docHeader = response.headers.find(h => h.name.toLowerCase() === 'x-documentation-url');
+    expect(docHeader.value).toContain('/logs');
+  });
+
   it('should mask `Authorization` headers', async function () {
     const authorizationHeader = 'Bearer: a-random-api-key';
     function getAuthorizationHeader() {

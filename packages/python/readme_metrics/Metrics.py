@@ -4,11 +4,13 @@ import queue
 import threading
 import traceback
 import importlib
+import uuid
 
 from readme_metrics import MetricsApiConfig
 from readme_metrics.publisher import publish_batch
 from readme_metrics.PayloadBuilder import PayloadBuilder
 from readme_metrics.ResponseInfoWrapper import ResponseInfoWrapper
+from readme_metrics.GetProjectBaseUrl import get_project_base_url
 
 
 class Metrics:
@@ -63,7 +65,12 @@ class Metrics:
             return
 
         try:
-            payload = self.payload_builder(request, response)
+            base_url = self.config.BASE_LOG_URL or get_project_base_url(self.config.README_API_URL, self.config.README_API_KEY)
+            logId = str(uuid.uuid4())
+
+            response.headers['x-documentation-url'] = f"{base_url}/logs/{logId}"
+
+            payload = self.payload_builder(request, response, logId)
             if payload is None:
                 # PayloadBuilder returns None when the grouping function returns
                 # None (an indication that the request should not be logged.)

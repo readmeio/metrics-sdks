@@ -132,6 +132,7 @@ README_METRICS_CONFIG = MetricsApiConfig(
     api_key=os.getenv("README_API_KEY"),
     grouping_function="metrics.views.grouping_function",
     background_worker_mode=False,
+    base_log_url="https://docs.readme.com"
     buffer_length=1,
     timeout=5,
 )
