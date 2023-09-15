@@ -57,7 +57,7 @@ class PayloadBuilder:
         self.grouping_function = grouping_function
         self.logger = logger
 
-    def __call__(self, request, response: ResponseInfoWrapper, logId) -> dict:
+    def __call__(self, request, response: ResponseInfoWrapper, logId: str) -> Optional[dict]:
         """Builds a HAR payload encompassing the request & response data
 
         Args:
