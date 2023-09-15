@@ -1,18 +1,24 @@
 import requests, base64
 
 from functools import lru_cache
+from urllib.parse import urljoin
 
 
 def auth(readme_api_key: str):
-    encodedAuth = base64.b64encode("%s:" % readme_api_key)
+    encodedAuth = base64.b64encode(f"{readme_api_key}:")
     return {"Authorization": "Basic %s" % encodedAuth}
 
 
-@lru_cache(maxsize = 512)
+@lru_cache(maxsize=None)
 def get_project_base_url(readme_api_url: str, readme_api_key: str):
-    url = "%s/v1" % readme_api_url
+
+    url = urljoin(readme_api_url, "/v1")
     headers = auth(readme_api_key)
 
-    project = requests.get(url, headers=headers).json()
-    return project.baseUrl
+    try:
+        response = requests.get(url, headers=headers, timeout=1)
+        response.raise_for_status()
+        return response.baseUrl
+    except:
+        return ""
 

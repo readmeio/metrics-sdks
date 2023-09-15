@@ -197,7 +197,7 @@ describe('Metrics SDK Integration Tests', function () {
     expect(response.content.mimeType).toMatch(/application\/json(;\s?charset=utf-8)?/);
   });
 
-  it.only('should include an _id UUID in har payload', async function () {
+  it('should include an _id UUID in har payload', async function () {
     await fetch(`http://localhost:${PORT}`, { method: 'get' });
 
     const [, body] = await getRequest();
