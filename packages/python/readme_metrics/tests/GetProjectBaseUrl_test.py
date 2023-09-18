@@ -1,5 +1,3 @@
-from typing import List, Tuple
-
 import pytest
 import requests
 
@@ -38,6 +36,22 @@ class MockResponse:
         return
 
 
+def FakeLogger():
+    return
+
+
+def test_get_project_base_url(readme_api_v1_success):
+    assert get_project_base_url("", "secretkey", 3, FakeLogger) == "https://zombo.com"
+
+
+def test_get_project_base_url_exception(readme_api_v1_http_error):
+    try:
+        get_project_base_url("", "secretkey", 3, FakeLogger)
+        assert False
+    except: # pylint: disable=bare-except
+        # Do nothing
+
+
 @pytest.fixture
 def readme_api_v1_success(monkeypatch):
     monkeypatch.setattr(requests, "get", lambda *_, **__: MockResponse())
@@ -48,15 +62,3 @@ def readme_api_v1_http_error(monkeypatch):
     monkeypatch.setattr(
         requests, "get", lambda *_, **__: MockResponse(throw=requests.HTTPError)
     )
-
-
-def test_get_project_base_url(readme_api_v1_success):
-    assert get_project_base_url("", "secretkey") == "https://zombo.com"
-
-
-def test_get_project_base_url_exception(readme_api_v1_http_error):
-    try:
-        get_project_base_url("", "secretkey")
-        assert False
-    except:
-        return

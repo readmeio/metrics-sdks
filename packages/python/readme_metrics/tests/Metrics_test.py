@@ -3,12 +3,11 @@ import json
 import time
 import types
 
+from werkzeug import Request
 from readme_metrics import Metrics
 from readme_metrics import MetricsApiConfig
 from readme_metrics.ResponseInfoWrapper import ResponseInfoWrapper
 from .fixtures import Environ
-
-from werkzeug import Request
 
 def mock_request():
     body = json.dumps({"ok": 123, "password": 456}).encode()

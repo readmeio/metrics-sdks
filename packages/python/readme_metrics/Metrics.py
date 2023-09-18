@@ -65,9 +65,16 @@ class Metrics:
             return
 
         try:
-            base_url = self.config.BASE_LOG_URL or get_project_base_url(self.config.README_API_URL, self.config.README_API_KEY)
+            # Generate logId for enqueued API log and documentation URL generation
             logId = str(uuid.uuid4())
-
+            # Reference base_url from config, or from ReadMe project metadata
+            base_url = self.config.BASE_LOG_URL or get_project_base_url(
+                self.config.README_API_URL,
+                self.config.README_API_KEY,
+                self.config.METRICS_API_TIMEOUT,
+                self.config.LOGGER
+            )
+            # Construct header link from base_url and logId
             response.headers['x-documentation-url'] = f"{base_url}/logs/{logId}"
 
             payload = self.payload_builder(request, response, logId)
