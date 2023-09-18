@@ -7,7 +7,6 @@ from readme_metrics.GetProjectBaseUrl import auth, get_project_base_url
 
 
 def test_auth():
-    # b'Og=='
     tests = [
         ("", "Og=="),
         ("some_api_key", "c29tZV9hcGlfa2V5Og=="),
