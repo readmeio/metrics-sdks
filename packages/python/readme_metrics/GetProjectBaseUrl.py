@@ -5,8 +5,8 @@ from urllib.parse import urljoin
 
 
 def auth(readme_api_key: str):
-    encodedAuth = base64.b64encode(f"{readme_api_key}:")
-    return {"Authorization": "Basic %s" % encodedAuth}
+    encodedAuth = base64.b64encode(f"{readme_api_key}:".encode('utf8'))
+    return {"Authorization": f"Basic {encodedAuth}"}
 
 
 @lru_cache(maxsize=None)
