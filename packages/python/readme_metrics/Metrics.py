@@ -10,7 +10,7 @@ from readme_metrics import MetricsApiConfig
 from readme_metrics.publisher import publish_batch
 from readme_metrics.PayloadBuilder import PayloadBuilder
 from readme_metrics.ResponseInfoWrapper import ResponseInfoWrapper
-from readme_metrics.GetProjectBaseUrl import get_project_base_url
+from readme_metrics.GetProjectBaseUrl import build_project_base_url_f
 
 
 class Metrics:
@@ -39,6 +39,11 @@ class Metrics:
         else:
             self.grouping_function = self.config.GROUPING_FUNCTION
 
+        self.get_project_base_url = build_project_base_url_f(
+            self.config.README_API_URL,
+            self.config.METRICS_API_TIMEOUT,
+            self.config.LOGGER,
+        )
         self.payload_builder = PayloadBuilder(
             config.DENYLIST,
             config.ALLOWLIST,
@@ -68,11 +73,8 @@ class Metrics:
             # Generate logId for enqueued API log and documentation URL generation
             logId = str(uuid.uuid4())
             # Reference base_url from config, or from ReadMe project metadata
-            base_url = self.config.BASE_LOG_URL or get_project_base_url(
-                self.config.README_API_URL,
+            base_url = self.config.BASE_LOG_URL or self.get_project_base_url(
                 self.config.README_API_KEY,
-                self.config.METRICS_API_TIMEOUT,
-                self.config.LOGGER,
             )
             # Construct header link from base_url and logId
             response.headers["x-documentation-url"] = f"{base_url}/logs/{logId}"
