@@ -72,10 +72,10 @@ class Metrics:
                 self.config.README_API_URL,
                 self.config.README_API_KEY,
                 self.config.METRICS_API_TIMEOUT,
-                self.config.LOGGER
+                self.config.LOGGER,
             )
             # Construct header link from base_url and logId
-            response.headers['x-documentation-url'] = f"{base_url}/logs/{logId}"
+            response.headers["x-documentation-url"] = f"{base_url}/logs/{logId}"
 
             payload = self.payload_builder(request, response, logId)
             if payload is None:

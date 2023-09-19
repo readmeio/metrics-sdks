@@ -9,6 +9,7 @@ from readme_metrics import MetricsApiConfig
 from readme_metrics.ResponseInfoWrapper import ResponseInfoWrapper
 from .fixtures import Environ
 
+
 def mock_request():
     body = json.dumps({"ok": 123, "password": 456}).encode()
     environ = Environ.MockEnviron().getEnvironForRequest(body, "POST")
@@ -17,6 +18,7 @@ def mock_request():
     req.rm_start_ts = int(time.time() * 1000)
     req.rm_body = body
     return req
+
 
 class TestMetrics:
     def test_grouping_function_import(self):
