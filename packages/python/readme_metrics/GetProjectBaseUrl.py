@@ -17,6 +17,7 @@ def build_project_base_url_f(
 ) -> Callable[[str], str]:
     """returns a function that takes an API key and returns the baseUrl for
     that key"""
+
     @lru_cache(maxsize=512)
     def _build_project_base_url_f(readme_api_key):
         try:

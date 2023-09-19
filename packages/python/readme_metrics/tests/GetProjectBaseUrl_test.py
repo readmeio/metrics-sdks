@@ -1,7 +1,7 @@
 import pytest
 import requests
 
-from readme_metrics.GetProjectBaseUrl import auth,build_project_base_url_f 
+from readme_metrics.GetProjectBaseUrl import auth, build_project_base_url_f
 
 
 def test_auth():
@@ -52,7 +52,9 @@ def fixture_readme_api_v1_http_error(monkeypatch):
 
 
 def test_get_project_base_url(readme_api_v1_success):  # pylint: disable=unused-argument
-    assert build_project_base_url_f("", 3, FakeLogger)("secretkey") == "https://zombo.com"
+    assert (
+        build_project_base_url_f("", 3, FakeLogger)("secretkey") == "https://zombo.com"
+    )
 
 
 def test_get_project_base_url_exception(
