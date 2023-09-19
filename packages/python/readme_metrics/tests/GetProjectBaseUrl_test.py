@@ -33,11 +33,22 @@ class MockResponse:
     def raise_for_status(self):
         if self.throw:
             raise self.throw("oh no")
-        return
 
 
 def FakeLogger():
     return
+
+
+@pytest.fixture(name="readme_api_v1_success")
+def fixture_readme_api_v1_success(monkeypatch):
+    monkeypatch.setattr(requests, "get", lambda *_, **__: MockResponse())
+
+
+@pytest.fixture(name="readme_api_v1_http_error")
+def fixture_readme_api_v1_http_error(monkeypatch):
+    monkeypatch.setattr(
+        requests, "get", lambda *_, **__: MockResponse(throw=requests.HTTPError)
+    )
 
 
 def test_get_project_base_url(readme_api_v1_success):
@@ -48,17 +59,5 @@ def test_get_project_base_url_exception(readme_api_v1_http_error):
     try:
         get_project_base_url("", "secretkey", 3, FakeLogger)
         assert False
-    except: # pylint: disable=bare-except
-        # Do nothing
-
-
-@pytest.fixture
-def readme_api_v1_success(monkeypatch):
-    monkeypatch.setattr(requests, "get", lambda *_, **__: MockResponse())
-
-
-@pytest.fixture
-def readme_api_v1_http_error(monkeypatch):
-    monkeypatch.setattr(
-        requests, "get", lambda *_, **__: MockResponse(throw=requests.HTTPError)
-    )
+    except Exception:
+        assert True
