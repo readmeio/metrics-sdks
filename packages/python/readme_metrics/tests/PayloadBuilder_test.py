@@ -202,7 +202,7 @@ class TestPayloadBuilder:
         next(middleware(environ, app.mockStartResponse))
 
         payload_builder = self.createPayload(config)
-        payload = payload_builder(metrics.req, metrics.res, uuid.uuid4())
+        payload = payload_builder(metrics.req, metrics.res, str(uuid.uuid4()))
 
         assert payload is None
 
