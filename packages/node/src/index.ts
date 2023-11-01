@@ -12,12 +12,15 @@ import verifyWebhook from './lib/verify-webhook';
 
 const env = process.env.NODE_ENV || 'development';
 
+interface BasicAuthObject {
+  pass: string;
+  user: string;
+}
+
 interface ApiKey {
   [x: string]: unknown;
-  apiKey?: string;
-  name: string;
-  pass?: string;
-  user?: string;
+  apiKey?: string | BasicAuthObject;
+  label: string;
 }
 
 interface GroupingObject {
@@ -144,15 +147,28 @@ const readme = (
     const user = await userFunction(req, getUser);
     if (!user || !Object.keys(user).length || options.disableMetrics) return next();
 
+    // TODO: We should do some checks on the format of the user object
+    // how would any of htis work with security schemes?
+
     const filteredKey = user.keys.find(key => key.apiKey === requestAPIKey);
 
     if (!filteredKey || !filteredKey.apiKey) {
       console.error(`API key ${requestAPIKey} not found`);
-      console.error('What does that mean? We shoudl probably have a better explainer');
+      console.error('What does that mean? We should probably have a better explainer');
       return next();
     }
 
-    log(readmeAPIKey, req, res, { apiKey: filteredKey.apiKey, label: filteredKey.name, email: user.email }, options);
+    log(
+      readmeAPIKey,
+      req,
+      res,
+      {
+        apiKey: typeof filteredKey.apiKey === 'string' ? filteredKey.apiKey : filteredKey.apiKey.user, // If basic auth, we send the username
+        label: filteredKey.label,
+        email: user.email,
+      },
+      options,
+    );
     return next();
   };
 };

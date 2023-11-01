@@ -20,6 +20,14 @@ export function buildSetupView({
     var form = document.getElementById("testWebhookForm");
     form.addEventListener('submit', testWebhook);
 
+    function updateUser(user) {
+      let elements = document.getElementsByClassName('userObject');
+
+      for(let i=0; i<elements.length; i++) {
+          elements[i].innerHTML = user;
+      }
+    }
+
     function testWebhook(e) {
       e.preventDefault();
       // make request to /webhook-test with email in input
@@ -31,15 +39,16 @@ export function buildSetupView({
           document.getElementById('webhook-test').classList.add('hidden');
           if (!webhookVerified) {
             document.getElementById('webhook-fail').classList.remove('hidden');
-            document.getElementById('userObject').innerHTML = data.error;
+            updateUser(data.error);
           } else if (JSON.stringify(user) === '{}') {
             const webhookSuccess = document.getElementById('webhook-warning').classList.remove('hidden');
 
-            document.getElementById('userObject').innerHTML = 'Recieved empty object, does that user exist?';
+            updateUser('Recieved empty object, does that user exist?');
             window.webhookSuccess = true;
           } else {
             document.getElementById('webhook-success').classList.remove('hidden');
-            document.getElementById('userObject').innerHTML = JSON.stringify(user, null, 2);
+            console.log(user)
+            updateUser(JSON.stringify(user, null, 2));
             window.webhookSuccess = true;
           }
         })
@@ -93,7 +102,7 @@ export function buildSetupView({
           </h2>
           <p>We couldn’t verify your webhook. Send us an email at <a href="mailto:devdash@readme.io">devdash@readme.io</a> and we'll help you out!
           <p>Error we recieved:</p>
-          <pre id="userObject"></pre>
+          <pre class="userObject"></pre>
         </div>
       </div>
       <div class="hidden" id="webhook-success">
@@ -112,7 +121,7 @@ export function buildSetupView({
           Enter the production version of that URL in your ReadMe dashboard.
         </p>
         <p>User we recieved:</p>
-        <pre id="userObject"></p>
+        <pre class="userObject"></p>
       </div>
       <div class="hidden" id="webhook-warning">
         <h2 class="card-heading">
@@ -199,7 +208,7 @@ export function buildSetupView({
             </span>
             <span class="card-badge">Metrics</span>
           </h2>
-          <p id="userObject"></p>
+          <p class="userObject"></p>
           <p>
             Developer Metrics has been disabled. You can re-enable it by removing "disableMetrics: true" from your configuration.
         </div>
