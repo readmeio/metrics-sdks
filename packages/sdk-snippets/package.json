@@ -28,7 +28,7 @@
     "test": "vitest --coverage"
   },
   "dependencies": {
-    "@readme/httpsnippet": "^6.2.1"
+    "@readme/httpsnippet": "^8.1.2"
   },
   "devDependencies": {
     "@readme/eslint-config": "^12.1.0",
