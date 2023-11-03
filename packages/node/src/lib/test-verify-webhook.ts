@@ -45,28 +45,45 @@ export async function testVerifyWebhook(baseUrl: string, email: string, apiKey: 
     signed = await verifyWebhook(`${baseUrl}/readme-webhook`, email, apiKey);
   } catch (e) {
     return {
-      webhookVerified: false,
+      webhookError: 'FAILED_VERIFY',
       error: (e as Error).message,
     };
   }
-  // TODO: error case if this is an empty object
+
   try {
     const unsigned = await verifyWebhook(`${baseUrl}/readme-webhook`, email, apiKey, { unsigned: true });
 
-    if (JSON.stringify(unsigned) === JSON.stringify(signed))
+    if (JSON.stringify(unsigned) === JSON.stringify(signed)) {
       return {
-        webhookVerified: false,
+        webhookError: 'UNVERIFIED',
       };
+    }
 
-    // Might have returned a 200 with an empty object
+    // Should never reach here
     return {
-      webhookVerified: true,
-      user: signed,
+      webhookError: 'UNKNOWN',
     };
   } catch (e) {
-    // handled the invalid request properly
+    // Webhook correctly failed with unsigned request
+
+    // Make sure we actually have a user we got back
+    if (JSON.stringify(signed) === JSON.stringify({})) {
+      return {
+        webhookError: 'EMPTY_USER',
+      };
+    }
+
+    // Required to have a keys array
+    if (!signed.keys) {
+      return {
+        webhookError: 'MISSING_KEYS',
+        user: signed,
+      };
+    }
+
+    // We can do more validation here
+
     return {
-      webhookVerified: true,
       user: signed,
     };
   }

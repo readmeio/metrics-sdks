@@ -44,6 +44,7 @@ interface GetUserFunction {
 
 // See comment at the auth definition below
 let requestAPIKey = '';
+let usingManualAPIKey = false;
 let readmeAPIKey = '';
 let readmeProjectData: GetProjectResponse200 | undefined;
 
@@ -74,19 +75,16 @@ const readme = (
       if (manualAPIKey) {
         // we should remember this for later
         requestAPIKey = manualAPIKey;
+        usingManualAPIKey = true;
         return byAPIKey(manualAPIKey);
       }
       // Try to figure out where the api key is
       try {
         requestAPIKey = findAPIKey(req);
       } catch (e) {
-        // TODO: Better error handling here
-        // The tricky thing is we want to show a nice error on /readme-setup
-        // but I'm not sure how to get this there
-        console.error('Could not automatically find API key in the request');
-        console.error('You should use manualAPIKey in the readme function to pass the API key in');
-        console.error('Obviously we should have better error handling here');
-        console.error(e);
+        console.error(
+          'Could not automatically find API key in the request. You should pass the API key via `manualAPIKey` in the getUser function. Learn more here: [link to docs]',
+        );
       }
       return byAPIKey(requestAPIKey);
     };
@@ -144,31 +142,36 @@ const readme = (
       }
     }
 
-    const user = await userFunction(req, getUser);
-    if (!user || !Object.keys(user).length || options.disableMetrics) return next();
+    try {
+      const user = await userFunction(req, getUser);
+      if (!user || !Object.keys(user).length || options.disableMetrics) return next();
 
-    // TODO: We should do some checks on the format of the user object
-    // how would any of htis work with security schemes?
+      // TODO: how would any of htis work with security schemes?
 
-    const filteredKey = user.keys.find(key => key.apiKey === requestAPIKey);
+      const filteredKey = user.keys.find(key => key.apiKey === requestAPIKey);
+      if (!filteredKey?.apiKey) {
+        console.error(
+          usingManualAPIKey
+            ? 'The API key you passed in via `manualAPIKey` could not be found in the user object you provided.'
+            : 'Could not automatically find API key in the request. You should pass the API key via `manualAPIKey` in the getUser function. Learn more here: [link to docs]',
+        );
+        return next();
+      }
 
-    if (!filteredKey || !filteredKey.apiKey) {
-      console.error(`API key ${requestAPIKey} not found`);
-      console.error('What does that mean? We should probably have a better explainer');
+      log(
+        readmeAPIKey,
+        req,
+        res,
+        {
+          apiKey: typeof filteredKey.apiKey === 'string' ? filteredKey.apiKey : filteredKey.apiKey.user, // If basic auth, we send the username
+          label: filteredKey.label,
+          email: user.email,
+        },
+        options,
+      );
+    } catch (e) {
       return next();
     }
-
-    log(
-      readmeAPIKey,
-      req,
-      res,
-      {
-        apiKey: typeof filteredKey.apiKey === 'string' ? filteredKey.apiKey : filteredKey.apiKey.user, // If basic auth, we send the username
-        label: filteredKey.label,
-        email: user.email,
-      },
-      options,
-    );
     return next();
   };
 };

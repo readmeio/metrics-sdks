@@ -20,13 +20,22 @@ export function buildSetupView({
     var form = document.getElementById("testWebhookForm");
     form.addEventListener('submit', testWebhook);
 
-    function updateUser(user) {
-      let elements = document.getElementsByClassName('userObject');
+    function updateElement(className, user) {
+      let elements = document.getElementsByClassName(className);
 
       for(let i=0; i<elements.length; i++) {
           elements[i].innerHTML = user;
       }
     }
+
+    function updateUser(user) { 
+        updateElement('userObject', JSON.stringify(user, undefined, 2)); 
+    }
+
+    function updateWarning(warning) { 
+        updateElement('warningText', warning); 
+    }
+
 
     function testWebhook(e) {
       e.preventDefault();
@@ -35,20 +44,26 @@ export function buildSetupView({
       fetch('${baseUrl}/webhook-test?email=' + email)
         .then(response => response.json())
         .then(data => {
-          const { webhookVerified, user } = data;
+          const { webhookError, user } = data;
           document.getElementById('webhook-test').classList.add('hidden');
-          if (!webhookVerified) {
+          if (webhookError === 'FAILED_VERIFY' || webhookError === 'UNVERIFIED') {
             document.getElementById('webhook-fail').classList.remove('hidden');
             updateUser(data.error);
-          } else if (JSON.stringify(user) === '{}') {
+          } else if (webhookError === 'EMPTY_USER') {
             const webhookSuccess = document.getElementById('webhook-warning').classList.remove('hidden');
 
-            updateUser('Recieved empty object, does that user exist?');
+            updateWarning('Recieved empty object, does that user exist?');
+            updateUser(user);
             window.webhookSuccess = true;
-          } else {
+          } else if (webhookError === 'MISSING_KEYS') {
+            const webhookSuccess = document.getElementById('webhook-warning').classList.remove('hidden');
+
+            updateWarning('Missing required array \`keys\` from the user data we received.')
+            updateUser(user);
+            window.webhookSuccess = false;
+          } else if (!webhookError) {
             document.getElementById('webhook-success').classList.remove('hidden');
-            console.log(user)
-            updateUser(JSON.stringify(user, null, 2));
+            updateUser(user);
             window.webhookSuccess = true;
           }
         })
@@ -127,11 +142,12 @@ export function buildSetupView({
         <h2 class="card-heading">
           <span>
             <span class="card-status card-status_warning"></span>
-            Verified, but missing data
+            Verified, but invalid data
           </span>
           <span class="card-badge">Webhook</span>
         </h2>
-        <p class="warning">It seems like an empty object was returned for this user. Is that expected?</p>
+        <p class="warningText"></p>
+        <pre class="userObject"></pre>
         <p>
           Webhook running at:
           <a href="${baseUrl}/readme-webhook">${baseUrl}/readme-webhook</a>
