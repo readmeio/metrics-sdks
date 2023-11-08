@@ -4,6 +4,7 @@ import type { NextFunction, Request, Response } from 'express';
 
 import readmeSdk from './.api/apis/developers';
 import findAPIKey from './lib/find-api-key';
+import { getGroupId } from './lib/get-group-id';
 import { getProjectBaseUrl } from './lib/get-project-base-url';
 import { log } from './lib/log';
 import { buildSetupView } from './lib/setup-readme-view';
@@ -17,46 +18,54 @@ interface BasicAuthObject {
   user: string;
 }
 
-interface ApiKey {
+export interface ApiKey {
   [x: string]: unknown;
+
   apiKey?: string | BasicAuthObject;
-  label: string;
+  id?: string;
+  name?: string;
+  label?: string;
 }
 
 interface GroupingObject {
   [x: string]: unknown;
+
   email: string;
   keys: ApiKey[];
   name: string;
+  label?: string;
+  id?: string;
+  apiKey?: string;
 }
 
 // Typing the return as unknown to make it easier to format the user to our format in the middleware
 // This way these functions can just return from their database
 interface GetUserParams {
-  byAPIKey: (apiKey: string) => unknown;
-  byEmail: (email: string) => unknown;
+  byAPIKey: (apiKey: string) => GroupingObject | void;
+  byEmail: (email: string) => GroupingObject | void;
   manualAPIKey?: string;
 }
 
 interface GetUserFunction {
-  (params: GetUserParams): unknown;
+  (params: GetUserParams): GroupingObject | void;
 }
 
 // See comment at the auth definition below
-let requestAPIKey = '';
-let usingManualAPIKey = false;
 let readmeAPIKey = '';
 let readmeProjectData: GetProjectResponse200 | undefined;
 
 const readme = (
-  userFunction: (req: Request, getUser: GetUserFunction) => GroupingObject,
+  userFunction: (req: Request, getUser: GetUserFunction) => GroupingObject | void,
   options: Options = {
     disableWebhook: false,
     disableMetrics: false,
   },
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const getUser = ({ byAPIKey, byEmail, manualAPIKey }: GetUserParams): unknown => {
+    let requestAPIKey = '';
+    let usingManualAPIKey = false;
+
+    const getUser: GetUserFunction = ({ byAPIKey, byEmail, manualAPIKey }) => {
       if (!byAPIKey || !byEmail) {
         // Some kind of error handling here
         // Would be nice ot use the readme-setup page for this
@@ -82,6 +91,8 @@ const readme = (
       try {
         requestAPIKey = findAPIKey(req);
       } catch (e) {
+        // TODO JIM should we still be calling byAPIKey if we don't find an api key?
+        // e.g return next()
         console.error(
           'Could not automatically find API key in the request. You should pass the API key via `manualAPIKey` in the getUser function. Learn more here: [link to docs]',
         );
@@ -146,10 +157,8 @@ const readme = (
       const user = await userFunction(req, getUser);
       if (!user || !Object.keys(user).length || options.disableMetrics) return next();
 
-      // TODO: how would any of htis work with security schemes?
-
-      const filteredKey = user.keys.find(key => key.apiKey === requestAPIKey);
-      if (!filteredKey?.apiKey) {
+      const groupId = getGroupId(user, requestAPIKey);
+      if (!groupId) {
         console.error(
           usingManualAPIKey
             ? 'The API key you passed in via `manualAPIKey` could not be found in the user object you provided.'
@@ -163,8 +172,8 @@ const readme = (
         req,
         res,
         {
-          apiKey: typeof filteredKey.apiKey === 'string' ? filteredKey.apiKey : filteredKey.apiKey.user, // If basic auth, we send the username
-          label: filteredKey.label,
+          apiKey: groupId,
+          label: user.label ? user.label : user.name,
           email: user.email,
         },
         options,

@@ -230,12 +230,33 @@ describe('#metrics', function () {
       readmeio.auth(apiKey);
       app = express();
       app.use(
-        readmeio.readme(() => {
-          return {
-            keys: [{ apiKey: endUserApiKey, name: 'test' }],
-            name: 'First Last',
-            email: 'test@example.com',
-          };
+        readmeio.readme((req, getUser) => {
+          return getUser({
+            byAPIKey: (requestApiKey: string) => {
+              // TODO should we be calling this if the requestApiKey is undefined?
+              if (!requestApiKey) {
+                return undefined;
+              }
+
+              // TODO JIM what do we return if no user is found?
+              return {
+                keys: [{ apiKey: requestApiKey, name: 'test' }],
+                name: 'First Last',
+                email: 'test@example.com',
+              };
+            },
+            byEmail: (email: string) => {
+              if (!email) {
+                return undefined;
+              }
+
+              return {
+                keys: [{ apiKey: endUserApiKey, name: 'test' }],
+                name: 'First Last',
+                email: 'test@example.com',
+              };
+            },
+          });
         }),
       );
       app.get('/test', (req, res) => {
@@ -266,6 +287,14 @@ describe('#metrics', function () {
         await makeRequest(); // eslint-disable-line no-await-in-loop
       }
       expect(metricsServerRequests).to.equal(0);
+    });
+
+    it('should not persist the api key between requests', async function () {
+      expect.assertions(3);
+
+      await makeRequest(`?api_key=${endUserApiKey}`);
+      await makeRequest();
+      expect(metricsServerRequests).to.equal(1);
     });
   });
 
@@ -521,6 +550,7 @@ describe('#metrics', function () {
 
   describe('`res._body`', function () {
     const responseBody = { a: 1, b: 2, c: 3 };
+
     function createMock() {
       return server.use(
         rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {

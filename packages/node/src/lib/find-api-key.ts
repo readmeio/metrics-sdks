@@ -1,6 +1,9 @@
 import type { Request } from 'express';
 
 export default function findAPIKey(req: Request): string {
+  // TODO JIM the header could be any one of the security schemes
+  // TODO JIM Does this function work in these cases?
+  
   // Authorization header
   if (req.headers.authorization && req.headers.authorization.includes('Bearer')) {
     return req.headers.authorization.split(' ')[1];
