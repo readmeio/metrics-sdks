@@ -4,7 +4,7 @@ import type { NextFunction, Request, Response } from 'express';
 
 import readmeSdk from './.api/apis/developers';
 import findAPIKey from './lib/find-api-key';
-import { getGroupId } from './lib/get-group-id';
+import { getGroupIdByApiKey } from './lib/get-group-id';
 import { getProjectBaseUrl } from './lib/get-project-base-url';
 import { log } from './lib/log';
 import { buildSetupView } from './lib/setup-readme-view';
@@ -27,8 +27,10 @@ export interface ApiKey {
   label?: string;
 }
 
-interface GroupingObject {
-  [x: string]: unknown;
+export type KeyValue = string | Record<string, string>;
+
+export interface GroupingObject {
+  [x: string]: KeyValue | string | undefined | ApiKey[];
 
   email: string;
   keys: ApiKey[];
@@ -91,8 +93,6 @@ const readme = (
       try {
         requestAPIKey = findAPIKey(req);
       } catch (e) {
-        // TODO JIM should we still be calling byAPIKey if we don't find an api key?
-        // e.g return next()
         console.error(
           'Could not automatically find API key in the request. You should pass the API key via `manualAPIKey` in the getUser function. Learn more here: [link to docs]',
         );
@@ -157,7 +157,7 @@ const readme = (
       const user = await userFunction(req, getUser);
       if (!user || !Object.keys(user).length || options.disableMetrics) return next();
 
-      const groupId = getGroupId(user, requestAPIKey);
+      const groupId = getGroupIdByApiKey(user, requestAPIKey);
       if (!groupId) {
         console.error(
           usingManualAPIKey

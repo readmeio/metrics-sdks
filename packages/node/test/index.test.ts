@@ -238,7 +238,6 @@ describe('#metrics', function () {
                 return undefined;
               }
 
-              // TODO JIM what do we return if no user is found?
               return {
                 keys: [{ apiKey: requestApiKey, name: 'test' }],
                 name: 'First Last',
