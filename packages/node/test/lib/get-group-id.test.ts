@@ -236,11 +236,25 @@ describe('getGroupId', () => {
         expect(groupId).toBe('requestApiKey');
       });
 
-      it('returns the name of the key as fourth priority', () => {
+      it('returns the basic user as the fourth priority', () => {
+        const user = mockUser([{ user: 'basic-user', pass: 'basic-pass' }]);
+        const groupId = getGroupIdByApiKey(user, 'requestApiKey');
+
+        expect(groupId).toBe('basic-user');
+      });
+
+      it('returns the name of the key as fifth priority', () => {
         const user = mockUser([{ name: 'key-1-name' }]);
         const groupId = getGroupIdByApiKey(user, 'requestApiKey');
 
         expect(groupId).toBe('key-1-name');
+      });
+
+      it('supports having basic auth as a security scheme', () => {
+        const user = mockUser([{ basic: { user: 'basic-user', pass: 'basic-pass' } }]);
+        const groupId = getGroupIdByApiKey(user, 'requestApiKey');
+
+        expect(groupId).toBe('basic-user');
       });
     });
 
