@@ -240,7 +240,7 @@ describe('#metrics', function () {
 
               return {
                 keys: [{ apiKey: requestApiKey, name: 'test' }],
-                name: 'First Last',
+                name: 'test',
                 email: 'test@example.com',
               };
             },
@@ -251,7 +251,7 @@ describe('#metrics', function () {
 
               return {
                 keys: [{ apiKey: endUserApiKey, name: 'test' }],
-                name: 'First Last',
+                name: 'test',
                 email: 'test@example.com',
               };
             },
@@ -289,7 +289,9 @@ describe('#metrics', function () {
     });
 
     it('should not persist the api key between requests', async function () {
-      expect.assertions(3);
+      // Four since we have assertions in the beforeEach for each request
+      // the one without the key will fail on the first assertion
+      expect.assertions(4);
 
       await makeRequest(`?api_key=${endUserApiKey}`);
       await makeRequest();
