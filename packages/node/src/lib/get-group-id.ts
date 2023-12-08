@@ -1,6 +1,11 @@
 import type { ApiKey, GroupingObject, KeyValue } from '../index';
 import type { Operation } from 'oas';
 
+import get from 'lodash/get';
+
+/**
+ * Parses the basic auth object to return the user
+ */
 const parseBasicAuth = (key: KeyValue): string | undefined => {
   if (typeof key === 'object' && 'user' in key) {
     return key.user;
@@ -11,6 +16,45 @@ const parseBasicAuth = (key: KeyValue): string | undefined => {
   }
 
   return undefined;
+};
+
+/**
+ * Finds the relevant key and its path for a given apiKey
+ */
+const findRelevantKey = (keys: ApiKey[], apiKey: string) => {
+  // Recursive function to traverse the nested structure of ApiKey and find the path to a specific key
+  const findPath = (obj: ApiKey | string | unknown, key: string, parentPath?: string): string | undefined => {
+    if (typeof obj === 'object' && obj !== null) {
+      return Object.keys(obj).reduce((acc: string | undefined, k) => {
+        // Construct the current path by appending the current key to the parent path
+        const currentPath = parentPath ? `${parentPath}.${k}` : k;
+        // Continue searching down the tree
+        return acc || findPath((obj as ApiKey)[k], key, currentPath);
+      }, undefined);
+    }
+
+    // If the current object is equal to the key, return the parent path
+    if (obj === key) {
+      return parentPath;
+    }
+
+    return undefined;
+  };
+
+  // Reduce the array of ApiKeys to find the relevant key and its path
+  return keys.reduce(
+    (acc: { relevantKey?: ApiKey; path?: string }, item) => {
+      const path = findPath(item, apiKey);
+      // If the path is found, return the relevantKey and path
+      if (path !== undefined) {
+        return { relevantKey: item, path };
+      }
+
+      return acc;
+    },
+    // Initialize the accumulator with the first key and undefined path
+    { relevantKey: keys[0], path: undefined },
+  );
 };
 
 /**
@@ -27,6 +71,9 @@ const buildFlattenedSecurityRequirements = (operation: Operation): string[] => {
   }, []);
 };
 
+/**
+ * Gets the group ID from the keys array for a given security scheme
+ */
 const getGroupFromKeysBySecuritySchemes = (keys: ApiKey[] = [], securitySchemes: string[] = []) => {
   if (!keys || !keys.length) {
     return undefined;
@@ -38,7 +85,7 @@ const getGroupFromKeysBySecuritySchemes = (keys: ApiKey[] = [], securitySchemes:
       return [...securitySchemes].some(keyName => key[keyName]);
     }) ?? keys[0];
 
-  const groupKey = ['id', 'apiKey', ...securitySchemes, 'user', 'name'].find(k => !!relevantKey[k]);
+  const groupKey = ['id', 'apiKey', ...securitySchemes, 'user', 'label', 'name'].find(k => !!relevantKey[k]);
   if (!groupKey) {
     return undefined;
   }
@@ -47,30 +94,26 @@ const getGroupFromKeysBySecuritySchemes = (keys: ApiKey[] = [], securitySchemes:
 };
 
 /**
- * Gets the group ID from the keys array
+ * Gets the group ID from the keys array for a given apiKey
  */
 const getGroupFromKeysByApiKey = (keys: ApiKey[] = [], apiKey = ''): string | undefined => {
-  if (!keys || !keys.length) {
+  if (!keys || !Array.isArray(keys)) {
     return undefined;
   }
 
-  // Look for the first key containing the apiKey
-  const relevantKey =
-    keys.find(key => {
-      return Object.values(key).some(value => apiKey === value);
-    }) ?? keys[0];
+  const { relevantKey, path } = findRelevantKey(keys, apiKey);
+  const searchArray = ['id', 'apiKey', path || '', 'user', 'label', 'name'];
 
-  const searchArray = ['id', 'apiKey', ...Object.keys(relevantKey).filter(k => relevantKey[k] === apiKey), 'name'];
-  const groupKey = searchArray.find(k => !!relevantKey[k]);
+  const groupKey = searchArray.find(k => get(relevantKey, k));
   if (!groupKey) {
     return undefined;
   }
 
-  return relevantKey[groupKey] as string;
+  return get(relevantKey, groupKey) as string;
 };
 
 /**
- * Gets the group ID from the user object
+ * Gets the group ID from the user object for a given security scheme
  */
 const getFromUser = (user: GroupingObject, securitySchemes: string[]): string | undefined => {
   const groupKey = ['id', 'apiKey', ...securitySchemes, 'user', 'email'].find(k => !!user[k]);
@@ -94,8 +137,9 @@ const getFromUser = (user: GroupingObject, securitySchemes: string[]): string | 
  * 1. The key "id"
  * 2. The key "apiKey"
  * 3. The requestApiKey value if it is in the key object
- * The key "user" (for basic auth)
- * 4. The key "name"
+ * 4. The key "user" (for basic auth)
+ * 5. The key "label"
+ * 6. The key "name"
  */
 export const getGroupIdByApiKey = (user: GroupingObject, apiKey: string) => {
   if (!user) {
@@ -125,7 +169,8 @@ export const getGroupIdByApiKey = (user: GroupingObject, apiKey: string) => {
  * 2. The key "apiKey"
  * 3. The key matching security scheme value
  * 4. The key "user" (for basic auth)
- * 4. The key "name"
+ * 5. The key "label" (for basic auth)
+ * 6. The key "name"
  *
  * If no key is found it will return the group ID from the user object matching the following priority:
  * 1. The user "id"
