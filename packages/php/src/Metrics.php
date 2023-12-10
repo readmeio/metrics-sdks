@@ -80,7 +80,7 @@ class Metrics
         ]);
 
         $this->package_version = InstalledVersions::getVersion(self::PACKAGE_NAME);
-        $this->user_agent = 'readme-metrics-php/' . $this->package_version ?? 'unknown';
+        $this->user_agent = 'readme-metrics-php/' . ($this->package_version ?? 'unknown');
     }
 
     /**
