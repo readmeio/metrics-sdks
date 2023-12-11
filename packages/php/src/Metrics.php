@@ -29,7 +29,7 @@ class Metrics
     private Client $readme_api_client;
 
     private string|null $package_version;
-    private string $cache_dir;
+    private string|null $cache_dir;
     private string $user_agent;
 
     /**
@@ -80,6 +80,7 @@ class Metrics
         ]);
 
         $this->package_version = InstalledVersions::getVersion(self::PACKAGE_NAME);
+        $this->cache_dir = null;
 
         $this->user_agent = 'readme-metrics-php/' . ($this->package_version ?? 'unknown');
     }
@@ -150,7 +151,8 @@ class Metrics
             // for the user.
             return;
         }
-
+        
+        /** @psalm-suppress PossiblyInvalidArgument */
         $ex = new MetricsException(str_replace($json->_message, $json->name, $json->message));
         $ex->setErrors((array)$json->errors);
         throw $ex;
@@ -254,7 +256,7 @@ class Metrics
      */
     public function getCacheDir(): string
     {
-        if (!$this->cache_dir) {
+        if ($this->cache_dir === null) {
             $this->cache_dir = Factory::createConfig()->get('cache-dir');
         }
 
