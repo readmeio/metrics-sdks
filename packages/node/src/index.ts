@@ -49,7 +49,7 @@ interface GetUserParams {
 }
 
 interface GetUserFunction {
-  (params: GetUserParams): GroupingObject | void;
+  (params: GetUserParams): Promise<GroupingObject | void>;
 }
 
 // See comment at the auth definition below
