@@ -6,8 +6,6 @@ export default function findAPIKey(req: Request): string {
     return req.headers.authorization.split(' ')[1];
   } else if (req.headers.authorization && req.headers.authorization.includes('Basic')) {
     const basicAuth = Buffer.from(req.headers.authorization.split(' ')[1], 'base64').toString().split(':');
-    // TODO: what other types of basic auth are there?
-    // TWilio has a username and a password in their basic auth
     return basicAuth[0];
   }
 
