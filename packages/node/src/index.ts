@@ -67,17 +67,20 @@ const readme = (
     let requestAPIKey = '';
     let usingManualAPIKey = false;
 
-    const getUser: GetUserFunction = ({ byAPIKey, byEmail, manualAPIKey }) => {
-      if (!byAPIKey || !byEmail) {
-        // Some kind of error handling here
-        // Would be nice ot use the readme-setup page for this
-        console.error('Missing required definition for byAPIKey or byEmail');
+    const getUser: GetUserFunction = async ({ byAPIKey, byEmail, manualAPIKey }) => {
+      if (!byAPIKey && !options.disableMetrics) {
+        console.error('Missing required definition for byAPIKey');
+        console.error('This should be much more useful than it is.');
+        return next();
+      }
+      if (!byEmail && !options.disableWebhook) {
+        console.error('Missing required definition for byEmail');
         console.error('This should be much more useful than it is.');
         return next();
       }
 
       if (req.path === '/readme-webhook' && req.method === 'POST' && !options.disableWebhook) {
-        const user = byEmail(req.body.email);
+        const user = await byEmail(req.body.email);
         if (!user) {
           throw new Error(`User with email ${req.body.email} not found`);
         }
