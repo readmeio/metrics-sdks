@@ -43,13 +43,13 @@ export interface GroupingObject {
 // Typing the return as unknown to make it easier to format the user to our format in the middleware
 // This way these functions can just return from their database
 interface GetUserParams {
-  byAPIKey: (apiKey: string) => GroupingObject | void;
-  byEmail: (email: string) => GroupingObject | void;
+  byAPIKey: (apiKey: string) => Promise<GroupingObject | void>;
+  byEmail: (email: string) => Promise<GroupingObject | void>;
   manualAPIKey?: string;
 }
 
 interface GetUserFunction {
-  (params: GetUserParams): GroupingObject | void;
+  (params: GetUserParams): Promise<GroupingObject | void>;
 }
 
 // See comment at the auth definition below
@@ -57,7 +57,7 @@ let readmeAPIKey = '';
 let readmeProjectData: GetProjectResponse200 | undefined;
 
 const readme = (
-  userFunction: (req: Request, getUser: GetUserFunction) => GroupingObject | void,
+  userFunction: (req: Request, getUser: GetUserFunction) => Promise<GroupingObject | void>,
   options: Options = {
     disableWebhook: false,
     disableMetrics: false,
