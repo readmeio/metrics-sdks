@@ -57,7 +57,7 @@ let readmeAPIKey = '';
 let readmeProjectData: GetProjectResponse200 | undefined;
 
 const readme = (
-  userFunction: (req: Request, getUser: GetUserFunction) => GroupingObject | void,
+  userFunction: (req: Request, getUser: GetUserFunction) => Promise<GroupingObject | void>,
   options: Options = {
     disableWebhook: false,
     disableMetrics: false,
