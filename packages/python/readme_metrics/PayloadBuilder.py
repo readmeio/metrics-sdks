@@ -8,8 +8,6 @@ import time
 
 from typing import List, Optional
 from urllib import parse
-import uuid
-
 from readme_metrics import ResponseInfoWrapper
 
 
@@ -59,7 +57,9 @@ class PayloadBuilder:
         self.grouping_function = grouping_function
         self.logger = logger
 
-    def __call__(self, request, response: ResponseInfoWrapper) -> dict:
+    def __call__(
+        self, request, response: ResponseInfoWrapper, logId: str
+    ) -> Optional[dict]:
         """Builds a HAR payload encompassing the request & response data
 
         Args:
@@ -76,7 +76,7 @@ class PayloadBuilder:
             return None
 
         payload = {
-            "_id": str(uuid.uuid4()),
+            "_id": logId,
             "group": group,
             "clientIPAddress": request.environ.get("REMOTE_ADDR"),
             "development": self.development_mode,

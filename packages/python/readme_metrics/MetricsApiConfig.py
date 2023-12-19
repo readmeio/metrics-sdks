@@ -15,6 +15,7 @@ class MetricsApiConfig:
             "label" and "email" fields.
 
             The main purpose of the identity object is to identify the API's caller.
+        BASE_LOG_URL (str): URL for your documentation site
         BUFFER_LENGTH (int): Number of requests to buffer before sending data
             to ReadMe. Defaults to 1.
         IS_DEVELOPMENT_MODE (bool): Determines whether you are running in
@@ -31,6 +32,7 @@ class MetricsApiConfig:
             If this option is configured, ONLY the allowlisted properties will be sent.
         ALLOWED_HTTP_HOSTS (List[str]): A list of allowed http hosts for sending
             data to the ReadMe API.
+        README_API_URL (str): Base URL of ReadMe's documentation API
         METRICS_API (str): Base URL of the ReadMe metrics API.
         METRICS_API_TIMEOUT (int): Timeout (in seconds) for metrics API calls.
         LOGGER (logging.Logger): Logger used by all classes and methods in the
@@ -42,6 +44,7 @@ class MetricsApiConfig:
     """
 
     README_API_KEY: str = None
+    BASE_LOG_URL: str = None
     BUFFER_LENGTH: int = 1
     GROUPING_FUNCTION: Callable[[Any], None] = lambda req: None
     IS_DEVELOPMENT_MODE: bool = False
@@ -49,6 +52,7 @@ class MetricsApiConfig:
     DENYLIST: List[str] = []
     ALLOWLIST: List[str] = []
     ALLOWED_HTTP_HOSTS: List[str] = []
+    README_API_URL: str = "https://dash.readme.com/api"
     METRICS_API: str = "https://metrics.readme.io"
     METRICS_API_TIMEOUT: int = 3
 
@@ -56,6 +60,7 @@ class MetricsApiConfig:
         self,
         api_key: str,
         grouping_function,
+        base_log_url: str = None,
         buffer_length: int = 1,
         development_mode: bool = False,
         background_worker_mode: bool = True,
@@ -80,6 +85,7 @@ class MetricsApiConfig:
                 You can optionally pass the path of the function to the MetricsApiConfig
                 constructor, in which case it will automatically be resolved and imported
                 when this object is initialized.
+            base_log_url (str): URL for your documentation site
             buffer_length (int, optional): Number of requests to buffer before sending
                 data to ReadMe. Defaults to 1.
             development_mode (bool, optional): Determines whether you are running in
@@ -112,6 +118,7 @@ class MetricsApiConfig:
         """
         self.README_API_KEY = api_key
         self.GROUPING_FUNCTION = grouping_function
+        self.BASE_LOG_URL = base_log_url
         self.BUFFER_LENGTH = buffer_length
         self.IS_DEVELOPMENT_MODE = development_mode
         self.IS_BACKGROUND_MODE = background_worker_mode

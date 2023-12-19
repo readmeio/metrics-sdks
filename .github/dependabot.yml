@@ -8,6 +8,17 @@ updates:
       - dependency-type: production
     labels:
       - dependencies
+    groups:
+      minor-production-deps:
+        dependency-type: 'production'
+        update-types:
+          - minor
+          - patch
+      minor-development-deps:
+        dependency-type: 'development'
+        update-types:
+          - minor
+          - patch
     commit-message:
       prefix: chore(deps)
       prefix-development: chore(deps-dev)
@@ -21,6 +32,17 @@ updates:
     open-pull-requests-limit: 10
     labels:
       - dependencies
+    groups:
+      minor-production-deps:
+        dependency-type: 'production'
+        update-types:
+          - minor
+          - patch
+      minor-development-deps:
+        dependency-type: 'development'
+        update-types:
+          - minor
+          - patch
     commit-message:
       prefix: chore(deps)
       prefix-development: chore(deps-dev)
@@ -40,6 +62,17 @@ updates:
     labels:
       - dependencies
       - area:node
+    groups:
+      minor-production-deps:
+        dependency-type: 'production'
+        update-types:
+          - minor
+          - patch
+      minor-development-deps:
+        dependency-type: 'development'
+        update-types:
+          - minor
+          - patch
     commit-message:
       prefix: chore(deps)
       prefix-development: chore(deps-dev)
@@ -76,6 +109,17 @@ updates:
     labels:
       - dependencies
       - area:php
+    groups:
+      minor-production-deps:
+        dependency-type: 'production'
+        update-types:
+          - minor
+          - patch
+      minor-development-deps:
+        dependency-type: 'development'
+        update-types:
+          - minor
+          - patch
     commit-message:
       prefix: chore(deps)
       prefix-development: chore(deps-dev)
