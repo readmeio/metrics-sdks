@@ -1,8 +1,7 @@
+import type { GroupingObject } from '../../src';
 import type { Operation } from 'oas';
 
 import { describe, expect, it, beforeEach } from 'vitest';
-
-import type { GroupingObject } from '../../src';
 
 import { getGroupIdByApiKey, getGroupIdByOperation } from '../../src/lib/get-group-id';
 
@@ -189,8 +188,23 @@ describe('getGroupId', () => {
       expect(groupId).toBeUndefined();
     });
 
-    it('returns false for a user without a keys array', () => {
+    it('returns undefined for a user without a keys array', () => {
       const groupId = getGroupIdByApiKey({} as GroupingObject, 'requestApiKey');
+      expect(groupId).toBeUndefined();
+    });
+
+    it('returns undefined for a user with a null keys array', () => {
+      const groupId = getGroupIdByApiKey(mockUser(null), 'requestApiKey');
+      expect(groupId).toBeUndefined();
+    });
+
+    it('returns undefined for a user with an object as the keys array', () => {
+      const groupId = getGroupIdByApiKey({ keys: {} } as GroupingObject, 'requestApiKey');
+      expect(groupId).toBeUndefined();
+    });
+
+    it('returns undefined for a user with a string as the keys array', () => {
+      const groupId = getGroupIdByApiKey({ keys: 'broken' as unknown } as GroupingObject, 'requestApiKey');
       expect(groupId).toBeUndefined();
     });
 
@@ -250,9 +264,9 @@ describe('getGroupId', () => {
         expect(groupId).toBe('key-1-name');
       });
 
-      it('supports having basic auth as a security scheme', () => {
-        const user = mockUser([{ basic: { user: 'basic-user', pass: 'basic-pass' } }]);
-        const groupId = getGroupIdByApiKey(user, 'requestApiKey');
+      it('supports having nested basic auth', () => {
+        const user = mockUser([{ notRelevant: 'foo' }, { basic: { user: 'basic-user', pass: 'basic-pass' } }]);
+        const groupId = getGroupIdByApiKey(user, 'basic-user');
 
         expect(groupId).toBe('basic-user');
       });
