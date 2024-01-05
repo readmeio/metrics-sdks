@@ -548,7 +548,7 @@ ${metricsVerifiedHtml}
   </ol>
   <pre>
 <div class="cm-s-neo"><span class="cm-variable">readme</span>(<span class="cm-keyword">async</span> (<span class="cm-def">req</span>) <span class="cm-operator">=&gt;</span> {
-  <span class="cm-keyword">const</span> <span class="cm-def">user</span> <span class="cm-operator">=</span> <span class="cm-variable">getUser</span>({ <span class="cm-property">email</span>: <span class="cm-variable-2">req</span>.<span class="cm-property">body</span>.<span class="cm-property">email</span>, <span class="cm-property">apiKey</span>: <span class="cm-variable-2">req</span>.<span class="cm-property">query</span>.<span class="cm-property">apiKey</span> });
+  <span class="cm-keyword">const</span> <span class="cm-def">user</span> <span class="cm-operator">=</span> <span class="cm-variable">getUser</span>({ <span class="cm-property">byEmail</span>: <span class="cm-variable">getUserByEmail</span>, <span class="cm-property">apiKey</span>: <span class="cm-variable">getUserByAPIKey</span> });
 
   <span class="cm-keyword">return</span> {
     <span class="cm-property">email</span>: <span class="cm-variable-2">user</span>.<span class="cm-property">email</span>,

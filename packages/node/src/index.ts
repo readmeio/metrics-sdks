@@ -70,13 +70,13 @@ const readme = (
     const getUser: GetUserFunction = async ({ byAPIKey, byEmail, manualAPIKey }) => {
       if (!byAPIKey && !options.disableMetrics) {
         console.error(
-          'Missing required definition for byAPIKey. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#/getuserbyapikey',
+          'Missing required definition for byAPIKey. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#getuserbyapikey',
         );
         return next();
       }
       if (!byEmail && !options.disableWebhook) {
         console.error(
-          'Missing required definition for byEmail. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#/getuserbyapikey',
+          'Missing required definition for byEmail. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#getuserbyapikey',
         );
         return next();
       }
