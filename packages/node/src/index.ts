@@ -52,9 +52,15 @@ interface GetUserFunction {
   (params: GetUserParams): Promise<GroupingObject | void>;
 }
 
+interface ReadMeVersion {
+  is_stable: boolean;
+  version: string;
+}
+
 // See comment at the auth definition below
 let readmeAPIKey = '';
 let readmeProjectData: GetProjectResponse200 | undefined;
+let readmeVersionData: ReadMeVersion[] | undefined;
 
 const readme = (
   userFunction: (req: Request, getUser: GetUserFunction) => Promise<GroupingObject | void>,
@@ -116,6 +122,7 @@ const readme = (
       readmeSdk.auth(readmeAPIKey);
       try {
         readmeProjectData = (await readmeSdk.getProject()).data;
+        readmeVersionData = (await readmeSdk.getVersions()).data as ReadMeVersion[];
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
         // TODO: Maybe send this to sentry?
@@ -143,6 +150,7 @@ const readme = (
       const setupHtml = buildSetupView({
         baseUrl,
         subdomain: readmeProjectData.subdomain as string,
+        stableVersion: readmeVersionData?.find(version => version.is_stable)?.version || '1.0',
         readmeAPIKey,
         disableMetrics: options.disableMetrics,
         disableWebhook: options.disableWebhook,

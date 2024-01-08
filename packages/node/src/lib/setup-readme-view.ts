@@ -6,6 +6,7 @@ export function buildSetupView({
   baseUrl,
   readmeAPIKey,
   subdomain,
+  stableVersion,
   disableWebhook,
   disableMetrics,
 }: {
@@ -14,8 +15,9 @@ export function buildSetupView({
   disableMetrics?: boolean;
   disableWebhook?: boolean;
   subdomain: string;
+  stableVersion: string;
 }) {
-  const dashUrl = `https://dash.readme.com/project/${subdomain}/v1.0/metrics/developers`;
+  const dashUrl = `https://dash.readme.com/project/${subdomain}/v${stableVersion}/metrics/developers`;
   let webhookScriptHtml = `
     var form = document.getElementById("testWebhookForm");
     form.addEventListener('submit', testWebhook);
