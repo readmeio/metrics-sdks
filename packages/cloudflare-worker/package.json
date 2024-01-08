@@ -6,7 +6,7 @@
     "minimatch": "^9.0.1"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "scripts": {
     "build": "HOST=https://metrics.readme.io webpack",
