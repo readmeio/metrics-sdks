@@ -21,7 +21,7 @@
     "url": "https://github.com/readmeio/metrics-sdks.git"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "workspaces": [
     "./packages/cloudflare-worker",
