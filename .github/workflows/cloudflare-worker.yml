@@ -14,10 +14,9 @@ jobs:
         working-directory: packages/cloudflare-worker
 
     strategy:
+      fail-fast: false
       matrix:
         node-version:
-          - 14
-          - 16
           - 18
           - 20
 
