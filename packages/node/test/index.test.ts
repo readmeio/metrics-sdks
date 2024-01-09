@@ -224,6 +224,17 @@ describe('#metrics', function () {
               }),
             );
           }),
+          rest.get(`${config.readmeApiUrl}/v1/version`, (req, res, ctx) => {
+            return res(
+              ctx.status(200),
+              ctx.json([
+                {
+                  version: '1.0',
+                  subdomain: 'subdomain',
+                },
+              ]),
+            );
+          }),
         ],
       );
 
