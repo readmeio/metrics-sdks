@@ -18,6 +18,9 @@
     "api-metrics",
     "readme"
   ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
     "clean": "rm -rf dist/",
