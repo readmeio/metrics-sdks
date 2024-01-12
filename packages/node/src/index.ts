@@ -11,8 +11,6 @@ import { buildSetupView } from './lib/setup-readme-view';
 import { testVerifyWebhook } from './lib/test-verify-webhook';
 import verifyWebhook from './lib/verify-webhook';
 
-const env = process.env.NODE_ENV || 'development';
-
 interface BasicAuthObject {
   pass: string;
   user: string;
@@ -67,6 +65,7 @@ const readme = (
   options: Options = {
     disableWebhook: false,
     disableMetrics: false,
+    development: false,
   },
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -113,11 +112,6 @@ const readme = (
 
     const baseUrl = `${req.protocol}://${req.get('host')}${req.baseUrl}`;
 
-    // Really want to make sure we only show setup on development
-    // not sure how reliable node_env is
-    const isDevelopment =
-      env === 'development' || baseUrl.includes('localhost') || baseUrl.includes('.local') || baseUrl.includes('.dev');
-
     if (!readmeProjectData) {
       readmeSdk.auth(readmeAPIKey);
       try {
@@ -146,7 +140,7 @@ const readme = (
       } catch (e) {
         return res.status(400).json({ error: (e as Error).message });
       }
-    } else if (req.path === '/readme-setup' && isDevelopment) {
+    } else if (req.path === '/readme-setup' && options.development) {
       const setupHtml = buildSetupView({
         baseUrl,
         subdomain: readmeProjectData.subdomain as string,
@@ -156,7 +150,7 @@ const readme = (
         disableWebhook: options.disableWebhook,
       });
       return res.send(setupHtml);
-    } else if (req.path === '/webhook-test' && isDevelopment) {
+    } else if (req.path === '/webhook-test' && options.development) {
       const email = req.query.email as string;
       try {
         const webhookData = await testVerifyWebhook(baseUrl, email, readmeProjectData.jwtSecret as string);
