@@ -75,13 +75,13 @@ const readme = (
     const getUser: GetUserFunction = async ({ byAPIKey, byEmail, manualAPIKey }) => {
       if (!byAPIKey && !options.disableMetrics) {
         console.error(
-          'Missing required definition for byAPIKey. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#getuserbyapikey',
+          'Missing required definition for `byAPIKey`. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#getuserbyapikey',
         );
         return next();
       }
       if (!byEmail && !options.disableWebhook) {
         console.error(
-          'Missing required definition for byEmail. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#getuserbyapikey',
+          'Missing required definition for `byEmail`. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#getuserbyapikey',
         );
         return next();
       }
@@ -104,7 +104,7 @@ const readme = (
         requestAPIKey = findAPIKey(req);
       } catch (e) {
         console.error(
-          'Could not automatically find API key in the request. You should pass the API key via `manualAPIKey` in the getUser function. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#getuserbyapikey',
+          'Could not automatically find an API key in the request. You should pass the API key via `manualAPIKey` in the `getUser` function. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#getuserbyapikey',
         );
       }
       return byAPIKey(requestAPIKey);
@@ -169,7 +169,7 @@ const readme = (
         console.error(
           usingManualAPIKey
             ? 'The API key you passed in via `manualAPIKey` could not be found in the user object you provided.'
-            : 'Could not automatically find API key in the request. You should pass the API key via `manualAPIKey` in the getUser function. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#/getuserbyapikey',
+            : 'Could not automatically find an API key in the request. You should pass the API key via `manualAPIKey` in the `getUser` function. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#/getuserbyapikey',
         );
         return next();
       }

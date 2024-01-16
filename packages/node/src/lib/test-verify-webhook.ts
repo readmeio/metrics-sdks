@@ -82,7 +82,6 @@ export async function testVerifyWebhook(baseUrl: string, email: string, apiKey: 
     }
 
     // We can do more validation here
-
     return {
       user: signed,
     };
