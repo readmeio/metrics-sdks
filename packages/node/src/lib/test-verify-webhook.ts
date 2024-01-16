@@ -2,6 +2,8 @@ import crypto from 'crypto';
 
 import fetch, { Headers } from 'node-fetch';
 
+import pkg from '../../package.json';
+
 async function verifyWebhook(url: string, email: string, secret: string, opts = { unsigned: false }) {
   if (!url || !email || !secret) {
     throw new Error('Missing required params');
@@ -13,7 +15,7 @@ async function verifyWebhook(url: string, email: string, secret: string, opts = 
   };
 
   const headers = new Headers({
-    'User-Agent': 'readme',
+    'User-Agent': `${pkg.name}/${pkg.version}`,
     'content-type': 'application/json',
   });
 
