@@ -1,4 +1,5 @@
 require 'readme/http_request'
+require 'readme/mask'
 
 RSpec.describe Readme::HttpRequest do
   describe '#url' do
@@ -159,6 +160,40 @@ RSpec.describe Readme::HttpRequest do
         }
       )
     end
+
+    it 'properly sanitizes authorization headers' do
+      env = {
+        'HTTP_AUTHORIZATION' => 'Basic xxx:aaa'
+      }
+
+      env['HTTP_VERSION'] = 'HTTP/1.1' unless Readme::HttpRequest::IS_RACK_V3
+
+      request = described_class.new(env)
+
+      expect(request.headers).to eq(
+        {
+          'Authorization' => Readme::Mask.mask('Basic xxx:aaa'),
+        }
+      )
+    end
+
+
+    it 'matches the hashing output of the node.js SDK' do
+      env = {
+        'HTTP_AUTHORIZATION' => 'Bearer: a-random-api-key'
+      }
+
+      env['HTTP_VERSION'] = 'HTTP/1.1' unless Readme::HttpRequest::IS_RACK_V3
+
+      request = described_class.new(env)
+
+      expect(request.headers).to eq(
+        {
+          'Authorization' => 'sha512-7S+L0vUE8Fn6HI3836rtz4b6fVf6H4JFur6SGkOnL3bFpC856+OSZkpIHphZ0ipNO+kUw1ePb5df2iYrNQCpXw==?-key'
+        }
+      )
+    end
+
   end
 
   describe '#body' do
