@@ -1,3 +1,4 @@
+require 'readme/mask'
 require 'rack'
 require 'rack/request'
 require_relative 'content_type_helper'
@@ -25,7 +26,12 @@ module Readme
     HTTP_NON_HEADERS.freeze
 
     def initialize(env)
+      # Sanitize the auth header, if it exists
+      if env.has_key?("HTTP_AUTHORIZATION")
+        env["HTTP_AUTHORIZATION"] = Readme::Mask.mask(env["HTTP_AUTHORIZATION"])
+      end
       @request = Rack::Request.new(env)
+
       return unless IS_RACK_V3
 
       @input = Rack::RewindableInput.new(@request.body)
