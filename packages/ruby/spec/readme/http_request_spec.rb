@@ -172,11 +172,10 @@ RSpec.describe Readme::HttpRequest do
 
       expect(request.headers).to eq(
         {
-          'Authorization' => Readme::Mask.mask('Basic xxx:aaa'),
+          'Authorization' => Readme::Mask.mask('Basic xxx:aaa')
         }
       )
     end
-
 
     it 'matches the hashing output of the node.js SDK' do
       env = {
@@ -193,7 +192,6 @@ RSpec.describe Readme::HttpRequest do
         }
       )
     end
-
   end
 
   describe '#body' do

@@ -19,7 +19,7 @@ RSpec.describe Readme::Payload do
       development: true
     )
 
-    expect(JSON.parse(result.to_json)["group"]["id"]).to match(Readme::Mask.mask(id))
+    expect(JSON.parse(result.to_json)['group']['id']).to match(Readme::Mask.mask(id))
     expect(result.to_json).to match_json_schema('payload')
   end
 
@@ -32,7 +32,7 @@ RSpec.describe Readme::Payload do
       development: true
     )
 
-    expect(JSON.parse(result.to_json)["group"]["id"]).to match(Readme::Mask.mask(api_key))
+    expect(JSON.parse(result.to_json)['group']['id']).to match(Readme::Mask.mask(api_key))
     expect(result.to_json).to match_json_schema('payload')
   end
 
