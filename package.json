@@ -5,7 +5,6 @@
     "clean": "npx lerna clean",
     "lint": "eslint test/ && npm run lint --workspaces",
     "lint:docs": "alex .",
-    "prepare": "husky install",
     "prettier": "prettier --list-different \"./**/**.{js,ts,md}\"",
     "prettier:write": "prettier --list-different --write \"./**/**.{js,ts,md}\"",
     "publish": "npx lerna publish",
@@ -38,7 +37,6 @@
     "form-data-encoder": "^2.1.0",
     "formdata-node": "^5.0.0",
     "har-validator": "^5.1.5",
-    "husky": "^8.0.3",
     "isomorphic-fetch": "^3.0.0",
     "prettier": "^3.0.2",
     "vitest": "^0.34.2"
