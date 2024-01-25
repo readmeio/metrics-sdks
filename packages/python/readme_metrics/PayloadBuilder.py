@@ -1,4 +1,3 @@
-from collections.abc import Mapping
 import importlib
 import json
 from json import JSONDecodeError
@@ -8,7 +7,8 @@ import time
 
 from typing import List, Optional
 from urllib import parse
-from readme_metrics import ResponseInfoWrapper
+from .ResponseInfoWrapper import ResponseInfoWrapper
+from .util import mask
 
 
 class QueryNotFound(Exception):
@@ -135,6 +135,9 @@ class PayloadBuilder:
             )
             return None
 
+        # Mask the id / api_key
+        group["id"] = mask(group["id"])
+
         for field in ["email", "label"]:
             if field not in group:
                 self.logger.warning(
@@ -167,6 +170,11 @@ class PayloadBuilder:
             dict: Wrapped request payload
         """
         headers = self.redact_dict(request.headers)
+
+        # Mask the auth header
+        if "Authorization" in headers:
+            headers["Authorization"] = mask(headers["Authorization"])
+
         queryString = parse.parse_qsl(self._get_query_string(request))
 
         content_type = self._get_content_type(headers)
@@ -357,23 +365,20 @@ class PayloadBuilder:
 
         return {"mimeType": content_type, "text": body}
 
-    def redact_dict(self, mapping: Mapping):
+    def redact_dict(self, mapping: dict) -> dict:
         def _redact_value(val):
-            if isinstance(val, str):
-                return f"[REDACTED {len(val)}]"
+            return f"[REDACTED {len(val)}]" if isinstance(val, str) else "[REDACTED]"
 
-            return "[REDACTED]"
-
-        # Short-circuit this function if there's no allowlist or denylist
-        if not (self.allowlist or self.denylist):
+        if not self.allowlist and not self.denylist:
             return mapping
 
         result = {}
-        for (key, value) in mapping.items():
+        for key, value in mapping.items():
             if self.denylist and key in self.denylist:
                 result[key] = _redact_value(value)
             elif self.allowlist and key not in self.allowlist:
                 result[key] = _redact_value(value)
             else:
                 result[key] = value
+
         return result
