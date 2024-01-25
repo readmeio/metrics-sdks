@@ -28,6 +28,14 @@ class MockApplication:
         self.headers = headers
 
 
+class TestUtils:
+    def testMask(self):
+        assert (
+            mask("deadbeef")
+            == "sha512-ETo7x4PYUfwDcyFLGep76fo95UHsuf4CbVLGA+jqGcF0zA6XBfi5DTEiEsDDpthFPd+z4xQUCc9L7cjvAzWQtA==?beef"
+        )
+
+
 class TestPayloadBuilder:
     """
     Unit Tests for Payload Builder to make sure the created payloads are created

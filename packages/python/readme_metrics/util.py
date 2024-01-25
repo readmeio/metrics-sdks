@@ -16,7 +16,7 @@ def util_build_logger():
 
 def mask(data):
     m = hashlib.sha512()
-    m.update(bytes(data, "ascii"))
-    digest = base64.b64encode(m.digest())
+    m.update(data.encode("utf8"))
+    digest = base64.b64encode(m.digest()).decode("utf8")
     opts = data[-4:]
-    return "sha512-" + digest.decode("ascii") + "?" + opts
+    return f"sha512-{digest}?{opts}"

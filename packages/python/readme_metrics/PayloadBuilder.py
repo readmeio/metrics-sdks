@@ -173,7 +173,8 @@ class PayloadBuilder:
         headers = self.redact_dict(request.headers)
 
         # Mask the auth header
-        if headers.get("Authentication"):
+        print("Auth in headers")
+        if "Authentication" in headers:
             headers["Authentication"] = mask(headers.get("Authentication"))
 
         queryString = parse.parse_qsl(self._get_query_string(request))
@@ -374,7 +375,7 @@ class PayloadBuilder:
             return "[REDACTED]"
 
         result = {}
-        for (key, value) in mapping.items():
+        for key, value in mapping.items():
             if self.denylist and key in self.denylist:
                 result[key] = _redact_value(value)
             elif self.allowlist and key not in self.allowlist:
