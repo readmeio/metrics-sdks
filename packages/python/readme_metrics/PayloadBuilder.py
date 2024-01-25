@@ -367,10 +367,7 @@ class PayloadBuilder:
 
     def redact_dict(self, mapping: dict) -> dict:
         def _redact_value(val):
-            if isinstance(val, str):
-                return f"[REDACTED {len(val)}]"
-
-            return "[REDACTED]"
+            return f"[REDACTED {len(val)}]" if isinstance(val, str) else "[REDACTED]"
 
         if not self.allowlist and not self.denylist:
             return mapping
