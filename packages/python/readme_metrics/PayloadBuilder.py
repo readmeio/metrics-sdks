@@ -1,4 +1,3 @@
-from collections.abc import Mapping
 import importlib
 import json
 from json import JSONDecodeError
@@ -366,12 +365,15 @@ class PayloadBuilder:
 
         return {"mimeType": content_type, "text": body}
 
-    def redact_dict(self, mapping: Mapping):
+    def redact_dict(self, mapping: dict) -> dict:
         def _redact_value(val):
             if isinstance(val, str):
                 return f"[REDACTED {len(val)}]"
 
             return "[REDACTED]"
+
+        if not self.allowlist and not self.denylist:
+            return mapping
 
         result = {}
         for key, value in mapping.items():
