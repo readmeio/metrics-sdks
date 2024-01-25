@@ -394,9 +394,8 @@ class TestPayloadBuilder:
         data = payload(metrics.req, metrics.res, str(uuid.uuid4()))
 
         # Pull out the auth header
-        auth_header = ""
         for header in data["request"]["log"]["entries"][0]["request"]["headers"]:
-            if header["name"] == "Authentication":
+            if header["name"] == "Authorization":
                 auth_header = header["value"]
 
-        assert auth_header == mask(environ["HTTP_AUTHENTICATION"])
+        assert auth_header and auth_header == mask(environ["HTTP_AUTHORIZATION"])
