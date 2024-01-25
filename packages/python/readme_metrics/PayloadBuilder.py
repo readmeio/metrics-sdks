@@ -174,7 +174,7 @@ class PayloadBuilder:
 
         # Mask the auth header
         if "Authorization" in headers:
-            headers["Authorization"] = mask(headers.get("Authorization"))
+            headers["Authorization"] = mask(headers["Authorization"])
 
         queryString = parse.parse_qsl(self._get_query_string(request))
 
