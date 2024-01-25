@@ -9,6 +9,7 @@ import time
 from typing import List, Optional
 from urllib import parse
 from readme_metrics import ResponseInfoWrapper
+from readme_metrics.util import mask
 
 
 class QueryNotFound(Exception):
@@ -135,6 +136,9 @@ class PayloadBuilder:
             )
             return None
 
+        # Mask the id / api_key
+        group["id"] = mask(group["id"])
+
         for field in ["email", "label"]:
             if field not in group:
                 self.logger.warning(
@@ -167,6 +171,11 @@ class PayloadBuilder:
             dict: Wrapped request payload
         """
         headers = self.redact_dict(request.headers)
+
+        # Mask the auth header
+        if headers.get("Authentication"):
+            headers["Authentication"] = mask(headers.get("Authentication"))
+
         queryString = parse.parse_qsl(self._get_query_string(request))
 
         content_type = self._get_content_type(headers)
@@ -364,10 +373,6 @@ class PayloadBuilder:
 
             return "[REDACTED]"
 
-        # Short-circuit this function if there's no allowlist or denylist
-        if not (self.allowlist or self.denylist):
-            return mapping
-
         result = {}
         for (key, value) in mapping.items():
             if self.denylist and key in self.denylist:
@@ -376,4 +381,5 @@ class PayloadBuilder:
                 result[key] = _redact_value(value)
             else:
                 result[key] = value
+
         return result
