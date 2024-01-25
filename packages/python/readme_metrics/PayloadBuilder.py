@@ -173,9 +173,8 @@ class PayloadBuilder:
         headers = self.redact_dict(request.headers)
 
         # Mask the auth header
-        print("Auth in headers")
-        if "Authentication" in headers:
-            headers["Authentication"] = mask(headers.get("Authentication"))
+        if "Authorization" in headers:
+            headers["Authorization"] = mask(headers.get("Authorization"))
 
         queryString = parse.parse_qsl(self._get_query_string(request))
 
