@@ -8,8 +8,8 @@ import time
 
 from typing import List, Optional
 from urllib import parse
-from readme_metrics import ResponseInfoWrapper
-from readme_metrics.util import mask
+from .ResponseInfoWrapper import ResponseInfoWrapper
+from .util import mask
 
 
 class QueryNotFound(Exception):
