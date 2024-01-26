@@ -23,6 +23,19 @@ RSpec.describe Readme::Payload do
     expect(result.to_json).to match_json_schema('payload')
   end
 
+  it 'has the version param set' do
+    id = '1'
+    result = described_class.new(
+      har,
+      { id: id, label: 'Owlbert', email: 'owlbert@example.com' },
+      ip_address,
+      development: true
+    )
+
+    expect(JSON.parse(result.to_json)['_version']).to match(3)
+    expect(result.to_json).to match_json_schema('payload')
+  end
+
   it 'substitutes api_key for id' do
     api_key = '1'
     result = described_class.new(
