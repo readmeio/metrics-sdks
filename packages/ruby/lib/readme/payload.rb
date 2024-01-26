@@ -27,7 +27,7 @@ module Readme
     def to_json(*_args)
       {
         _id: validate_uuid(@log_id) ? @log_id : @uuid,
-        _version: 3, 
+        _version: 3,
         group: @user_info,
         clientIPAddress: @ip_address,
         development: @development,

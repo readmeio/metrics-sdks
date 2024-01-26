@@ -281,7 +281,7 @@ RSpec.describe Readme::Metrics do
       expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
       expect(last_response.status).to eq 200
     end
-    
+
     it 'is submitted to Readme when the body is empty with reject_params configured' do
       def app
         json_app_with_middleware(buffer_length: 1, reject_params: ['reject'])
