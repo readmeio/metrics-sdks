@@ -198,7 +198,7 @@ const readme = (
  *
  * @see {@link https://readme.com/metrics}
  * @see {@link https://docs.readme.com/main/docs/unified-snippet-docs}
- * @param readmeApiKey The API key for your ReadMe project. This ensures your requests end up in
+ * @param key The API key for your ReadMe project. This ensures your requests end up in
  *    your dashboard. You can read more about the API key in
  *    [our docs](https://docs.readme.com/reference/authentication).
  */
@@ -206,7 +206,9 @@ function ReadMe(key: string) {
   readmeAPIKey = key;
   // Reset the cache for the ReadMe project if the api key changes
   readmeProjectData = undefined;
-  return readme;
+  return {
+    express: readme, // Only works with Express for now
+  };
 }
 
 export default ReadMe;

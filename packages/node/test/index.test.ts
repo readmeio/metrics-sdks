@@ -238,10 +238,10 @@ describe('#metrics', function () {
         ],
       );
 
-      readmeio.auth(apiKey);
+      const readme = readmeio.ReadMe(apiKey);
       app = express();
       app.use(
-        readmeio.readme((req, getUser) => {
+        readme.express((req, getUser) => {
           return getUser({
             byAPIKey: (requestApiKey: string) => {
               // TODO should we be calling this if the requestApiKey is undefined?
