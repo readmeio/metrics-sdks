@@ -238,7 +238,7 @@ describe('#metrics', function () {
         ],
       );
 
-      const readme = readmeio.ReadMe(apiKey);
+      const readme = new readmeio.ReadMe(apiKey);
       app = express();
       app.use(
         readme.express((req, getUser) => {
@@ -249,22 +249,22 @@ describe('#metrics', function () {
                 return undefined;
               }
 
-              return {
+              return Promise.resolve({
                 keys: [{ apiKey: requestApiKey, name: 'test' }],
                 name: 'test',
                 email: 'test@example.com',
-              };
+              });
             },
             byEmail: (email: string) => {
               if (!email) {
                 return undefined;
               }
 
-              return {
+              return Promise.resolve({
                 keys: [{ apiKey: endUserApiKey, name: 'test' }],
                 name: 'test',
                 email: 'test@example.com',
-              };
+              });
             },
           });
         }),
