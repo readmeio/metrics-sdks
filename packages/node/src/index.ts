@@ -198,11 +198,11 @@ const readme = (
 // I don't like this as much but not sure how else we can do it
 // import { readme } from 'readmeio';
 // readme.auth('api-key');
-function auth(key: string) {
+function ReadMe(key: string) {
   readmeAPIKey = key;
   // Reset the cache for the ReadMe project if the api key changes
   readmeProjectData = undefined;
   return readme;
 }
 
-export { verifyWebhook, log, auth, getProjectBaseUrl, readme };
+export { verifyWebhook, log, ReadMe, getProjectBaseUrl };
