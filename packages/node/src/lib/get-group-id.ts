@@ -1,4 +1,4 @@
-import type { ApiKey, GroupingObject, KeyValue } from '../index';
+import type { ApiKey, GroupingObject, KeyValue } from './ReadMe';
 import type { Operation } from 'oas';
 
 import get from 'lodash/get';
