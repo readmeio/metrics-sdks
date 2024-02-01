@@ -63,17 +63,17 @@ interface ReadMeVersion {
  * @see {@link https://docs.readme.com/main/docs/unified-snippet-docs}
  */
 export default class ReadMe {
-  /**
-   * The API key for your ReadMe project. This ensures your requests end up in
-   * your dashboard. You can read more about the API key in
-   * [our docs](https://docs.readme.com/reference/authentication).
-   */
-  readmeAPIKey: string;
+  private readmeAPIKey: string;
 
   private readmeProjectData!: GetProjectResponse200;
 
   private readmeVersionData!: ReadMeVersion[];
 
+  /**
+   * @param key The API key for your ReadMe project. This ensures your requests end up in
+   * your dashboard. You can read more about the API key in
+   * [our docs](https://docs.readme.com/reference/authentication).
+   */
   constructor(key: string) {
     this.readmeAPIKey = key;
   }
