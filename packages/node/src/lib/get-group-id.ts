@@ -96,7 +96,7 @@ const getGroupFromKeysBySecuritySchemes = (keys: ApiKey[] = [], securitySchemes:
 /**
  * Gets the group ID from the keys array for a given apiKey
  */
-const getGroupFromKeysByApiKey = (keys: ApiKey[] = [], apiKey = ''): string | undefined => {
+const getGroupFromKeysByApiKey = (keys: ApiKey[] = [], apiKey = '') => {
   if (!keys || !Array.isArray(keys)) {
     return undefined;
   }
@@ -109,7 +109,10 @@ const getGroupFromKeysByApiKey = (keys: ApiKey[] = [], apiKey = ''): string | un
     return undefined;
   }
 
-  return get(relevantKey, groupKey) as string;
+  return {
+    id: get(relevantKey, groupKey) as string,
+    label: get(relevantKey, 'label') || get(relevantKey, 'name'),
+  };
 };
 
 /**
@@ -141,7 +144,7 @@ const getFromUser = (user: GroupingObject, securitySchemes: string[]): string | 
  * 5. The key "label"
  * 6. The key "name"
  */
-export const getGroupIdByApiKey = (user: GroupingObject, apiKey: string) => {
+export const getGroupByApiKey = (user: GroupingObject, apiKey: string) => {
   if (!user) {
     return undefined;
   }

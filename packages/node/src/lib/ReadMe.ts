@@ -5,7 +5,7 @@ import type { NextFunction, Request, Response } from 'express';
 import readmeSdk from '../.api/apis/developers';
 
 import findAPIKey from './find-api-key';
-import { getGroupIdByApiKey } from './get-group-id';
+import { getGroupByApiKey } from './get-group-id';
 import { log } from './log';
 import { buildSetupView } from './setup-readme-view';
 import { testVerifyWebhook } from './test-verify-webhook';
@@ -189,8 +189,8 @@ export default class ReadMe {
         const user = await userFunction(req, getUser);
         if (!user || !Object.keys(user).length || options.disableMetrics) return next();
 
-        const groupId = getGroupIdByApiKey(user, requestAPIKey);
-        if (!groupId) {
+        const group = getGroupByApiKey(user, requestAPIKey);
+        if (!group) {
           console.error(
             usingManualAPIKey
               ? 'The API key you passed in via `manualAPIKey` could not be found in the user object you provided.'
@@ -204,8 +204,8 @@ export default class ReadMe {
           req,
           res,
           {
-            apiKey: groupId,
-            label: user.label ? user.label : user.name,
+            apiKey: group.id,
+            label: group.label,
             email: user.email,
           },
           options,
