@@ -30,7 +30,7 @@
     "api": "^6.1.1",
     "content-type": "^1.0.5",
     "find-cache-dir": "^3.3.2",
-    "flat-cache": "^3.0.4",
+    "flat-cache": "^4.0.1",
     "json-schema-to-ts": "^2.9.2",
     "lodash": "^4.17.15",
     "node-fetch": "^2.6.7",
