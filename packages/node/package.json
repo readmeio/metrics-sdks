@@ -34,7 +34,7 @@
     "json-schema-to-ts": "^2.9.2",
     "lodash": "^4.17.15",
     "node-fetch": "^2.6.7",
-    "oas": "^20.10.2",
+    "oas": "^24.3.1",
     "ssri": "^10.0.1",
     "timeout-signal": "^1.1.0",
     "type-is": "^1.6.18",
