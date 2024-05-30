@@ -190,7 +190,7 @@ RSpec.describe Readme::Metrics do
 
       post '/api/foo'
 
-      expect(last_response.status).to eq 200
+      expect(last_response.status).to have_http_status(200)
     end
 
     it 'returns a response when the Payload raises an error' do
@@ -198,7 +198,7 @@ RSpec.describe Readme::Metrics do
 
       post '/api/foo'
 
-      expect(last_response.status).to eq 200
+      expect(last_response.status).to have_http_status(200)
     end
 
     it 'returns a response when the Har::Serializer raises an error' do
@@ -206,7 +206,7 @@ RSpec.describe Readme::Metrics do
 
       post '/api/foo'
 
-      expect(last_response.status).to eq 200
+      expect(last_response.status).to have_http_status(200)
     end
 
     it 'returns a response when the RequestQueue raises an error' do
@@ -214,14 +214,14 @@ RSpec.describe Readme::Metrics do
 
       post '/api/foo'
 
-      expect(last_response.status).to eq 200
+      expect(last_response.status).to have_http_status(200)
     end
 
     it "doesn't send a request to Readme with an OPTIONS request" do
       options 'api/foo'
 
       expect(WebMock).not_to have_requested(:post, Readme::Metrics::ENDPOINT)
-      expect(last_response.status).to eq 200
+      expect(last_response.status).to have_http_status(200)
     end
 
     def app
@@ -244,7 +244,7 @@ RSpec.describe Readme::Metrics do
       post '/api/foo', '[BODY]'
 
       expect(WebMock).not_to have_requested(:post, Readme::Metrics::ENDPOINT)
-      expect(last_response.status).to eq 200
+      expect(last_response.status).to have_http_status(200)
     end
 
     it 'is not submitted to Readme with allow-only configured' do
@@ -256,7 +256,7 @@ RSpec.describe Readme::Metrics do
       post '/api/foo', '[BODY]'
 
       expect(WebMock).not_to have_requested(:post, Readme::Metrics::ENDPOINT)
-      expect(last_response.status).to eq 200
+      expect(last_response.status).to have_http_status(200)
     end
 
     it 'is submitted to Readme with no filter configured' do
@@ -268,7 +268,7 @@ RSpec.describe Readme::Metrics do
       post '/api/foo', '[BODY]'
 
       expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-      expect(last_response.status).to eq 200
+      expect(last_response.status).to have_http_status(200)
     end
 
     it 'is submitted to Readme when the body is empty with allow-only configured' do
@@ -279,7 +279,7 @@ RSpec.describe Readme::Metrics do
       get '/api/foo'
 
       expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-      expect(last_response.status).to eq 200
+      expect(last_response.status).to have_http_status(200)
     end
 
     it 'is submitted to Readme when the body is empty with reject_params configured' do
@@ -290,7 +290,7 @@ RSpec.describe Readme::Metrics do
       get '/api/foo'
 
       expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-      expect(last_response.status).to eq 200
+      expect(last_response.status).to have_http_status(200)
     end
   end
 
@@ -308,7 +308,7 @@ RSpec.describe Readme::Metrics do
       post '/api/foo'
 
       expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-      expect(last_response.status).to eq 200
+      expect(last_response.status).to have_http_status(200)
     end
 
     it 'is not submitted to Readme with an allow-only configured' do
@@ -319,7 +319,7 @@ RSpec.describe Readme::Metrics do
       post '/api/foo'
 
       expect(WebMock).not_to have_requested(:post, Readme::Metrics::ENDPOINT)
-      expect(last_response.status).to eq 200
+      expect(last_response.status).to have_http_status(200)
     end
 
     it 'is not submitted to Readme with reject_params configured' do
@@ -330,7 +330,7 @@ RSpec.describe Readme::Metrics do
       post '/api/foo'
 
       expect(WebMock).not_to have_requested(:post, Readme::Metrics::ENDPOINT)
-      expect(last_response.status).to eq 200
+      expect(last_response.status).to have_http_status(200)
     end
 
     it 'is submitted to Readme with reject_params configured for empty bodies' do
@@ -341,7 +341,7 @@ RSpec.describe Readme::Metrics do
       post '/api/foo'
 
       expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-      expect(last_response.status).to eq 204
+      expect(last_response.status).to have_http_status(204)
     end
 
     it 'is submitted to Readme with allow_only configured for empty bodies' do
@@ -352,7 +352,7 @@ RSpec.describe Readme::Metrics do
       post '/api/foo'
 
       expect(WebMock).to have_requested(:post, Readme::Metrics::ENDPOINT)
-      expect(last_response.status).to eq 204
+      expect(last_response.status).to have_http_status(204)
     end
   end
 
