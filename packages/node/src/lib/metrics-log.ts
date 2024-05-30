@@ -132,7 +132,9 @@ export function metricsAPICall(
   };
 
   if (fireAndForget) {
-    makeRequest();
+    makeRequest().catch((err) => {
+      // silently catch error so we don't crash the node process!
+    });
     return Promise.resolve<LogResponse>({
       ids: getLogIds(body),
     });
