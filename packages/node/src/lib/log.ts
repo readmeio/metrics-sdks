@@ -27,7 +27,10 @@ function doSend(readmeApiKey: string, options: Options) {
   // Make the log call
   metricsAPICall(readmeApiKey, json).catch(e => {
     // Silently discard errors and timeouts.
-    if (options.development) throw e;
+    if (options.development) {
+      // maybe a console.log(e) ?
+      // throw e;
+    }
   });
 }
 // Make sure we flush the queue if the process is exited
