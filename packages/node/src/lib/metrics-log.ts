@@ -1,3 +1,4 @@
+import type { Options } from './log';
 import type { UUID } from 'crypto';
 import type { Har } from 'har-format';
 import type { Response } from 'node-fetch';
@@ -88,11 +89,7 @@ function getLogIds(body: OutgoingLogBody | OutgoingLogBody[]): LogId {
   return body._id;
 }
 
-export function metricsAPICall(
-  readmeAPIKey: string,
-  body: OutgoingLogBody[],
-  fireAndForget = false,
-): Promise<LogResponse> {
+export function metricsAPICall(readmeAPIKey: string, body: OutgoingLogBody[], options: Options): Promise<LogResponse> {
   const signal = timeoutSignal(config.timeout);
   const encodedKey = Buffer.from(`${readmeAPIKey}:`).toString('base64');
 
@@ -131,7 +128,7 @@ export function metricsAPICall(
       });
   };
 
-  if (fireAndForget) {
+  if (options.fireAndForget) {
     makeRequest();
     return Promise.resolve<LogResponse>({
       ids: getLogIds(body),
