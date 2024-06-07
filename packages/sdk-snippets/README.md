@@ -4,7 +4,7 @@ Generate code snippets for ReadMe Metrics SDKs in multiple languages.
 
 [![Build](https://img.shields.io/github/actions/workflow/status/readmeio/metrics-sdks/snippets.yml?branch=main)](https://github.com/readmeio/metricds-sdks) [![](https://img.shields.io/npm/v/@readme/metrics-sdk-snippets)](https://npm.im/@readme/metrics-sdk-snippets)
 
-[![](https://d3vv6lp55qjaqc.cloudfront.net/items/1M3C3j0I0s0j3T362344/Untitled-2.png)](https://readme.io)
+[![](https://raw.githubusercontent.com/readmeio/.github/main/oss-header.png)](https://readme.io)
 
 This library was built for [ReadMe's Metrics](https://readme.com/metrics) onboarding flow.
 

@@ -1,5 +1,6 @@
 import { getProjectBaseUrl } from './lib/get-project-base-url';
 import { log } from './lib/log';
+import ReadMe from './lib/ReadMe';
 import verifyWebhook from './lib/verify-webhook';
 
-export { log, verifyWebhook, getProjectBaseUrl };
+export { verifyWebhook, log, ReadMe, getProjectBaseUrl };

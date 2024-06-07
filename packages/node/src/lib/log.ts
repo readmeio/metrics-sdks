@@ -64,6 +64,8 @@ export interface ExtendedResponse extends ServerResponse {
 export interface Options extends LogOptions {
   baseLogUrl?: string;
   bufferLength?: number;
+  disableWebhook?: boolean;
+  disableMetrics?: boolean;
 }
 
 function setDocumentationHeader(res: ServerResponse, baseLogUrl: string, logId: string) {

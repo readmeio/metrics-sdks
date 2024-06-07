@@ -2,13 +2,12 @@
   "name": "metrics-sdks-monorepo",
   "private": true,
   "scripts": {
-    "clean": "npx lerna clean",
+    "clean": "npx lerna@6 clean",
     "lint": "eslint test/ && npm run lint --workspaces",
     "lint:docs": "alex .",
-    "prepare": "husky install",
     "prettier": "prettier --list-different \"./**/**.{js,ts,md}\"",
     "prettier:write": "prettier --list-different --write \"./**/**.{js,ts,md}\"",
-    "publish": "npx lerna publish",
+    "publish": "npx lerna@6 publish",
     "test": "npm test --workspaces",
     "test:integration-metrics": "vitest test/integration-metrics.test.js",
     "test:integration-metrics-watch": "vitest run test/integration-metrics.test.js",
@@ -21,7 +20,7 @@
     "url": "https://github.com/readmeio/metrics-sdks.git"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "workspaces": [
     "./packages/cloudflare-worker",
@@ -38,7 +37,6 @@
     "form-data-encoder": "^2.1.0",
     "formdata-node": "^5.0.0",
     "har-validator": "^5.1.5",
-    "husky": "^8.0.3",
     "isomorphic-fetch": "^3.0.0",
     "prettier": "^3.0.2",
     "vitest": "^0.34.2"

@@ -29,7 +29,7 @@ class Metrics
     private Client $readme_api_client;
 
     private string|null $package_version;
-    private string $cache_dir;
+    private string|null $cache_dir;
     private string $user_agent;
 
     /**
@@ -80,7 +80,7 @@ class Metrics
         ]);
 
         $this->package_version = InstalledVersions::getVersion(self::PACKAGE_NAME);
-        $this->cache_dir = Factory::createConfig()->get('cache-dir');
+        $this->cache_dir = null;
 
         $this->user_agent = 'readme-metrics-php/' . ($this->package_version ?? 'unknown');
     }
@@ -247,7 +247,20 @@ class Metrics
         // Replace potentially unsafe characters in the cache key so it can be safely used as a filename on the server.
         $cache_key = str_replace([DIRECTORY_SEPARATOR, '@'], '-', $cache_key);
 
-        return $this->cache_dir . DIRECTORY_SEPARATOR . $cache_key;
+        return $this->getCacheDir() . DIRECTORY_SEPARATOR . $cache_key;
+    }
+
+    /**
+     * Retrieve the cache dir where the cache file will be stored.
+     *
+     */
+    public function getCacheDir(): string
+    {
+        if ($this->cache_dir === null) {
+            $this->cache_dir = Factory::createConfig()->get('cache-dir');
+        }
+
+        return $this->cache_dir;
     }
 
     public function getPackageVersion(): ?string

@@ -91,7 +91,7 @@ class TestPayloadBuilder:
         next(middleware(environ, app.mockStartResponse))
 
         payload = self.createPayload(config)
-        data = payload(metrics.req, metrics.res)
+        data = payload(metrics.req, metrics.res, str(uuid.uuid4()))
         text = data["request"]["log"]["entries"][0]["request"]["postData"]["text"]
 
         assert text == '{"ok": 123, "password": "[REDACTED]"}'
@@ -110,7 +110,7 @@ class TestPayloadBuilder:
         next(middleware(environ, app.mockStartResponse))
 
         payload = self.createPayload(config)
-        data = payload(metrics.req, metrics.res)
+        data = payload(metrics.req, metrics.res, str(uuid.uuid4()))
         text = data["request"]["log"]["entries"][0]["request"]["postData"]["text"]
 
         assert text == '{"ok": 123, "password": "[REDACTED]"}'
@@ -129,7 +129,7 @@ class TestPayloadBuilder:
         next(middleware(environ, app.mockStartResponse))
 
         payload = self.createPayload(config)
-        data = payload(metrics.req, metrics.res)
+        data = payload(metrics.req, metrics.res, str(uuid.uuid4()))
         text = data["request"]["log"]["entries"][0]["request"]["postData"]["text"]
 
         assert "ok" in text
@@ -152,7 +152,7 @@ class TestPayloadBuilder:
         next(middleware(environ, app.mockStartResponse))
 
         payload = self.createPayload(config)
-        data = payload(metrics.req, metrics.res)
+        data = payload(metrics.req, metrics.res, str(uuid.uuid4()))
         text = data["request"]["log"]["entries"][0]["request"]["postData"]["text"]
 
         assert "ok" in text
@@ -180,7 +180,7 @@ class TestPayloadBuilder:
         next(middleware(environ, app.mockStartResponse))
 
         payload = self.createPayload(config)
-        data = payload(metrics.req, metrics.res)
+        data = payload(metrics.req, metrics.res, str(uuid.uuid4()))
         group = data["group"]
 
         assert group["id"] == "spam"
@@ -202,7 +202,7 @@ class TestPayloadBuilder:
         next(middleware(environ, app.mockStartResponse))
 
         payload_builder = self.createPayload(config)
-        payload = payload_builder(metrics.req, metrics.res)
+        payload = payload_builder(metrics.req, metrics.res, str(uuid.uuid4()))
 
         assert payload is None
 
@@ -225,7 +225,7 @@ class TestPayloadBuilder:
         next(middleware(environ, app.mockStartResponse))
 
         payload = self.createPayload(config)
-        data = payload(metrics.req, metrics.res)
+        data = payload(metrics.req, metrics.res, str(uuid.uuid4()))
         group = data["group"]
 
         assert group["id"] == "spam"
@@ -250,7 +250,7 @@ class TestPayloadBuilder:
         next(middleware(environ, app.mockStartResponse))
 
         payload = self.createPayload(config)
-        data = payload(metrics.req, metrics.res)
+        data = payload(metrics.req, metrics.res, str(uuid.uuid4()))
 
         # When the `id` and `api_key` fields are both missing, the payload should be `None`
         assert data is None
@@ -277,7 +277,7 @@ class TestPayloadBuilder:
         next(middleware(environ, app.mockStartResponse))
 
         payload = self.createPayload(config)
-        data = payload(metrics.req, metrics.res)
+        data = payload(metrics.req, metrics.res, str(uuid.uuid4()))
 
         assert isinstance(data, dict)
         assert "group" in data
@@ -309,7 +309,7 @@ class TestPayloadBuilder:
         next(middleware(environ, app.mockStartResponse))
 
         payload = self.createPayload(config)
-        data = payload(metrics.req, metrics.res)
+        data = payload(metrics.req, metrics.res, str(uuid.uuid4()))
 
         assert data["_id"] == str(uuid.UUID(data["_id"], version=4))
 
@@ -326,7 +326,7 @@ class TestPayloadBuilder:
         next(middleware(environ, app.mockStartResponse))
 
         payload = self.createPayload(config)
-        data = payload(metrics.req, metrics.res)
+        data = payload(metrics.req, metrics.res, str(uuid.uuid4()))
         creator = data["request"]["log"]["creator"]
 
         assert creator["name"] == "readme-metrics (python)"
