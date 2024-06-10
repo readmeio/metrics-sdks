@@ -2,12 +2,12 @@
   "name": "metrics-sdks-monorepo",
   "private": true,
   "scripts": {
-    "clean": "npx lerna@6 clean",
+    "clean": "npx lerna clean",
     "lint": "eslint test/ && npm run lint --workspaces",
     "lint:docs": "alex .",
     "prettier": "prettier --list-different \"./**/**.{js,ts,md}\"",
     "prettier:write": "prettier --list-different --write \"./**/**.{js,ts,md}\"",
-    "publish": "npx lerna@6 publish",
+    "publish": "npx lerna publish",
     "test": "npm test --workspaces",
     "test:integration-metrics": "vitest test/integration-metrics.test.js",
     "test:integration-metrics-watch": "vitest run test/integration-metrics.test.js",
@@ -27,8 +27,6 @@
     "./packages/sdk-snippets"
   ],
   "devDependencies": {
-    "@commitlint/cli": "^17.4.3",
-    "@commitlint/config-conventional": "^17.4.3",
     "@readme/eslint-config": "^12.1.0",
     "alex": "^11.0.0",
     "caseless": "^0.12.0",
@@ -37,6 +35,7 @@
     "formdata-node": "^5.0.0",
     "har-validator": "^5.1.5",
     "isomorphic-fetch": "^3.0.0",
+    "lerna": "^8.1.3",
     "prettier": "^3.0.2",
     "vitest": "^0.34.2"
   },

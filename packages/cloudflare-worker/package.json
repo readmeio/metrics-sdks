@@ -13,7 +13,7 @@
     "lint": "eslint .",
     "prepublishOnly": "npm run build",
     "prettier": "prettier --list-different \"./**/**.js\"",
-    "test": "vitest --coverage"
+    "test": "vitest run --coverage"
   },
   "author": "Dom Harrington <dom@readme.io>",
   "license": "ISC",

@@ -28,7 +28,7 @@
     "prebuild": "npm run clean",
     "prepack": "npm run build",
     "prettier": "prettier --list-different --write \"./**/**.{js,ts}\"",
-    "test": "vitest --coverage"
+    "test": "vitest run --coverage"
   },
   "dependencies": {
     "@readme/httpsnippet": "^6.2.1"
