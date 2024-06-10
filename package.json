@@ -12,8 +12,7 @@
     "test:integration-metrics": "vitest test/integration-metrics.test.js",
     "test:integration-metrics-watch": "vitest run test/integration-metrics.test.js",
     "test:integration-webhooks": "vitest test/integration-webhooks.test.js",
-    "test:integration-webhooks-watch": "vitest run test/integration-webhooks.test.js",
-    "version": "npx conventional-changelog-cli --pkg lerna.json -i CHANGELOG.md -s && git add CHANGELOG.md"
+    "test:integration-webhooks-watch": "vitest run test/integration-webhooks.test.js"
   },
   "repository": {
     "type": "git",
