@@ -1,4 +1,13 @@
 {
-  "version": "independent",
-  "useWorkspaces": true
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json",
+  "command": {
+    "publish": {
+      "message": "chore(release): publish"
+    },
+    "version": {
+      "message": "chore(release): publish"
+    }
+  },
+  "packages": ["packages/*"],
+  "version": "independent"
 }

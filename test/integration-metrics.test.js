@@ -454,7 +454,6 @@ describe('Metrics SDK Integration Tests', function () {
     ]);
   });
 
-  // eslint-disable-next-line vitest/require-hook
   it.skipIf(!supportsMultipart())('should process a `multipart/form-data` POST payload', async function () {
     const formData = new FormData();
     formData.append('password', 123456);
@@ -492,7 +491,6 @@ describe('Metrics SDK Integration Tests', function () {
     expect(request.postData.text).toBeUndefined();
   });
 
-  // eslint-disable-next-line vitest/require-hook
   it.skipIf(!supportsMultipart())(
     'should process a `multipart/form-data` POST payload containing files',
     async function () {
