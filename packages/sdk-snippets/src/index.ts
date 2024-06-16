@@ -18,7 +18,7 @@ export interface SecurityVariable {
   type: 'apiKey' | 'http' | 'oauth';
 }
 
-export type Variables = (ServerVariable | SecurityVariable)[];
+export type Variables = (SecurityVariable | ServerVariable)[];
 
 export class MetricsSDKSnippet {
   secret: string;
@@ -49,7 +49,7 @@ export class MetricsSDKSnippet {
     const { convert } = target.services[snippetType][clientId || target.info.default];
 
     // Reduce our variables into a set keyed by their type.
-    const { server, security } = this.variables.reduce(
+    const { server, security } = this.variables.reduce<any>(
       (prev, next) => {
         prev[next.source].push(next);
         return prev;

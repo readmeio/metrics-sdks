@@ -13,14 +13,14 @@ async function getStdin() {
   return result.join('');
 }
 
-function processLine(line) {
+function processLine(line: string) {
   if (line === '') return '\nblank()\n';
   const indentation = line.search(/\S|$/) / 2;
   const quote = line.match(/'/) ? '"' : "'";
   return `push(${quote}${line.trimLeft()}${quote}${indentation !== 0 ? `, ${indentation}` : ''});`;
 }
 
-export default function main(input) {
+export default function main(input: string) {
   return input
     .toString()
     .split('\n')

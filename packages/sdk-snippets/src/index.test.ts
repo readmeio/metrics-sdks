@@ -6,9 +6,10 @@ import serverVariables from './fixtures/webhooks/server-variables';
 
 import { MetricsSDKSnippet } from '.';
 
-describe('MetricsSDKSnippet', function () {
-  it('should return false if no matching target', function () {
+describe('MetricsSDKSnippet', () => {
+  it('should return false if no matching target', () => {
     const snippet = new MetricsSDKSnippet(serverVariables as Variables);
+    // @ts-expect-error Testing a mistyped target
     const result = snippet.convert('webhooks', null);
 
     expect(result).toBe(false);

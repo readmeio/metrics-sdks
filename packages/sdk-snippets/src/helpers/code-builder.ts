@@ -29,7 +29,7 @@ export class CodeBuilder extends HTTPSnippetCodeBuilder {
   };
 
   endSection = (section: 'payload' | 'verification') => {
-    this.sections[section].end = this.code.length;
+    this.sections[section]!.end = this.code.length;
   };
 
   ranges = () => {
@@ -58,7 +58,7 @@ export class CodeBuilder extends HTTPSnippetCodeBuilder {
       this.variables[opts.type] = {};
     }
 
-    this.variables[opts.type][opts.name] = {
+    this.variables[opts.type]![opts.name] = {
       line: this.code.length,
     };
   };

@@ -24,7 +24,9 @@
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
     "clean": "rm -rf dist/",
-    "lint": "eslint . --ext js,ts",
+    "lint": "npm run lint:types && npm run lint:js",
+    "lint:js": "eslint . --ext js,ts",
+    "lint:types": "tsc --noEmit",
     "prebuild": "npm run clean",
     "prepack": "npm run build",
     "prettier": "prettier --list-different --write \"./**/**.{js,ts}\"",
@@ -35,6 +37,7 @@
   },
   "devDependencies": {
     "@readme/eslint-config": "^14.0.0",
+    "@tsconfig/node18": "^18.2.4",
     "@vitest/coverage-v8": "^1.6.0",
     "eslint": "^8.47.0",
     "prettier": "^3.3.2",
