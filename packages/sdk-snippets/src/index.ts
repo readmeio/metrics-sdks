@@ -18,7 +18,7 @@ export interface SecurityVariable {
   type: 'apiKey' | 'http' | 'oauth';
 }
 
-export type Variables = (ServerVariable | SecurityVariable)[];
+export type Variables = (SecurityVariable | ServerVariable)[];
 
 export class MetricsSDKSnippet {
   secret: string;

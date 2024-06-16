@@ -34,7 +34,7 @@
     "@readme/httpsnippet": "^6.2.1"
   },
   "devDependencies": {
-    "@readme/eslint-config": "^12.1.0",
+    "@readme/eslint-config": "^14.0.0",
     "@vitest/coverage-v8": "^0.34.2",
     "eslint": "^8.47.0",
     "prettier": "^3.0.2",
