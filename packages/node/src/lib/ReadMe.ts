@@ -19,23 +19,23 @@ interface BasicAuthObject {
 export interface ApiKey {
   [x: string]: unknown;
 
-  apiKey?: string | BasicAuthObject;
+  apiKey?: BasicAuthObject | string;
   id?: string;
-  name?: string;
   label?: string;
+  name?: string;
 }
 
-export type KeyValue = string | Record<string, string>;
+export type KeyValue = Record<string, string> | string;
 
 export interface GroupingObject {
-  [x: string]: KeyValue | string | undefined | ApiKey[];
+  [x: string]: ApiKey[] | KeyValue | string | undefined;
 
-  email: string;
-  keys: ApiKey[];
-  name: string;
-  label?: string;
-  id?: string;
   apiKey?: string;
+  email: string;
+  id?: string;
+  keys: ApiKey[];
+  label?: string;
+  name: string;
 }
 
 // Typing the return as unknown to make it easier to format the user to our format in the middleware

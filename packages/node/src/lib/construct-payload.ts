@@ -20,7 +20,7 @@ import processResponse from './process-response';
  * @param req
  * @returns
  */
-export function getProto(req: IncomingMessage): 'https' | 'http' {
+export function getProto(req: IncomingMessage): 'http' | 'https' {
   return (req.socket as TLSSocket).encrypted ? 'https' : 'http';
 }
 

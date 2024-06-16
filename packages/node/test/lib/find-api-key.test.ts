@@ -15,7 +15,7 @@ describe('findAPIKey', () => {
       query: {},
     } as unknown as Request;
 
-    expect(findAPIKey(req)).toStrictEqual('token');
+    expect(findAPIKey(req)).toBe('token');
   });
 
   it('returns the username when Authorization header with Basic auth is present', () => {
@@ -26,7 +26,7 @@ describe('findAPIKey', () => {
       query: {},
     } as unknown as Request;
 
-    expect(findAPIKey(req)).toStrictEqual('username');
+    expect(findAPIKey(req)).toBe('username');
   });
 
   it('returns the key when custom api-key header is present', () => {
@@ -37,7 +37,7 @@ describe('findAPIKey', () => {
       query: {},
     } as unknown as Request;
 
-    expect(findAPIKey(req)).toStrictEqual('token');
+    expect(findAPIKey(req)).toBe('token');
   });
 
   it('returns the key from query params when present', () => {
@@ -48,7 +48,7 @@ describe('findAPIKey', () => {
       },
     } as unknown as Request;
 
-    expect(findAPIKey(req)).toStrictEqual('token');
+    expect(findAPIKey(req)).toBe('token');
   });
 
   it('throws when no key present', () => {
@@ -57,6 +57,6 @@ describe('findAPIKey', () => {
       query: {},
     } as unknown as Request;
 
-    expect(() => findAPIKey(req)).toThrow();
+    expect(() => findAPIKey(req)).toThrow('test');
   });
 });

@@ -433,7 +433,7 @@ describe('#metrics', function () {
         .expect(res => {
           expect(res.headers).toHaveADocumentationHeader(baseLogUrl);
           logUrl = res.headers['x-documentation-url'];
-          expect(logUrl).not.toBeUndefined();
+          expect(logUrl).toBeDefined();
         });
 
       await request(app)
@@ -443,7 +443,7 @@ describe('#metrics', function () {
           expect(res.headers).toHaveADocumentationHeader(baseLogUrl);
           expect(res.headers['x-documentation-url']).not.toBe(logUrl);
           logUrl = res.headers['x-documentation-url'];
-          expect(logUrl).not.toBeUndefined();
+          expect(logUrl).toBeDefined();
         });
 
       return request(app)
@@ -453,7 +453,7 @@ describe('#metrics', function () {
           expect(res.headers).toHaveADocumentationHeader(baseLogUrl);
           expect(res.headers['x-documentation-url']).not.toBe(logUrl);
           logUrl = res.headers['x-documentation-url'];
-          expect(logUrl).not.toBeUndefined();
+          expect(logUrl).toBeDefined();
         });
     });
 
@@ -623,7 +623,7 @@ describe('#metrics', function () {
   });
 
   describe('`req.body`', function () {
-    function createMock(checkLocation: 'text' | 'params', requestBody: unknown) {
+    function createMock(checkLocation: 'params' | 'text', requestBody: unknown) {
       return server.use(
         rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
           const body: OutgoingLogBody[] = await req.json();

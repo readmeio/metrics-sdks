@@ -20,7 +20,7 @@ import { objectToArray, searchToArray } from './object-to-array';
  * @param header
  * @returns
  */
-export function fixHeader(header: string | number | string[]): string | undefined {
+export function fixHeader(header: string[] | number | string): string | undefined {
   if (header === undefined) {
     return undefined;
   }

@@ -41,7 +41,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@readme/eslint-config": "^12.1.0",
+    "@readme/eslint-config": "^14.0.0",
     "@types/caseless": "^0.12.2",
     "@types/content-type": "^1.1.5",
     "@types/find-cache-dir": "^3.2.1",
