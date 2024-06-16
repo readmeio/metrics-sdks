@@ -1,7 +1,7 @@
-import type { Client } from '../../../targets';
+import type { Client } from '../../../targets.js';
 
-import { CodeBuilder } from '../../../../helpers/code-builder';
-import { escapeForDoubleQuotes } from '../../../../helpers/escape';
+import { CodeBuilder } from '../../../../helpers/code-builder.js';
+import { escapeForDoubleQuotes } from '../../../../helpers/escape.js';
 
 export const flask: Client = {
   info: {

@@ -1,7 +1,7 @@
-import type { Target } from '../targets';
+import type { Target } from '../targets.js';
 
-import { aws } from './aws/webhooks/client';
-import { express } from './express/webhooks/client';
+import { aws } from './aws/webhooks/client.js';
+import { express } from './express/webhooks/client.js';
 
 export const node: Target = {
   info: {

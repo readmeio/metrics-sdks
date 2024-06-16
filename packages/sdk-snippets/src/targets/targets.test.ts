@@ -1,13 +1,13 @@
-import type { ClientId, SnippetType, TargetId } from './targets';
-import type { Variables } from '..';
+import type { ClientId, SnippetType, TargetId } from './targets.js';
+import type { Variables } from '../index.js';
 
-import { readdirSync, readFileSync, writeFileSync } from 'fs';
-import path from 'path';
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
 
 import { describe, it, expect } from 'vitest';
 
-import { MetricsSDKSnippet } from '..';
-import { availableWebhookTargets, extname } from '../helpers/utils';
+import { availableWebhookTargets, extname } from '../helpers/utils.js';
+import { MetricsSDKSnippet } from '../index.js';
 
 const expectedBasePath = ['src', 'fixtures', 'webhooks'];
 
@@ -15,7 +15,7 @@ const inputFileNames = readdirSync(path.join(...expectedBasePath), 'utf-8');
 
 const fixtures: [string, Variables][] = inputFileNames.map(inputFileName => [
   inputFileName.replace(path.extname(inputFileName), ''),
-  // eslint-disable-next-line import/no-dynamic-require, global-require
+  // eslint-disable-next-line import/no-dynamic-require, global-require, unicorn/prefer-module
   require(path.resolve(...expectedBasePath, inputFileName)),
 ]);
 

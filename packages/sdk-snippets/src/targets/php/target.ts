@@ -1,6 +1,6 @@
-import type { Target } from '../targets';
+import type { Target } from '../targets.js';
 
-import { laravel } from './laravel/webhooks/client';
+import { laravel } from './laravel/webhooks/client.js';
 
 export const php: Target = {
   info: {

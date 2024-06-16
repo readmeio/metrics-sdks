@@ -1,12 +1,19 @@
 {
-  "extends": "./tsconfig.build.json",
+  "extends": "@tsconfig/node18",
   "compilerOptions": {
+    "allowJs": true,
+    "declaration": true,
+    "downlevelIteration": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "outDir": "dist",
+
     "rootDir": ".",
 
     // Allows us to not have to typeguard in catches.
     // https://bobbyhadz.com/blog/typescript-object-is-of-type-unknown
     "useUnknownInCatchVariables": false
   },
-  "exclude": ["dist"],
-  "include": ["src"]
+  "include": ["./src/**/*"],
+  "exclude": ["dist", "./src/fixtures/", "./src/**/fixtures", "**/*.test.ts"]
 }

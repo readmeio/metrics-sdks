@@ -2,38 +2,48 @@
   "name": "@readme/metrics-sdk-snippets",
   "version": "2.4.1",
   "description": "Generate code snippets for ReadMe Metrics SDKs in multiple languages",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "license": "ISC",
-  "homepage": "https://readme.com/metrics",
-  "bugs": {
-    "email": "support@readme.io",
-    "url": "https://github.com/readmeio/metrics-sdks/issues"
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
   },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:readmeio/metrics-sdks.git"
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.cts",
+  "engines": {
+    "node": ">=18"
   },
   "keywords": [
     "api-metrics",
     "readme"
   ],
-  "engines": {
-    "node": ">=18"
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:readmeio/metrics-sdks.git"
+  },
+  "homepage": "https://readme.com/metrics",
+  "bugs": {
+    "email": "support@readme.io",
+    "url": "https://github.com/readmeio/metrics-sdks/issues"
   },
   "scripts": {
-    "build": "tsc --build tsconfig.build.json",
-    "clean": "rm -rf dist/",
+    "attw": "attw --pack --format table-flipped",
+    "build": "tsup",
     "lint": "npm run lint:types && npm run lint:js",
     "lint:js": "eslint . --ext js,ts",
     "lint:types": "tsc --noEmit",
-    "prebuild": "npm run clean",
+    "prebuild": "rm -rf dist/",
     "prepack": "npm run build",
     "prettier": "prettier --list-different --write \"./**/**.{js,ts}\"",
     "test": "vitest run --coverage"
   },
   "dependencies": {
-    "@readme/httpsnippet": "^6.2.1"
+    "@readme/httpsnippet": "^10.0.5"
   },
   "devDependencies": {
     "@readme/eslint-config": "^14.0.0",
@@ -41,6 +51,7 @@
     "@vitest/coverage-v8": "^1.6.0",
     "eslint": "^8.47.0",
     "prettier": "^3.3.2",
+    "tsup": "^8.1.0",
     "type-fest": "^4.20.1",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"

@@ -1,7 +1,7 @@
-import type { Client } from '../../../targets';
+import type { Client } from '../../../targets.js';
 
-import { CodeBuilder } from '../../../../helpers/code-builder';
-import { escapeForObjectKey, escapeForSingleQuotes } from '../../../../helpers/escape';
+import { CodeBuilder } from '../../../../helpers/code-builder.js';
+import { escapeForObjectKey, escapeForSingleQuotes } from '../../../../helpers/escape.js';
 
 export const express: Client = {
   info: {

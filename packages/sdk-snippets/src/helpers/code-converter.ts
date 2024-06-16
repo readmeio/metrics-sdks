@@ -1,5 +1,5 @@
 import { basename } from 'node:path';
-import process from 'process';
+import process from 'node:process';
 
 async function getStdin() {
   if (process.stdin.isTTY) return null;

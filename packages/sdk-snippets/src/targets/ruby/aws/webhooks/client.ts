@@ -1,9 +1,9 @@
 // For use with AWS Lambda Runtime: ruby2.7
 
-import type { Client } from '../../../targets';
+import type { Client } from '../../../targets.js';
 
-import { CodeBuilder } from '../../../../helpers/code-builder';
-import { escapeForObjectKey, escapeForDoubleQuotes } from '../../../../helpers/escape';
+import { CodeBuilder } from '../../../../helpers/code-builder.js';
+import { escapeForObjectKey, escapeForDoubleQuotes } from '../../../../helpers/escape.js';
 
 export const aws: Client = {
   info: {

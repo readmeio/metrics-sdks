@@ -1,8 +1,8 @@
-import type { ClientId, SnippetType, TargetId } from './targets/targets';
+import type { ClientId, SnippetType, TargetId } from './targets/targets.js';
 
-import { targets } from './targets/targets';
+import { targets } from './targets/targets.js';
 
-export { availableServerTargets, availableWebhookTargets, extname } from './helpers/utils';
+export { availableServerTargets, availableWebhookTargets, extname } from './helpers/utils.js';
 
 export interface ServerVariable {
   default?: string;
