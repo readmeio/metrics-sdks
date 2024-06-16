@@ -1,6 +1,6 @@
 {
   "name": "@readme/metrics-sdk-snippets",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "Generate code snippets for ReadMe Metrics SDKs in multiple languages",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,6 +18,9 @@
     "api-metrics",
     "readme"
   ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
     "clean": "rm -rf dist/",
@@ -25,7 +28,7 @@
     "prebuild": "npm run clean",
     "prepack": "npm run build",
     "prettier": "prettier --list-different --write \"./**/**.{js,ts}\"",
-    "test": "vitest --coverage"
+    "test": "vitest run --coverage"
   },
   "dependencies": {
     "@readme/httpsnippet": "^6.2.1"

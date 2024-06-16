@@ -26,8 +26,9 @@ import getReadMeApiMock from './helpers/getReadMeApiMock';
 const upload = multer();
 
 const apiKey = 'mockReadMeApiKey';
+const endUserApiKey = '5afa21b97011c63320226ef3';
 const incomingGroup = {
-  apiKey: '5afa21b97011c63320226ef3',
+  apiKey: endUserApiKey,
   label: 'test',
   email: 'test@example.com',
 };
@@ -125,11 +126,11 @@ describe('#metrics', function () {
   describe('tests for sending requests to the metrics server', function () {
     let metricsServerRequests: number;
     let app: Express;
-    // eslint-disable-next-line vitest/require-hook
-    let metricsServerResponseCode = 202;
+    let metricsServerResponseCode: number;
 
     beforeEach(function () {
       metricsServerRequests = 0;
+      metricsServerResponseCode = 202;
       server.use(
         rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
           const body: OutgoingLogBody[] = await req.json();
@@ -189,6 +190,123 @@ describe('#metrics', function () {
       setBackoff(new Date(2022, 12, 31));
       await makeRequest();
       expect(metricsServerRequests).toBe(1);
+    });
+  });
+
+  describe('unified snippet tests', function () {
+    let metricsServerRequests: number;
+    let app: Express;
+    let metricsServerResponseCode: number;
+
+    beforeEach(function () {
+      metricsServerRequests = 0;
+      metricsServerResponseCode = 202;
+      server.use(
+        ...[
+          rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
+            const body: OutgoingLogBody[] = await req.json();
+            if (doMetricsHeadersMatch(req.headers)) {
+              metricsServerRequests += 1;
+              expect(body[0]._version).to.equal(3);
+              expect(body[0].group).to.deep.equal(outgoingGroup);
+              expect(typeof body[0].request.log.entries[0].startedDateTime).to.equal('string');
+              return res(ctx.status(metricsServerResponseCode), ctx.text(''));
+            }
+
+            return res(ctx.status(500));
+          }),
+          rest.get(`${config.readmeApiUrl}/v1`, (req, res, ctx) => {
+            return res(
+              ctx.status(200),
+              ctx.json({
+                jwtSecret: '123',
+                subdomain: 'subdomain',
+              }),
+            );
+          }),
+          rest.get(`${config.readmeApiUrl}/v1/version`, (req, res, ctx) => {
+            return res(
+              ctx.status(200),
+              ctx.json([
+                {
+                  version: '1.0',
+                  subdomain: 'subdomain',
+                },
+              ]),
+            );
+          }),
+        ],
+      );
+
+      const readme = new readmeio.ReadMe(apiKey);
+      app = express();
+      app.use(
+        readme.express((req, getUser) => {
+          return getUser({
+            byAPIKey: (requestApiKey: string) => {
+              // TODO should we be calling this if the requestApiKey is undefined?
+              if (!requestApiKey) {
+                return undefined;
+              }
+
+              return Promise.resolve({
+                keys: [{ apiKey: requestApiKey, name: 'test' }],
+                name: 'test',
+                email: 'test@example.com',
+              });
+            },
+            byEmail: (email: string) => {
+              if (!email) {
+                return undefined;
+              }
+
+              return Promise.resolve({
+                keys: [{ apiKey: endUserApiKey, name: 'test' }],
+                name: 'test',
+                email: 'test@example.com',
+              });
+            },
+          });
+        }),
+      );
+      app.get('/test', (req, res) => {
+        return res.sendStatus(200);
+      });
+    });
+
+    afterEach(function () {
+      setBackoff(undefined);
+      metricsServerResponseCode = 202;
+    });
+
+    function makeRequest(query = '') {
+      return request(app).get(`/test${query}`).expect(200);
+    }
+
+    it('should send requests to the metrics server', async function () {
+      expect.assertions(10);
+      for (let i = 0; i < 3; i += 1) {
+        await makeRequest(`?api_key=${endUserApiKey}`); // eslint-disable-line no-await-in-loop
+      }
+      expect(metricsServerRequests).to.equal(3);
+    });
+
+    it('should send not requests to the metrics server if no api key is included', async function () {
+      expect.assertions(1);
+      for (let i = 0; i < 3; i += 1) {
+        await makeRequest(); // eslint-disable-line no-await-in-loop
+      }
+      expect(metricsServerRequests).to.equal(0);
+    });
+
+    it('should not persist the api key between requests', async function () {
+      // Four since we have assertions in the beforeEach for each request
+      // the one without the key will fail on the first assertion
+      expect.assertions(4);
+
+      await makeRequest(`?api_key=${endUserApiKey}`);
+      await makeRequest();
+      expect(metricsServerRequests).to.equal(1);
     });
   });
 
@@ -444,6 +562,7 @@ describe('#metrics', function () {
 
   describe('`res._body`', function () {
     const responseBody = { a: 1, b: 2, c: 3 };
+
     function createMock() {
       return server.use(
         rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
