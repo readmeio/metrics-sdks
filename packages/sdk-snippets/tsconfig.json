@@ -1,17 +1,17 @@
 {
-  "extends": "@tsconfig/node18",
   "compilerOptions": {
     "allowJs": true,
     "declaration": true,
     "downlevelIteration": true,
+    "esModuleInterop": true,
+    "lib": ["es2023"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "outDir": "dist",
-
     "rootDir": ".",
-
-    // Allows us to not have to typeguard in catches.
-    // https://bobbyhadz.com/blog/typescript-object-is-of-type-unknown
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "es2022",
     "useUnknownInCatchVariables": false
   },
   "include": ["./src/**/*"],

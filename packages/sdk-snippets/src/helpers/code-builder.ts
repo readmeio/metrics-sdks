@@ -1,8 +1,4 @@
-import type { CodeBuilderOptions } from '@readme/httpsnippet/helpers/code-builder';
-
 import { CodeBuilder as HTTPSnippetCodeBuilder } from '@readme/httpsnippet/helpers/code-builder';
-
-export type { CodeBuilderOptions };
 
 export class CodeBuilder extends HTTPSnippetCodeBuilder {
   sections: {
