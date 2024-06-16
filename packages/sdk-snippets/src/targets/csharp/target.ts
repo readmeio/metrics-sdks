@@ -1,7 +1,7 @@
-import type { Target } from '../targets';
+import type { Target } from '../targets.js';
 
-import { aws } from './aws/webhooks/client';
-import { dotnet6 } from './dotnet6/webhooks/client';
+import { aws } from './aws/webhooks/client.js';
+import { dotnet6 } from './dotnet6/webhooks/client.js';
 
 export const csharp: Target = {
   info: {

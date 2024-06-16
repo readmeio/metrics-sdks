@@ -78,7 +78,7 @@ OVERWRITE_EVERYTHING=true npx jest src/targets/targets.test.ts
 
 ```ts
 import type { Client } from '../../../targets';
-import { CodeBuilder } from '@readme/httpsnippet/dist/helpers/code-builder';
+import { CodeBuilder } from '@readme/httpsnippet/helpers/code-builder';
 
 export const express: Client = {
   info: {

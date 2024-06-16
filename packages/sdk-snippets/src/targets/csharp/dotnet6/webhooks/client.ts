@@ -1,7 +1,7 @@
-import type { Client } from '../../../targets';
+import type { Client } from '../../../targets.js';
 
-import { CodeBuilder } from '../../../../helpers/code-builder';
-import { escapeForObjectKey, escapeForDoubleQuotes } from '../../../../helpers/escape';
+import { CodeBuilder } from '../../../../helpers/code-builder.js';
+import { escapeForObjectKey, escapeForDoubleQuotes } from '../../../../helpers/escape.js';
 
 export const dotnet6: Client = {
   info: {

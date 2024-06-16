@@ -1,8 +1,8 @@
-import type { ClientId, SnippetType, TargetId } from './targets/targets';
+import type { ClientId, SnippetType, TargetId } from './targets/targets.js';
 
-import { targets } from './targets/targets';
+import { targets } from './targets/targets.js';
 
-export { availableServerTargets, availableWebhookTargets, extname } from './helpers/utils';
+export { availableServerTargets, availableWebhookTargets, extname } from './helpers/utils.js';
 
 export interface ServerVariable {
   default?: string;
@@ -49,7 +49,7 @@ export class MetricsSDKSnippet {
     const { convert } = target.services[snippetType][clientId || target.info.default];
 
     // Reduce our variables into a set keyed by their type.
-    const { server, security } = this.variables.reduce(
+    const { server, security } = this.variables.reduce<any>(
       (prev, next) => {
         prev[next.source].push(next);
         return prev;

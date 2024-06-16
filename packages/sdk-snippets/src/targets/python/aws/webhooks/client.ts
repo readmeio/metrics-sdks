@@ -1,9 +1,9 @@
 // For use with AWS Lambda Runtime: python3.9
 
-import type { Client } from '../../../targets';
+import type { Client } from '../../../targets.js';
 
-import { CodeBuilder } from '../../../../helpers/code-builder';
-import { escapeForDoubleQuotes } from '../../../../helpers/escape';
+import { CodeBuilder } from '../../../../helpers/code-builder.js';
+import { escapeForDoubleQuotes } from '../../../../helpers/escape.js';
 
 export const aws: Client = {
   info: {

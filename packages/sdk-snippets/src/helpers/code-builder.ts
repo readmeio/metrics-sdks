@@ -1,8 +1,4 @@
-import type { CodeBuilderOptions } from '@readme/httpsnippet/dist/helpers/code-builder';
-
-import { CodeBuilder as HTTPSnippetCodeBuilder } from '@readme/httpsnippet/dist/helpers/code-builder';
-
-export type { CodeBuilderOptions };
+import { CodeBuilder as HTTPSnippetCodeBuilder } from '@readme/httpsnippet/helpers/code-builder';
 
 export class CodeBuilder extends HTTPSnippetCodeBuilder {
   sections: {
@@ -29,7 +25,7 @@ export class CodeBuilder extends HTTPSnippetCodeBuilder {
   };
 
   endSection = (section: 'payload' | 'verification') => {
-    this.sections[section].end = this.code.length;
+    this.sections[section]!.end = this.code.length;
   };
 
   ranges = () => {
@@ -58,7 +54,7 @@ export class CodeBuilder extends HTTPSnippetCodeBuilder {
       this.variables[opts.type] = {};
     }
 
-    this.variables[opts.type][opts.name] = {
+    this.variables[opts.type]![opts.name] = {
       line: this.code.length,
     };
   };

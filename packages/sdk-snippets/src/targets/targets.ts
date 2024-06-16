@@ -1,12 +1,12 @@
-import type { SecurityVariable, ServerVariable } from '..';
-import type { CodeBuilder } from '../helpers/code-builder';
+import type { CodeBuilder } from '../helpers/code-builder.js';
+import type { SecurityVariable, ServerVariable } from '../index.js';
 import type { Merge } from 'type-fest';
 
-import { csharp } from './csharp/target';
-import { node } from './node/target';
-import { php } from './php/target';
-import { python } from './python/target';
-import { ruby } from './ruby/target';
+import { csharp } from './csharp/target.js';
+import { node } from './node/target.js';
+import { php } from './php/target.js';
+import { python } from './python/target.js';
+import { ruby } from './ruby/target.js';
 
 export type TargetId = keyof typeof targets;
 export type SnippetType = 'server' | 'webhooks';

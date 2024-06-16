@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import codeConverter from './code-converter';
+import codeConverter from './code-converter.js';
 
 const codeSample = `
 import express from 'express';
