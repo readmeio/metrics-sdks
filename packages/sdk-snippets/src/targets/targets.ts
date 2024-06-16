@@ -9,7 +9,7 @@ import { python } from './python/target';
 import { ruby } from './ruby/target';
 
 export type TargetId = keyof typeof targets;
-export type SnippetType = 'webhooks' | 'server';
+export type SnippetType = 'server' | 'webhooks';
 export type ClientId = string;
 
 export interface ClientInfo {

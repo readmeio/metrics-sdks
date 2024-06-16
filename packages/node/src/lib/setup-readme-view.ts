@@ -10,12 +10,12 @@ export function buildSetupView({
   disableWebhook,
   disableMetrics,
 }: {
-  readmeAPIKey: string;
   baseUrl: string;
   disableMetrics?: boolean;
   disableWebhook?: boolean;
-  subdomain: string;
+  readmeAPIKey: string;
   stableVersion: string;
+  subdomain: string;
 }) {
   const dashUrl = `https://dash.readme.com/project/${subdomain}/v${stableVersion}/metrics/developers`;
   let webhookScriptHtml = `
@@ -30,12 +30,12 @@ export function buildSetupView({
       }
     }
 
-    function updateUser(user) { 
-        updateElement('userObject', JSON.stringify(user, undefined, 2)); 
+    function updateUser(user) {
+        updateElement('userObject', JSON.stringify(user, undefined, 2));
     }
 
-    function updateWarning(warning) { 
-        updateElement('warningText', warning); 
+    function updateWarning(warning) {
+        updateElement('warningText', warning);
     }
 
 
@@ -491,7 +491,7 @@ export function buildSetupView({
     color: #f07178;
   }
 
-  .cm-keyword { 
+  .cm-keyword {
     color: #c792ea;
   }
 

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-interface */
 import caseless from 'caseless';
 import { isValidUUIDV4 } from 'is-valid-uuid-v4';
 import { expect } from 'vitest';
@@ -17,7 +16,7 @@ interface CustomMatchers<R = unknown> {
   /**
    * Assert that a given HAR `headers` array has a given header matching a specific value.
    */
-  toHaveHeader(header: string, expected: string | RegExp): R;
+  toHaveHeader(header: string, expected: RegExp | string): R;
 }
 
 declare module 'vitest' {
@@ -115,7 +114,7 @@ export function toHaveADocumentationHeader(headers: Record<string, string>, base
  * @param {string} header
  * @param {string|RegExp} expected
  */
-export function toHaveHeader(headers: { name: string; value: string }[], header: string, expected: string | RegExp) {
+export function toHaveHeader(headers: { name: string; value: string }[], header: string, expected: RegExp | string) {
   // const obj = utils.flag(this, 'object');
   const caselessHeaders = caseless(arrayToObject(headers));
   const actual = caselessHeaders.get(header);
