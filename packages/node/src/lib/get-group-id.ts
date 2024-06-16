@@ -43,7 +43,7 @@ const findRelevantKey = (keys: ApiKey[], apiKey: string) => {
 
   // Reduce the array of ApiKeys to find the relevant key and its path
   return keys.reduce(
-    (acc: { path?: string, relevantKey?: ApiKey; }, item) => {
+    (acc: { path?: string; relevantKey?: ApiKey }, item) => {
       const path = findPath(item, apiKey);
       // If the path is found, return the relevantKey and path
       if (path !== undefined) {
