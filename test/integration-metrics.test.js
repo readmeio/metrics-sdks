@@ -3,12 +3,8 @@ import { once } from 'node:events';
 import fs from 'node:fs/promises';
 import http from 'node:http';
 import net from 'node:net';
-import { Readable } from 'node:stream';
 
 import chai from 'chai';
-import { FormDataEncoder } from 'form-data-encoder';
-import { File, FormData } from 'formdata-node';
-import 'isomorphic-fetch';
 import { describe, beforeAll, beforeEach, afterAll, expect, it, expectTypeOf } from 'vitest';
 
 import chaiPlugins from './helpers/chai-plugins.js';
@@ -461,12 +457,9 @@ describe('Metrics SDK Integration Tests', function () {
     formData.append('another', 'Hello world');
     formData.append('buster', [1234, 5678]);
 
-    const encoder = new FormDataEncoder(formData);
-
     await fetch(`http://localhost:${PORT}/`, {
       method: 'post',
-      headers: encoder.headers,
-      body: Readable.from(encoder),
+      body: formData,
     });
 
     const [, body] = await getRequest();
@@ -503,12 +496,9 @@ describe('Metrics SDK Integration Tests', function () {
       formData.append('buster', [1234, 5678]);
       formData.append('owlbert.png', new File([owlbert], 'owlbert.png', { type: 'image/png' }), 'owlbert.png');
 
-      const encoder = new FormDataEncoder(formData);
-
       await fetch(`http://localhost:${PORT}/`, {
         method: 'post',
-        headers: encoder.headers,
-        body: Readable.from(encoder),
+        body: formData,
       });
 
       const [, body] = await getRequest();
