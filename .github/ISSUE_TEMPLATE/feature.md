@@ -7,4 +7,4 @@ labels: question
 Please provide details about:
 
 - What SDK or language is this for
-- What you're trying to do
+- What's your use case
