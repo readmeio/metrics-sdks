@@ -10,6 +10,4 @@ export default defineConfig(options => ({
   shims: true,
   silent: !options.watch,
   sourcemap: true,
-  treeshake: true,
-  tsconfig: './tsconfig.json',
 }));
