@@ -55,7 +55,6 @@ jobs:
         run: |
           make install
           gem install rack ${{ matrix.rack-version }}
-        # bundle update
 
       - name: Run linter
         run: make lint
