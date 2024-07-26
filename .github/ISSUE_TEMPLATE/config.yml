@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Need integration help? Or need help with anything else?
+    url: mailto:support@readme.io?subject=I%20need%20help%20integrating%20a%20Metrics%20SDK!
+    about: Email our support team!
