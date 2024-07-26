@@ -3,11 +3,11 @@ import type { UUID } from 'node:crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { TLSSocket } from 'tls';
 
+import { randomUUID } from 'node:crypto';
 import os from 'os';
 import { URL } from 'url';
 
 import ssri from 'ssri';
-import { v4 as uuidv4 } from 'uuid';
 
 import { version } from '../../package.json';
 
@@ -142,7 +142,7 @@ export function constructPayload(
   const serverTime = payloadData.responseEndDateTime.getTime() - payloadData.startedDateTime.getTime();
 
   return {
-    _id: payloadData.logId || (uuidv4() as UUID),
+    _id: payloadData.logId || randomUUID(),
     _version: 3,
     group: {
       id: mask(payloadData.apiKey),

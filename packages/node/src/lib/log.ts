@@ -1,12 +1,11 @@
 import type { LogOptions } from './construct-payload';
 import type { GroupingObject, OutgoingLogBody } from './metrics-log';
-import type { UUID } from 'node:crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
+import { randomUUID } from 'node:crypto';
 import * as url from 'url';
 
 import clamp from 'lodash/clamp';
-import { v4 as uuidv4 } from 'uuid';
 
 import config from '../config';
 
@@ -108,7 +107,7 @@ export function log(
   const bufferLength = clamp(options.bufferLength || config.bufferLength, 1, 30);
 
   const startedDateTime = new Date();
-  const logId = uuidv4() as UUID;
+  const logId = randomUUID();
 
   // baseLogUrl can be provided, but if it isn't then we
   // attempt to fetch it from the ReadMe API
