@@ -7,6 +7,6 @@ labels: needs triage
 Please provide details about:
 
 - What SDK this is for
-- What you're trying to do
+- What's your use case
 - What happened
 - What you expected to happen
