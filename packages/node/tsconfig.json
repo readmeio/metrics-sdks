@@ -1,15 +1,12 @@
 {
+  "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
     "allowJs": true,
     "baseUrl": ".",
     "declaration": true,
-    "esModuleInterop": true,
     "inlineSourceMap": true,
-    "lib": ["es2019"],
     "outDir": "./dist",
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "strict": true
+    "resolveJsonModule": true
   },
   "include": [
     "src/**/*",

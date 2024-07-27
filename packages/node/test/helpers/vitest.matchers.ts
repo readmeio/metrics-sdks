@@ -1,4 +1,3 @@
-import caseless from 'caseless';
 import { isValidUUIDV4 } from 'is-valid-uuid-v4';
 import { expect } from 'vitest';
 
@@ -33,14 +32,14 @@ declare module 'vitest' {
  *    { name: 'connection', value: 'close' },
  *  ];
  *
- * To an object that can be passed in to caseless:
+ * To a flattened object:
  *
  *  {
  *    host: 'localhost:49914',
  *    connection: 'close'
  *  }
  */
-function arrayToObject(array: { name: string; value: string }[]) {
+function arrayToObject(array: { name: string; value: string }[]): Record<string, string> {
   return array.reduce((prev, next) => {
     return Object.assign(prev, { [next.name]: next.value });
   }, {});
@@ -50,7 +49,7 @@ function arrayToObject(array: { name: string; value: string }[]) {
  * Assert that a given URL is a valid URL.
  *
  * @example
- * expect(body.url).totoBeAURL()
+ * expect(body.url).toBeAURL()
  */
 export function toBeAURL(url: string) {
   let valid = true;
@@ -115,9 +114,7 @@ export function toHaveADocumentationHeader(headers: Record<string, string>, base
  * @param {string|RegExp} expected
  */
 export function toHaveHeader(headers: { name: string; value: string }[], header: string, expected: RegExp | string) {
-  // const obj = utils.flag(this, 'object');
-  const caselessHeaders = caseless(arrayToObject(headers));
-  const actual = caselessHeaders.get(header);
+  const actual = arrayToObject(headers)?.[header];
 
   let message: string;
   let valid: boolean;

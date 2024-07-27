@@ -1,4 +1,4 @@
-import type { GroupingObject } from '../../src';
+import type { GroupingObject } from '../../src/lib/ReadMe';
 import type { Operation } from 'oas';
 
 import { describe, expect, it, beforeEach } from 'vitest';
