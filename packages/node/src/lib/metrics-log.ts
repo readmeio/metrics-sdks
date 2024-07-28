@@ -1,7 +1,7 @@
 import type { Options } from './log';
-import type { UUID } from 'crypto';
 import type { Har } from 'har-format';
 import type { Response } from 'node-fetch';
+import type { UUID } from 'node:crypto';
 
 import fetch from 'node-fetch';
 import timeoutSignal from 'timeout-signal';
