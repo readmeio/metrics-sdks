@@ -2,14 +2,13 @@
 /* eslint-disable vitest/no-standalone-expect */
 import type { OutgoingLogBody } from '../src/lib/metrics-log';
 import type { Express } from 'express';
-import type { Headers } from 'headers-polyfill';
 
 import * as crypto from 'crypto';
 import { createServer } from 'http';
 
 import express from 'express';
 import FormData from 'form-data';
-import { rest } from 'msw';
+import { delay, http, HttpResponse, passthrough } from 'msw';
 import { setupServer } from 'msw/node';
 import multer from 'multer';
 import request from 'supertest';
@@ -44,8 +43,8 @@ const baseLogUrl = 'https://docs.example.com';
 const server = setupServer(
   ...[
     // allow any localhost requests
-    rest.all(/^http:\/\/127.0.0.1/, req => {
-      return req.passthrough();
+    http.all(/^http:\/\/127.0.0.1/, () => {
+      return passthrough();
     }),
     getReadMeApiMock(baseLogUrl),
   ],
@@ -132,17 +131,17 @@ describe('#metrics', function () {
       metricsServerRequests = 0;
       metricsServerResponseCode = 202;
       server.use(
-        rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
-          const body: OutgoingLogBody[] = await req.json();
+        http.post(`${config.host}/v1/request`, async ({ request: req }) => {
+          const body = (await req.json()) as OutgoingLogBody[];
           if (doMetricsHeadersMatch(req.headers)) {
             metricsServerRequests += 1;
             expect(body[0]._version).toBe(3);
             expect(body[0].group).toStrictEqual(outgoingGroup);
             expect(typeof body[0].request.log.entries[0].startedDateTime).toBe('string');
-            return res(ctx.status(metricsServerResponseCode), ctx.text(''));
+            return new HttpResponse('', { status: metricsServerResponseCode });
           }
 
-          return res(ctx.status(500));
+          return new HttpResponse(null, { status: 500 });
         }),
       );
 
@@ -203,36 +202,36 @@ describe('#metrics', function () {
       metricsServerResponseCode = 202;
       server.use(
         ...[
-          rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
-            const body: OutgoingLogBody[] = await req.json();
+          http.post(`${config.host}/v1/request`, async ({ request: req }) => {
+            const body = (await req.json()) as OutgoingLogBody[];
             if (doMetricsHeadersMatch(req.headers)) {
               metricsServerRequests += 1;
               expect(body[0]._version).to.equal(3);
               expect(body[0].group).to.deep.equal(outgoingGroup);
               expect(typeof body[0].request.log.entries[0].startedDateTime).to.equal('string');
-              return res(ctx.status(metricsServerResponseCode), ctx.text(''));
+              return new HttpResponse('', { status: metricsServerResponseCode });
             }
 
-            return res(ctx.status(500));
+            return new HttpResponse(null, { status: 500 });
           }),
-          rest.get(`${config.readmeApiUrl}/v1`, (req, res, ctx) => {
-            return res(
-              ctx.status(200),
-              ctx.json({
+          http.get(`${config.readmeApiUrl}/v1`, () => {
+            return HttpResponse.json(
+              {
                 jwtSecret: '123',
                 subdomain: 'subdomain',
-              }),
+              },
+              { status: 200 },
             );
           }),
-          rest.get(`${config.readmeApiUrl}/v1/version`, (req, res, ctx) => {
-            return res(
-              ctx.status(200),
-              ctx.json([
+          http.get(`${config.readmeApiUrl}/v1/version`, () => {
+            return HttpResponse.json(
+              [
                 {
                   version: '1.0',
                   subdomain: 'subdomain',
                 },
-              ]),
+              ],
+              { status: 200 },
             );
           }),
         ],
@@ -313,14 +312,14 @@ describe('#metrics', function () {
   it('should set `pageref` correctly based on `req.route`', function () {
     expect.assertions(1);
     server.use(
-      rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
-        const body: OutgoingLogBody[] = await req.json();
+      http.post(`${config.host}/v1/request`, async ({ request: req }) => {
+        const body = (await req.json()) as OutgoingLogBody[];
         if (doMetricsHeadersMatch(req.headers)) {
           expect(body[0].request.log.entries[0].pageref).toBe('http://127.0.0.1/test/:id');
-          return res(ctx.status(200));
+          return new HttpResponse(null, { status: 200 });
         }
 
-        return res(ctx.status(500));
+        return new HttpResponse(null, { status: 500 });
       }),
     );
 
@@ -341,14 +340,14 @@ describe('#metrics', function () {
   it('should set `pageref` without express', function () {
     expect.assertions(1);
     server.use(
-      rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
-        const body: OutgoingLogBody[] = await req.json();
+      http.post(`${config.host}/v1/request`, async ({ request: req }) => {
+        const body = (await req.json()) as OutgoingLogBody[];
         if (doMetricsHeadersMatch(req.headers)) {
           expect(body[0].request.log.entries[0].pageref).toMatch(/^http:\/\/127.0.0.1:\d.*\/test\/hello/);
-          return res(ctx.status(200));
+          return new HttpResponse(null, { status: 200 });
         }
 
-        return res(ctx.status(500));
+        return new HttpResponse(null, { status: 500 });
       }),
     );
 
@@ -364,15 +363,15 @@ describe('#metrics', function () {
   it('express should log the full request url with nested express apps', function () {
     expect.assertions(3);
     server.use(
-      rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
-        const body: OutgoingLogBody[] = await req.json();
+      http.post(`${config.host}/v1/request`, async ({ request: req }) => {
+        const body = (await req.json()) as OutgoingLogBody[];
         if (doMetricsHeadersMatch(req.headers)) {
           expect(body[0].group).toStrictEqual(outgoingGroup);
           expect(body[0].request.log.entries[0].request.url).toContain('/test/nested');
-          return res(ctx.status(200));
+          return new HttpResponse(null, { status: 200 });
         }
 
-        return res(ctx.status(500));
+        return new HttpResponse(null, { status: 500 });
       }),
     );
 
@@ -406,14 +405,14 @@ describe('#metrics', function () {
     it('should send requests when number hits `bufferLength` size', async function test() {
       expect.assertions(9);
       server.use(
-        rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
-          const body: OutgoingLogBody[] = await req.json();
+        http.post(`${config.host}/v1/request`, async ({ request: req }) => {
+          const body = (await req.json()) as OutgoingLogBody[];
           if (doMetricsHeadersMatch(req.headers)) {
             expect(body).toHaveLength(3);
-            return res(ctx.status(200));
+            return new HttpResponse(null, { status: 200 });
           }
 
-          return res(ctx.status(500));
+          return new HttpResponse(null, { status: 500 });
         }),
       );
 
@@ -466,8 +465,8 @@ describe('#metrics', function () {
       const seenLogs: string[] = [];
 
       server.use(
-        rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
-          const body: OutgoingLogBody[] = await req.json();
+        http.post(`${config.host}/v1/request`, async ({ request: req }) => {
+          const body = (await req.json()) as OutgoingLogBody[];
           if (doMetricsHeadersMatch(req.headers)) {
             expect(body).toHaveLength(bufferLength);
 
@@ -478,10 +477,12 @@ describe('#metrics', function () {
               seenLogs.push(requestHash);
             });
 
-            return res(ctx.status(200), ctx.delay(1000));
+            await delay(1000);
+
+            return new HttpResponse(null, { status: 200 });
           }
 
-          return res(ctx.status(500));
+          return new HttpResponse(null, { status: 500 });
         }),
       );
 
@@ -503,12 +504,12 @@ describe('#metrics', function () {
   describe('#baseLogUrl', function () {
     beforeEach(function () {
       server.use(
-        rest.post(`${config.host}/v1/request`, (req, res, ctx) => {
+        http.post(`${config.host}/v1/request`, ({ request: req }) => {
           if (doMetricsHeadersMatch(req.headers)) {
-            return res(ctx.status(200));
+            return new HttpResponse(null, { status: 200 });
           }
 
-          return res(ctx.status(500));
+          return new HttpResponse(null, { status: 500 });
         }),
       );
     });
@@ -565,14 +566,14 @@ describe('#metrics', function () {
 
     function createMock() {
       return server.use(
-        rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
-          const body: OutgoingLogBody[] = await req.json();
+        http.post(`${config.host}/v1/request`, async ({ request: req }) => {
+          const body = (await req.json()) as OutgoingLogBody[];
           if (doMetricsHeadersMatch(req.headers)) {
             expect(body[0].request.log.entries[0].response.content.text).toStrictEqual(JSON.stringify(responseBody));
-            return res(ctx.status(200));
+            return new HttpResponse(null, { status: 200 });
           }
 
-          return res(ctx.status(500));
+          return new HttpResponse(null, { status: 500 });
         }),
       );
     }
@@ -625,14 +626,14 @@ describe('#metrics', function () {
   describe('`req.body`', function () {
     function createMock(checkLocation: 'params' | 'text', requestBody: unknown) {
       return server.use(
-        rest.post(`${config.host}/v1/request`, async (req, res, ctx) => {
-          const body: OutgoingLogBody[] = await req.json();
+        http.post(`${config.host}/v1/request`, async ({ request: req }) => {
+          const body = (await req.json()) as OutgoingLogBody[];
           if (doMetricsHeadersMatch(req.headers)) {
             expect(body[0].request.log.entries[0].request.postData[checkLocation]).toStrictEqual(requestBody);
-            return res(ctx.status(200));
+            return new HttpResponse(null, { status: 200 });
           }
 
-          return res(ctx.status(500));
+          return new HttpResponse(null, { status: 500 });
         }),
       );
     }
