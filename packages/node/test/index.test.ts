@@ -7,10 +7,8 @@ import * as crypto from 'crypto';
 import { createServer } from 'http';
 
 import express from 'express';
-import FormData from 'form-data';
 import { delay, http, HttpResponse, passthrough } from 'msw';
 import { setupServer } from 'msw/node';
-import multer from 'multer';
 import request from 'supertest';
 import { describe, afterAll, beforeEach, afterEach, expect, it } from 'vitest';
 
@@ -21,8 +19,6 @@ import { getCache } from '../src/lib/get-project-base-url';
 import { setBackoff } from '../src/lib/metrics-log';
 
 import getReadMeApiMock from './helpers/getReadMeApiMock';
-
-const upload = multer();
 
 const apiKey = 'mockReadMeApiKey';
 const endUserApiKey = '5afa21b97011c63320226ef3';
@@ -640,16 +636,11 @@ describe('#metrics', function () {
 
     it('should accept multipart/form-data', function () {
       expect.assertions(1);
-      const form = new FormData();
-      form.append('password', '123456');
-      form.append('apiKey', 'abc');
-      form.append('another', 'Hello world');
 
       // If the request body for a multipart/form-data request comes in as an object (as it does with the express
       // middleware) we expect it to be recorded json encoded
       createMock('text', JSON.stringify({ password: '123456', apiKey: 'abc', another: 'Hello world' }));
       const app = express();
-      app.use(upload.none());
       app.use((req, res, next) => {
         readmeio.log(apiKey, req, res, incomingGroup);
         return next();
@@ -658,7 +649,12 @@ describe('#metrics', function () {
         res.status(200).end();
       });
 
-      return request(app).post('/test').set(form.getHeaders()).send(form.getBuffer().toString()).expect(200);
+      return request(app)
+        .post('/test')
+        .field('password', '123456')
+        .field('apiKey', 'abc')
+        .field('another', 'Hello world')
+        .expect(200);
     });
   });
 });
