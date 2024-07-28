@@ -1,5 +1,5 @@
 import type { GroupingObject } from '../../src/lib/ReadMe';
-import type { Operation } from 'oas';
+import type { Operation } from 'oas/operation';
 
 import { describe, expect, it, beforeEach } from 'vitest';
 
