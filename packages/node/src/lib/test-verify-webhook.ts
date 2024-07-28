@@ -1,7 +1,5 @@
 import crypto from 'crypto';
 
-import fetch, { Headers } from 'node-fetch';
-
 import pkg from '../../package.json';
 
 async function verifyWebhook(url: string, email: string, secret: string, opts = { unsigned: false }) {
@@ -31,7 +29,7 @@ async function verifyWebhook(url: string, email: string, secret: string, opts = 
     headers,
   }).then(res => {
     if (res.status !== 200) {
-      return res.json().then(json => {
+      return (res.json() as Promise<{ error: string }>).then(json => {
         throw new Error(json.error);
       });
     }
@@ -42,7 +40,8 @@ async function verifyWebhook(url: string, email: string, secret: string, opts = 
 }
 
 export async function testVerifyWebhook(baseUrl: string, email: string, apiKey: string) {
-  let signed;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let signed: any; /** @fixme give this a better type */
   try {
     signed = await verifyWebhook(`${baseUrl}/readme-webhook`, email, apiKey);
   } catch (e) {
