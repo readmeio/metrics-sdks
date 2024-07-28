@@ -153,7 +153,6 @@ export default class ReadMe {
             headers,
           }).then(r => r.json() as Promise<typeof this.readmeProjectData>);
 
-          // return this.core.fetch('/version', 'get');
           this.readmeVersionData = await fetch(new URL('/api/v1/version', readmeAPIOrigin), {
             headers,
           }).then(r => r.json() as Promise<ReadMeVersion[]>);
