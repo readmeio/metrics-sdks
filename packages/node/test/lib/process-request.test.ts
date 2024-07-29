@@ -3,7 +3,6 @@ import type { LogOptions } from 'src/lib/construct-payload';
 
 import { createServer } from 'http';
 
-import FormData from 'form-data';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
@@ -99,20 +98,35 @@ describe('process-request', function () {
   it('should work with multipart/form-data', function () {
     const app = createApp({ denylist: ['password'] });
 
-    const form = new FormData();
-    form.append('password', '123456');
-    form.append('apiKey', 'abc');
-    form.append('another', 'Hello world');
-
-    const formHeaders = form.getHeaders();
-
     return request(app)
       .post('/')
-      .set(formHeaders)
-      .send(form.getBuffer().toString())
+      .field('password', '123456')
+      .field('apiKey', 'abc')
+      .field('another', 'Hello world')
       .expect(({ body }) => {
+        expect(body.postData.mimeType).toBe('multipart/form-data');
+
         // If the request body for multipart form comes in as a string, we record it as is.
-        expect(body.postData.text).toBe(form.getBuffer().toString());
+        const payload = body.postData.text.split('\r\n').map((str: string) => {
+          return str.startsWith('---') ? '---BOUNDARY' : str;
+        });
+
+        expect(payload).toStrictEqual([
+          '---BOUNDARY',
+          'Content-Disposition: form-data; name="password"',
+          '',
+          '123456',
+          '---BOUNDARY',
+          'Content-Disposition: form-data; name="apiKey"',
+          '',
+          'abc',
+          '---BOUNDARY',
+          'Content-Disposition: form-data; name="another"',
+          '',
+          'Hello world',
+          '---BOUNDARY',
+          '',
+        ]);
       });
   });
 
@@ -512,6 +526,7 @@ describe('process-request', function () {
     });
 
     it('should not error with no body', function () {
+      // @ts-expect-error deliberately passing in bad data
       return request(createApp({}, false, null))
         .post('/')
         .set('content-type', 'application/x-www-form-urlencoded')

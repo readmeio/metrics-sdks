@@ -2,7 +2,6 @@ import crypto from 'crypto';
 
 import findCacheDir from 'find-cache-dir';
 import flatCache from 'flat-cache';
-import fetch from 'node-fetch';
 import timeoutSignal from 'timeout-signal';
 
 import pkg from '../../package.json';
@@ -50,7 +49,7 @@ export async function getProjectBaseUrl(readmeApiKey: string, requestTimeout = c
           throw res;
         }
 
-        return res.json();
+        return res.json() as Promise<{ baseUrl: string }>;
       })
       .then(project => {
         baseUrl = project.baseUrl;

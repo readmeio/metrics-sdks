@@ -1,8 +1,8 @@
 import type { Options } from './log';
-import type { GetProjectResponse200 } from '../.api/apis/developers';
 import type { NextFunction, Request, Response } from 'express';
 
-import readmeSdk from '../.api/apis/developers';
+import pkg from '../../package.json';
+import config from '../config';
 
 import findAPIKey from './find-api-key';
 import { getGroupByApiKey } from './get-group-id';
@@ -41,8 +41,8 @@ export interface GroupingObject {
 // Typing the return as unknown to make it easier to format the user to our format in the middleware
 // This way these functions can just return from their database
 interface GetUserParams {
-  byAPIKey: (apiKey: string) => Promise<GroupingObject | void>;
-  byEmail: (email: string) => Promise<GroupingObject | void>;
+  byAPIKey: (apiKey: string) => Promise<GroupingObject | undefined | void> | undefined;
+  byEmail: (email: string) => Promise<GroupingObject | undefined | void> | undefined;
   manualAPIKey?: string;
 }
 
@@ -65,7 +65,14 @@ interface ReadMeVersion {
 export default class ReadMe {
   private readmeAPIKey: string;
 
-  private readmeProjectData!: GetProjectResponse200;
+  private readmeProjectData!: {
+    [x: string]: unknown;
+    baseUrl?: string;
+    jwtSecret?: string;
+    name?: string;
+    plan?: string;
+    subdomain?: string;
+  };
 
   private readmeVersionData!: ReadMeVersion[];
 
@@ -134,12 +141,22 @@ export default class ReadMe {
       const baseUrl = `${req.protocol}://${req.get('host')}${req.baseUrl}`;
 
       if (!this.readmeProjectData) {
-        readmeSdk.auth(this.readmeAPIKey);
         try {
-          this.readmeProjectData = (await readmeSdk.getProject()).data;
-          this.readmeVersionData = (await readmeSdk.getVersions()).data as ReadMeVersion[];
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (e: any) {
+          const encodedApiKey = Buffer.from(`${this.readmeAPIKey}:`).toString('base64');
+          const { origin: readmeAPIOrigin } = new URL(config.readmeApiUrl);
+          const headers = {
+            authorization: encodedApiKey,
+            'user-agent': `${pkg.name}/${pkg.version}`,
+          };
+
+          this.readmeProjectData = await fetch(new URL('/api/v1/', readmeAPIOrigin), {
+            headers,
+          }).then(r => r.json() as Promise<typeof this.readmeProjectData>);
+
+          this.readmeVersionData = await fetch(new URL('/api/v1/version', readmeAPIOrigin), {
+            headers,
+          }).then(r => r.json() as Promise<ReadMeVersion[]>);
+        } catch (e) {
           // TODO: Maybe send this to sentry?
           if (e.status === 401) {
             console.error('Invalid ReadMe API key. Contact support@readme.io for help!');

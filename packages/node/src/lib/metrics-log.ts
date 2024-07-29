@@ -1,9 +1,7 @@
 import type { Options } from './log';
 import type { Har } from 'har-format';
-import type { Response } from 'node-fetch';
 import type { UUID } from 'node:crypto';
 
-import fetch from 'node-fetch';
 import timeoutSignal from 'timeout-signal';
 
 import pkg from '../../package.json';

@@ -81,9 +81,6 @@ updates:
       - dependency-name: find-cache-dir
         versions:
           - '>= 4'
-      - dependency-name: node-fetch
-        versions:
-          - '>= 3'
 
   #   - package-ecosystem: bundler
   #     directory: "/packages/ruby"

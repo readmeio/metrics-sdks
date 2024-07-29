@@ -1,6 +1,4 @@
-import type { Headers } from 'headers-polyfill';
-
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 
 import pkg from '../../package.json';
 import config from '../../src/config';
@@ -15,10 +13,10 @@ function doHeadersMatch(headers: Headers) {
 }
 
 export default function getReadMeApiMock(baseUrl: string) {
-  return rest.get(`${config.readmeApiUrl}/v1`, (req, res, ctx) => {
-    if (doHeadersMatch(req.headers)) {
-      return res(ctx.status(200), ctx.json({ baseUrl }));
+  return http.get(`${config.readmeApiUrl}/v1`, ({ request }) => {
+    if (doHeadersMatch(request.headers)) {
+      return HttpResponse.json({ baseUrl }, { status: 200 });
     }
-    return res(ctx.status(500));
+    return new HttpResponse(null, { status: 500 });
   });
 }
