@@ -4,7 +4,6 @@ title: 'feat: '
 labels:
   - enhancement
   - needs triage
-  - question
 body:
   - type: markdown
     attributes:
