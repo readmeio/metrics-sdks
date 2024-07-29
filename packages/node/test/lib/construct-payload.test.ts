@@ -7,7 +7,7 @@ import * as qs from 'querystring';
 
 import { isValidUUIDV4 } from 'is-valid-uuid-v4';
 import request from 'supertest';
-import { describe, expect, expectTypeOf, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import pkg from '../../package.json';
 import { constructPayload, mask } from '../../src/lib/construct-payload';
@@ -33,6 +33,7 @@ function createApp(options?: LogOptions, payloadData?: PayloadData) {
         parsedBody = qs.parse(body);
       }
 
+      // @ts-expect-error deliberately passing in potentially bad data
       res.end(JSON.stringify(constructPayload(req, res, { ...payloadData, requestBody: parsedBody }, options)));
     });
   };
@@ -81,8 +82,6 @@ describe('constructPayload()', function () {
       .send({ password: '123456' })
       .expect(({ body }) => {
         expect(isValidUUIDV4(body._id)).toBe(true);
-        expectTypeOf(body.request.log.entries[0].request).toBeObject();
-        expectTypeOf(body.request.log.entries[0].response).toBeObject();
         expect(body.request.log.entries[0].request.postData).toStrictEqual({
           mimeType: 'application/json',
           text: '{"password":"[REDACTED 6]"}',
@@ -140,7 +139,6 @@ describe('constructPayload()', function () {
     return request(createApp(undefined, group))
       .post('/')
       .expect(({ body }) => {
-        expectTypeOf(body.request.log.entries[0].time).toBeNumber();
         expect(body.request.log.entries[0].time).toBe(20000);
       });
   });

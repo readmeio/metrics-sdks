@@ -48,7 +48,7 @@ const server = setupServer(
 
 function doMetricsHeadersMatch(headers: Headers) {
   const auth = headers.get('authorization');
-  const decodedAuth = Buffer.from(auth.replace(/^Basic /, ''), 'base64').toString('ascii');
+  const decodedAuth = Buffer.from((auth || '').replace(/^Basic /, ''), 'base64').toString('ascii');
   const contentType = headers.get('content-type');
   const userAgent = headers.get('user-agent');
   return (
@@ -625,7 +625,7 @@ describe('#metrics', function () {
         http.post(`${config.host}/v1/request`, async ({ request: req }) => {
           const body = (await req.json()) as OutgoingLogBody[];
           if (doMetricsHeadersMatch(req.headers)) {
-            expect(body[0].request.log.entries[0].request.postData[checkLocation]).toStrictEqual(requestBody);
+            expect(body[0].request.log.entries[0].request.postData?.[checkLocation]).toStrictEqual(requestBody);
             return new HttpResponse(null, { status: 200 });
           }
 
