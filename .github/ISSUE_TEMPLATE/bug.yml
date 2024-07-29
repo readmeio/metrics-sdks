@@ -1,6 +1,8 @@
 name: Bug Report
 description: If something isn't working the way you expect it to.
+title: 'bug: '
 labels:
+  - bug
   - needs triage
 body:
   - type: markdown

@@ -1,6 +1,9 @@
 name: Feature Request
 description: Suggestions for new or different behavior.
+title: 'feat: '
 labels:
+  - enhancement
+  - needs triage
   - question
 body:
   - type: markdown
