@@ -51,5 +51,5 @@ body:
     id: logs
     attributes:
       label: Relevant log output
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      description: Please include any relevant log output. This will be automatically formatted into code, so no need for backticks. If your logs include any sensitive information, please either redact it or email it to us at support@readme.io.
       render: shell
