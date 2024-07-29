@@ -526,6 +526,7 @@ describe('process-request', function () {
     });
 
     it('should not error with no body', function () {
+      // @ts-expect-error deliberately passing in bad data
       return request(createApp({}, false, null))
         .post('/')
         .set('content-type', 'application/x-www-form-urlencoded')

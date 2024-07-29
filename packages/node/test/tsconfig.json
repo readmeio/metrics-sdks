@@ -3,7 +3,8 @@
   "compilerOptions": {
     "downlevelIteration": true,
     "noImplicitAny": true,
-    "strict": false
+    "noEmit": true,
+    "strict": true
   },
   "include": ["./index.test.ts", "./lib/*.ts", "./global.d.ts"]
 }
