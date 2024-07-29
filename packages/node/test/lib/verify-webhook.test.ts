@@ -59,6 +59,7 @@ describe('verifyWebhook', function () {
     const secret = 'docs4dayz';
 
     expect(() => {
+      // @ts-expect-error deliberately passing in bad data
       verifyWebhook(body, undefined, secret);
     }).toThrow(/Missing Signature/);
   });

@@ -22,6 +22,7 @@ const mockUser = (keys: Record<string, unknown>[] = [], user = {}) => {
 
 describe('#getGroupByApiKey', () => {
   it('returns undefined when no user is passed', () => {
+    // @ts-expect-error deliberately passing in bad data
     const groupId = getGroupByApiKey(undefined, 'requestApiKey');
     expect(groupId).toBeUndefined();
   });
@@ -32,6 +33,7 @@ describe('#getGroupByApiKey', () => {
   });
 
   it('returns undefined for a user with a null keys array', () => {
+    // @ts-expect-error deliberately passing in bad data
     const groupId = getGroupByApiKey(mockUser(null), 'requestApiKey');
     expect(groupId).toBeUndefined();
   });
@@ -58,14 +60,14 @@ describe('#getGroupByApiKey', () => {
       ]);
       const groupId = getGroupByApiKey(user, 'requestApiKey');
 
-      expect(groupId.id).toBe('key-2-id');
+      expect(groupId?.id).toBe('key-2-id');
     });
 
     it('returns the id of the key as first priority', () => {
       const user = mockUser([{ id: 'key-1-id', name: 'key-1-name', otherField: 'requestApiKey' }]);
       const groupId = getGroupByApiKey(user, 'requestApiKey');
 
-      expect(groupId.id).toBe('key-1-id');
+      expect(groupId?.id).toBe('key-1-id');
     });
 
     it('returns the apiKey of the key as second priority', () => {
@@ -78,35 +80,35 @@ describe('#getGroupByApiKey', () => {
       ]);
       const groupId = getGroupByApiKey(user, 'requestApiKey');
 
-      expect(groupId.id).toBe('key-1-apiKey');
+      expect(groupId?.id).toBe('key-1-apiKey');
     });
 
     it('returns the value of the matching apiKey as the third priority', () => {
       const user = mockUser([{ otherField: 'requestApiKey' }]);
       const groupId = getGroupByApiKey(user, 'requestApiKey');
 
-      expect(groupId.id).toBe('requestApiKey');
+      expect(groupId?.id).toBe('requestApiKey');
     });
 
     it('returns the basic user as the fourth priority', () => {
       const user = mockUser([{ user: 'basic-user', pass: 'basic-pass' }]);
       const groupId = getGroupByApiKey(user, 'requestApiKey');
 
-      expect(groupId.id).toBe('basic-user');
+      expect(groupId?.id).toBe('basic-user');
     });
 
     it('returns the name of the key as fifth priority', () => {
       const user = mockUser([{ name: 'key-1-name' }]);
       const groupId = getGroupByApiKey(user, 'requestApiKey');
 
-      expect(groupId.id).toBe('key-1-name');
+      expect(groupId?.id).toBe('key-1-name');
     });
 
     it('supports having nested basic auth', () => {
       const user = mockUser([{ notRelevant: 'foo' }, { basic: { user: 'basic-user', pass: 'basic-pass' } }]);
       const groupId = getGroupByApiKey(user, 'basic-user');
 
-      expect(groupId.id).toBe('basic-user');
+      expect(groupId?.id).toBe('basic-user');
     });
   });
 
@@ -121,7 +123,7 @@ describe('#getGroupByApiKey', () => {
       ]);
       const groupId = getGroupByApiKey(user, 'requestApiKey');
 
-      expect(groupId.id).toBe('key-1-id');
+      expect(groupId?.id).toBe('key-1-id');
     });
   });
 
@@ -136,7 +138,7 @@ describe('#getGroupByApiKey', () => {
       ]);
       const groupId = getGroupByApiKey(user, 'requestApiKey');
 
-      expect(groupId.label).toBe('key-1-name');
+      expect(groupId?.label).toBe('key-1-name');
     });
   });
 });

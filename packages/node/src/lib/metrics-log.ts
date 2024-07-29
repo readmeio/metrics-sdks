@@ -1,6 +1,6 @@
 import type { Options } from './log';
-import type { UUID } from 'crypto';
 import type { Har } from 'har-format';
+import type { UUID } from 'node:crypto';
 
 import timeoutSignal from 'timeout-signal';
 
