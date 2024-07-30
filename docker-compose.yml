@@ -2,17 +2,17 @@ version: '3.4'
 
 x-server-config: &server-config
   README_API_KEY: rdme_abcdefghijklmnopqrstuvwxyz
-  README_METRICS_SERVER: "http://host.docker.internal:8001"
+  README_METRICS_SERVER: 'http://host.docker.internal:8001'
 
 x-extra_hosts: &default-extra_hosts
   # Docker in Github doesn't automaticaly map these and without `host.docker.internal`
   # working our SDK HTTP servers can't talk to our mock Metrics server.
-  - "host.docker.internal:host-gateway"
+  - 'host.docker.internal:host-gateway'
 
 services:
   runner:
     container_name: runner
-    image: node:16
+    image: node:20
 
   #
   # .NET
