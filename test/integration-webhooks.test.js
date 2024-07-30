@@ -1,6 +1,5 @@
 import crypto from 'node:crypto';
 
-import 'isomorphic-fetch';
 import { describe, it, expect } from 'vitest';
 
 const PORT = 8000; // SDK HTTP server port
