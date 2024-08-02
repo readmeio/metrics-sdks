@@ -30,7 +30,7 @@
     "QUERY_STRING": "",
     "REMOTE_ADDR": "127.0.0.1",
     "CONTENT_TYPE": "text/plain",
-    "HTTP_HOST": "localhost: 8000",
+    "HTTP_HOST": "localhost:8000",
     "HTTP_USER_AGENT": "curl/7.64.1",
     "HTTP_ACCEPT": "*/*",
     "wsgi.run_once": false,
