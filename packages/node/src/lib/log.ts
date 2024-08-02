@@ -12,6 +12,7 @@ import config from '../config';
 import { constructPayload } from './construct-payload';
 import { getProjectBaseUrl } from './get-project-base-url';
 import isRequest from './is-request';
+import { logger } from './logger';
 import { metricsAPICall } from './metrics-log';
 import { patchRequest } from './patch-request';
 import { patchResponse } from './patch-response';
@@ -24,9 +25,11 @@ function doSend(readmeApiKey: string, options: Options) {
   queue = [];
 
   // Make the log call
-  metricsAPICall(readmeApiKey, json, options).catch(e => {
+  metricsAPICall(readmeApiKey, json, options).catch(err => {
     // Silently discard errors and timeouts.
-    if (options.development) throw e;
+    if (options.development && options.logger) {
+      logger.error({ message: 'Error making API call', err });
+    }
   });
 }
 // Make sure we flush the queue if the process is exited

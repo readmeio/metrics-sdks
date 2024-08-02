@@ -55,6 +55,11 @@ export interface LogOptions {
   fireAndForget?: boolean;
 
   /**
+   * If true, the errors and other logs will be displayed in console.
+   */
+  logger?: boolean;
+
+  /**
    * @deprecated use `allowList` instead
    */
   whitelist?: string[];
