@@ -15,9 +15,10 @@ import isRequest from './is-request';
 import { metricsAPICall } from './metrics-log';
 import { patchRequest } from './patch-request';
 import { patchResponse } from './patch-response';
+import ConsoleLogger, { Logger } from './logger';
 
 let queue: OutgoingLogBody[] = [];
-function doSend(readmeApiKey: string, options: Options) {
+function doSend(readmeApiKey: string, options: Options, logger: Logger) {
   // Copy the queue so we can send all the requests in one batch
   const json = [...queue];
   // Clear out the queue so we don't resend any data in the future
@@ -26,7 +27,10 @@ function doSend(readmeApiKey: string, options: Options) {
   // Make the log call
   metricsAPICall(readmeApiKey, json, options).catch(e => {
     // Silently discard errors and timeouts.
-    if (options.development) throw e;
+    if (options.development) {
+      logger.error(e);
+      throw e;
+    }
   });
 }
 // Make sure we flush the queue if the process is exited
@@ -99,6 +103,7 @@ export function log(
   res: ExtendedResponse,
   group: GroupingObject,
   options: Options = {},
+  logger: Logger = new ConsoleLogger()
 ) {
   if (!readmeApiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a group');
@@ -164,7 +169,7 @@ export function log(
     );
 
     queue.push(payload);
-    if (queue.length >= bufferLength) doSend(readmeApiKey, options);
+    if (queue.length >= bufferLength) doSend(readmeApiKey, options, logger);
 
     cleanup(); // eslint-disable-line @typescript-eslint/no-use-before-define
   }
