@@ -101,7 +101,7 @@ export function log(
   req: ExtendedIncomingMessage,
   res: ExtendedResponse,
   group: GroupingObject,
-  options: Options = {}
+  options: Options = {},
 ) {
   if (!readmeApiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a group');
@@ -167,7 +167,7 @@ export function log(
     );
 
     queue.push(payload);
-    if (queue.length >= bufferLength) doSend(readmeApiKey, options, logger);
+    if (queue.length >= bufferLength) doSend(readmeApiKey, options);
 
     cleanup(); // eslint-disable-line @typescript-eslint/no-use-before-define
   }
