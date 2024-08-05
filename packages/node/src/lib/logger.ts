@@ -18,7 +18,16 @@ export interface Logger {
     error(log: ErrorLog): void;
 }
 
-export default class ConsoleLogger {
+class DefaultLogger implements Logger {
+    private static instance: Logger;
+
+    static getInstance(): Logger {
+        if (!DefaultLogger.instance) {
+            DefaultLogger.instance = new DefaultLogger();
+        } 
+        return DefaultLogger.instance;
+    }
+
     trace({ message, args }: Log) {
         const params: unknown[] = formatMessage('TRACE', message)
         if (args) {
@@ -26,6 +35,7 @@ export default class ConsoleLogger {
         }
         console.debug(...params)
     }
+
     debug({ message, args }: Log) {
         const params: unknown[] = formatMessage('DEBUG', message)
         if (args) {
@@ -33,6 +43,7 @@ export default class ConsoleLogger {
         }
         console.debug(...params)    
     }
+
     error({ message, args, err }: ErrorLog) {
         const params: unknown[] = formatMessage('ERROR', message)
         if (args) {
@@ -44,3 +55,5 @@ export default class ConsoleLogger {
         console.error(...params)
     }
 }
+
+export const logger = DefaultLogger.getInstance();

@@ -15,10 +15,10 @@ import isRequest from './is-request';
 import { metricsAPICall } from './metrics-log';
 import { patchRequest } from './patch-request';
 import { patchResponse } from './patch-response';
-import ConsoleLogger, { Logger } from './logger';
+import { logger } from './logger';
 
 let queue: OutgoingLogBody[] = [];
-function doSend(readmeApiKey: string, options: Options, logger: Logger) {
+function doSend(readmeApiKey: string, options: Options) {
   // Copy the queue so we can send all the requests in one batch
   const json = [...queue];
   // Clear out the queue so we don't resend any data in the future
@@ -29,7 +29,6 @@ function doSend(readmeApiKey: string, options: Options, logger: Logger) {
     // Silently discard errors and timeouts.
     if (options.development) {
       logger.error(e);
-      throw e;
     }
   });
 }
@@ -102,8 +101,7 @@ export function log(
   req: ExtendedIncomingMessage,
   res: ExtendedResponse,
   group: GroupingObject,
-  options: Options = {},
-  logger: Logger = new ConsoleLogger()
+  options: Options = {}
 ) {
   if (!readmeApiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a group');
