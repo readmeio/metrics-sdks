@@ -58,6 +58,11 @@ export interface LogOptions {
    * @deprecated use `allowList` instead
    */
   whitelist?: string[];
+
+  /**
+   * If true, the errors will be logged in console.
+   */
+  logger?: boolean;
 }
 
 export interface PayloadData {

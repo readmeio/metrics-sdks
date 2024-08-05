@@ -10,6 +10,7 @@ import { log } from './log';
 import { buildSetupView } from './setup-readme-view';
 import { testVerifyWebhook } from './test-verify-webhook';
 import verifyWebhook from './verify-webhook';
+import { logger } from './logger';
 
 interface BasicAuthObject {
   pass: string;
@@ -158,6 +159,7 @@ export default class ReadMe {
           }).then(r => r.json() as Promise<ReadMeVersion[]>);
         } catch (e) {
           // TODO: Maybe send this to sentry?
+          logger.error({ err: e, message: 'Error fetching readme data' })
           if (e.status === 401) {
             console.error('Invalid ReadMe API key. Contact support@readme.io for help!');
             console.error(e.data);
