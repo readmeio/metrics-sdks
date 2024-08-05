@@ -369,7 +369,7 @@ class PayloadBuilder:
             return mapping
 
         result = {}
-        for (key, value) in mapping.items():
+        for key, value in mapping.items():
             if self.denylist and key in self.denylist:
                 result[key] = _redact_value(value)
             elif self.allowlist and key not in self.allowlist:

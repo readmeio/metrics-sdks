@@ -26,5 +26,5 @@ class MockEnviron:
         contentLength = len(jsonByteString)
         stream = io.BytesIO(jsonByteString)
         environ["wsgi.input"] = wsgi.LimitedStream(stream, contentLength)
-        environ["CONTENT_LENGTH"] = contentLength
+        environ["CONTENT_LENGTH"] = str(contentLength)
         return environ
