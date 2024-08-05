@@ -12,10 +12,10 @@ import config from '../config';
 import { constructPayload } from './construct-payload';
 import { getProjectBaseUrl } from './get-project-base-url';
 import isRequest from './is-request';
+import { logger } from './logger';
 import { metricsAPICall } from './metrics-log';
 import { patchRequest } from './patch-request';
 import { patchResponse } from './patch-response';
-import { logger } from './logger';
 
 let queue: OutgoingLogBody[] = [];
 function doSend(readmeApiKey: string, options: Options) {
