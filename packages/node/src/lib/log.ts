@@ -25,10 +25,10 @@ function doSend(readmeApiKey: string, options: Options) {
   queue = [];
 
   // Make the log call
-  metricsAPICall(readmeApiKey, json, options).catch(e => {
+  metricsAPICall(readmeApiKey, json, options).catch(err => {
     // Silently discard errors and timeouts.
     if (options.development && options.logger) {
-      logger.error(e);
+      logger.error({ message: 'Error making API call', err });
     }
   });
 }

@@ -131,10 +131,12 @@ export default class ReadMe {
         // Try to figure out where the api key is
         try {
           requestAPIKey = findAPIKey(req);
-        } catch (e) {
-          console.error(
-            'Could not automatically find an API key in the request. You should pass the API key via `manualAPIKey` in the `getUser` function. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#getuserbyapikey',
-          );
+        } catch (err) {
+          logger.error({
+            err,
+            message:
+              'Could not automatically find an API key in the request. You should pass the API key via `manualAPIKey` in the `getUser` function. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#getuserbyapikey',
+          });
         }
         return byAPIKey(requestAPIKey);
       };
@@ -157,15 +159,12 @@ export default class ReadMe {
           this.readmeVersionData = await fetch(new URL('/api/v1/version', readmeAPIOrigin), {
             headers,
           }).then(r => r.json() as Promise<ReadMeVersion[]>);
-        } catch (e) {
+        } catch (err) {
           // TODO: Maybe send this to sentry?
-          logger.error({ err: e, message: 'Error fetching readme data' })
-          if (e.status === 401) {
-            console.error('Invalid ReadMe API key. Contact support@readme.io for help!');
-            console.error(e.data);
+          if (err.status === 401) {
+            logger.error({ err, message: 'Invalid ReadMe API key. Contact support@readme.io for help!' });
           } else {
-            console.error('Error calling ReadMe API. Contact support@readme.io for help!');
-            console.error(e.data);
+            logger.error({ err, message: 'Error calling ReadMe API. Contact support@readme.io for help!' });
           }
           // Don't want to cause an error in their API
           return next();
@@ -181,8 +180,9 @@ export default class ReadMe {
           );
           const user = await userFunction(req, getUser);
           return res.send(user);
-        } catch (e) {
-          return res.status(400).json({ error: (e as Error).message });
+        } catch (err) {
+          logger.error({ err, message: 'Verify webhook error' });
+          return res.status(400).json({ error: (err as Error).message });
         }
       } else if (req.path === '/readme-setup' && options.development) {
         const setupHtml = buildSetupView({
@@ -199,8 +199,9 @@ export default class ReadMe {
         try {
           const webhookData = await testVerifyWebhook(baseUrl, email, this.readmeProjectData.jwtSecret as string);
           return res.json({ ...webhookData });
-        } catch (e) {
-          return res.status(400).json({ error: (e as Error).message });
+        } catch (err) {
+          logger.error({ err, message: 'Test verify webhook error' });
+          return res.status(400).json({ error: (err as Error).message });
         }
       }
 
