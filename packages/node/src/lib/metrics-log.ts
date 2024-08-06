@@ -7,8 +7,6 @@ import timeoutSignal from 'timeout-signal';
 import pkg from '../../package.json';
 import config from '../config';
 
-import { logger } from './logger';
-
 export interface GroupingObject {
   /**
    * API Key used to make the request. Note that this is different from the `readmeAPIKey`

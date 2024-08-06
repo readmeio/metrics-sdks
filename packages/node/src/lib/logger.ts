@@ -11,9 +11,17 @@ export interface Logger {
     trace(log: Log): void;
 }
 
+/**
+ * Default implementation of the Logger interface. Represents a signleton class of console logger.
+ */
 class DefaultLogger implements Logger {
+
     private static instance: Logger;
 
+    /**
+     * Method for getting instance of the logger class
+     * @returns A single instance of the logger
+     */
     static getInstance(): Logger {
         if (!DefaultLogger.instance) {
             DefaultLogger.instance = new DefaultLogger();
@@ -21,15 +29,23 @@ class DefaultLogger implements Logger {
         return DefaultLogger.instance;
     }
 
+    /**
+     * This method takes a level of the log and a message and formats it to the unified log format
+     * @returns A formatted log message
+     */
     // eslint-disable-next-line class-methods-use-this
     private formatMessage(
         level: 'DEBUG' | 'ERROR' | 'TRACE',
         message: string
-    ) {
+    ): string[] {
         return [`${level} ${new Date().toISOString()} [readmeio] ${message}`]
     }
 
-    trace({ message, args }: Log) {
+    /**
+     * Logs a trace message.
+     * @param log The trace log entry. Contains the message as required field and optional args.
+     */
+    trace({ message, args }: Log): void {
         const params: unknown[] = this.formatMessage('TRACE', message)
         if (args) {
             params.push('\nArguments:', args)
@@ -37,7 +53,11 @@ class DefaultLogger implements Logger {
         console.debug(...params)
     }
 
-    debug({ message, args }: Log) {
+    /**
+     * Logs a debug message.
+     * @param log The debug log entry. Contains the message as required field and optional args.
+     */
+    debug({ message, args }: Log): void {
         const params: unknown[] = this.formatMessage('DEBUG', message)
         if (args) {
             params.push('\nArguments:', args)
@@ -45,7 +65,11 @@ class DefaultLogger implements Logger {
         console.debug(...params)    
     }
 
-    error({ message, args, err }: ErrorLog) {
+    /**
+     * Logs an error message.
+     * @param log The error log entry. Contains the message and error object as required fields and optional args.
+     */
+    error({ message, args, err }: ErrorLog): void {
         const params: unknown[] = this.formatMessage('ERROR', message)
         if (args) {
             params.push('\nArguments:', args)

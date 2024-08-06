@@ -7,10 +7,10 @@ import config from '../config';
 import findAPIKey from './find-api-key';
 import { getGroupByApiKey } from './get-group-id';
 import { log } from './log';
+import { logger } from './logger';
 import { buildSetupView } from './setup-readme-view';
 import { testVerifyWebhook } from './test-verify-webhook';
 import verifyWebhook from './verify-webhook';
-import { logger } from './logger';
 
 interface BasicAuthObject {
   pass: string;
