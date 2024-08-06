@@ -3,7 +3,7 @@ interface Log {
   message: string;
 }
 
-type ErrorLog = Log & { err: Error };
+type ErrorLog = Log & { err?: Error };
 
 export interface Logger {
   debug(log: Log): void;

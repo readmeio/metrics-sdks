@@ -103,15 +103,21 @@ export default class ReadMe {
 
       const getUser: GetUserFunction = async ({ byAPIKey, byEmail, manualAPIKey }) => {
         if (!byAPIKey && !options.disableMetrics) {
-          console.error(
-            'Missing required definition for `byAPIKey`. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#getuserbyapikey',
-          );
+          if (options.logger) {
+            logger.error({
+              message:
+                'Missing required definition for `byAPIKey`. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#getuserbyapikey',
+            });
+          }
           return next();
         }
         if (!byEmail && !options.disableWebhook) {
-          console.error(
-            'Missing required definition for `byEmail`. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#getuserbyapikey',
-          );
+          if (options.logger) {
+            logger.error({
+              message:
+                'Missing required definition for `byEmail`. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#getuserbyapikey',
+            });
+          }
           return next();
         }
 
@@ -132,11 +138,13 @@ export default class ReadMe {
         try {
           requestAPIKey = findAPIKey(req);
         } catch (err) {
-          logger.error({
-            err,
-            message:
-              'Could not automatically find an API key in the request. You should pass the API key via `manualAPIKey` in the `getUser` function. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#getuserbyapikey',
-          });
+          if (options.logger) {
+            logger.error({
+              err,
+              message:
+                'Could not automatically find an API key in the request. You should pass the API key via `manualAPIKey` in the `getUser` function. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#getuserbyapikey',
+            });
+          }
         }
         return byAPIKey(requestAPIKey);
       };
@@ -160,11 +168,13 @@ export default class ReadMe {
             headers,
           }).then(r => r.json() as Promise<ReadMeVersion[]>);
         } catch (err) {
-          // TODO: Maybe send this to sentry?
-          if (err.status === 401) {
-            logger.error({ err, message: 'Invalid ReadMe API key. Contact support@readme.io for help!' });
-          } else {
-            logger.error({ err, message: 'Error calling ReadMe API. Contact support@readme.io for help!' });
+          if (options.logger) {
+            // TODO: Maybe send this to sentry?
+            if (err.status === 401) {
+              logger.error({ err, message: 'Invalid ReadMe API key. Contact support@readme.io for help!' });
+            } else {
+              logger.error({ err, message: 'Error calling ReadMe API. Contact support@readme.io for help!' });
+            }
           }
           // Don't want to cause an error in their API
           return next();
@@ -181,7 +191,9 @@ export default class ReadMe {
           const user = await userFunction(req, getUser);
           return res.send(user);
         } catch (err) {
-          logger.error({ err, message: 'Verify webhook error' });
+          if (options.logger) {
+            logger.error({ err, message: 'Verify webhook error' });
+          }
           return res.status(400).json({ error: (err as Error).message });
         }
       } else if (req.path === '/readme-setup' && options.development) {
@@ -200,7 +212,9 @@ export default class ReadMe {
           const webhookData = await testVerifyWebhook(baseUrl, email, this.readmeProjectData.jwtSecret as string);
           return res.json({ ...webhookData });
         } catch (err) {
-          logger.error({ err, message: 'Test verify webhook error' });
+          if (options.logger) {
+            logger.error({ err, message: 'Test verify webhook error' });
+          }
           return res.status(400).json({ error: (err as Error).message });
         }
       }
@@ -211,11 +225,13 @@ export default class ReadMe {
 
         const group = getGroupByApiKey(user, requestAPIKey);
         if (!group) {
-          console.error(
-            usingManualAPIKey
-              ? 'The API key you passed in via `manualAPIKey` could not be found in the user object you provided.'
-              : 'Could not automatically find an API key in the request. You should pass the API key via `manualAPIKey` in the `getUser` function. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#/getuserbyapikey',
-          );
+          if (options.logger) {
+            logger.error({
+              message: usingManualAPIKey
+                ? 'The API key you passed in via `manualAPIKey` could not be found in the user object you provided.'
+                : 'Could not automatically find an API key in the request. You should pass the API key via `manualAPIKey` in the `getUser` function. Learn more here: https://docs.readme.com/main/docs/unified-snippet-docs#/getuserbyapikey',
+            });
+          }
           return next();
         }
 
