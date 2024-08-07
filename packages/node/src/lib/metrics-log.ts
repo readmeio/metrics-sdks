@@ -101,6 +101,7 @@ export function metricsAPICall(readmeAPIKey: string, body: OutgoingLogBody[], op
       // after the backoff expires, erase the old expiration time
       backoffExpiresAt = undefined;
     }
+    logger.trace({ message: 'Making a POST request to a service...', args: { body } });
     return fetch(new URL('/v1/request', config.host), {
       method: 'post',
       body: JSON.stringify(body),
@@ -121,6 +122,7 @@ export function metricsAPICall(readmeAPIKey: string, body: OutgoingLogBody[], op
             backoffExpiresAt.setSeconds(backoffExpiresAt.getSeconds() + BACKOFF_SECONDS);
           }
         }
+        logger.debug({ message: `Service responded with status ${response.status}: ${response.statusText}` });
         return response;
       })
       .finally(() => {

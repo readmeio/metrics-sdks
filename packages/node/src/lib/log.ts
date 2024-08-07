@@ -31,6 +31,8 @@ function doSend(readmeApiKey: string, options: Options) {
       logger.error({ message: 'Error making API call', err });
     }
   });
+
+  logger.debug({ message: 'Queue is cleared.', args: { queue } });
 }
 // Make sure we flush the queue if the process is exited
 process.on('exit', doSend);
@@ -168,6 +170,7 @@ export function log(
     );
 
     queue.push(payload);
+    logger.debug({ message: 'Queue is appended.', args: { queue } });
     if (queue.length >= bufferLength) doSend(readmeApiKey, options);
 
     cleanup(); // eslint-disable-line @typescript-eslint/no-use-before-define

@@ -7,6 +7,8 @@ import timeoutSignal from 'timeout-signal';
 import pkg from '../../package.json';
 import config from '../config';
 
+import { logger } from './logger';
+
 export function getCache(readmeApiKey: string) {
   const encodedApiKey = Buffer.from(`${readmeApiKey}:`).toString('base64');
   const cacheDir = findCacheDir({ name: pkg.name, create: true });
@@ -48,7 +50,7 @@ export async function getProjectBaseUrl(readmeApiKey: string, requestTimeout = c
         if (res.status >= 400 && res.status <= 599) {
           throw res;
         }
-
+        logger.debug({ message: `Fetch Base URL: Service responded with status ${res.status}: ${res.statusText}` });
         return res.json() as Promise<{ baseUrl: string }>;
       })
       .then(project => {

@@ -68,10 +68,11 @@ class DefaultLogger implements Logger {
   trace({ message, args }: Log): void {
     if (!this.config.isLoggingEnabled) return;
     const params: unknown[] = this.formatMessage('TRACE', message);
+    console.log(...params);
     if (args) {
-      params.push('\nArguments:', args);
+      console.dir(args, { depth: null });
+      console.log('\n');
     }
-    console.debug(...params);
   }
 
   /**
@@ -84,7 +85,7 @@ class DefaultLogger implements Logger {
     if (args) {
       params.push('\nArguments:', args);
     }
-    console.debug(...params);
+    console.debug(...params, '\n');
   }
 
   /**
@@ -100,7 +101,7 @@ class DefaultLogger implements Logger {
     if (err) {
       params.push('\n', err);
     }
-    console.error(...params);
+    console.error(...params, '\n');
   }
 }
 
