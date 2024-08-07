@@ -27,7 +27,7 @@ function doSend(readmeApiKey: string, options: Options) {
   // Make the log call
   metricsAPICall(readmeApiKey, json, options).catch(err => {
     // Silently discard errors and timeouts.
-    if (options.development && options.logger) {
+    if (options.development) {
       logger.error({ message: 'Error making API call', err });
     }
   });
@@ -105,6 +105,7 @@ export function log(
 ) {
   if (!readmeApiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a group');
+  if (options.logger) logger.configure({ isLoggingEnabled: true });
 
   // Ensures the buffer length is between 1 and 30
   const bufferLength = clamp(options.bufferLength || config.bufferLength, 1, 30);
