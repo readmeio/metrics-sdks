@@ -173,7 +173,7 @@ export function log(
     );
 
     queue.push(payload);
-    logger.debug({ message: 'Queue is appended.', args: { queue } });
+    logger.debug({ message: 'Request enqueued.', args: { queue } });
     if (queue.length >= bufferLength) doSend(readmeApiKey, options);
 
     cleanup(); // eslint-disable-line @typescript-eslint/no-use-before-define

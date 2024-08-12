@@ -202,7 +202,7 @@ export default class ReadMe {
           const webhookData = await testVerifyWebhook(baseUrl, email, this.readmeProjectData.jwtSecret as string);
           return res.json({ ...webhookData });
         } catch (err) {
-          logger.error({ err, message: 'Test verify webhook error' });
+          logger.error({ err, message: 'Webhook verification failed.' });
           return res.status(400).json({ error: (err as Error).message });
         }
       }
