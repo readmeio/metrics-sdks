@@ -19,6 +19,7 @@ import { getCache } from '../src/lib/get-project-base-url';
 import { setBackoff } from '../src/lib/metrics-log';
 
 import getReadMeApiMock from './helpers/getReadMeApiMock';
+import { MockLoggerStrategy } from './lib/logger.test';
 
 const apiKey = 'mockReadMeApiKey';
 const endUserApiKey = '5afa21b97011c63320226ef3';
@@ -122,6 +123,7 @@ describe('#metrics', function () {
     let metricsServerRequests: number;
     let app: Express;
     let metricsServerResponseCode: number;
+    const mockLogger = new MockLoggerStrategy();
 
     beforeEach(function () {
       metricsServerRequests = 0;
@@ -143,7 +145,7 @@ describe('#metrics', function () {
 
       app = express();
       app.use((req, res, next) => {
-        const logId = readmeio.log(apiKey, req, res, incomingGroup);
+        const logId = readmeio.log(apiKey, req, res, incomingGroup, { logger: mockLogger });
         res.setHeader('x-log-id', logId);
         return next();
       });
@@ -178,6 +180,22 @@ describe('#metrics', function () {
       }
       // first request goes to the server, server returns a 401, subsequent requests are skipped
       expect(metricsServerRequests).toBe(1);
+    });
+
+    it('should log response status after the metrics server responds', async function () {
+      metricsServerResponseCode = 202;
+      await makeRequest();
+      expect(mockLogger.debug).toHaveBeenCalledWith({
+        message: expect.stringContaining(`Service responded with status ${metricsServerResponseCode}`),
+      });
+    });
+
+    it('should log error response status after the metrics server returns an error', async function () {
+      metricsServerResponseCode = 401;
+      await makeRequest();
+      expect(mockLogger.error).toHaveBeenCalledWith({
+        message: expect.stringContaining(`Service responded with status ${metricsServerResponseCode}`),
+      });
     });
 
     it('should send a request to the metrics server after the backoff time has expired', async function () {

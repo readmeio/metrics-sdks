@@ -25,7 +25,7 @@ export interface Logger extends LoggerStrategy {
 /**
  * Default implementation of the Logger interface. Represents a signleton class of logger with selected strategy.
  */
-class DefaultLogger implements Logger {
+export class DefaultLogger implements Logger {
   private static instance: Logger;
 
   private config: LoggerConfig;

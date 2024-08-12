@@ -122,7 +122,8 @@ export function metricsAPICall(readmeAPIKey: string, body: OutgoingLogBody[], op
             backoffExpiresAt.setSeconds(backoffExpiresAt.getSeconds() + BACKOFF_SECONDS);
           }
         }
-        logger.debug({ message: `Service responded with status ${response.status}: ${response.statusText}` });
+        const logLevel = response.ok ? 'debug' : 'error';
+        logger[logLevel]({ message: `Service responded with status ${response.status}: ${response.statusText}` });
         return response;
       })
       .finally(() => {
