@@ -1,24 +1,29 @@
+import ConsoleLogger from './console-logger';
+
 interface LoggerConfig {
   isLoggingEnabled: boolean;
-  logPrefix: string;
+  strategy: LoggerStrategy;
 }
 
-interface Log {
+export interface Log {
   args?: Record<string, unknown>;
   message: string;
 }
 
-type ErrorLog = Log & { err?: Error };
+export type ErrorLog = Log & { err?: Error };
 
-export interface Logger {
-  configure(config: Partial<LoggerConfig>): void;
+export interface LoggerStrategy {
   debug(log: Log): void;
   error(log: ErrorLog): void;
   trace(log: Log): void;
 }
 
+export interface Logger extends LoggerStrategy {
+  configure(config: Partial<LoggerConfig>): void;
+}
+
 /**
- * Default implementation of the Logger interface. Represents a signleton class of console logger.
+ * Default implementation of the Logger interface. Represents a signleton class of logger with selected strategy.
  */
 class DefaultLogger implements Logger {
   private static instance: Logger;
@@ -37,7 +42,7 @@ class DefaultLogger implements Logger {
     if (!DefaultLogger.instance) {
       const defaultConfig: LoggerConfig = {
         isLoggingEnabled: false,
-        logPrefix: '[readmeio]',
+        strategy: new ConsoleLogger(),
       };
       DefaultLogger.instance = new DefaultLogger(defaultConfig);
     }
@@ -53,55 +58,30 @@ class DefaultLogger implements Logger {
   }
 
   /**
-   * This method takes a level of the log and a message and formats it to the unified log format
-   * @returns A formatted log message
+   * Logs an error message.
+   * @param log The error log entry. Contains the message and error object as required fields and optional args.
    */
-
-  private formatMessage(level: 'DEBUG' | 'ERROR' | 'TRACE', message: string): string[] {
-    return [`${level} ${new Date().toISOString()} ${this.config.logPrefix} ${message}`];
-  }
-
-  /**
-   * Logs a trace message.
-   * @param log The trace log entry. Contains the message as required field and optional args.
-   */
-  trace({ message, args }: Log): void {
+  error(log: ErrorLog): void {
     if (!this.config.isLoggingEnabled) return;
-    const params: unknown[] = this.formatMessage('TRACE', message);
-    console.log(...params);
-    if (args) {
-      console.dir(args, { depth: null });
-      console.log('\n');
-    }
+    this.config.strategy.error(log);
   }
 
   /**
    * Logs a debug message.
    * @param log The debug log entry. Contains the message as required field and optional args.
    */
-  debug({ message, args }: Log): void {
+  debug(log: Log): void {
     if (!this.config.isLoggingEnabled) return;
-    const params: unknown[] = this.formatMessage('DEBUG', message);
-    if (args) {
-      params.push('\nArguments:', args);
-    }
-    console.debug(...params, '\n');
+    this.config.strategy.debug(log);
   }
 
   /**
-   * Logs an error message.
-   * @param log The error log entry. Contains the message and error object as required fields and optional args.
+   * Logs a trace message.
+   * @param log The trace log entry. Contains the message as required field and optional args.
    */
-  error({ message, args, err }: ErrorLog): void {
+  trace(log: Log): void {
     if (!this.config.isLoggingEnabled) return;
-    const params: unknown[] = this.formatMessage('ERROR', message);
-    if (args) {
-      params.push('\nArguments:', args);
-    }
-    if (err) {
-      params.push('\n', err);
-    }
-    console.error(...params, '\n');
+    this.config.strategy.trace(log);
   }
 }
 

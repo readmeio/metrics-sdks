@@ -107,7 +107,10 @@ export function log(
 ) {
   if (!readmeApiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a group');
-  if (options.logger) logger.configure({ isLoggingEnabled: true });
+  if (options.logger) {
+    if (typeof options.logger === 'boolean') logger.configure({ isLoggingEnabled: true });
+    else logger.configure({ isLoggingEnabled: true, strategy: options.logger });
+  }
 
   // Ensures the buffer length is between 1 and 30
   const bufferLength = clamp(options.bufferLength || config.bufferLength, 1, 30);
