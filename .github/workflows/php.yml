@@ -34,12 +34,12 @@ jobs:
       matrix:
         # https://endoflife.date/php
         php:
-          - 8.0 # EOL: November 26th, 2023
-          - 8.1 # EOL: November 25th, 2024
-          - 8.2 # EOL: December 8th, 2025
+          - 8.1 # EOL: December 31th, 2025
+          - 8.2 # EOL: December 31th, 2026
+          - 8.3 # EOL: December 31th, 2027
         # https://endoflife.date/laravel
         laravel:
-          - 9.* # EOL: February 8th, 2024
+          - 10.* # EOL: February 4th, 2025
 
     name: build (${{ matrix.php }} w/ Laravel ${{ matrix.laravel }}
 
@@ -76,7 +76,7 @@ jobs:
       - name: Run tests
         run: make test
 
-  build-laravel10:
+  build-laravel11:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -87,11 +87,11 @@ jobs:
       matrix:
         # https://endoflife.date/php
         php:
-          - 8.1 # EOL: November 25th, 2024
-          - 8.2 # EOL: December 8th, 2025
+          - 8.2 # EOL: December 31th, 2026
+          - 8.3 # EOL: December 31th, 2027
         # https://endoflife.date/laravel
         laravel:
-          - 10.* # EOL: February 4th, 2025
+          - 11.* # EOL: March 12th, 2026
 
     name: build (${{ matrix.php }} w/ Laravel ${{ matrix.laravel }}
 
