@@ -92,7 +92,7 @@ class Metrics
      */
     public function track(Request $request, Response &$response): void
     {
-        if (empty($this->base_log_url)) {
+        if ($this->base_log_url === null || $this->base_log_url === '') {
             $this->base_log_url = $this->getProjectBaseUrl();
         }
 

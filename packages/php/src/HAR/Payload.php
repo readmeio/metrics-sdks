@@ -117,7 +117,7 @@ class Payload
                 // Normally we'd use `$request->post()` to get this data but in the case that the
                 // payload is corrupted JSON `$request->post()` returns an empty array. Not ideal!
                 try {
-                    $content = json_decode($request->getContent(), true);
+                    $content = json_decode(stream_get_contents($request->getContent()), true);
                     if (json_last_error() == JSON_ERROR_SYNTAX) {
                         throw new \Exception('invalid json');
                     }
@@ -132,7 +132,7 @@ class Payload
                     'mimeType' => $content_type,
                     'text' => $content,
                 ];
-            } elseif (!!$content_type) {
+            } elseif ($content_type !== null && $content_type !== '') {
                 $post_data = [
                     'mimeType' => $content_type,
                     'text' => $request->getContent()
