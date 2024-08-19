@@ -5,7 +5,9 @@ import { type LoggerStrategy, type Log, type ErrorLog, logger } from '../../src/
 export class MockLoggerStrategy implements LoggerStrategy {
   debug = vi.fn();
 
-  trace = vi.fn();
+  verbose = vi.fn();
+
+  info = vi.fn();
 
   error = vi.fn();
 }
@@ -21,15 +23,15 @@ describe('Default Logger', () => {
   describe('trace', () => {
     it('should log trace messages when logging is enabled', () => {
       const log: Log = { message: 'Trace test message.' };
-      logger.trace(log);
-      expect(mockStrategy.trace).toHaveBeenCalledWith(log);
+      logger.verbose(log);
+      expect(mockStrategy.verbose).toHaveBeenCalledWith(log);
     });
 
     it('should not log trace messages when logging is disabled', () => {
       const log: Log = { message: 'Trace test message.' };
       logger.configure({ isLoggingEnabled: false });
-      logger.trace(log);
-      expect(mockStrategy.trace).not.toHaveBeenCalled();
+      logger.verbose(log);
+      expect(mockStrategy.verbose).not.toHaveBeenCalled();
     });
   });
 

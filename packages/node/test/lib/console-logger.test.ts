@@ -11,7 +11,8 @@ describe('ConsoleLogger', () => {
   beforeEach(() => {
     logger = new ConsoleLogger();
     // Mock console methods
-    vi.spyOn(console, 'trace').mockImplementation(() => {});
+    vi.spyOn(console, 'info').mockImplementation(() => {});
+    vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.spyOn(console, 'debug').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.spyOn(console, 'dir').mockImplementation(() => {});
@@ -22,26 +23,26 @@ describe('ConsoleLogger', () => {
     vi.restoreAllMocks();
   });
 
-  describe('trace', () => {
-    it('should format and log trace messages correctly with args if provided', () => {
-      const log: Log = { message: 'Trace test message', args: { key: 'value' } };
-      const expectedLevel = 'TRACE';
+  describe('verbose', () => {
+    it('should format and log verbose messages correctly with args if provided', () => {
+      const log: Log = { message: 'Verbose test message', args: { key: 'value' } };
+      const expectedLevel = 'VERBOSE';
 
-      logger.trace(log);
+      logger.verbose(log);
 
-      expect(console.trace).toHaveBeenCalledWith(
+      expect(console.log).toHaveBeenCalledWith(
         expect.stringMatching(`${expectedLevel} ${isoDateRegex} \\[readmeio\\] ${log.message}$`),
       );
       expect(console.dir).toHaveBeenCalledWith(log.args, { depth: null });
     });
 
-    it('should format and log trace messages correctly without args if not provided', () => {
-      const log: Log = { message: 'Trace test message' };
-      const expectedLevel = 'TRACE';
+    it('should format and log verbose messages correctly without args if not provided', () => {
+      const log: Log = { message: 'Verbose test message' };
+      const expectedLevel = 'VERBOSE';
 
-      logger.trace(log);
+      logger.verbose(log);
 
-      expect(console.trace).toHaveBeenCalledWith(
+      expect(console.log).toHaveBeenCalledWith(
         expect.stringMatching(`${expectedLevel} ${isoDateRegex} \\[readmeio\\] ${log.message}$`),
       );
       expect(console.dir).not.toHaveBeenCalled();
@@ -70,6 +71,34 @@ describe('ConsoleLogger', () => {
       logger.debug(log);
 
       expect(console.debug).toHaveBeenCalledWith(
+        expect.stringMatching(`${expectedLevel} ${isoDateRegex} \\[readmeio\\] ${log.message}$`),
+        '\n',
+      );
+    });
+  });
+
+  describe('info', () => {
+    it('should format and log info messages correctly with args if provided', () => {
+      const log: Log = { message: 'Info test message', args: { key: 'value' } };
+      const expectedLevel = 'INFO';
+
+      logger.info(log);
+
+      expect(console.info).toHaveBeenCalledWith(
+        expect.stringMatching(`${expectedLevel} ${isoDateRegex} \\[readmeio\\] ${log.message}$`),
+        '\nArguments:',
+        log.args,
+        '\n',
+      );
+    });
+
+    it('should format and log debug messages correctly without args if not provided', () => {
+      const log: Log = { message: 'Info test message' };
+      const expectedLevel = 'INFO';
+
+      logger.info(log);
+
+      expect(console.info).toHaveBeenCalledWith(
         expect.stringMatching(`${expectedLevel} ${isoDateRegex} \\[readmeio\\] ${log.message}$`),
         '\n',
       );

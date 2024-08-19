@@ -1,4 +1,5 @@
 import ConsoleLogger from './console-logger';
+import PinoLogger from './pino-logger';
 
 interface LoggerConfig {
   isLoggingEnabled: boolean;
@@ -15,7 +16,8 @@ export type ErrorLog = Log & { err?: Error };
 export interface LoggerStrategy {
   debug(log: Log): void;
   error(log: ErrorLog): void;
-  trace(log: Log): void;
+  info(log: Log): void;
+  verbose(log: Log): void;
 }
 
 export interface Logger extends LoggerStrategy {
@@ -40,10 +42,18 @@ export class DefaultLogger implements Logger {
    */
   static getInstance(): Logger {
     if (!DefaultLogger.instance) {
-      const defaultConfig: LoggerConfig = {
-        isLoggingEnabled: false,
-        strategy: new ConsoleLogger(),
-      };
+      let defaultConfig: LoggerConfig;
+      try {
+        defaultConfig = {
+          isLoggingEnabled: false,
+          strategy: new PinoLogger(),
+        };
+      } catch (e) {
+        defaultConfig = {
+          isLoggingEnabled: false,
+          strategy: new ConsoleLogger(),
+        };
+      }
       DefaultLogger.instance = new DefaultLogger(defaultConfig);
     }
     return DefaultLogger.instance;
@@ -79,9 +89,14 @@ export class DefaultLogger implements Logger {
    * Logs a trace message.
    * @param log The trace log entry. Contains the message as required field and optional args.
    */
-  trace(log: Log): void {
+  verbose(log: Log): void {
     if (!this.config.isLoggingEnabled) return;
-    this.config.strategy.trace(log);
+    this.config.strategy.verbose(log);
+  }
+
+  info(log: Log): void {
+    if (!this.config.isLoggingEnabled) return;
+    this.config.strategy.info(log);
   }
 }
 
