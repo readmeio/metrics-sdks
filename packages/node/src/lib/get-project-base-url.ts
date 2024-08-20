@@ -50,7 +50,8 @@ export async function getProjectBaseUrl(readmeApiKey: string, requestTimeout = c
         if (res.status >= 400 && res.status <= 599) {
           throw res;
         }
-        logger.debug({ message: `Fetch Base URL: Service responded with status ${res.status}: ${res.statusText}` });
+        const logLevel = res.ok ? 'info' : 'error';
+        logger[logLevel]({ message: `Fetch Base URL: Service responded with status ${res.status}: ${res.statusText}.` });
         return res.json() as Promise<{ baseUrl: string }>;
       })
       .then(project => {
@@ -73,6 +74,7 @@ export async function getProjectBaseUrl(readmeApiKey: string, requestTimeout = c
 
     return baseUrl;
   }
-
-  return cache.getKey('baseUrl');
+  const cachedBaseUrl = cache.getKey('baseUrl');
+  logger.verbose({ message: 'Retrieved baseUrl from cache.', args: { baseUrl: cachedBaseUrl } });
+  return cachedBaseUrl;
 }

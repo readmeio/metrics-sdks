@@ -27,6 +27,14 @@ export default class PinoLogger implements LoggerStrategy {
         customLevels: customLogLevels,
         level: 'debug',
         useOnlyCustomLevels: true,
+        transport: {
+          target: 'pino-pretty',
+          options: {
+            customLevels: Object.entries(customLogLevels)
+              .map(([key, value]) => `${key}:${value}`)
+              .join(','),
+          },
+        },
         formatters: {
           level: (label: string) => {
             return { level: label.toUpperCase() };

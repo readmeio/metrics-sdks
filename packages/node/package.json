@@ -70,6 +70,7 @@
   },
   "prettier": "@readme/eslint-config/prettier",
   "optionalDependencies": {
-    "pino": "^9.3.2"
+    "pino": "^9.3.2",
+    "pino-pretty": "^11.2.2"
   }
 }

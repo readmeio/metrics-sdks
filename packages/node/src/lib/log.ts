@@ -81,8 +81,12 @@ function setDocumentationHeader(res: ServerResponse, baseLogUrl: string, logId: 
   // do with a test, but it's a little difficult to test. Maybe with a nock()
   // delay timeout.
   if (res.headersSent) return;
-
-  res.setHeader('x-documentation-url', `${baseLogUrl}/logs/${logId}`);
+  const documentationUrl = `${baseLogUrl}/logs/${logId}`;
+  logger.verbose({
+    message: 'The documentation URL is created.',
+    args: { 'x-documentation-url': documentationUrl },
+  });
+  res.setHeader('x-documentation-url', documentationUrl);
 }
 
 /**
