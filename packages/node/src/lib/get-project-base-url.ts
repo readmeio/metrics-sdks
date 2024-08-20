@@ -51,7 +51,9 @@ export async function getProjectBaseUrl(readmeApiKey: string, requestTimeout = c
           throw res;
         }
         const logLevel = res.ok ? 'info' : 'error';
-        logger[logLevel]({ message: `Fetch Base URL: Service responded with status ${res.status}: ${res.statusText}.` });
+        logger[logLevel]({
+          message: `Fetch Base URL: Service responded with status ${res.status}: ${res.statusText}.`,
+        });
         return res.json() as Promise<{ baseUrl: string }>;
       })
       .then(project => {

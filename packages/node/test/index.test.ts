@@ -185,7 +185,7 @@ describe('#metrics', function () {
     it('should log response status after the metrics server responds', async function () {
       metricsServerResponseCode = 202;
       await makeRequest();
-      expect(mockLogger.debug).toHaveBeenCalledWith({
+      expect(mockLogger.info).toHaveBeenCalledWith({
         message: expect.stringContaining(`Service responded with status ${metricsServerResponseCode}`),
       });
     });
