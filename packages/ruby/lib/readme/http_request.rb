@@ -87,15 +87,9 @@ module Readme
 
     def body
       if IS_RACK_V3
-        body = @input.read
-        @input.rewind
-        body
+        read_body(@input)
       else
-        @request.body.rewind
-        content = @request.body.read
-        @request.body.rewind
-
-        content
+        read_body(@request.body)
       end
     end
 
@@ -133,6 +127,18 @@ module Readme
       {
         'Host' => @request.host
       }.compact
+    end
+
+    def read_body(io)
+      return '' if io.nil?
+      
+      io.rewind if io.respond_to?(:rewind)
+      content = io.read || ''
+      io.rewind if io.respond_to?(:rewind)
+      content
+    rescue => e
+      Readme::Metrics.logger.warn "Error reading request body: #{e.message}"
+      ''
     end
   end
 end
