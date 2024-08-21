@@ -131,7 +131,7 @@ module Readme
 
     def read_body(io)
       return '' if io.nil?
-      
+
       io.rewind if io.respond_to?(:rewind)
       content = io.read || ''
       io.rewind if io.respond_to?(:rewind)

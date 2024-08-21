@@ -26,6 +26,6 @@ Gem::Specification.new do |spec|
   # spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_runtime_dependency 'httparty', '~> 0.18'
-  spec.add_runtime_dependency 'rack', '>= 2.2', '< 4'
+  spec.add_dependency 'httparty', '~> 0.18'
+  spec.add_dependency 'rack', '>= 2.2', '< 4'
 end
