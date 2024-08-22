@@ -16,7 +16,8 @@ RUN apk add php81 \
     php81-simplexml \
     php81-tokenizer \
     php81-xml \
-    php81-xmlwriter
+    php81-xmlwriter \
+    php81-pdo
 RUN ln /usr/bin/php81 /usr/bin/php
 
 # Install Composer

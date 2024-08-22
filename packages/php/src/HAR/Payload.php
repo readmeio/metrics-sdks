@@ -136,7 +136,7 @@ class Payload
             } elseif ($content_type !== null && $content_type !== '') {
                 $post_data = [
                     'mimeType' => $content_type,
-                    'text' => $request->all()
+                    'text' => $request->getContent()
                 ];
             }
         }
