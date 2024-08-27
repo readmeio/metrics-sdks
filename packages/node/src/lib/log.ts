@@ -28,11 +28,11 @@ function doSend(readmeApiKey: string, options: Options) {
   metricsAPICall(readmeApiKey, json, options).catch(err => {
     // Silently discard errors and timeouts.
     if (options.development) {
-      logger.error({ message: 'Error making API call', err });
+      logger.error({ message: 'Failed to capture API request.', err });
     }
   });
 
-  logger.debug({ message: 'Queue is cleared.', args: { queue } });
+  logger.debug({ message: 'Queue flushed.', args: { queue } });
 }
 // Make sure we flush the queue if the process is exited
 process.on('exit', doSend);
@@ -83,7 +83,7 @@ function setDocumentationHeader(res: ServerResponse, baseLogUrl: string, logId: 
   if (res.headersSent) return;
   const documentationUrl = `${baseLogUrl}/logs/${logId}`;
   logger.verbose({
-    message: 'The documentation URL is created.',
+    message: 'Created URL to your API request log.',
     args: { 'x-documentation-url': documentationUrl },
   });
   res.setHeader('x-documentation-url', documentationUrl);

@@ -113,7 +113,7 @@ function parseRequestBody(body: string, mimeType: string): Record<string, unknow
     try {
       return JSON.parse(body);
     } catch (err) {
-      logger.error({ message: 'Error parsing request body JSON (process-request)', err });
+      logger.error({ message: 'Error parsing request body JSON.', err });
     }
   }
 
