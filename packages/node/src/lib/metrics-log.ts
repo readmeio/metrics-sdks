@@ -7,6 +7,8 @@ import timeoutSignal from 'timeout-signal';
 import pkg from '../../package.json';
 import config from '../config';
 
+import { logger } from './logger';
+
 export interface GroupingObject {
   /**
    * API Key used to make the request. Note that this is different from the `readmeAPIKey`
@@ -99,6 +101,7 @@ export function metricsAPICall(readmeAPIKey: string, body: OutgoingLogBody[], op
       // after the backoff expires, erase the old expiration time
       backoffExpiresAt = undefined;
     }
+    logger.verbose({ message: 'Making a POST request to a service...', args: { body } });
     return fetch(new URL('/v1/request', config.host), {
       method: 'post',
       body: JSON.stringify(body),
@@ -119,6 +122,8 @@ export function metricsAPICall(readmeAPIKey: string, body: OutgoingLogBody[], op
             backoffExpiresAt.setSeconds(backoffExpiresAt.getSeconds() + BACKOFF_SECONDS);
           }
         }
+        const logLevel = response.ok ? 'info' : 'error';
+        logger[logLevel]({ message: `Service responded with status ${response.status}: ${response.statusText}.` });
         return response;
       })
       .finally(() => {

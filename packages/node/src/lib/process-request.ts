@@ -12,6 +12,7 @@ import pick from 'lodash/pick';
 import set from 'lodash/set';
 
 import { getProto, mask } from './construct-payload';
+import { logger } from './logger';
 import { objectToArray, searchToArray } from './object-to-array';
 
 /**
@@ -112,7 +113,7 @@ function parseRequestBody(body: string, mimeType: string): Record<string, unknow
     try {
       return JSON.parse(body);
     } catch (err) {
-      // no-op
+      logger.error({ message: 'Error parsing request body JSON.', err });
     }
   }
 
