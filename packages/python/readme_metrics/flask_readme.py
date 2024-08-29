@@ -27,6 +27,9 @@ class ReadMeMetrics:
         app.after_request(self.after_request)
 
     def before_request(self):
+        if request.method == "OPTIONS":
+            return
+
         try:
             request.rm_start_dt = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
             request.rm_start_ts = int(time.time() * 1000)
@@ -39,6 +42,9 @@ class ReadMeMetrics:
             self.config.LOGGER.exception(e)
 
     def after_request(self, response):
+        if request.method == "OPTIONS":
+            return response
+
         try:
             response_info = ResponseInfoWrapper(
                 response.headers,
