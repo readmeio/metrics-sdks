@@ -229,7 +229,7 @@ RSpec.describe Readme::HttpRequest do
 
     it 'returns an empty string if an error occurs while reading the body' do
       io = instance_double(StringIO, read: nil)
-      allow(io).to receive(:rewind).and_raise(StandardError.new("Test Error"))
+      allow(io).to receive(:rewind).and_raise(StandardError.new('Test Error'))
 
       env = { 'rack.input' => io }
       request = described_class.new(env)
