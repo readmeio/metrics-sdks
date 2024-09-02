@@ -69,5 +69,5 @@ class TestDjangoMiddleware:
         middleware.metrics_core = Mock()
         request = Mock()
         request.method = "OPTIONS"
-        result = middleware(request)
+        middleware(request)
         assert not middleware.metrics_core.process.called
