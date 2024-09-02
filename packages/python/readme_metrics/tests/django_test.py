@@ -63,3 +63,11 @@ class TestDjangoMiddleware:
         request.headers = {}
         middleware(request)
         assert getattr(request, "rm_content_length") == "0"
+
+    def test_options_request(self):
+        middleware = MetricsMiddleware(Mock(), config=mock_config)
+        middleware.metrics_core = Mock()
+        request = Mock()
+        request.method = "OPTIONS"
+        result = middleware(request)
+        assert not middleware.metrics_core.process.called

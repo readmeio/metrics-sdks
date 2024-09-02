@@ -42,9 +42,6 @@ class ReadMeMetrics:
             self.config.LOGGER.exception(e)
 
     def after_request(self, response):
-        if request.method == "OPTIONS":
-            return response
-
         try:
             response_info = ResponseInfoWrapper(
                 response.headers,
