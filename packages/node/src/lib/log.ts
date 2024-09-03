@@ -109,6 +109,7 @@ export function log(
   group: GroupingObject,
   options: Options = {},
 ) {
+  if (req.method === 'OPTIONS') return undefined;
   if (!readmeApiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a group');
   if (options.logger) {

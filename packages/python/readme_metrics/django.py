@@ -16,6 +16,9 @@ class MetricsMiddleware:
         self.metrics_core = Metrics(self.config)
 
     def __call__(self, request):
+        if request.method == "OPTIONS":
+            return self.get_response(request)
+
         try:
             request.rm_start_dt = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
             request.rm_start_ts = int(time.time() * 1000)
