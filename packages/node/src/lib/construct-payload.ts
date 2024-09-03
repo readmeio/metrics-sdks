@@ -1,3 +1,4 @@
+import type { LoggerStrategy } from './logger';
 import type { OutgoingLogBody } from './metrics-log';
 import type { UUID } from 'node:crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
@@ -53,6 +54,11 @@ export interface LogOptions {
    * servers.
    */
   fireAndForget?: boolean;
+
+  /**
+   * If true, the errors and other logs will be displayed in console. Your own logger strategy can be passed.
+   */
+  logger?: LoggerStrategy | boolean;
 
   /**
    * @deprecated use `allowList` instead

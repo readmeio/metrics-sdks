@@ -12,6 +12,7 @@ import config from '../config';
 import { constructPayload } from './construct-payload';
 import { getProjectBaseUrl } from './get-project-base-url';
 import isRequest from './is-request';
+import { logger } from './logger';
 import { metricsAPICall } from './metrics-log';
 import { patchRequest } from './patch-request';
 import { patchResponse } from './patch-response';
@@ -24,10 +25,14 @@ function doSend(readmeApiKey: string, options: Options) {
   queue = [];
 
   // Make the log call
-  metricsAPICall(readmeApiKey, json, options).catch(e => {
+  metricsAPICall(readmeApiKey, json, options).catch(err => {
     // Silently discard errors and timeouts.
-    if (options.development) throw e;
+    if (options.development) {
+      logger.error({ message: 'Failed to capture API request.', err });
+    }
   });
+
+  logger.debug({ message: 'Queue flushed.', args: { queue } });
 }
 // Make sure we flush the queue if the process is exited
 process.on('exit', doSend);
@@ -76,8 +81,12 @@ function setDocumentationHeader(res: ServerResponse, baseLogUrl: string, logId: 
   // do with a test, but it's a little difficult to test. Maybe with a nock()
   // delay timeout.
   if (res.headersSent) return;
-
-  res.setHeader('x-documentation-url', `${baseLogUrl}/logs/${logId}`);
+  const documentationUrl = `${baseLogUrl}/logs/${logId}`;
+  logger.verbose({
+    message: 'Created URL to your API request log.',
+    args: { 'x-documentation-url': documentationUrl },
+  });
+  res.setHeader('x-documentation-url', documentationUrl);
 }
 
 /**
@@ -102,6 +111,10 @@ export function log(
 ) {
   if (!readmeApiKey) throw new Error('You must provide your ReadMe API key');
   if (!group) throw new Error('You must provide a group');
+  if (options.logger) {
+    if (typeof options.logger === 'boolean') logger.configure({ isLoggingEnabled: true });
+    else logger.configure({ isLoggingEnabled: true, strategy: options.logger });
+  }
 
   // Ensures the buffer length is between 1 and 30
   const bufferLength = clamp(options.bufferLength || config.bufferLength, 1, 30);
@@ -164,6 +177,7 @@ export function log(
     );
 
     queue.push(payload);
+    logger.debug({ message: 'Request enqueued.', args: { queue } });
     if (queue.length >= bufferLength) doSend(readmeApiKey, options);
 
     cleanup(); // eslint-disable-line @typescript-eslint/no-use-before-define
