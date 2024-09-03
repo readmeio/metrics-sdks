@@ -11,13 +11,13 @@ RUN apk add php81 \
     php81-mbstring \
     php81-opcache \
     php81-openssl \
+    php81-pdo \
     php81-phar \
     php81-session \
     php81-simplexml \
     php81-tokenizer \
     php81-xml \
-    php81-xmlwriter \
-    php81-pdo
+    php81-xmlwriter 
 RUN ln /usr/bin/php81 /usr/bin/php
 
 # Install Composer
