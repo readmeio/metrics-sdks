@@ -107,28 +107,37 @@ local function make_readme_payload(conf, entries)
       table.insert(request_entry.response.headers, {name = name, value = final_value})
     end
 
-    -- Convert query string
     for name, value in pairs(entry.request.querystring) do
       table.insert(request_entry.request.queryString, {name = name, value = value})
     end
 
+    local group = {}
+    if conf.group_by then
+      for header_name, group_value in pairs(conf.group_by) do
+        local header_value = entry.request.headers[header_name]
+        group[group_value] = header_value or "unknown"
+      end
+    end
+
+    local id_header = (conf.id_header and conf.id_header:lower()) or "authorization"
+    local id = entry.request.headers[id_header] or "unknown"
+    if id_header == "authorization" and entry.raw_auth then
+      id = entry.raw_auth
+    end
+    group.id = id
     local api_log = {
       httpVersion = entry.httpVersion,
       requestBody = {},
       responseBody = {},
 
       clientIPAddress = entry.client_ip,
-      createdAt = os.date("!%Y-%m-%dT%H:%M:%SZ"),
-      development = false, -- Set this based on your environment
+      createdAt = request_entry.startedDateTime,
+      development = false,
       error = nil,
-      group = {
-        email = "anand@gmail.com", -- Set this if available
-        id = entry.service and entry.service.id or 'nil',
-        label = entry.service and entry.service.name or 'nil'
-      },
+      group = group,
       _id = entry.request.id,
       method = entry.request.method,
-      normalizedPath = '/foo',
+      normalizedPath = entry.normalized_path,
       queryString = request_entry.request.queryString,
       request = {
         log = {
@@ -148,10 +157,6 @@ local function make_readme_payload(conf, entries)
       url = entry.request.url
     }
 
-    -- Print all key-value pairs in latencies
-    for key, value in pairs(entry.latencies) do
-      kong.log.debug("Latency - " .. key .. ": " .. tostring(value), "\n")
-    end
     table.insert(payload, api_log)
   end
 
@@ -220,14 +225,13 @@ local HttpLogHandler = {
 
 function HttpLogHandler:log(conf)
   local queue_conf = Queue.get_plugin_params("readme-plugin", conf, 'readme-plugin')
-  kong.log.debug("Queue name automatically configured based on configuration parameters to: ", queue_conf.name)
   local info = kong.log.serialize()
   local scheme = kong.request.get_scheme()
   local version = kong.request.get_http_version()
   info.httpVersion = scheme .. "/" .. version
   info.mimeType = kong.response.get_header("Content-Type")
-  info.normalizedPath = kong.request.get_path()
-  kong.log.debug("Response status: ", info.httpVersion, ' ', info.mimeType)
+  info.normalized_path = kong.request.get_path()
+  info.raw_auth = kong.request.get_header("Authorization")
 
   local ok, err = Queue.enqueue(
     queue_conf,

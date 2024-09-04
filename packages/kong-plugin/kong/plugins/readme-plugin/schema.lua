@@ -10,11 +10,18 @@ return {
                 type = "record",
                 fields = {
                     {
-                        api_key = {
-                            required = true,
-                            description = "Readme API key.",
-                            type = "string"
-                        }
+                      api_key = {
+                        required = true,
+                        description = "ReadMe API key.",
+                        type = "string"
+                      }
+                    },
+                    {
+                      id_header = {
+                          description = "Select header to be used as a unique identifier for a user. This value will be hashed by ReadMe. Authorization header is used by default. If header was not found, it will be set to 'Unknown'.",
+                          type = "string",
+                          default = "Authorization"
+                      }
                     },
                     {
                         proxy_endpoint = typedefs.url(
@@ -53,13 +60,17 @@ return {
                     },
                     {
                         group_by = {
-                            description = "An optional array of headers to group by. applies to both requests and responses.",
+                            description = "A map of headers to group by. The key is the header name and value is the header value to group by. Applies to both request headers only. If header is not found, it will be set to 'unknown'. email and label are recommened.",
                             type = "map",
-                            keys = {
-                                type = "string"
-                            },
+                            keys = typedefs.header_name,
                             values = {
-                                type = "string"
+                                type = "string",
+                                match_none = {
+                                  {
+                                    pattern = "^id$",
+                                    err = "cannot map to 'id'",
+                                  }
+                                }
                             }
                         }
                     },

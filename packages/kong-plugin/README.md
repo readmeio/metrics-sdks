@@ -48,10 +48,14 @@ curl  http://localhost:8001/plugins  | jq '.data | map(select(.name == "readme-p
 ```
 
 ```bash
+# get plugin id
+export PLUGIN_ID=$(curl -s http://localhost:8001/plugins  | jq '.data | map(select(.name == "readme-plugin")) | first | .id' | tr -d '"')
 # Configure the plugin with your API key
-curl  -X PATCH http://localhost:8001/plugins/6cfe12f1-cbdf-4ffd-8750-617dc4a5199d --data "config.api_key=<Your API Key>" | jq '.config.api_key'
+curl -sX PATCH http://localhost:8001/plugins/$PLUGIN_ID --data "config.api_key=<Your API Key>" | jq '.config.api_key'
 # configure Hide headers
-curl -X PATCH -H'Content-Type: application/json' http://localhost:8001/plugins/6cfe12f1-cbdf-4ffd-8750-617dc4a5199d --data '{"config": {"hide_headers": {"foo": "", "bar": "default"}}}' | jq '.config.hide_headers'
+curl -sX PATCH -H'Content-Type: application/json' http://localhost:8001/plugins/$PLUGIN_ID --data '{"config": {"hide_headers": {"foo": "", "bar": "default"}}}' | jq '.config.hide_headers'
+# configure id_header
+curl -sX PATCH -H'Content-Type: application/json' http://localhost:8001/plugins/$PLUGIN_ID --data '{"config": {"id_header": "email"}}' | jq '.config.id_header'
 ```
 
 
