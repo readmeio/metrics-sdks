@@ -1,0 +1,243 @@
+local Queue = require "kong.tools.queue"
+local cjson = require "cjson"
+local url = require "socket.url"
+local http = require "resty.http"
+local sandbox = require "kong.tools.sandbox".sandbox
+local kong_meta = require "kong.meta"
+
+
+local kong = kong
+local ngx = ngx
+local encode_base64 = ngx.encode_base64
+local tostring = tostring
+local tonumber = tonumber
+local fmt = string.format
+local pairs = pairs
+local max = math.max
+
+
+local sandbox_opts = { env = { kong = kong, ngx = ngx } }
+local parsed_urls_cache = {}
+-- Parse host url.
+-- @param `url` host url
+-- @return `parsed_url` a table with host details:
+-- scheme, host, port, path, query, userinfo
+local function parse_url(host_url)
+  local parsed_url = parsed_urls_cache[host_url]
+
+  if parsed_url then
+    return parsed_url
+  end
+
+  parsed_url = url.parse(host_url)
+  if not parsed_url.port then
+    if parsed_url.scheme == "http" then
+      parsed_url.port = 80
+
+    elseif parsed_url.scheme == "https" then
+      parsed_url.port = 443
+    end
+  end
+  if not parsed_url.path then
+    parsed_url.path = "/"
+  end
+
+  parsed_urls_cache[host_url] = parsed_url
+
+  return parsed_url
+end
+
+
+local function make_readme_payload(conf, entries)
+  local payload = {}
+  for _, entry in ipairs(entries) do
+    local request_entry = {
+      pageref = entry.request.url,
+      startedDateTime = os.date("!%Y-%m-%dT%H:%M:%SZ", entry.started_at / 1000),
+      time = entry.latencies.request,
+      request = {
+        httpVersion = entry.request.httpVersion,
+        -- postData: {params = string[]}
+        headers = {},
+        method = entry.request.method,
+        queryString = {},
+        bodySize = entry.request.size,
+        url = entry.request.url,
+      },
+      response = {
+        status = entry.response.status,
+        headers = {},
+        content = {
+          -- compression = "",
+          -- text = "",
+          mimeType = entry.response.mimeType,
+          size = entry.response.size,
+        },
+        bodySize = entry.response.size
+      }
+    }
+
+
+    -- Convert headers
+    for name, value in pairs(entry.request.headers) do
+      local final_value = value
+      if conf.hide_headers[name] then
+        if conf.hide_headers[name] == "" then
+          kong.log.debug("Hiding request header: ", name)
+          break
+        else
+          final_value = conf.hide_headers[name]
+          kong.log.debug("Overriding request header: ", name, " with ", final_value)
+        end
+      end
+      table.insert(request_entry.request.headers, {name = name, value = final_value})
+    end
+
+    for name, value in pairs(entry.response.headers) do
+      local final_value = value
+      if conf.hide_headers[name] then
+        if conf.hide_headers[name] == "" then
+          kong.log.debug("Hiding response header: ", name)
+          break
+        else
+          final_value = conf.hide_headers[name]
+          kong.log.debug("Overriding response header: ", name, " with ", final_value)
+        end
+      end
+      table.insert(request_entry.response.headers, {name = name, value = final_value})
+    end
+
+    -- Convert query string
+    for name, value in pairs(entry.request.querystring) do
+      table.insert(request_entry.request.queryString, {name = name, value = value})
+    end
+
+    local api_log = {
+      httpVersion = entry.httpVersion,
+      requestBody = {},
+      responseBody = {},
+
+      clientIPAddress = entry.client_ip,
+      createdAt = os.date("!%Y-%m-%dT%H:%M:%SZ"),
+      development = false, -- Set this based on your environment
+      error = nil,
+      group = {
+        email = "anand@gmail.com", -- Set this if available
+        id = entry.service and entry.service.id or 'nil',
+        label = entry.service and entry.service.name or 'nil'
+      },
+      _id = entry.request.id,
+      method = entry.request.method,
+      normalizedPath = '/foo',
+      queryString = request_entry.request.queryString,
+      request = {
+        log = {
+          creator = {
+            comment = "Kong " .. kong.version,
+            name = "readme-metrics (kong)",
+            version = "1.0.0"
+          },
+          entries = {request_entry}
+        },
+      },
+      requestHeaders = request_entry.request.headers,
+      responseHeaders = request_entry.response.headers,
+      responseTime = entry.latencies.request,
+      startedDateTime = request_entry.startedDateTime,
+      status = entry.response.status,
+      url = entry.request.url
+    }
+
+    -- Print all key-value pairs in latencies
+    for key, value in pairs(entry.latencies) do
+      kong.log.debug("Latency - " .. key .. ": " .. tostring(value), "\n")
+    end
+    table.insert(payload, api_log)
+  end
+
+  return cjson.encode(payload)
+end
+
+-- Sends the provided entries to the configured plugin host
+-- @return true if everything was sent correctly, falsy if error
+-- @return error message if there was an error
+local function send_entries(conf, entries)
+  local payload = make_readme_payload(conf, entries)
+  local content_length = #payload
+  local method = "POST"
+  local timeout = conf.timeout
+  local keepalive = conf.keepalive
+  local proxy_endpoint = conf.proxy_endpoint
+  local http_endpoint = proxy_endpoint or "https://metrics.readme.io/v1/request"
+  local api_key = conf.api_key
+
+  local parsed_url = parse_url(http_endpoint)
+  local host = parsed_url.host
+  local port = tonumber(parsed_url.port)
+
+  local httpc = http.new()
+  httpc:set_timeout(timeout)
+
+  local headers = {
+    ["Content-Type"] = "application/json",
+    ["Content-Length"] = content_length,
+    ["Authorization"] = "Basic " ..encode_base64(api_key .. ":") or nil
+  }
+
+  local log_server_url = fmt("%s://%s:%d%s", parsed_url.scheme, host, port, parsed_url.path)
+  local res, err = httpc:request_uri(log_server_url, {
+    method = method,
+    headers = headers,
+    body = payload,
+    keepalive_timeout = keepalive,
+    ssl_verify = false,
+  })
+  if not res then
+    return nil, "failed request to " .. host .. ":" .. tostring(port) .. ": " .. err
+  end
+
+  -- always read response body, even if we discard it without using it on success
+  local response_body = res.body
+
+  kong.log.debug(fmt("http-log sent data log server, %s:%s HTTP status %d",
+    host, port, res.status))
+
+  if res.status < 300 then
+    return true
+
+  else
+    return nil, "request to " .. host .. ":" .. tostring(port)
+      .. " returned status code " .. tostring(res.status) .. " and body "
+      .. response_body
+  end
+end
+
+
+local HttpLogHandler = {
+  PRIORITY = 12,
+  VERSION = kong_meta.version,
+}
+
+function HttpLogHandler:log(conf)
+  local queue_conf = Queue.get_plugin_params("readme-plugin", conf, 'readme-plugin')
+  kong.log.debug("Queue name automatically configured based on configuration parameters to: ", queue_conf.name)
+  local info = kong.log.serialize()
+  local scheme = kong.request.get_scheme()
+  local version = kong.request.get_http_version()
+  info.httpVersion = scheme .. "/" .. version
+  info.mimeType = kong.response.get_header("Content-Type")
+  info.normalizedPath = kong.request.get_path()
+  kong.log.debug("Response status: ", info.httpVersion, ' ', info.mimeType)
+
+  local ok, err = Queue.enqueue(
+    queue_conf,
+    send_entries,
+    conf,
+    info
+  )
+  if not ok then
+    kong.log.err("Failed to enqueue log entry to log server: ", err)
+  end
+end
+
+return HttpLogHandler
