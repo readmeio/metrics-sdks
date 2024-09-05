@@ -2,8 +2,6 @@ local Queue = require "kong.tools.queue"
 local cjson = require "cjson"
 local url = require "socket.url"
 local http = require "resty.http"
-local kong_meta = require "kong.meta"
-
 
 local kong = kong
 local ngx = ngx
@@ -219,7 +217,7 @@ end
 
 local HttpLogHandler = {
   PRIORITY = 12,
-  VERSION = kong_meta.version,
+  VERSION = "0.0.1",
 }
 
 function HttpLogHandler:log(conf)
