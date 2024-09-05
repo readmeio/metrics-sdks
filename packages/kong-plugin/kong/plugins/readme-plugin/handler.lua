@@ -2,7 +2,6 @@ local Queue = require "kong.tools.queue"
 local cjson = require "cjson"
 local url = require "socket.url"
 local http = require "resty.http"
-local sandbox = require "kong.tools.sandbox".sandbox
 local kong_meta = require "kong.meta"
 
 
@@ -15,9 +14,9 @@ local fmt = string.format
 local pairs = pairs
 local max = math.max
 
-
-local sandbox_opts = { env = { kong = kong, ngx = ngx } }
+-- this is used so we don't have to parse the url every time we log.
 local parsed_urls_cache = {}
+
 -- Parse host url.
 -- @param `url` host url
 -- @return `parsed_url` a table with host details:
@@ -47,7 +46,8 @@ local function parse_url(host_url)
   return parsed_url
 end
 
-
+-- Creates a payload for ReadMe
+-- @return JSON string in ReadMe API Log format
 local function make_readme_payload(conf, entries)
   local payload = {}
   for _, entry in ipairs(entries) do
@@ -163,7 +163,7 @@ local function make_readme_payload(conf, entries)
   return cjson.encode(payload)
 end
 
--- Sends the provided entries to the configured plugin host
+-- Sends the provided entries to ReadMe
 -- @return true if everything was sent correctly, falsy if error
 -- @return error message if there was an error
 local function send_entries(conf, entries)
@@ -204,8 +204,7 @@ local function send_entries(conf, entries)
   -- always read response body, even if we discard it without using it on success
   local response_body = res.body
 
-  kong.log.debug(fmt("http-log sent data log server, %s:%s HTTP status %d",
-    host, port, res.status))
+  kong.log.debug(fmt("sent data to ReadMe, %s:%s HTTP status %d %s", host, port, res.status, response_body))
 
   if res.status < 300 then
     return true
@@ -225,7 +224,9 @@ local HttpLogHandler = {
 
 function HttpLogHandler:log(conf)
   local queue_conf = Queue.get_plugin_params("readme-plugin", conf, 'readme-plugin')
+  -- this creates a object with some request and response details. see https://docs.konghq.com/gateway/latest/plugin-development/pdk/kong.log/#konglogserialize
   local info = kong.log.serialize()
+  -- add more details to the info object
   local scheme = kong.request.get_scheme()
   local version = kong.request.get_http_version()
   info.httpVersion = scheme .. "/" .. version
@@ -233,6 +234,7 @@ function HttpLogHandler:log(conf)
   info.normalized_path = kong.request.get_path()
   info.raw_auth = kong.request.get_header("Authorization")
 
+  -- This sends configuration and current request data to a queue for processing. will call `send_entries` function.
   local ok, err = Queue.enqueue(
     queue_conf,
     send_entries,
