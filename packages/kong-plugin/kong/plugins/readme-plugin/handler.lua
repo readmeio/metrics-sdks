@@ -55,7 +55,6 @@ local function make_readme_payload(conf, entries)
       time = entry.latencies.request,
       request = {
         httpVersion = entry.request.httpVersion,
-        -- postData: {params = string[]}
         headers = {},
         method = entry.request.method,
         queryString = {},
@@ -66,8 +65,6 @@ local function make_readme_payload(conf, entries)
         status = entry.response.status,
         headers = {},
         content = {
-          -- compression = "",
-          -- text = "",
           mimeType = entry.response.mimeType,
           size = entry.response.size,
         },

@@ -36,6 +36,7 @@ kms
 curl -s localhost:8001 | jq '.plugins.available_on_server."readme-plugin"'
 ```
 
+
 #### Enable for all services
 
 ```bash
@@ -58,10 +59,8 @@ curl -i -X POST http://localhost:8001/services/example_service/routes --data 'pa
 curl -i http://localhost:8000/mock/anything
 ```
 
-### Development tricks
-
-Get plugin config for a route
-
+### 🧙 Development tricks
+Get plugin config
 ```bash
 curl -s http://localhost:8001/plugins  | jq '.data | map(select(.name == "readme-plugin")) | first'
 ```
