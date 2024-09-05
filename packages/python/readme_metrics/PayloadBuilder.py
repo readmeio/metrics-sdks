@@ -221,7 +221,9 @@ class PayloadBuilder:
         }
 
         if "Authorization" in headers:
-            payload["headers"].append({"name": "Authorization", "value": mask(headers["Authorization"])})
+            payload["headers"].append(
+                {"name": "Authorization", "value": mask(headers["Authorization"])}
+            )
 
         if not post_data is False:
             payload["postData"] = post_data
