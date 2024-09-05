@@ -30,11 +30,11 @@ class MockApplication:
 
 class TestUtils:
     def testMask(self):
-        expected = (
-            "sha512-ETo7x4PYUfwDcyFLGep76fo95UHsuf4CbVLGA+jqGcF0zA6XBfi5DTEiEsDDpthFPd+z4xQUCc9L7c",
-            "jvAzWQtA==?beef",
+        # pylint: disable=line-too-long
+        assert (
+            mask("deadbeef")
+            == "sha512-ETo7x4PYUfwDcyFLGep76fo95UHsuf4CbVLGA+jqGcF0zA6XBfi5DTEiEsDDpthFPd+z4xQUCc9L7cjvAzWQtA==?beef"
         )
-        assert mask("deadbeef") == expected
 
 
 class TestPayloadBuilder:
