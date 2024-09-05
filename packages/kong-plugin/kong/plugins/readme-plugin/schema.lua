@@ -18,7 +18,7 @@ return {
                     },
                     {
                       id_header = {
-                          description = "Select header to be used as a unique identifier for a user. This value will be hashed by ReadMe. Authorization header is used by default. If header was not found, it will be set to 'Unknown'.",
+                          description = "Select header to be used as a unique identifier for a user. This value will be hashed by ReadMe. The `Authorization` header is used by default. If the configured header was not found then it will be set to 'Unknown'.",
                           type = "string",
                           default = "Authorization"
                       }
@@ -26,7 +26,7 @@ return {
                     {
                         proxy_endpoint = typedefs.url(
                             {
-                                description = "An optional endpoint to send reqeust to. If you are proxying ensure final endpoint is https://metrics.readme.io/v1/request."
+                                description = "An optional endpoint to send the request to. If you are proxying, ensure the final endpoint is `https://metrics.readme.io/v1/request`."
                             }
                         )
                     },
@@ -46,7 +46,7 @@ return {
                     },
                     {
                         hide_headers = {
-                            description = "An optional table of headers to exclude from logging. Header will be set to supplied value. If values set to an empty string will be ignored. applies to both requests and responses.",
+                            description = "An optional table of headers to exclude from logging. The header will be set to supplied value. If the supplised value is an empty string, the header will be excluded from logging. This applies to both requests and responses.",
                             type = "map",
                             keys = {
                                 type = "string"
@@ -60,7 +60,7 @@ return {
                     },
                     {
                         group_by = {
-                            description = "A map of headers to group by. The key is the header name and value is the header value to group by. Applies to both request headers only. If header is not found, it will be set to 'unknown'. email and label are recommened.",
+                            description = "A map of headers to group by. The key is the header name and the value is the header value to group by. Applies to request headers only. If the header is not found, it will be set to `unknown`. `email` and `label` are recommended keys to provide.",
                             type = "map",
                             keys = typedefs.header_name,
                             values = {

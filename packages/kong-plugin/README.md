@@ -17,15 +17,16 @@ With [ReadMe's Metrics API](https://readme.com/metrics) your team can get deep i
 ### 📦 Deploying locally
 
 ```bash
-docker build -t kong-readme-plugin:1 .
-curl -Ls https://get.konghq.com/quickstart |  bash -s -- -r "" -i kong-readme-plugin -t 1
-curl -i -s -X POST http://localhost:8001/plugins --data name=readme-plugin --data 'config.api_key=<Your API Key>'
-
-# Setup endpoints or test
-curl -i http://localhost:8000/mock/anything
+# Build kong image with the plugin
+docker build -t kong-readme-plugin:v1 .
+# Run kong with the plugin
+curl -Ls https://get.konghq.com/quickstart |  bash -s -- -r "" -i kong-readme-plugin -t v1
+# Enable the plugin
+curl -isX POST http://localhost:8001/plugins -d name=readme-plugin -d 'config.api_key=<Your API Key>'
 ```
 
 ### 🧑‍🔬 Testing
+Requires [pongo](https://github.com/Kong/kong-pongo) to test and develop.
 
 ```bash
 pongo up
@@ -40,43 +41,47 @@ curl -s localhost:8001 | jq '.plugins.available_on_server."readme-plugin"'
 #### Enable for all services
 
 ```bash
-curl -i -s -X POST http://localhost:8001/plugins --data name=readme-plugin --data 'config.api_key=<Your API Key>'
+curl -sX POST http://localhost:8001/plugins -d name=readme-plugin -d 'config.api_key=<Your API Key>' | jq
 ```
 
-#### Enable for a specific service route
+#### Enable for a specific service
 
 ```bash
 # Add a new service
-curl -i -s -X POST http://localhost:8001/services --data name=example_service --data url='http://httpbin.org'
+curl -isX POST http://localhost:8001/services -d name=example_service -d url='http://httpbin.org'
 
 # Associate the custom plugin with the `example_service` service
-curl -is -X POST http://localhost:8001/services/example_service/plugins --data 'name=readme-plugin' -d "config.queue.max_retry_time=1"
+curl -isX POST http://localhost:8001/services/example_service/plugins -d 'name=readme-plugin' -d "config.queue.max_retry_time=1"
 
 # Add a new route for sending requests through the `example_service` service
-curl -i -X POST http://localhost:8001/services/example_service/routes --data 'paths[]=/mock' --data name=example_route
+curl -iX POST http://localhost:8001/services/example_service/routes -d 'paths[]=/mock' -d name=example_route
 
 # Test
 curl -i http://localhost:8000/mock/anything
 ```
 
 ### 🧙 Development tricks
-Get plugin config
 ```bash
+# Get plugin config
 curl -s http://localhost:8001/plugins  | jq '.data | map(select(.name == "readme-plugin")) | first'
-```
 
-```bash
 # Retrieve the plugin ID
 export PLUGIN_ID=$(curl -s http://localhost:8001/plugins  | jq '.data | map(select(.name == "readme-plugin")) | first | .id' | tr -d '"')
 
 # Configure the plugin with your API key
-curl -sX PATCH http://localhost:8001/plugins/$PLUGIN_ID --data "config.api_key=<Your API Key>" | jq '.config.api_key'
+curl -sX PATCH http://localhost:8001/plugins/$PLUGIN_ID -d "config.api_key=<Your API Key>" | jq '.config.api_key'
 
 # Configure `hide_headers`
-curl -sX PATCH -H'Content-Type: application/json' http://localhost:8001/plugins/$PLUGIN_ID --data '{"config": {"hide_headers": {"foo": "", "bar": "default"}}}' | jq '.config.hide_headers'
+curl -sX PATCH -H'Content-Type: application/json' http://localhost:8001/plugins/$PLUGIN_ID -d '{"config": {"hide_headers": {"foo": "", "bar": "default"}}}' | jq '.config.hide_headers'
 
 # Configure `id_header`
-curl -sX PATCH -H'Content-Type: application/json' http://localhost:8001/plugins/$PLUGIN_ID --data '{"config": {"id_header": "email"}}' | jq '.config.id_header'
+curl -sX PATCH -H'Content-Type: application/json' http://localhost:8001/plugins/$PLUGIN_ID -d '{"config": {"id_header": "email"}}' | jq '.config.id_header'
+
+# Configure `group_by`
+curl -sX PATCH -H'Content-Type: application/json' http://localhost:8001/plugins/$PLUGIN_ID -d '{"config": {"group_by": {"x-user-email": "email", "x-org-name": "label"}}}' | jq '.config.group_by'
+
+# Delete the plugin
+curl -sX DELETE http://localhost:8001/plugins/$PLUGIN_ID
 ```
 
 > 🚧 Any Issues?
