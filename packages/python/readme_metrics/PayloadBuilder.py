@@ -171,10 +171,6 @@ class PayloadBuilder:
         """
         headers = self.redact_dict(request.headers)
 
-        # Mask the auth header
-        if "Authorization" in headers:
-            headers["Authorization"] = mask(headers["Authorization"])
-
         queryString = parse.parse_qsl(self._get_query_string(request))
 
         content_type = self._get_content_type(headers)
@@ -223,6 +219,9 @@ class PayloadBuilder:
             "cookies": [],
             "bodySize": -1,
         }
+
+        if "Authorization" in headers:
+            payload["headers"].append({"name": "Authorization", "value": mask(headers["Authorization"])})
 
         if not post_data is False:
             payload["postData"] = post_data

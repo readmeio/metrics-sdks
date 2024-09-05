@@ -393,6 +393,8 @@ class TestPayloadBuilder:
         payload = self.createPayload(config)
         data = payload(metrics.req, metrics.res, str(uuid.uuid4()))
 
+        auth_header = None
+
         # Pull out the auth header
         for header in data["request"]["log"]["entries"][0]["request"]["headers"]:
             if header["name"] == "Authorization":
