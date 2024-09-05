@@ -97,6 +97,14 @@ This will output a new key, associated with your email address to /tmp/new-ssh-k
 5. Update `./bin/split.sh` and `./.github/workflows/split-monorepo.yml` to include the new mirror and SSH key.
 6. Update the main README.md to include information about the new package.
 
+### Kong Plugin
+
+This does not require a release. Users will simply copy the `kong` directory into their Kong image [see this guide](https://docs.konghq.com/gateway/latest/plugin-development/get-started/deploy/).
+
+In the future:
+* We will build a Docker image for the plugin and release it to the Kong Community plugins site.
+* We will offer a zip file with the plugin code.
+
 ## 🧑‍🔬 Integration Testing
 
 We have an integration testing layer for both Metrics and webhooks to ensure that the different SDKs, and how they may be used within a variety of HTTP frameworks, are compliant to the Metrics API and all behave the same given certain parameters.
