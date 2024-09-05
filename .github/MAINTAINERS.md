@@ -102,8 +102,9 @@ This will output a new key, associated with your email address to /tmp/new-ssh-k
 This does not require a release. Users will simply copy the `kong` directory into their Kong image [see this guide](https://docs.konghq.com/gateway/latest/plugin-development/get-started/deploy/).
 
 In the future:
-* We will build a Docker image for the plugin and release it to the Kong Community plugins site.
-* We will offer a zip file with the plugin code.
+
+- We will build a Docker image for the plugin and release it to the Kong Community plugins site.
+- We will offer a zip file with the plugin code.
 
 ## 🧑‍🔬 Integration Testing
 

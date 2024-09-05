@@ -26,6 +26,7 @@ curl -isX POST http://localhost:8001/plugins -d name=readme-plugin -d 'config.ap
 ```
 
 ### 🧑‍🔬 Testing
+
 Requires [pongo](https://github.com/Kong/kong-pongo) to test and develop.
 
 ```bash
@@ -36,7 +37,6 @@ kms
 # Check if the plugin is available
 curl -s localhost:8001 | jq '.plugins.available_on_server."readme-plugin"'
 ```
-
 
 #### Enable for all services
 
@@ -61,6 +61,7 @@ curl -i http://localhost:8000/mock/anything
 ```
 
 ### 🧙 Development tricks
+
 ```bash
 # Get plugin config
 curl -s http://localhost:8001/plugins  | jq '.data | map(select(.name == "readme-plugin")) | first'
