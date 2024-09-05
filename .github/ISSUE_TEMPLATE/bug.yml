@@ -1,0 +1,57 @@
+name: Bug Report
+description: If something isn't working the way you expect it to.
+title: 'bug: '
+labels:
+  - bug
+  - needs triage
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to fill out this bug report!
+
+  - type: dropdown
+    id: sdk
+    attributes:
+      label: SDK
+      description: What SDK are you running?
+      options:
+        - Node
+        - PHP
+        - Python
+        - Ruby
+        - .NET
+      default: 0
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Which version?
+      description: Which version of that SDK are you using?
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: What's your use case?
+      description: Tell us how you use ReadMe Metrics!
+    validations:
+      required: false
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Also tell us, what did you expect to happen?
+      placeholder: Tell us what you're seeing!
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please include any relevant log output. This will be automatically formatted into code, so no need for backticks. If your logs include any sensitive information, please either redact it or email it to us at support@readme.io.
+      render: shell

@@ -1,0 +1,42 @@
+name: Feature Request
+description: Suggestions for new or different behavior.
+title: 'feat: '
+labels:
+  - enhancement
+  - needs triage
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to fill out this feature request!
+
+  - type: dropdown
+    id: sdk
+    attributes:
+      label: SDK
+      description: What SDK or language is this for?
+      options:
+        - Node
+        - PHP
+        - Python
+        - Ruby
+        - .NET
+        - Other (please specify below)
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: What's your use case?
+      description: Tell us how you use ReadMe Metrics!
+    validations:
+      required: false
+
+  - type: textarea
+    id: feature-request
+    attributes:
+      label: What would you like to see?
+      placeholder: I would like you to support <this brand new language>!
+    validations:
+      required: true

@@ -1,12 +1,13 @@
-import type { UUID } from 'crypto';
+import type { Options } from './log';
 import type { Har } from 'har-format';
-import type { Response } from 'node-fetch';
+import type { UUID } from 'node:crypto';
 
-import fetch from 'node-fetch';
 import timeoutSignal from 'timeout-signal';
 
 import pkg from '../../package.json';
 import config from '../config';
+
+import { logger } from './logger';
 
 export interface GroupingObject {
   /**
@@ -88,11 +89,7 @@ function getLogIds(body: OutgoingLogBody | OutgoingLogBody[]): LogId {
   return body._id;
 }
 
-export function metricsAPICall(
-  readmeAPIKey: string,
-  body: OutgoingLogBody[],
-  fireAndForget = false,
-): Promise<LogResponse> {
+export function metricsAPICall(readmeAPIKey: string, body: OutgoingLogBody[], options: Options): Promise<LogResponse> {
   const signal = timeoutSignal(config.timeout);
   const encodedKey = Buffer.from(`${readmeAPIKey}:`).toString('base64');
 
@@ -104,6 +101,7 @@ export function metricsAPICall(
       // after the backoff expires, erase the old expiration time
       backoffExpiresAt = undefined;
     }
+    logger.verbose({ message: 'Making a POST request to a service...', args: { body } });
     return fetch(new URL('/v1/request', config.host), {
       method: 'post',
       body: JSON.stringify(body),
@@ -124,6 +122,8 @@ export function metricsAPICall(
             backoffExpiresAt.setSeconds(backoffExpiresAt.getSeconds() + BACKOFF_SECONDS);
           }
         }
+        const logLevel = response.ok ? 'info' : 'error';
+        logger[logLevel]({ message: `Service responded with status ${response.status}: ${response.statusText}.` });
         return response;
       })
       .finally(() => {
@@ -131,7 +131,7 @@ export function metricsAPICall(
       });
   };
 
-  if (fireAndForget) {
+  if (options.fireAndForget) {
     makeRequest();
     return Promise.resolve<LogResponse>({
       ids: getLogIds(body),

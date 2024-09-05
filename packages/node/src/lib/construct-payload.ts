@@ -1,13 +1,14 @@
+import type { LoggerStrategy } from './logger';
 import type { OutgoingLogBody } from './metrics-log';
 import type { UUID } from 'node:crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { TLSSocket } from 'tls';
 
+import { randomUUID } from 'node:crypto';
 import os from 'os';
 import { URL } from 'url';
 
 import ssri from 'ssri';
-import { v4 as uuidv4 } from 'uuid';
 
 import { version } from '../../package.json';
 
@@ -20,7 +21,7 @@ import processResponse from './process-response';
  * @param req
  * @returns
  */
-export function getProto(req: IncomingMessage): 'https' | 'http' {
+export function getProto(req: IncomingMessage): 'http' | 'https' {
   return (req.socket as TLSSocket).encrypted ? 'https' : 'http';
 }
 
@@ -53,6 +54,11 @@ export interface LogOptions {
    * servers.
    */
   fireAndForget?: boolean;
+
+  /**
+   * If true, the errors and other logs will be displayed in console. Your own logger strategy can be passed.
+   */
+  logger?: LoggerStrategy | boolean;
 
   /**
    * @deprecated use `allowList` instead
@@ -142,7 +148,7 @@ export function constructPayload(
   const serverTime = payloadData.responseEndDateTime.getTime() - payloadData.startedDateTime.getTime();
 
   return {
-    _id: payloadData.logId || (uuidv4() as UUID),
+    _id: payloadData.logId || randomUUID(),
     _version: 3,
     group: {
       id: mask(payloadData.apiKey),

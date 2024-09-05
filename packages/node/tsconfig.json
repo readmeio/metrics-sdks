@@ -1,20 +1,23 @@
 {
+  "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
     "allowJs": true,
     "baseUrl": ".",
     "declaration": true,
-    "esModuleInterop": true,
     "inlineSourceMap": true,
-    "lib": ["es2019"],
     "outDir": "./dist",
     "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "strict": true
+
+    /**
+     * With strict mode on anything thrown within a `try-catch` is typed as `unknown`. Because we
+     * have the `no-throw-literal` ESLint rule enabled these things will always be an `Error` object
+     * so TS forcing us to type a known `Error` object as `(err as Error).message` in order to
+     * access a message adds nothing but unnecessary bloat for us.
+     *
+     * @see {@link https://eslint.org/docs/latest/rules/no-throw-literal}
+     * @see {@link https://www.typescriptlang.org/tsconfig#useUnknownInCatchVariables}
+     */
+    "useUnknownInCatchVariables": false
   },
-  "include": [
-    "src/**/*",
-    // We have to explicitly list these config files
-    // due to the dynamic require in certain envs
-    "src/config/*.json"
-  ]
+  "include": ["src/**/*"]
 }

@@ -1,7 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: github-actions
-    directory: "/"
+    directory: '/'
     schedule:
       interval: monthly
     allow:
@@ -24,7 +24,7 @@ updates:
       prefix-development: chore(deps-dev)
 
   - package-ecosystem: npm
-    directory: "/"
+    directory: '/'
     schedule:
       interval: monthly
     allow:
@@ -50,10 +50,10 @@ updates:
       # These packages are now ESM-only and can't be used without a rewrite.
       - dependency-name: find-cache-dir
         versions:
-          - ">= 4"
+          - '>= 4'
 
   - package-ecosystem: npm
-    directory: "/packages/node"
+    directory: '/packages/node'
     schedule:
       interval: monthly
     allow:
@@ -61,7 +61,7 @@ updates:
     open-pull-requests-limit: 10
     labels:
       - dependencies
-      - area:node
+      - node
     groups:
       minor-production-deps:
         dependency-type: 'production'
@@ -80,27 +80,24 @@ updates:
       # These packages are now ESM-only and can't be used without a rewrite.
       - dependency-name: find-cache-dir
         versions:
-          - ">= 4"
-      - dependency-name: node-fetch
-        versions:
-          - ">= 3"
+          - '>= 4'
 
-#   - package-ecosystem: bundler
-#     directory: "/packages/ruby"
-#     schedule:
-#       interval: monthly
-#     allow:
-#       - dependency-type: production
-#     open-pull-requests-limit: 10
-#     labels:
-#       - dependencies
-#       - area:ruby
-#     commit-message:
-#       prefix: chore(deps)
-#       prefix-development: chore(deps-dev)
+  #   - package-ecosystem: bundler
+  #     directory: "/packages/ruby"
+  #     schedule:
+  #       interval: monthly
+  #     allow:
+  #       - dependency-type: production
+  #     open-pull-requests-limit: 10
+  #     labels:
+  #       - dependencies
+  #       - ruby
+  #     commit-message:
+  #       prefix: chore(deps)
+  #       prefix-development: chore(deps-dev)
 
   - package-ecosystem: composer
-    directory: "/packages/php"
+    directory: '/packages/php'
     schedule:
       interval: monthly
     allow:
@@ -108,7 +105,7 @@ updates:
     open-pull-requests-limit: 10
     labels:
       - dependencies
-      - area:php
+      - php
     groups:
       minor-production-deps:
         dependency-type: 'production'
@@ -124,16 +121,16 @@ updates:
       prefix: chore(deps)
       prefix-development: chore(deps-dev)
 
-#   - package-ecosystem: pip
-#     directory: "/packages/python"
-#     schedule:
-#       interval: monthly
-#     allow:
-#       - dependency-type: production
-#     open-pull-requests-limit: 10
-#     labels:
-#       - dependencies
-#       - area:python
-#     commit-message:
-#       prefix: chore(deps)
-#       prefix-development: chore(deps-dev)
+  - package-ecosystem: pip
+    directory: "/packages/python"
+    schedule:
+      interval: monthly
+    allow:
+      - dependency-type: production
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+      - python
+    commit-message:
+      prefix: chore(deps)
+      prefix-development: chore(deps-dev)

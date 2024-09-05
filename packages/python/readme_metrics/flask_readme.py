@@ -27,6 +27,9 @@ class ReadMeMetrics:
         app.after_request(self.after_request)
 
     def before_request(self):
+        if request.method == "OPTIONS":
+            return
+
         try:
             request.rm_start_dt = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
             request.rm_start_ts = int(time.time() * 1000)

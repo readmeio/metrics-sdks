@@ -21,6 +21,12 @@ namespace ReadMe
 
     public async Task InvokeAsync(HttpContext context)
     {
+      if (context.Request.Method == HttpMethods.Options)
+      {
+        await this.next(context);
+        return;
+      }
+
       if (!context.Request.Path.Value.Contains("favicon.ico"))
       {
         this.group = new Group()

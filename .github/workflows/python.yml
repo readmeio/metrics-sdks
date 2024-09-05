@@ -10,10 +10,10 @@ jobs:
   integration:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 20
 
       - run: npm ci --ignore-scripts
       - run: make test-metrics-python-django
@@ -22,7 +22,7 @@ jobs:
 
       - name: Cleanup
         if: always()
-        run: docker-compose down
+        run: docker compose down
 
   build:
     name: ${{ matrix.python-version }} on ${{ matrix.os }}
@@ -38,16 +38,16 @@ jobs:
           - windows-latest
         python-version:
           # https://endoflife.date/python
-          - 3.7 # EOL: June 27th, 2023
           - 3.8 # EOL: October 14th, 2024
           - 3.9 # EOL: October 5rd, 2025
           - '3.10' # EOL: October 4rd, 2026
           - '3.11' # EOL: October 24th, 2027
+          - '3.12' # EOL: October 31th, 2028
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 

@@ -69,3 +69,15 @@ class TestFlaskExtension:
         assert call_args[0][0] == request
         assert isinstance(call_args[0][1], ResponseInfoWrapper)
         assert call_args[0][1].headers.get("X-Header") == "X Value!"
+
+    def test_before_request_options(self):
+        app = Flask(__name__)
+        extension = ReadMeMetrics(config=mock_config, app=app)
+
+        with app.test_request_context("/", method="OPTIONS"):
+            extension.before_request()
+
+            assert not hasattr(request, "rm_start_dt")
+            assert not hasattr(request, "rm_start_ts")
+            assert not hasattr(request, "rm_content_length")
+            assert not hasattr(request, "rm_body")

@@ -10,10 +10,10 @@ jobs:
   integration:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 20
 
       - run: npm ci --ignore-scripts
       - run: make test-metrics-node-express
@@ -23,7 +23,7 @@ jobs:
 
       - name: Cleanup
         if: always()
-        run: docker-compose down
+        run: docker compose down
 
   build:
     runs-on: ubuntu-latest
@@ -35,12 +35,13 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - 18
-          - 20
+          - lts/-1
+          - lts/*
+          - latest
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -56,6 +57,6 @@ jobs:
         working-directory: packages/node
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: npm ci --ignore-scripts
       - run: npm run lint

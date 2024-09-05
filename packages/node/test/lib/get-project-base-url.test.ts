@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { describe, beforeAll, afterAll, afterEach, expect, it } from 'vitest';
 
@@ -64,17 +64,17 @@ describe('get-project-base-url', function () {
 
   it('should temporarily set baseUrl to null if the call to the ReadMe API fails for whatever reason', async function () {
     server.use(
-      rest.get(`${config.readmeApiUrl}/v1`, (req, res, ctx) => {
-        return res(
-          ctx.status(401),
-          ctx.json({
+      http.get(`${config.readmeApiUrl}/v1`, () => {
+        return HttpResponse.json(
+          {
             error: 'APIKEY_NOTFOUND',
             message: "We couldn't find your API key",
             suggestion:
               "The API key you passed in (moc··········Key) doesn't match any keys we have in our system. API keys must be passed in as the username part of basic auth>",
             docs: 'https://docs.readme.com/developers/logs/fake-uuid',
             help: "If you need help, email support@readme.io and mention log 'fake-uuid'.",
-          }),
+          },
+          { status: 401 },
         );
       }),
     );

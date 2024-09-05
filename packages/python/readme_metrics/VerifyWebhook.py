@@ -1,5 +1,6 @@
-import json
 import hmac
+import json
+import typing as t
 from datetime import datetime, timedelta
 
 
@@ -8,7 +9,7 @@ class VerificationError(Exception):
 
 
 class VerifyWebhook:
-    def __init__(self, body: dict, signature: str, secret: str):
+    def __init__(self, body: dict, signature: t.Optional[str], secret: str):
         if signature is None:
             raise VerificationError("Missing Signature")
 
