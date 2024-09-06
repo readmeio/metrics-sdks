@@ -18,7 +18,7 @@ return {
                     },
                     {
                       id_header = {
-                          description = "Select header to be used as a unique identifier for a user. This value will be hashed by ReadMe. The `Authorization` header is used by default. If the configured header was not found then it will be set to 'Unknown'.",
+                          description = "Select header to be used as a unique identifier for a user. This value will be hashed by ReadMe. The `Authorization` header is used by default. If the configured header was not found then it will be set to `none`.",
                           type = "string",
                           default = "Authorization"
                       }
@@ -60,7 +60,7 @@ return {
                     },
                     {
                         group_by = {
-                            description = "A map of headers to group by. The key is the header name and the value is the header value to group by. Applies to request headers only. If the header is not found, it will be set to `unknown`. `email` and `label` are recommended keys to provide.",
+                            description = "A map of headers to group by. The key is the header name and the value is the header value to group by. Applies to request headers only. If the header is not found, it will be set to `none`. `email` and `label` are recommended keys to provide.",
                             type = "map",
                             keys = typedefs.header_name,
                             values = {
@@ -68,7 +68,7 @@ return {
                                 match_none = {
                                   {
                                     pattern = "^id$",
-                                    err = "cannot map to 'id'",
+                                    err = "cannot map to `id`",
                                   }
                                 }
                             }

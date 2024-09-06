@@ -18,9 +18,9 @@ With [ReadMe's Metrics API](https://readme.com/metrics) your team can get deep i
 
 ```bash
 # Build kong image with the plugin
-docker build -t kong-readme-plugin:v1 .
+docker build -t kong-readme-plugin:latest .
 # Run kong with the plugin
-curl -Ls https://get.konghq.com/quickstart |  bash -s -- -r "" -i kong-readme-plugin -t v1
+curl -Ls https://get.konghq.com/quickstart |  bash -s -- -r "" -i kong-readme-plugin -t latest
 # Enable the plugin
 curl -isX POST http://localhost:8001/plugins -d name=readme-plugin -d 'config.api_key=<Your API Key>'
 ```

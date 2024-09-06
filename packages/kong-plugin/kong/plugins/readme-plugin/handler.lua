@@ -2,6 +2,7 @@ local Queue = require "kong.tools.queue"
 local cjson = require "cjson"
 local url = require "socket.url"
 local http = require "resty.http"
+local openssl_digest = require "resty.openssl.digest"
 
 local kong = kong
 local ngx = ngx
@@ -43,6 +44,17 @@ local function parse_url(host_url)
 
   return parsed_url
 end
+
+-- This will generate an integrity hash that looks something like this:
+-- sha512-Naxska/M1INY/thefLQ49sExJ8E+89Q2bz/nC4Pet52iSRPtI9w3Cyg0QdZExt0uUbbnfMJZ0qTabiLJxw6Wrg==?1345
+-- With the last 4 digits on the end for us to use to identify it later in a list.
+local function hash_value(value)
+  local last_4_digits = value:sub(-4)
+  local digest = openssl_digest.new("sha512")
+  local encoded_value = encode_base64(digest:final(value))
+  return encoded_value .. "?" .. last_4_digits
+end
+
 
 -- Creates a payload for ReadMe
 -- @return JSON string in ReadMe API Log format
@@ -110,16 +122,17 @@ local function make_readme_payload(conf, entries)
     if conf.group_by then
       for header_name, group_value in pairs(conf.group_by) do
         local header_value = entry.request.headers[header_name]
-        group[group_value] = header_value or "unknown"
+        group[group_value] = header_value or "none"
       end
     end
 
     local id_header = (conf.id_header and conf.id_header:lower()) or "authorization"
-    local id = entry.request.headers[id_header] or "unknown"
+    local id = entry.request.headers[id_header] or "none"
     if id_header == "authorization" and entry.raw_auth then
       id = entry.raw_auth
     end
-    group.id = id
+    group.id = hash_value(id)
+
     local api_log = {
       httpVersion = entry.httpVersion,
       requestBody = {},
