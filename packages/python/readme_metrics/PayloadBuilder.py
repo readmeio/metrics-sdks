@@ -209,6 +209,11 @@ class PayloadBuilder:
             else:
                 post_data = self._process_body(content_type, request.rm_body)
 
+        headers = dict(headers)
+
+        if "Authorization" in headers:
+            headers["Authorization"] = mask(headers["Authorization"])
+
         payload = {
             "method": request.method,
             "url": self._build_base_url(request),
@@ -219,11 +224,6 @@ class PayloadBuilder:
             "cookies": [],
             "bodySize": -1,
         }
-
-        if "Authorization" in headers:
-            payload["headers"].append(
-                {"name": "Authorization", "value": mask(headers["Authorization"])}
-            )
 
         if not post_data is False:
             payload["postData"] = post_data
