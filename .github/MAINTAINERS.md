@@ -99,7 +99,7 @@ This will output a new key, associated with your email address to /tmp/new-ssh-k
 
 ### Kong Plugin
 
-This does not require a release. Users will simply copy the `kong` directory with `packages/kong-plugin` into their Kong image [see this guide](https://docs.konghq.com/gateway/latest/plugin-development/get-started/deploy/).
+This does not require a release. Users will simply copy the `kong` directory within `packages/kong-plugin` into their Kong image [see this guide](https://docs.konghq.com/gateway/latest/plugin-development/get-started/deploy/).
 
 In the future:
 
