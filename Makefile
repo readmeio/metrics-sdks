@@ -16,12 +16,12 @@ cleanup-failure:
 test-metrics-dotnet: ## Run Metrics tests against the .NET SDK
 	docker compose up --build --detach integration_dotnet_metrics_v6.0
 	sleep 5
-	npm run test:integration-metrics || make cleanup-failure
+	SUPPORTS_HASHING=true npm run test:integration-metrics || make cleanup-failure
 	@make cleanup
 
 test-webhooks-dotnet: ## Run webhooks tests against the .NET SDK
 	docker compose up --build --detach integration_dotnet_webhooks_v6.0
-	npm run test:integration-webhooks || make cleanup-failure
+	SUPPORTS_HASHING=true npm run test:integration-webhooks || make cleanup-failure
 	@make cleanup
 
 ##
