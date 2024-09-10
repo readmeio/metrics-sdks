@@ -147,7 +147,7 @@ namespace ReadMe.HarJsonObjectModels
         {
           Headers header = new Headers();
           header.name = reqHeader.Key;
-          header.value = reqHeader.Key == "Authorization" ? MaskHelper.Mask(reqHeader.Value) : reqHeader.Value.ToString();        
+          header.value = reqHeader.Key == "Authorization" ? MaskHelper.Mask(reqHeader.Value) : reqHeader.Value.ToString();
           if (!this.configValues.options.isAllowListEmpty)
           {
             if (this.CheckAllowList(reqHeader.Key))
