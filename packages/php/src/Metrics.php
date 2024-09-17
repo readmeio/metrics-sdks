@@ -93,69 +93,71 @@ class Metrics
     public function track(Request $request, Response &$response): void
     {
         if ($this->base_log_url === null || $this->base_log_url === '') {
-            $this->base_log_url = $this->getProjectBaseUrl();
-        }
-
-        $log_id = Uuid::uuid4()->toString();
-        if (!is_null($this->base_log_url)) {
-            // Only set the header if we have a fully-formed log URL to give to users.
-            $response->headers->set('x-documentation-url', $this->base_log_url . '/logs/' . $log_id);
-        }
-
-        $payload = (new Payload($this))->create($log_id, $request, $response);
-
-        $headers = [
-            'Authorization' => 'Basic ' . $this->api_key,
-            'User-Agent' => $this->user_agent
-        ];
-
-        // If not in development mode, all requests should be async.
-        if (!$this->development_mode) {
-            try {
-                $promise = $this->client->postAsync('/v1/request', [
-                    'headers' => $headers,
-                    'json' => [$payload]
-                ]);
-
-                $this->curl_handler->execute();
-            } catch (\Exception $e) {
-                // Usually this'll happen from a connection timeout exception from Guzzle trying to wait for us to
-                // resolve the promise we set up, but since we just want this to be a fire and forget request, we don't
-                // actually care about the response coming back from the Metrics API and all exceptions here can be
-                // discarded.
-                //
-                // @todo we should log this somewhere
+            if ($request->getMethod() === 'OPTIONS') {
+                return;
             }
 
-            return;
-        }
+            $log_id = Uuid::uuid4()->toString();
+            if (!is_null($this->base_log_url)) {
+                // Only set the header if we have a fully-formed log URL to give to users.
+                $response->headers->set('x-documentation-url', $this->base_log_url . '/logs/' . $log_id);
+            }
 
-        try {
-            $metrics_response = $this->client->post('/v1/request', [
+            $payload = (new Payload($this))->create($log_id, $request, $response);
+
+            $headers = [
+            'Authorization' => 'Basic ' . $this->api_key,
+            'User-Agent' => $this->user_agent
+            ];
+
+        // If not in development mode, all requests should be async.
+            if (!$this->development_mode) {
+                try {
+                    $promise = $this->client->postAsync('/v1/request', [
+                    'headers' => $headers,
+                    'json' => [$payload]
+                    ]);
+
+                    $this->curl_handler->execute();
+                } catch (\Exception $e) {
+                    // Usually this'll happen from a connection timeout exception from Guzzle trying to wait for us to
+                    // resolve the promise we set up, but since we just want this to be a fire and forget request,
+                    // we don't actually care about the response coming back from the Metrics API and all exceptions
+                    // here can be discarded.
+                    //
+                    // @todo we should log this somewhere
+                }
+
+                return;
+            }
+
+            try {
+                $metrics_response = $this->client->post('/v1/request', [
                 'headers' => $headers,
                 'json' => [$payload]
-            ]);
-        } catch (\Exception $e) {
-            throw $e;
-        }
+                ]);
+            } catch (\Exception $e) {
+                throw $e;
+            }
 
-        $json = (string) $metrics_response->getBody();
-        if ($json === 'OK') {
-            return;
-        }
+            $json = (string) $metrics_response->getBody();
+            if ($json === 'OK') {
+                return;
+            }
 
-        $json = json_decode($json);
-        if (!isset($json->errors)) {
-            // If we didn't get any errors back from the Metrics API, but didn't get an `OK` response, then something
-            // must be up with it so don't worry about communicating that here since there isn't anything actionable
-            // for the user.
-            return;
-        }
+            $json = json_decode($json);
+            if (!isset($json->errors)) {
+                // If we didn't get any errors back from the Metrics API, but didn't get an `OK` response,
+                // then something must be up with it so don't worry about communicating that here since there
+                // isn't anything actionable for the user.
+                return;
+            }
 
         /** @psalm-suppress PossiblyInvalidArgument */
-        $ex = new MetricsException(str_replace($json->_message, $json->name, $json->message));
-        $ex->setErrors((array)$json->errors);
-        throw $ex;
+            $ex = new MetricsException(str_replace($json->_message, $json->name, $json->message));
+            $ex->setErrors((array)$json->errors);
+            throw $ex;
+        }
     }
 
     /**
