@@ -92,6 +92,10 @@ class Metrics
      */
     public function track(Request $request, Response &$response): void
     {
+        if ($request->getMethod() === 'OPTIONS') {
+            return;
+        }
+
         if (empty($this->base_log_url)) {
             $this->base_log_url = $this->getProjectBaseUrl();
         }

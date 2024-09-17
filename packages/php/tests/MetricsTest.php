@@ -228,6 +228,29 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @group track
+     */
+    public function testTrackIgnoresOptionsMethod(): void
+    {
+        $request = new Request([], [], [], [], [], ['REQUEST_METHOD' => 'OPTIONS']);
+        $response = $this->getMockJsonResponse();
+
+        $handlers = $this->getMockHandlers(
+            new \GuzzleHttp\Psr7\Response(200, [], 'OK'),
+            new \GuzzleHttp\Psr7\Response(200, [], json_encode(['baseUrl' => $this->base_log_url]))
+        );
+
+        $this->metrics = new Metrics($this->readme_api_key, $this->group_handler, [
+            'development_mode' => false,
+            'client' => new Client(['handler' => $handlers->metrics]),
+            'client_readme' => new Client(['handler' => $handlers->readme])
+        ]);
+
+        $this->metrics->track($request, $response);
+        $this->assertEmpty($this->api_calls, 'No API calls should be made for OPTIONS requests.');
+    }
+
+    /**
      * @group getProjectBaseUrl
      * @dataProvider providerDevelopmentModeToggle
      */
