@@ -82,19 +82,19 @@ updates:
         versions:
           - '>= 4'
 
-  #   - package-ecosystem: bundler
-  #     directory: "/packages/ruby"
-  #     schedule:
-  #       interval: monthly
-  #     allow:
-  #       - dependency-type: production
-  #     open-pull-requests-limit: 10
-  #     labels:
-  #       - dependencies
-  #       - ruby
-  #     commit-message:
-  #       prefix: chore(deps)
-  #       prefix-development: chore(deps-dev)
+  - package-ecosystem: bundler
+    directory: '/packages/ruby'
+    schedule:
+      interval: monthly
+    allow:
+      - dependency-type: production
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+      - ruby
+    commit-message:
+      prefix: chore(deps)
+      prefix-development: chore(deps-dev)
 
   - package-ecosystem: composer
     directory: '/packages/php'

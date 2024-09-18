@@ -226,6 +226,16 @@ RSpec.describe Readme::HttpRequest do
       expect(request.body).to eq '[BODY]'
       expect(request.body).to eq '[BODY]'
     end
+
+    it 'returns an empty string if an error occurs while reading the body' do
+      io = instance_double(StringIO, read: nil)
+      allow(io).to receive(:rewind).and_raise(StandardError.new('Test Error'))
+
+      env = { 'rack.input' => io }
+      request = described_class.new(env)
+
+      expect(request.body).to eq ''
+    end
   end
 
   describe '#parsed_form_data' do
