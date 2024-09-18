@@ -27,4 +27,5 @@ class MockEnviron:
         stream = io.BytesIO(jsonByteString)
         environ["wsgi.input"] = wsgi.LimitedStream(stream, contentLength)
         environ["CONTENT_LENGTH"] = str(contentLength)
+        environ["HTTP_AUTHORIZATION"] = "Bearer: a-random-api-key"
         return environ

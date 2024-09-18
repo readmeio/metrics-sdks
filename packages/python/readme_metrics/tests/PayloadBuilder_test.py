@@ -4,6 +4,7 @@ import uuid
 from readme_metrics import MetricsApiConfig
 from readme_metrics import MetricsMiddleware
 from readme_metrics.PayloadBuilder import PayloadBuilder
+from readme_metrics.util import mask
 from .fixtures import Environ
 
 
@@ -25,6 +26,15 @@ class MockApplication:
     def mockStartResponse(self, status, headers):
         self.status = status
         self.headers = headers
+
+
+class TestUtils:
+    def testMask(self):
+        # pylint: disable=line-too-long
+        assert (
+            mask("deadbeef")
+            == "sha512-ETo7x4PYUfwDcyFLGep76fo95UHsuf4CbVLGA+jqGcF0zA6XBfi5DTEiEsDDpthFPd+z4xQUCc9L7cjvAzWQtA==?beef"
+        )
 
 
 class TestPayloadBuilder:
@@ -183,7 +193,37 @@ class TestPayloadBuilder:
         data = payload(metrics.req, metrics.res, str(uuid.uuid4()))
         group = data["group"]
 
-        assert group["id"] == "spam"
+        assert group["id"] == mask("spam")
+        assert group["email"] == "flavor@spam.musubi"
+        assert group["label"] == "Spam Musubi"
+
+    def test_mask_matches_node(self):
+        config = self.mockMiddlewareConfig(
+            grouping_function=lambda req: {
+                "api_key": "Bearer: a-random-api-key",
+                "email": "flavor@spam.musubi",
+                "label": "Spam Musubi",
+            }
+        )
+
+        environ = Environ.MockEnviron().getEnvironForRequest(b"", "POST")
+        app = MockApplication("{ 'responseObject': 'value' }")
+
+        metrics = MetricsCoreMock()
+        middleware = MetricsMiddleware(app, config)
+        middleware.metrics_core = metrics
+
+        next(middleware(environ, app.mockStartResponse))
+
+        payload = self.createPayload(config)
+        data = payload(metrics.req, metrics.res, str(uuid.uuid4()))
+        group = data["group"]
+
+        assert (
+            group["id"]
+            == "sha512-7S+L0vUE8Fn6HI3836rtz4b6fVf6H4JFur6SGkOnL3b"
+            + "FpC856+OSZkpIHphZ0ipNO+kUw1ePb5df2iYrNQCpXw==?-key"
+        )
         assert group["email"] == "flavor@spam.musubi"
         assert group["label"] == "Spam Musubi"
 
@@ -228,7 +268,7 @@ class TestPayloadBuilder:
         data = payload(metrics.req, metrics.res, str(uuid.uuid4()))
         group = data["group"]
 
-        assert group["id"] == "spam"
+        assert group["id"] == mask("spam")
         assert group["email"] == "flavor@spam.musubi"
         assert group["label"] == "Spam Musubi"
 
@@ -282,7 +322,7 @@ class TestPayloadBuilder:
         assert isinstance(data, dict)
         assert "group" in data
         assert data["group"] == {
-            "id": "spam",
+            "id": mask("spam"),
             "email": "flavor@spam.musubi",
             "label": "Spam Musubi",
         }
@@ -311,6 +351,8 @@ class TestPayloadBuilder:
         payload = self.createPayload(config)
         data = payload(metrics.req, metrics.res, str(uuid.uuid4()))
 
+        print(data["_id"])
+
         assert data["_id"] == str(uuid.UUID(data["_id"], version=4))
 
     def test_har_creator(self):
@@ -337,3 +379,26 @@ class TestPayloadBuilder:
 
         assert post_data["text"] == json.dumps({"ok": 123, "password": 456})
         assert post_data["mimeType"] == "text/plain"
+
+    def test_auth_header_masked(self):
+        config = self.mockMiddlewareConfig(development_mode=True)
+        environ = Environ.MockEnviron().getEnvironForRequest(b"", "GET")
+        app = MockApplication("{ 'responseObject': 'value' }")
+
+        metrics = MetricsCoreMock()
+        middleware = MetricsMiddleware(app, config)
+        middleware.metrics_core = metrics
+
+        next(middleware(environ, app.mockStartResponse))
+
+        payload = self.createPayload(config)
+        data = payload(metrics.req, metrics.res, str(uuid.uuid4()))
+
+        auth_header = None
+
+        # Pull out the auth header
+        for header in data["request"]["log"]["entries"][0]["request"]["headers"]:
+            if header["name"] == "Authorization":
+                auth_header = header["value"]
+
+        assert auth_header and auth_header == mask(environ["HTTP_AUTHORIZATION"])

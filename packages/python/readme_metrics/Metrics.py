@@ -91,6 +91,7 @@ class Metrics:
             )
             if self.config.IS_DEVELOPMENT_MODE:
                 print(traceback.format_exc())
+            return
 
         self.queue.put(payload)
         if self.queue.qsize() >= self.config.BUFFER_LENGTH:
