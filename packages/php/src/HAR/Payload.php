@@ -337,7 +337,7 @@ class Payload
                     continue; // @codeCoverageIgnore
                 }
 
-                if (strtolower($name) === 'authorization') {
+                if ($name === 'authorization') {
                     $value = MaskHelper::mask($value);
                 }
 
