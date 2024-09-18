@@ -102,7 +102,7 @@ class Payload
                     static::convertFileObjectForArray($this->sanitizeInputPerConfig($request->allFiles()))
                 ),
             ];
-        } elseif ($request->getContentType() === 'form') {
+        } elseif ($content_type !== null && str_contains($content_type, 'form')) {
             $post_data = [
                 'mimeType' => $content_type,
                 'params' => static::convertObjectToArray(
@@ -117,22 +117,23 @@ class Payload
                 // Normally we'd use `$request->post()` to get this data but in the case that the
                 // payload is corrupted JSON `$request->post()` returns an empty array. Not ideal!
                 try {
-                    $content = json_decode($request->getContent(), true);
-                    if (json_last_error() == JSON_ERROR_SYNTAX) {
-                        throw new \Exception('invalid json');
+                    /** @var resource|string $contentRaw */
+                    $contentRaw = $request->getContent();
+                    if (is_resource($contentRaw)) {
+                        $contentRaw = stream_get_contents($contentRaw);
                     }
-
+                    $content = json_decode($contentRaw, true);
                     $content = $this->sanitizeInputPerConfig($content);
                     $content = json_encode($content);
                 } catch (\Exception $e) {
-                    $content = $request->getContent();
+                    $content = $request->all();
                 }
 
                 $post_data = [
                     'mimeType' => $content_type,
                     'text' => $content,
                 ];
-            } elseif (!!$content_type) {
+            } elseif ($content_type !== null && $content_type !== '') {
                 $post_data = [
                     'mimeType' => $content_type,
                     'text' => $request->getContent()

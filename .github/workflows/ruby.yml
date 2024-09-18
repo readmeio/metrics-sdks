@@ -34,9 +34,9 @@ jobs:
       matrix:
         ruby-version:
           # https://endoflife.date/ruby
-          - 2.7 # EOL: March 31st, 2023
-          - '3.0' # EOL: March 31st, 2024
-          - 3.1 # EOL: December 25th, 2025
+          - 3.1 # EOL: March 31th, 2025
+          - 3.2 # EOL: March 31th, 2026
+          - 3.3 # EOL: March 31th, 2027
         rack-version:
           # This will install the latest v2
           - -v '>= 2.2' -v '< 3'

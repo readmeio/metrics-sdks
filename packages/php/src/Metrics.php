@@ -96,7 +96,7 @@ class Metrics
             return;
         }
 
-        if (empty($this->base_log_url)) {
+        if ($this->base_log_url === null || $this->base_log_url === '') {
             $this->base_log_url = $this->getProjectBaseUrl();
         }
 
@@ -161,6 +161,7 @@ class Metrics
         $ex->setErrors((array)$json->errors);
         throw $ex;
     }
+
 
     /**
      * Make an API request to ReadMe to retrieve the base log URL that'll be used to populate the `x-documentation-url`
