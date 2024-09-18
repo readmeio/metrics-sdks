@@ -145,13 +145,13 @@ namespace ReadMe.HarJsonObjectModels
       {
         foreach (var reqHeader in this.request.Headers)
         {
+          Headers header = new Headers();
+          header.name = reqHeader.Key;
+          header.value = reqHeader.Key == "Authorization" ? MaskHelper.Mask(reqHeader.Value) : reqHeader.Value.ToString();
           if (!this.configValues.options.isAllowListEmpty)
           {
             if (this.CheckAllowList(reqHeader.Key))
             {
-              Headers header = new Headers();
-              header.name = reqHeader.Key;
-              header.value = reqHeader.Value;
               headers.Add(header);
             }
           }
@@ -159,17 +159,11 @@ namespace ReadMe.HarJsonObjectModels
           {
             if (!this.CheckDenyList(reqHeader.Key))
             {
-              Headers header = new Headers();
-              header.name = reqHeader.Key;
-              header.value = reqHeader.Value;
               headers.Add(header);
             }
           }
           else
           {
-            Headers header = new Headers();
-            header.name = reqHeader.Key;
-            header.value = reqHeader.Value;
             headers.Add(header);
           }
         }

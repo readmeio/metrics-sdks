@@ -44,7 +44,7 @@ namespace ReadMe.HarJsonTranslationLogics
     private Group BuildGroup()
     {
       Group group = new Group();
-      group.id = this.configValues.group.id;
+      group.id = MaskHelper.Mask(this.configValues.group.id);
       group.label = this.configValues.group.label;
       group.email = this.configValues.group.email;
       return group;
