@@ -29,7 +29,7 @@
     "find-cache-dir": "^3.3.2",
     "flat-cache": "^3.0.4",
     "lodash": "^4.17.15",
-    "ssri": "^10.0.1",
+    "ssri": "^11.0.0",
     "timeout-signal": "^1.1.0",
     "type-is": "^1.6.18"
   },
