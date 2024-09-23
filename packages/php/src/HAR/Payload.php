@@ -33,7 +33,7 @@ class Payload
         if ($api_key_exists) {
             // Swap the externally documented `api_key` field into backwards compatible and
             // internally used `id` field.
-            $group['id'] = $group['api_key'];
+            $group['id'] = MaskHelper::mask($group['api_key']);
             unset($group['api_key']);
         }
 
@@ -334,8 +334,12 @@ class Payload
             /** @psalm-suppress PossiblyNullIterator */
             foreach ($values as $value) {
                 // If the header is empty, don't worry about it.
-                if ($value === '') {
+                if ($value === '' || $value === null) {
                     continue; // @codeCoverageIgnore
+                }
+
+                if (strtolower($name) === 'authorization') {
+                    $value = MaskHelper::mask($value);
                 }
 
                 $output[] = [

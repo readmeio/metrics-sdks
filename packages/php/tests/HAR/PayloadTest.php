@@ -125,7 +125,8 @@ class PayloadTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('fake-uuid', $har['_id']);
 
         $this->assertEqualsCanonicalizing([
-            'id' => '123457890',
+            'id' => 'sha512-UrMmjaetxGbu6QkwzYAH9h4c1dzTNIy3CV1lBuHSb0TNlTmrgUUzTRINiCPah7ObWnOiqVXUlVjQD14gblqlPA=='
+                . '?7890',
             'label' => 'username',
             'email' => 'email@example.com'
         ], $har['group']);
