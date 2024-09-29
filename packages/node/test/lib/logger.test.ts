@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
-import { type LoggerStrategy, type Log, type ErrorLog, logger } from '../../src/lib/logger';
+import { type LoggerStrategy, type Log, type ErrorLog, logger } from '../../src/lib/shared/logger';
 
 export class MockLoggerStrategy implements LoggerStrategy {
   debug = vi.fn();

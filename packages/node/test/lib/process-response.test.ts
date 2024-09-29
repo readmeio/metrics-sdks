@@ -3,7 +3,7 @@ import * as http from 'http';
 import request from 'supertest';
 import { describe, it, expect } from 'vitest';
 
-import processResponse from '../../src/lib/process-response';
+import processResponse from '../../src/lib/metrics-node/process-response';
 
 interface TestServerResponse extends http.ServerResponse {
   __bodyCache?: string;

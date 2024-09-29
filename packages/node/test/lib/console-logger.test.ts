@@ -2,7 +2,7 @@ import type { ErrorLog, Log } from 'src/lib/logger';
 
 import { describe, beforeEach, afterEach, vi, expect, it } from 'vitest';
 
-import ConsoleLogger from '../../src/lib/console-logger';
+import ConsoleLogger from '../../src/lib/shared/console-logger';
 
 describe('ConsoleLogger', () => {
   let logger: ConsoleLogger;

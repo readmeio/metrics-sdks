@@ -1,13 +1,14 @@
-import type { ExtendedIncomingMessage, ExtendedResponse, Options } from 'src/lib/log';
-import type { GroupingObject } from 'src/lib/metrics-log';
+import type { ExtendedIncomingMessage, ExtendedResponse } from 'src/lib/metrics-node/log';
+import type { GroupingObject } from 'src/lib/shared/metrics-log';
+import type { Options } from 'src/lib/shared/options';
 
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 
-import { log } from '../../src/lib/log';
-import { metricsAPICall } from '../../src/lib/metrics-log';
+import { log } from '../../src/lib/metrics-node/log';
+import { metricsAPICall } from '../../src/lib/shared/metrics-log';
 
 describe('log', function () {
-  vi.mock('../../src/lib/metrics-log');
+  vi.mock('../../src/lib/shared/metrics-log');
 
   let req: ExtendedIncomingMessage;
   let res: ExtendedResponse;

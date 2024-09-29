@@ -2,7 +2,7 @@ import { URLSearchParams } from 'url';
 
 import { describe, it, expect } from 'vitest';
 
-import { objectToArray, searchToArray } from '../../src/lib/object-to-array';
+import { objectToArray, searchToArray } from '../../src/lib/shared/object-to-array';
 
 describe('#object-to-array', function () {
   it('should transform a nested object of query parameters into an array', function () {

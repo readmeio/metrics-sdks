@@ -1,6 +1,6 @@
 /* eslint-disable vitest/no-conditional-expect */
 /* eslint-disable vitest/no-standalone-expect */
-import type { OutgoingLogBody } from '../src/lib/metrics-log';
+import type { OutgoingLogBody } from '../src/lib/shared/metrics-log';
 import type { Express } from 'express';
 
 import * as crypto from 'crypto';
@@ -13,10 +13,10 @@ import request from 'supertest';
 import { describe, afterAll, beforeEach, afterEach, expect, it } from 'vitest';
 
 import pkg from '../package.json';
-import * as readmeio from '../src';
 import config from '../src/config';
-import { getCache } from '../src/lib/get-project-base-url';
-import { setBackoff } from '../src/lib/metrics-log';
+import * as readmeio from '../src/lib/metrics-node';
+import { getCache } from '../src/lib/shared/get-project-base-url';
+import { setBackoff } from '../src/lib/shared/metrics-log';
 
 import getReadMeApiMock from './helpers/getReadMeApiMock';
 import { MockLoggerStrategy } from './lib/logger.test';

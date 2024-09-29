@@ -2,9 +2,8 @@ import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { describe, beforeAll, afterAll, afterEach, expect, it } from 'vitest';
 
-import { getProjectBaseUrl } from '../../src';
 import config from '../../src/config';
-import { getCache } from '../../src/lib/get-project-base-url';
+import { getProjectBaseUrl, getCache } from '../../src/lib/shared/get-project-base-url';
 import getReadMeApiMock from '../helpers/getReadMeApiMock';
 
 const apiKey = 'mockReadMeApiKey';

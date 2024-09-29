@@ -1,12 +1,12 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import type { LogOptions } from 'src/lib/construct-payload';
+import type { LogOptions } from 'src/lib/shared/options';
 
 import { createServer } from 'http';
 
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
-import processRequest from '../../src/lib/process-request';
+import processRequest from '../../src/lib/metrics-node/process-request';
 
 function createApp(reqOptions?: LogOptions, shouldPreParse = false, bodyOverride?: Record<string, unknown>) {
   const requestListener = function (req: IncomingMessage, res: ServerResponse) {

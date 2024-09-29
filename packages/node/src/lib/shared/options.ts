@@ -1,29 +1,5 @@
 import type { LoggerStrategy } from './logger';
-import type { OutgoingLogBody } from './metrics-log';
 import type { UUID } from 'node:crypto';
-import type { IncomingMessage, ServerResponse } from 'node:http';
-import type { TLSSocket } from 'tls';
-
-import { randomUUID } from 'node:crypto';
-import os from 'os';
-import { URL } from 'url';
-
-import ssri from 'ssri';
-
-import { version } from '../../package.json';
-
-import processRequest from './process-request';
-import processResponse from './process-response';
-
-/**
- * Extracts the protocol string from the incoming request
- *
- * @param req
- * @returns
- */
-export function getProto(req: IncomingMessage): 'http' | 'https' {
-  return (req.socket as TLSSocket).encrypted ? 'https' : 'http';
-}
 
 export interface LogOptions {
   /**
@@ -123,67 +99,9 @@ export interface PayloadData {
   startedDateTime: Date;
 }
 
-/**
- * This will generate an integrity hash that looks something like this:
- *
- * sha512-Naxska/M1INY/thefLQ49sExJ8E+89Q2bz/nC4Pet52iSRPtI9w3Cyg0QdZExt0uUbbnfMJZ0qTabiLJxw6Wrg==?1345
- *
- * With the last 4 digits on the end for us to use to identify it later in a list.
- */
-export function mask(apiKey: string) {
-  return ssri
-    .fromData(apiKey, {
-      algorithms: ['sha512'],
-      options: [apiKey.slice(-4)],
-    })
-    .toString();
-}
-
-export function constructPayload(
-  req: IncomingMessage,
-  res: ServerResponse,
-  payloadData: PayloadData,
-  logOptions: LogOptions,
-): OutgoingLogBody {
-  const serverTime = payloadData.responseEndDateTime.getTime() - payloadData.startedDateTime.getTime();
-
-  return {
-    _id: payloadData.logId || randomUUID(),
-    _version: 3,
-    group: {
-      id: mask(payloadData.apiKey),
-      label: payloadData.label,
-      email: payloadData.email,
-    },
-    clientIPAddress: req.socket.remoteAddress || '',
-    development: !!logOptions?.development,
-    request: {
-      log: {
-        version: '1.2',
-        creator: {
-          name: 'readme-metrics (node)',
-          version,
-          // x64-darwin21.3.0/14.19.3
-          comment: `${os.arch()}-${os.platform()}${os.release()}/${process.versions.node}`,
-        },
-        entries: [
-          {
-            pageref: payloadData.routePath
-              ? payloadData.routePath
-              : new URL(req.url || '', `${getProto(req)}://${req.headers.host}`).toString(),
-            startedDateTime: payloadData.startedDateTime.toISOString(),
-            time: serverTime,
-            request: processRequest(req, payloadData.requestBody, logOptions),
-            response: processResponse(res, payloadData.responseBody, logOptions),
-            cache: {},
-            timings: {
-              // This requires us to know the time the request was sent to the server, so we're skipping it for now
-              wait: 0,
-              receive: serverTime,
-            },
-          },
-        ],
-      },
-    },
-  };
+export interface Options extends LogOptions {
+  baseLogUrl?: string;
+  bufferLength?: number;
+  disableMetrics?: boolean;
+  disableWebhook?: boolean;
 }

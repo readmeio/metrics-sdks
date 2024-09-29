@@ -1,11 +1,11 @@
-import type { Options } from './log';
+import type { Options } from './options';
 import type { Har } from 'har-format';
 import type { UUID } from 'node:crypto';
 
 import timeoutSignal from 'timeout-signal';
 
-import pkg from '../../package.json';
-import config from '../config';
+import pkg from '../../../package.json';
+import config from '../../config';
 
 import { logger } from './logger';
 
@@ -89,7 +89,11 @@ function getLogIds(body: OutgoingLogBody | OutgoingLogBody[]): LogId {
   return body._id;
 }
 
-export function metricsAPICall(readmeAPIKey: string, body: OutgoingLogBody[], options: Options): Promise<LogResponse> {
+export function metricsAPICall(
+  readmeAPIKey: string,
+  body: OutgoingLogBody[],
+  options: Options,
+): Promise<LogResponse> {
   const signal = timeoutSignal(config.timeout);
   const encodedKey = Buffer.from(`${readmeAPIKey}:`).toString('base64');
 

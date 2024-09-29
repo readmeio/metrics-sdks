@@ -1,4 +1,4 @@
-import type { LogOptions } from './construct-payload';
+import type { LogOptions } from '../shared/options';
 import type { Response } from 'har-format';
 import type { ServerResponse } from 'http';
 
@@ -7,8 +7,8 @@ import { STATUS_CODES } from 'http';
 import removeProperties from 'lodash/omit';
 import removeOtherProperties from 'lodash/pick';
 
-import { objectToArray } from './object-to-array';
-import { fixHeader } from './process-request';
+import { objectToArray } from '../shared/object-to-array';
+import { fixHeader } from '../shared/processing-helpers';
 
 /**
  * Transforms the provided ServerResponse and additional information into the appropriate HAR structure

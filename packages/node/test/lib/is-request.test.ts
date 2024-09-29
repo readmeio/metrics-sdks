@@ -2,7 +2,7 @@
 import MockReq from 'mock-req';
 import { describe, it, expect } from 'vitest';
 
-import isRequest from '../../src/lib/is-request';
+import isRequest from '../../src/lib/metrics-node/is-request';
 
 describe('isRequest', function () {
   it('should detect `text/plain', function () {

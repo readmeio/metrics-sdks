@@ -1,5 +1,5 @@
-import type { LogOptions } from './construct-payload';
-import type { GroupingObject, OutgoingLogBody } from './metrics-log';
+import type { GroupingObject, OutgoingLogBody } from '../shared/metrics-log';
+import type { Options } from '../shared/options';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
 import { randomUUID } from 'node:crypto';
@@ -7,18 +7,19 @@ import * as url from 'url';
 
 import clamp from 'lodash/clamp';
 
-import config from '../config';
+import config from '../../config';
+import { getProjectBaseUrl } from '../shared/get-project-base-url';
+import { logger } from '../shared/logger';
+import { metricsAPICall } from '../shared/metrics-log';
 
 import { constructPayload } from './construct-payload';
-import { getProjectBaseUrl } from './get-project-base-url';
 import isRequest from './is-request';
-import { logger } from './logger';
-import { metricsAPICall } from './metrics-log';
 import { patchRequest } from './patch-request';
 import { patchResponse } from './patch-response';
 
 let queue: OutgoingLogBody[] = [];
-function doSend(readmeApiKey: string, options: Options) {
+
+export function doSend(readmeApiKey: string, options: Options) {
   // Copy the queue so we can send all the requests in one batch
   const json = [...queue];
   // Clear out the queue so we don't resend any data in the future
@@ -65,13 +66,6 @@ export interface ExtendedIncomingMessage extends IncomingMessage {
 
 export interface ExtendedResponse extends ServerResponse {
   _body?: string;
-}
-
-export interface Options extends LogOptions {
-  baseLogUrl?: string;
-  bufferLength?: number;
-  disableMetrics?: boolean;
-  disableWebhook?: boolean;
 }
 
 function setDocumentationHeader(res: ServerResponse, baseLogUrl: string, logId: string) {

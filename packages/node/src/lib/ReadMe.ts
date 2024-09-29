@@ -1,4 +1,4 @@
-import type { Options } from './log';
+import type { Options } from './shared/options';
 import type { NextFunction, Request, Response } from 'express';
 
 import pkg from '../../package.json';
@@ -6,9 +6,9 @@ import config from '../config';
 
 import findAPIKey from './find-api-key';
 import { getGroupByApiKey } from './get-group-id';
-import { log } from './log';
-import { logger } from './logger';
+import { log } from './metrics-node/log';
 import { buildSetupView } from './setup-readme-view';
+import { logger } from './shared/logger';
 import { testVerifyWebhook } from './test-verify-webhook';
 import verifyWebhook from './verify-webhook';
 

@@ -1,5 +1,5 @@
-import type { LogOptions, PayloadData } from '../../src/lib/construct-payload';
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import type { LogOptions, PayloadData } from 'src/lib/shared/options';
 
 import { createServer } from 'http';
 import os from 'os';
@@ -10,7 +10,8 @@ import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
 import pkg from '../../package.json';
-import { constructPayload, mask } from '../../src/lib/construct-payload';
+import { constructPayload } from '../../src/lib/metrics-node/construct-payload';
+import { mask } from '../../src/lib/shared/mask';
 
 function createApp(options?: LogOptions, payloadData?: PayloadData) {
   const requestListener = function (req: IncomingMessage, res: ServerResponse) {

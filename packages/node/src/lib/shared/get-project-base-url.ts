@@ -4,8 +4,8 @@ import findCacheDir from 'find-cache-dir';
 import flatCache from 'flat-cache';
 import timeoutSignal from 'timeout-signal';
 
-import pkg from '../../package.json';
-import config from '../config';
+import pkg from '../../../package.json';
+import config from '../../config';
 
 import { logger } from './logger';
 
