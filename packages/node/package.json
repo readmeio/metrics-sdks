@@ -27,7 +27,7 @@
   "dependencies": {
     "content-type": "^1.0.5",
     "find-cache-dir": "^3.3.2",
-    "flat-cache": "^3.0.4",
+    "flat-cache": "^6.1.0",
     "lodash": "^4.17.15",
     "ssri": "^11.0.0",
     "timeout-signal": "^1.1.0",
