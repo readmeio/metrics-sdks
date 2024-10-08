@@ -88,30 +88,42 @@ export const rails: Client = {
 
     if (security.length) {
       push('# OAS Security variables', 3);
+      push('keys: [', 3);
       security.forEach(data => {
+        push('{', 4);
         if (data.type === 'http') {
           // Only HTTP Basic auth has any special handling for supplying auth.
           if (data.scheme === 'basic') {
-            pushVariable(`${escapeForObjectKey(data.name)}: { user: 'user', pass: 'pass' },`, {
+            pushVariable(`name: '${escapeForSingleQuotes(data.name)}',`, {
               type: 'security',
               name: data.name,
-              indentationLevel: 3,
+              indentationLevel: 5,
             });
-            return;
+            push("user: 'user',", 5);
+            push("pass: 'pass',", 5);
           }
-        }
-
-        pushVariable(
-          `${escapeForObjectKey(data.name)}: '${escapeForSingleQuotes(
-            data.default || data.default === '' ? data.default : data.name,
-          )}',`,
-          {
+        } else if (data.type === 'oauth') {
+          pushVariable(`name: '${escapeForSingleQuotes(data.name)}',`, {
             type: 'security',
             name: data.name,
-            indentationLevel: 3,
-          },
-        );
+            indentationLevel: 5,
+          });
+          push("apiKey: 'apiKey',", 5);
+        } else {
+          pushVariable(
+            `${escapeForObjectKey(data.name)}: '${escapeForSingleQuotes(
+              data.default || data.default === '' ? data.default : data.name,
+            )}',`,
+            {
+              type: 'security',
+              name: data.name,
+              indentationLevel: 5,
+            },
+          );
+        }
+        push('}', 4);
       });
+      push(']', 3);
     }
 
     push('}', 2);

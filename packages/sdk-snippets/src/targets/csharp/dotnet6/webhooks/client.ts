@@ -90,28 +90,38 @@ export const dotnet6: Client = {
     if (security.length) {
       push('// OAS Security variables', 2);
       security.forEach(data => {
+        push('{', 3);
         if (data.type === 'http') {
           // Only HTTP Basic auth has any special handling for supplying auth.
           if (data.scheme === 'basic') {
-            pushVariable(`${escapeForObjectKey(data.name, true)} = new { user = "user", pass = "pass" },`, {
+            pushVariable(`name = "${escapeForDoubleQuotes(data.name)}",`, {
               type: 'security',
               name: data.name,
-              indentationLevel: 2,
+              indentationLevel: 4,
             });
-            return;
+            push('user = "user",', 4);
+            push('pass = "pass",', 4);
           }
-        }
-
-        pushVariable(
-          `${escapeForObjectKey(data.name, true)} = "${escapeForDoubleQuotes(
-            data.default || data.default === '' ? data.default : data.name,
-          )}",`,
-          {
+        } else if (data.type === 'oauth') {
+          pushVariable(`name = "${data.name}",`, {
             type: 'security',
             name: data.name,
-            indentationLevel: 2,
-          },
-        );
+            indentationLevel: 4,
+          });
+          push('apiKey = "apiKey",', 4);
+        } else {
+          pushVariable(
+            `${escapeForObjectKey(data.name, true)} = "${escapeForDoubleQuotes(
+              data.default || data.default === '' ? data.default : data.name,
+            )}",`,
+            {
+              type: 'security',
+              name: data.name,
+              indentationLevel: 4,
+            },
+          );
+        }
+        push(',', 3);
       });
     }
 
