@@ -81,18 +81,16 @@ export const express: Client = {
       push('keys: [', 2);
       security.forEach(data => {
         push('{', 3);
-        if (data.type === 'http') {
+        if (data.type === 'http' && data.scheme === 'basic') {
           // Only HTTP Basic auth has any special handling for supplying auth.
-          if (data.scheme === 'basic') {
-            pushVariable(`name: '${escapeForSingleQuotes(data.name)}',`, {
-              type: 'security',
-              name: data.name,
-              indentationLevel: 4,
-            });
-            push("user: 'user',", 4);
-            push("pass: 'pass',", 4);
-          }
-        } else if (data.type === 'oauth') {
+          pushVariable(`name: '${escapeForSingleQuotes(data.name)}',`, {
+            type: 'security',
+            name: data.name,
+            indentationLevel: 4,
+          });
+          push("user: 'user',", 4);
+          push("pass: 'pass',", 4);
+        } else if (data.type.includes('oauth')) {
           pushVariable(`name: '${escapeForSingleQuotes(data.name)}',`, {
             type: 'security',
             name: data.name,

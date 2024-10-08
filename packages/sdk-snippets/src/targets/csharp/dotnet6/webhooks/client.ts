@@ -89,26 +89,27 @@ export const dotnet6: Client = {
 
     if (security.length) {
       push('// OAS Security variables', 2);
+      push('keys = new[]', 2);
+      push('{', 2);
       security.forEach(data => {
+        push('new', 3);
         push('{', 3);
-        if (data.type === 'http') {
+        if (data.type === 'http' && data.scheme === 'basic') {
           // Only HTTP Basic auth has any special handling for supplying auth.
-          if (data.scheme === 'basic') {
-            pushVariable(`name = "${escapeForDoubleQuotes(data.name)}",`, {
-              type: 'security',
-              name: data.name,
-              indentationLevel: 4,
-            });
-            push('user = "user",', 4);
-            push('pass = "pass",', 4);
-          }
-        } else if (data.type === 'oauth') {
+          pushVariable(`name = "${escapeForDoubleQuotes(data.name)}",`, {
+            type: 'security',
+            name: data.name,
+            indentationLevel: 4,
+          });
+          push('user = "user",', 4);
+          push('pass = "pass"', 4);
+        } else if (data.type.includes('oauth')) {
           pushVariable(`name = "${data.name}",`, {
             type: 'security',
             name: data.name,
             indentationLevel: 4,
           });
-          push('apiKey = "apiKey",', 4);
+          push('apiKey = "apiKey"', 4);
         } else {
           pushVariable(
             `${escapeForObjectKey(data.name, true)} = "${escapeForDoubleQuotes(
@@ -121,8 +122,9 @@ export const dotnet6: Client = {
             },
           );
         }
-        push(',', 3);
+        push('},', 3);
       });
+      push('}', 2);
     }
 
     push('});', 1);
