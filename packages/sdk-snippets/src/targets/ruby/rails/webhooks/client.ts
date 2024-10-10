@@ -1,3 +1,4 @@
+import type { VariableOptions } from '../../../../helpers/code-builder';
 import type { Client } from '../../../targets';
 
 import { CodeBuilder } from '../../../../helpers/code-builder';
@@ -90,30 +91,41 @@ export const rails: Client = {
       push('# OAS Security variables', 3);
       push('keys: [', 3);
       security.forEach(data => {
-        push('{', 4);
-        pushVariable(`name: '${escapeForSingleQuotes(data.name)}',`, {
+        const variableOptions: VariableOptions = {
           type: 'security',
           name: data.name,
           indentationLevel: 5,
-        });
-        if (data.type === 'http') {
-          if (data.scheme === 'basic') {
-            push("user: 'user',", 5);
-            push("pass: 'pass',", 5);
-          } else if (data.scheme === 'bearer') {
-            push("apiKey: 'apiKey',", 5);
+        };
+
+        push('{', 4);
+        if (data.type === 'http' || data.type === 'apiKey') {
+          pushVariable(`name: '${escapeForSingleQuotes(data.name)}',`, variableOptions);
+
+          if (data.type === 'http') {
+            if (data.scheme === 'basic') {
+              push("user: 'user',", 5);
+              push("pass: 'pass',", 5);
+            } else if (data.scheme === 'bearer') {
+              pushVariable(
+                `bearer: '${escapeForSingleQuotes(data.default || data.default === '' ? data.default : data.name)}',`,
+                variableOptions,
+              );
+            }
+          } else {
+            pushVariable(
+              `apiKey: '${escapeForSingleQuotes(data.default || data.default === '' ? data.default : data.name)}',`,
+              variableOptions,
+            );
           }
-        } else if (data.type === 'apiKey') {
-          push("apiKey: 'apiKey',", 5);
+        } else {
+          pushVariable(
+            `${escapeForObjectKey(data.name)}: '${escapeForSingleQuotes(
+              data.default || data.default === '' ? data.default : data.name,
+            )}',`,
+            variableOptions,
+          );
         }
 
-        if (data.default) {
-          pushVariable(`default: '${escapeForSingleQuotes(data.default)}',`, {
-            type: 'security',
-            name: data.name,
-            indentationLevel: 5,
-          });
-        }
         push('},', 4);
       });
       push(']', 3);
