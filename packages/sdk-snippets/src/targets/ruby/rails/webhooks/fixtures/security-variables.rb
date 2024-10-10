@@ -27,8 +27,16 @@ class MetricsController < ApplicationController
     # current_user ||= User.find(session[:user_id]) if session[:user_id]
     render json: {
       # OAS Security variables
-      petstore_auth: 'default-key',
-      basic_auth: { user: 'user', pass: 'pass' },
+      keys: [
+        {
+          petstore_auth: 'default-key',
+        },
+        {
+          name: 'basic_auth',
+          user: 'user',
+          pass: 'pass',
+        },
+      ]
     }
   end
 end

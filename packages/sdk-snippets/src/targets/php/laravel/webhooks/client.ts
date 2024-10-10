@@ -2,7 +2,7 @@ import type { VariableOptions } from '../../../../helpers/code-builder';
 import type { Client } from '../../../targets';
 
 import { CodeBuilder } from '../../../../helpers/code-builder';
-import { escapeForObjectKey, escapeForSingleQuotes } from '../../../../helpers/escape';
+import { escapeForSingleQuotes } from '../../../../helpers/escape';
 
 export const laravel: Client = {
   info: {
@@ -109,7 +109,7 @@ export const laravel: Client = {
           }
         } else {
           pushVariable(
-            `'${escapeForObjectKey(data.name)}': '${escapeForSingleQuotes(
+            `'${escapeForSingleQuotes(data.name)}' => '${escapeForSingleQuotes(
               data.default || data.default === '' ? data.default : data.name,
             )}',`,
             variableOptions,

@@ -122,7 +122,7 @@ export const dotnet6: Client = {
           }
         } else {
           pushVariable(
-            `${escapeForObjectKey(data.name)} = "${escapeForDoubleQuotes(
+            `${escapeForObjectKey(data.name, true)} = "${escapeForDoubleQuotes(
               data.default || data.default === '' ? data.default : data.name,
             )}",`,
             variableOptions,

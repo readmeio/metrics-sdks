@@ -2,7 +2,7 @@ import type { VariableOptions } from '../../../../helpers/code-builder';
 import type { Client } from '../../../targets';
 
 import { CodeBuilder } from '../../../../helpers/code-builder';
-import { escapeForDoubleQuotes, escapeForObjectKey } from '../../../../helpers/escape';
+import { escapeForDoubleQuotes } from '../../../../helpers/escape';
 
 export const flask: Client = {
   info: {
@@ -121,7 +121,7 @@ export const flask: Client = {
           }
         } else {
           pushVariable(
-            `"${escapeForObjectKey(data.name)}": "${escapeForDoubleQuotes(
+            `"${escapeForDoubleQuotes(data.name)}": "${escapeForDoubleQuotes(
               data.default || data.default === '' ? data.default : data.name,
             )}",`,
             variableOptions,
