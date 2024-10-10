@@ -30,8 +30,19 @@ app.MapPost("/webhook", async context =>
   await context.Response.WriteAsJsonAsync(new
   {
     // OAS Security variables
-    petstore_auth = "default-key",
-    basic_auth = new { user = "user", pass = "pass" },
+    keys = new[]
+    {
+      new
+      {
+        petstore_auth = "default-key",
+      },
+      new
+      {
+        name = "basic_auth",
+        user = "user",
+        pass = "pass",
+      },
+    }
   });
 });
 

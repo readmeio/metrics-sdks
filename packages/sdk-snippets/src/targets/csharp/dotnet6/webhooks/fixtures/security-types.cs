@@ -30,10 +30,29 @@ app.MapPost("/webhook", async context =>
   await context.Response.WriteAsJsonAsync(new
   {
     // OAS Security variables
-    api_key = "default-api_key-key",
-    http_basic = new { user = "user", pass = "pass" },
-    http_bearer = "default-http_bearer-key",
-    oauth2 = "default-oauth2-key",
+    keys = new[]
+    {
+      new
+      {
+        name = "api_key",
+        apiKey = "default-api_key-key",
+      },
+      new
+      {
+        name = "http_basic",
+        user = "user",
+        pass = "pass",
+      },
+      new
+      {
+        name = "http_bearer",
+        bearer = "default-http_bearer-key",
+      },
+      new
+      {
+        oauth2 = "default-oauth2-key",
+      },
+    }
   });
 });
 

@@ -33,9 +33,21 @@ class MetricsController < ApplicationController
       normal_server_var: '',
 
       # OAS Security variables
-      '"petstore" auth': 'default "key"\\',
-      'basic-auth': { user: 'user', pass: 'pass' },
-      normal_security_var: { user: 'user', pass: 'pass' },
+      keys: [
+        {
+          '"petstore" auth': 'default "key"\\',
+        },
+        {
+          name: 'basic-auth',
+          user: 'user',
+          pass: 'pass',
+        },
+        {
+          name: 'normal_security_var',
+          user: 'user',
+          pass: 'pass',
+        },
+      ]
     }
   end
 end

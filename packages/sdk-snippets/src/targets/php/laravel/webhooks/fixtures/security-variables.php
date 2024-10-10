@@ -21,7 +21,15 @@ Route::post('/webhook', function (\Illuminate\Http\Request $request) use ($secre
     // $user = DB::table('users')->where('email', $request->input('email'))->limit(1)->get();
     return response()->json([
         // OAS Security variables
-        'petstore_auth' => 'default-key',
-        'basic_auth' => ['user' => 'user', 'pass' => 'pass'],
+        'keys' => [
+            [
+                'petstore_auth' => 'default-key',
+            ],
+            [
+                'name' => 'basic_auth',
+                'user' => 'user',
+                'pass' => 'pass',
+            ],
+        ]
     ]);
 });

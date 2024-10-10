@@ -34,8 +34,19 @@ app.MapPost("/webhook", async context =>
     port = "",
 
     // OAS Security variables
-    petstore_auth = "default-key",
-    basic_auth = new { user = "user", pass = "pass" },
+    keys = new[]
+    {
+      new
+      {
+        petstore_auth = "default-key",
+      },
+      new
+      {
+        name = "basic_auth",
+        user = "user",
+        pass = "pass",
+      },
+    }
   });
 });
 

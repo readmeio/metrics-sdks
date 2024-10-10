@@ -33,10 +33,24 @@ def webhook():
     return (
         {
             # OAS Security variables
-            "api_key": "default-api_key-key",
-            "http_basic": {"user": "user", "pass": "pass"},
-            "http_bearer": "default-http_bearer-key",
-            "oauth2": "default-oauth2-key",
+            "keys": [
+                {
+                    "name": "api_key",
+                    "apiKey": "default-api_key-key",
+                },
+                {
+                    "name": "http_basic",
+                    "user": "user",
+                    "pass": "pass",
+                },
+                {
+                    "name": "http_bearer",
+                    "bearer": "default-http_bearer-key",
+                },
+                {
+                    "oauth2": "default-oauth2-key",
+                },
+            ]
         },
         200,
         {"Content-Type": "application/json; charset=utf-8"},

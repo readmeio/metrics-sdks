@@ -24,7 +24,11 @@ app.post('/webhook', express.json({ type: 'application/json' }), async (req, res
     name: '',
 
     // OAS Security variables
-    petstore_auth: '',
+    keys: [
+      {
+        petstore_auth: '',
+      },
+    ]
   });
 });
 

@@ -21,8 +21,16 @@ app.post('/webhook', express.json({ type: 'application/json' }), async (req, res
   // const user = await db.find({ email: req.body.email })
   return res.json({
     // OAS Security variables
-    petstore_auth: 'default-key',
-    basic_auth: { user: 'user', pass: 'pass' },
+    keys: [
+      {
+        petstore_auth: 'default-key',
+      },
+      {
+        name: 'basic_auth',
+        user: 'user',
+        pass: 'pass',
+      },
+    ]
   });
 });
 

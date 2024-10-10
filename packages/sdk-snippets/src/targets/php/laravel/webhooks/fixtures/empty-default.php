@@ -24,6 +24,10 @@ Route::post('/webhook', function (\Illuminate\Http\Request $request) use ($secre
         'name' => '',
 
         // OAS Security variables
-        'petstore_auth' => '',
+        'keys' => [
+            [
+                'petstore_auth' => '',
+            ],
+        ]
     ]);
 });

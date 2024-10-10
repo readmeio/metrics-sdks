@@ -29,7 +29,7 @@ const { convert } = new MetricsSDKSnippet(
     },
     {
       name: 'basic_auth',
-      default: 'default',
+      scheme: 'basic',
       source: 'security',
       type: 'http',
     },

@@ -36,7 +36,11 @@ def webhook():
             "name": "",
 
             # OAS Security variables
-            "petstore_auth": "",
+            "keys": [
+                {
+                    "petstore_auth": "",
+                },
+            ]
         },
         200,
         {"Content-Type": "application/json; charset=utf-8"},

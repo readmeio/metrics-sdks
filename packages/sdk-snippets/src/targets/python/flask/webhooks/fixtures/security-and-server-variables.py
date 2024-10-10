@@ -37,8 +37,16 @@ def webhook():
             "port": "",
 
             # OAS Security variables
-            "petstore_auth": "default-key",
-            "basic_auth": {"user": "user", "pass": "pass"},
+            "keys": [
+                {
+                    "petstore_auth": "default-key",
+                },
+                {
+                    "name": "basic_auth",
+                    "user": "user",
+                    "pass": "pass",
+                },
+            ]
         },
         200,
         {"Content-Type": "application/json; charset=utf-8"},
