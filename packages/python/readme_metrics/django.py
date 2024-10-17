@@ -6,19 +6,28 @@ from django.conf import settings
 from readme_metrics.Metrics import Metrics
 from readme_metrics.ResponseInfoWrapper import ResponseInfoWrapper
 from readme_metrics import MetricsApiConfig
+from asgiref.sync import iscoroutinefunction, markcoroutinefunction
 
 
 class MetricsMiddleware:
+    async_capable = True
+    sync_capable = True
+
     def __init__(self, get_response, config=None):
         self.get_response = get_response
         self.config = config or settings.README_METRICS_CONFIG
         assert isinstance(self.config, MetricsApiConfig)
         self.metrics_core = Metrics(self.config)
+        if iscoroutinefunction(self.get_response):
+            markcoroutinefunction(self)
 
     def __call__(self, request):
-        if request.method == "OPTIONS":
-            return self.get_response(request)
-
+        if iscoroutinefunction(self.get_response):
+            return self.async_process(request)
+        else:
+            return self.sync_process(request)
+        
+    def preamble(self, request):
         try:
             request.rm_start_dt = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
             request.rm_start_ts = int(time.time() * 1000)
@@ -30,8 +39,7 @@ class MetricsMiddleware:
             # throw an error. Log it but don't re-raise.
             self.config.LOGGER.exception(e)
 
-        response = self.get_response(request)
-
+    def process_response(self, request, response):
         try:
             try:
                 body = response.content.decode("utf-8")
@@ -50,4 +58,19 @@ class MetricsMiddleware:
             # throw an error. Log it but don't re-raise.
             self.config.LOGGER.exception(e)
 
+    
+    def sync_process(self, request):
+        if request.method == "OPTIONS":
+            return self.get_response(request)
+        self.preamble(request)
+        response = self.get_response(request)
+        self.process_response(request, response)
+        return response
+    
+    async def async_process(self, request):
+        if request.method == "OPTIONS":
+            return await self.get_response(request)
+        self.preamble(request)
+        response = await self.get_response(request)
+        self.process_response(request, response)
         return response
