@@ -66,8 +66,13 @@ test-webhooks-php-laravel: ## Run webhooks tests against the PHP SDK + Laravel
 ## Python
 ##
 
-test-metrics-python-django: ## Run Metrics tests against the Python SDK + Django
-	docker compose up --build --detach integration_metrics_python_django
+test-metrics-python-django-wsgi: ## Run Metrics tests against the Python SDK + Django
+	docker compose up --build --detach integration_metrics_python_django_wsgi
+	SUPPORTS_HASHING=true npm run test:integration-metrics || make cleanup-failure
+	@make cleanup
+
+test-metrics-python-django-asgi: ## Run Metrics tests against the Python SDK + Django
+	docker compose up --build --detach integration_metrics_python_django_asgi
 	SUPPORTS_HASHING=true npm run test:integration-metrics || make cleanup-failure
 	@make cleanup
 
