@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 import time
-from unittest.mock import Mock
+from unittest.mock import Mock, AsyncMock
 
 from readme_metrics import MetricsApiConfig
 from readme_metrics.django import MetricsMiddleware
@@ -15,20 +15,26 @@ mock_config = MetricsApiConfig(
 
 
 class TestDjangoMiddleware:
-    def test(self):
-        response = Mock()
+    def setup_middleware(self, is_async=False):
+        response = AsyncMock() if is_async else Mock()
         response.headers = {"X-Header": "X Value!"}
-        get_response = Mock(return_value=response)
+        get_response = (
+            AsyncMock(return_value=response)
+            if is_async
+            else Mock(return_value=response)
+        )
 
         middleware = MetricsMiddleware(get_response, config=mock_config)
-        assert middleware.get_response == get_response
         middleware.metrics_core = Mock()
+        return middleware
 
-        request = Mock()
-        request.headers = {"Content-Length": "123"}
-        middleware(request)
-        # the middleware should call get_response(request)
-        get_response.assert_called_once_with(request)
+    def validate_metrics(self, middleware, request, is_async=False):
+        if is_async:
+            # the middleware should await get_response(request)
+            middleware.get_response.assert_awaited_once_with(request)
+        else:
+            # the middleware should call get_response(request)
+            middleware.get_response.assert_called_once_with(request)
 
         # the middleware should set request.rm_start_dt to roughly the current
         # datetime
@@ -56,6 +62,24 @@ class TestDjangoMiddleware:
         assert (
             getattr(request, "rm_content_length") == request.headers["Content-Length"]
         )
+
+    def test_sync(self):
+        middleware = self.setup_middleware()
+
+        request = Mock()
+        request.headers = {"Content-Length": "123"}
+        middleware(request)
+
+        self.validate_metrics(middleware, request)
+
+    async def test_async(self):
+        middleware = self.setup_middleware(is_async=True)
+
+        request = AsyncMock()
+        request.headers = {"Content-Length": "123"}
+        await middleware(request)
+
+        self.validate_metrics(middleware, request, is_async=True)
 
     def test_missing_content_length(self):
         middleware = MetricsMiddleware(Mock(), config=mock_config)
