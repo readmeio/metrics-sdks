@@ -16,7 +16,8 @@ jobs:
           node-version: 20
 
       - run: npm ci --ignore-scripts
-      - run: make test-metrics-python-django
+      - run: make test-metrics-python-django-wsgi
+      - run: make test-metrics-python-django-asgi
       - run: make test-metrics-python-flask
       - run: make test-webhooks-python-flask
 

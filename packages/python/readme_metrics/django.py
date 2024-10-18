@@ -2,11 +2,11 @@ from datetime import datetime
 import time
 
 from django.conf import settings
+from asgiref.sync import iscoroutinefunction, markcoroutinefunction
 
 from readme_metrics.Metrics import Metrics
 from readme_metrics.ResponseInfoWrapper import ResponseInfoWrapper
 from readme_metrics import MetricsApiConfig
-from asgiref.sync import iscoroutinefunction, markcoroutinefunction
 
 
 class MetricsMiddleware:
@@ -24,9 +24,8 @@ class MetricsMiddleware:
     def __call__(self, request):
         if iscoroutinefunction(self.get_response):
             return self.async_process(request)
-        else:
-            return self.sync_process(request)
-        
+        return self.sync_process(request)
+
     def preamble(self, request):
         try:
             request.rm_start_dt = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -58,7 +57,6 @@ class MetricsMiddleware:
             # throw an error. Log it but don't re-raise.
             self.config.LOGGER.exception(e)
 
-    
     def sync_process(self, request):
         if request.method == "OPTIONS":
             return self.get_response(request)
@@ -66,7 +64,7 @@ class MetricsMiddleware:
         response = self.get_response(request)
         self.process_response(request, response)
         return response
-    
+
     async def async_process(self, request):
         if request.method == "OPTIONS":
             return await self.get_response(request)

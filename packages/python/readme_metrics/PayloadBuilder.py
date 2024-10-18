@@ -74,11 +74,13 @@ class PayloadBuilder:
         group = self._validate_group(group)
         if group is None:
             return None
-        
+
         if hasattr(request, "environ"):
             client_ip_address = request.environ.get("REMOTE_ADDR")
         else:
-            client_ip_address = request.scope["client"][0] if hasattr(request, "scope") else None
+            client_ip_address = (
+                request.scope["client"][0] if hasattr(request, "scope") else None
+            )
 
         payload = {
             "_id": logId,
@@ -169,7 +171,8 @@ class PayloadBuilder:
 
         Args:
             request (Request): Request object containing the request information, either
-                a `werkzeug.Request`, `django.core.handlers.wsgi.WSGIRequest`, or a `django.core.handlers.asgi.ASGIRequest`.
+                a `werkzeug.Request`, `django.core.handlers.wsgi.WSGIRequest`, or
+                a `django.core.handlers.asgi.ASGIRequest`.
 
         Returns:
             dict: Wrapped request payload
@@ -223,6 +226,11 @@ class PayloadBuilder:
             http_version = request.environ["SERVER_PROTOCOL"]
         elif hasattr(request, "scope"):
             http_version = f'HTTP/{request.scope["http_version"]}'
+        else:
+            http_version = "HTTP/1.1"  # Assume it is default HTTP version
+            self.logger.warning(
+                "Unable to detect the HTTP version. Setting default to 'HTTP/1.1'."
+            )
 
         payload = {
             "method": request.method,
@@ -320,7 +328,7 @@ class PayloadBuilder:
             if len(query_string) > 0:
                 base_url += f"?{query_string}"
             return base_url
-        
+
         scheme, host, path = None, None, None
 
         if hasattr(request, "environ") and "wsgi.url_scheme" in request.environ:
@@ -336,7 +344,6 @@ class PayloadBuilder:
             host = request.environ["HTTP_HOST"]
         elif hasattr(request, "scope"):
             host = request.headers.get("host")
-
 
         if hasattr(request, "environ") and "PATH_INFO" in request.environ:
             path = request.environ["PATH_INFO"]

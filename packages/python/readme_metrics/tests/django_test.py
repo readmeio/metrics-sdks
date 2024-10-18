@@ -18,13 +18,17 @@ class TestDjangoMiddleware:
     def setup_middleware(self, is_async=False):
         response = AsyncMock() if is_async else Mock()
         response.headers = {"X-Header": "X Value!"}
-        get_response = AsyncMock(return_value=response) if is_async else Mock(return_value=response)
+        get_response = (
+            AsyncMock(return_value=response)
+            if is_async
+            else Mock(return_value=response)
+        )
 
         middleware = MetricsMiddleware(get_response, config=mock_config)
         middleware.metrics_core = Mock()
-        return middleware, response
-    
-    def validate_metrics(self, middleware, request, response, is_async=False):
+        return middleware
+
+    def validate_metrics(self, middleware, request, is_async=False):
         if is_async:
             # the middleware should await get_response(request)
             middleware.get_response.assert_awaited_once_with(request)
@@ -60,22 +64,22 @@ class TestDjangoMiddleware:
         )
 
     def test_sync(self):
-        middleware, response = self.setup_middleware()
+        middleware = self.setup_middleware()
 
         request = Mock()
         request.headers = {"Content-Length": "123"}
         middleware(request)
-        
-        self.validate_metrics(middleware, request, response)
+
+        self.validate_metrics(middleware, request)
 
     async def test_async(self):
-        middleware, response = self.setup_middleware(is_async=True)
+        middleware = self.setup_middleware(is_async=True)
 
         request = AsyncMock()
         request.headers = {"Content-Length": "123"}
         await middleware(request)
-        
-        self.validate_metrics(middleware, request, response, is_async=True)
+
+        self.validate_metrics(middleware, request, is_async=True)
 
     def test_missing_content_length(self):
         middleware = MetricsMiddleware(Mock(), config=mock_config)
