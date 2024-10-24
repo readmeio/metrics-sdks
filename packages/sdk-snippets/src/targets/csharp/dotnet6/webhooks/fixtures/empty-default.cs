@@ -33,7 +33,13 @@ app.MapPost("/webhook", async context =>
     name = "",
 
     // OAS Security variables
-    petstore_auth = "",
+    keys = new[]
+    {
+      new
+      {
+        petstore_auth = "",
+      },
+    }
   });
 });
 
