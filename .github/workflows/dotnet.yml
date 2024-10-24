@@ -23,7 +23,7 @@ jobs:
         if: always()
         run: docker compose down
 
-  build-dotnet:
+  build:
     runs-on: ubuntu-latest
     defaults:
       run:
