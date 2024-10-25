@@ -7,7 +7,6 @@ import * as crypto from 'crypto';
 import { createServer } from 'http';
 
 import express from 'express';
-import { FlatCache } from 'flat-cache';
 import { delay, http, HttpResponse, passthrough } from 'msw';
 import { setupServer } from 'msw/node';
 import request from 'supertest';
@@ -16,13 +15,11 @@ import { describe, afterAll, beforeEach, afterEach, expect, it } from 'vitest';
 import pkg from '../package.json';
 import * as readmeio from '../src';
 import config from '../src/config';
-import { getCache } from '../src/lib/get-project-base-url';
+import { getCache, cache } from '../src/lib/get-project-base-url';
 import { setBackoff } from '../src/lib/metrics-log';
 
 import getReadMeApiMock from './helpers/getReadMeApiMock';
 import { MockLoggerStrategy } from './lib/logger.test';
-
-const cache = new FlatCache();
 
 const apiKey = 'mockReadMeApiKey';
 const endUserApiKey = '5afa21b97011c63320226ef3';
