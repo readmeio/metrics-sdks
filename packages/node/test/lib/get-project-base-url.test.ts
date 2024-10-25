@@ -4,7 +4,7 @@ import { describe, beforeAll, afterAll, afterEach, expect, it } from 'vitest';
 
 import { getProjectBaseUrl } from '../../src';
 import config from '../../src/config';
-import { getCache } from '../../src/lib/get-project-base-url';
+import { getCache, cache } from '../../src/lib/get-project-base-url';
 import getReadMeApiMock from '../helpers/getReadMeApiMock';
 
 const apiKey = 'mockReadMeApiKey';
@@ -15,7 +15,7 @@ const restHandlers = [getReadMeApiMock(baseLogUrl)];
 const server = setupServer(...restHandlers);
 
 function hydrateCache(lastUpdated: number) {
-  const cache = getCache(apiKey);
+  getCache(apiKey);
 
   cache.setKey('lastUpdated', lastUpdated);
   cache.setKey('baseUrl', baseLogUrl);
@@ -30,7 +30,8 @@ describe('get-project-base-url', function () {
   afterEach(function () {
     server.resetHandlers();
 
-    getCache(apiKey).destroy();
+    getCache(apiKey);
+    cache.destroy();
   });
 
   //  Close server after all tests
@@ -40,26 +41,26 @@ describe('get-project-base-url', function () {
 
   it('should not call the API for project data if the cache is fresh', async function () {
     await getProjectBaseUrl(apiKey, 2000);
-    expect(getCache(apiKey).getKey('baseUrl')).toStrictEqual(baseLogUrl);
-    const lastUpdated = getCache(apiKey).getKey('lastUpdated');
+    expect(cache.getKey('baseUrl')).toStrictEqual(baseLogUrl);
+    const lastUpdated = cache.getKey('lastUpdated');
     await getProjectBaseUrl(apiKey, 2000);
-    expect(getCache(apiKey).getKey('lastUpdated')).toStrictEqual(lastUpdated);
+    expect(cache.getKey('lastUpdated')).toStrictEqual(lastUpdated);
   });
 
   it('should populate the cache if not present', async function () {
     await getProjectBaseUrl(apiKey, 2000);
-    expect(getCache(apiKey).getKey('baseUrl')).toStrictEqual(baseLogUrl);
+    expect(cache.getKey('baseUrl')).toStrictEqual(baseLogUrl);
   });
 
   it('should refresh the cache if stale', async function () {
     // Hydrate and postdate the cache to two days ago so it'll be seen as stale.
     hydrateCache(Math.round(Date.now() / 1000 - 86400 * 2));
-    expect(getCache(apiKey).getKey('baseUrl')).toStrictEqual(baseLogUrl);
+    expect(cache.getKey('baseUrl')).toStrictEqual(baseLogUrl);
 
-    const lastUpdated = getCache(apiKey).getKey('lastUpdated');
+    const lastUpdated = cache.getKey('lastUpdated');
     await getProjectBaseUrl(apiKey, 2000);
-    expect(getCache(apiKey).getKey('baseUrl')).toStrictEqual(baseLogUrl);
-    expect(getCache(apiKey).getKey('lastUpdated')).not.toStrictEqual(lastUpdated);
+    expect(cache.getKey('baseUrl')).toStrictEqual(baseLogUrl);
+    expect(cache.getKey('lastUpdated')).not.toStrictEqual(lastUpdated);
   });
 
   it('should temporarily set baseUrl to null if the call to the ReadMe API fails for whatever reason', async function () {
@@ -80,6 +81,6 @@ describe('get-project-base-url', function () {
     );
 
     await getProjectBaseUrl(apiKey, 2000);
-    expect(getCache(apiKey).getKey('baseUrl')).toBeNull();
+    expect(cache.getKey('baseUrl')).toBeNull();
   });
 });
