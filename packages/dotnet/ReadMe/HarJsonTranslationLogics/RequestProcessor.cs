@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace ReadMe.HarJsonObjectModels
 {
-  class RequestProcessor
+  public class RequestProcessor
   {
     private readonly HttpRequest request;
     private readonly ConfigValues configValues;
