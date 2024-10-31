@@ -2,7 +2,7 @@
 
 namespace ReadMe.HarJsonObjectModels
 {
-  class Content
+  public class Content
   {
     public string text { get; set; }
 

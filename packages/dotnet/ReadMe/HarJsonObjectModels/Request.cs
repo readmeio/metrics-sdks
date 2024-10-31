@@ -7,7 +7,7 @@ namespace ReadMe.HarJsonObjectModels
   // nullish data here as well otherwise if `PostData` is `null` then it'll be serialized here as
   // null.
   [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-  class Request
+  public class Request
   {
     public List<Headers> headers { get; set; }
 

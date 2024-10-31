@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace ReadMe.HarJsonObjectModels
 {
   [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-  class PostData
+  public class PostData
   {
     public string mimeType { get; set; }
 

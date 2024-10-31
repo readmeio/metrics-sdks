@@ -1,6 +1,6 @@
 ﻿namespace ReadMe.HarJsonObjectModels
 {
-  class RequestMain
+  public class RequestMain
   {
     public RequestMain(Log log)
     {

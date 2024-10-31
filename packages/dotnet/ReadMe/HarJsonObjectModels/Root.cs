@@ -1,6 +1,6 @@
 ﻿namespace ReadMe.HarJsonObjectModels
 {
-  class Root
+  public class Root
   {
     public string _id { get; set; }
 

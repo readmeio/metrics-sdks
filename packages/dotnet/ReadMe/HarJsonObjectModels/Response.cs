@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace ReadMe.HarJsonObjectModels
 {
   [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-  class Response
+  public class Response
   {
     public List<Headers> headers { get; set; }
 
