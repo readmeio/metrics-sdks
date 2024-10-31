@@ -227,7 +227,7 @@ class PayloadBuilder:
         elif hasattr(request, "scope"):
             http_version = f'HTTP/{request.scope["http_version"]}'
         else:
-            http_version = "HTTP/1.1"  # Assume it is default HTTP version
+            http_version = ""
             self.logger.warning(
                 "Unable to detect the HTTP version. Setting default to 'HTTP/1.1'."
             )
