@@ -38,6 +38,9 @@ namespace ReadMe.Tests
             httpRequestMock.Setup(r => r.Path).Returns("/api/data");
             httpRequestMock.Setup(r => r.QueryString).Returns(new QueryString("?id=123"));
             httpRequestMock.Setup(r => r.Protocol).Returns("HTTP/1.1");
+            httpRequestMock.Setup(r => r.Headers.Count).Returns(0);
+            httpRequestMock.Setup(r => r.Query.Count).Returns(0);
+            httpRequestMock.Setup(r => r.Cookies.Count).Returns(0);
 
             processor = new RequestProcessor(httpRequestMock.Object, configValues);
         }
@@ -100,6 +103,30 @@ namespace ReadMe.Tests
             Assert.That(result.cookies[0].value, Is.EqualTo("abc123"));
             Assert.That(result.cookies[1].name, Is.EqualTo("userId"));
             Assert.That(result.cookies[1].value, Is.EqualTo("user456"));
+        }
+
+        [Test]
+        public async Task ProcessRequest_IncludesPostData_IfContentTypeIsFormUrlEncoded()
+        {
+            httpRequestMock.Setup(r => r.ContentType).Returns("application/x-www-form-url-encoded");
+            httpRequestMock.Setup(r => r.Method).Returns("POST");
+            httpRequestMock.Setup(r => r.HasFormContentType).Returns(true);
+
+            var formCollection = new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>()
+            {
+                { "key1", "value1" },
+                { "key2", "value2" },
+            };
+            var form = new FormCollection(formCollection);
+            httpRequestMock.Setup(r => r.Form).Returns(form);
+
+            var result = await processor.ProcessRequest();
+
+            Assert.IsNotNull(result.postData);
+            Assert.That(result.postData.mimeType, Is.EqualTo("application/x-www-form-url-encoded"));
+            Assert.That(result.postData.@params.Count, Is.EqualTo(formCollection.Count));
+            Assert.That(result.postData.@params[0].name, Is.EqualTo("key1"));
+            Assert.That(result.postData.@params[0].value, Is.EqualTo("value1"));
         }
     }
 }
