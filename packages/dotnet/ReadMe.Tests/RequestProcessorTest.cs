@@ -23,6 +23,8 @@ namespace ReadMe.Tests
                     baseLogUrl = "http://example.com",
                     isAllowListEmpty = true,
                     isDenyListEmpty = true,
+                    allowList = new List<string>(),
+                    denyList = new List<string>(),
                 },
                 group = new Group
                 {
@@ -127,6 +129,84 @@ namespace ReadMe.Tests
             Assert.That(result.postData.@params.Count, Is.EqualTo(formCollection.Count));
             Assert.That(result.postData.@params[0].name, Is.EqualTo("key1"));
             Assert.That(result.postData.@params[0].value, Is.EqualTo("value1"));
+        }
+
+        [Test]
+        public async Task ProcessRequest_OnlyIncludesAllowListedHeaders()
+        {
+            httpRequestMock.Setup(r => r.Headers).Returns(new HeaderDictionary
+            {
+                { "AllowedHeader", "allowed-value" },
+                { "ExcludedHeader", "excluded-value" }
+            });
+            configValues.options.allowList = new List<string> { "AllowedHeader" };
+            configValues.options.isAllowListEmpty = false;
+
+            var result = await processor.ProcessRequest();
+
+            Assert.That(result.headers.Count, Is.EqualTo(1));
+            Assert.That(result.headers[0].name, Is.EqualTo("AllowedHeader"));
+            Assert.That(result.headers[0].value, Is.EqualTo("allowed-value"));
+        }
+
+        [Test]
+        public async Task ProcessRequest_ExcludesDenyListedHeaders()
+        {
+            httpRequestMock.Setup(r => r.Headers).Returns(new HeaderDictionary
+            {
+                { "IncludedHeader", "included-value" },
+                { "DeniedHeader", "denied-value" }
+            });
+            configValues.options.denyList = new List<string> { "DeniedHeader" };
+            configValues.options.isDenyListEmpty = false;
+
+            var result = await processor.ProcessRequest();
+
+            Assert.That(result.headers.Count, Is.EqualTo(1));
+            Assert.That(result.headers[0].name, Is.EqualTo("IncludedHeader"));
+            Assert.That(result.headers[0].value, Is.EqualTo("included-value"));
+        }
+
+        [Test]
+        public async Task ProcessRequest_OnlyIncludesAllowListedFormData()
+        {
+            httpRequestMock.Setup(r => r.Method).Returns("POST");
+            httpRequestMock.Setup(r => r.ContentType).Returns("application/x-www-form-urlencoded");
+            httpRequestMock.Setup(r => r.Form).Returns(new FormCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>
+            {
+                { "allowedField", "allowedValue" },
+                { "excludedField", "excludedValue" }
+            }));
+            configValues.options.allowList = new List<string> { "allowedField" };
+            configValues.options.isAllowListEmpty = false;
+
+            var result = await processor.ProcessRequest();
+
+            Assert.IsNotNull(result.postData);
+            Assert.That(result.postData.@params.Count, Is.EqualTo(1));
+            Assert.That(result.postData.@params[0].name, Is.EqualTo("allowedField"));
+            Assert.That(result.postData.@params[0].value, Is.EqualTo("allowedValue"));
+        }
+
+        [Test]
+        public async Task ProcessRequest_ExcludesDenyListedFormData()
+        {
+            httpRequestMock.Setup(r => r.Method).Returns("POST");
+            httpRequestMock.Setup(r => r.ContentType).Returns("application/x-www-form-urlencoded");
+            httpRequestMock.Setup(r => r.Form).Returns(new FormCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>
+            {
+                { "includedField", "includedValue" },
+                { "deniedField", "deniedValue" }
+            }));
+            configValues.options.denyList = new List<string> { "deniedField" };
+            configValues.options.isDenyListEmpty = false;
+
+            var result = await processor.ProcessRequest();
+
+            Assert.IsNotNull(result.postData);
+            Assert.That(result.postData.@params.Count, Is.EqualTo(1));
+            Assert.That(result.postData.@params[0].name, Is.EqualTo("includedField"));
+            Assert.That(result.postData.@params[0].value, Is.EqualTo("includedValue"));
         }
     }
 }
