@@ -18,6 +18,8 @@ namespace ReadMe.Tests
         private Mock<RequestDelegate> nextMock;
         private Mock<HttpContext> httpContextMock;
         private Mock<IConfiguration> configurationMock;
+        private Mock<HttpResponse> responseMock;
+        private Mock<HttpRequest> requestMock;
         private ConfigValues configValues;
         private HarJsonBuilder builder;
 
@@ -28,16 +30,16 @@ namespace ReadMe.Tests
             httpContextMock = new Mock<HttpContext>();
             configurationMock = new Mock<IConfiguration>();
 
-            var mockRequest = new Mock<HttpRequest>();
-            var mockResponse = new Mock<HttpResponse>();
+            requestMock = new Mock<HttpRequest>();
+            responseMock = new Mock<HttpResponse>();
             var connection = new Mock<ConnectionInfo>();
 
             connection.Setup(c => c.RemoteIpAddress).Returns(IPAddress.Parse("127.0.0.1"));
-            httpContextMock.Setup(c => c.Request).Returns(mockRequest.Object);
-            httpContextMock.Setup(c => c.Response).Returns(mockResponse.Object);
+            httpContextMock.Setup(c => c.Request).Returns(requestMock.Object);
+            httpContextMock.Setup(c => c.Response).Returns(responseMock.Object);
             httpContextMock.Setup(c => c.Connection).Returns(connection.Object);
 
-            mockResponse.SetupProperty(r => r.Body, new MemoryStream());
+            responseMock.SetupProperty(r => r.Body, new MemoryStream());
 
             configValues = new ConfigValues
             {
@@ -59,15 +61,15 @@ namespace ReadMe.Tests
             };
 
             var requestHeaders = new HeaderDictionary();
-            mockRequest.Setup(r => r.Headers).Returns(requestHeaders);
-            mockRequest.SetupProperty(r => r.Scheme, "https");
-            mockRequest.SetupProperty(r => r.Host, new HostString("localhost", 5000));
-            mockRequest.Setup(r => r.Query.Count).Returns(0);
-            mockRequest.Setup(r => r.Cookies.Count).Returns(0);
+            requestMock.Setup(r => r.Headers).Returns(requestHeaders);
+            requestMock.SetupProperty(r => r.Scheme, "https");
+            requestMock.SetupProperty(r => r.Host, new HostString("localhost", 5000));
+            requestMock.Setup(r => r.Query.Count).Returns(0);
+            requestMock.Setup(r => r.Cookies.Count).Returns(0);
 
             var responseHeaders = new HeaderDictionary();
-            mockResponse.Setup(r => r.Headers).Returns(responseHeaders);
-            mockResponse.SetupProperty(r => r.Body, new MemoryStream());
+            responseMock.Setup(r => r.Headers).Returns(responseHeaders);
+            responseMock.SetupProperty(r => r.Body, new MemoryStream());
 
             builder = new HarJsonBuilder(nextMock.Object, httpContextMock.Object, configurationMock.Object, configValues);
         }
@@ -83,6 +85,15 @@ namespace ReadMe.Tests
 
             Assert.That(deserializedResult[0].group.label, Is.EqualTo(configValues.group.label));
             Assert.That(deserializedResult[0].clientIPAddress, Is.EqualTo("127.0.0.1"));
+        }
+
+        [Test]
+        public async Task BuildHar_ShouldAddDocumentationUrlHeaderToResponse()
+        {
+            await builder.BuildHar();
+
+            Assert.IsTrue(responseMock.Object.Headers.ContainsKey("x-documentation-url"));
+            Assert.IsTrue(responseMock.Object.Headers["x-documentation-url"].ToString().StartsWith(configValues.options.baseLogUrl));
         }
     }
 }
