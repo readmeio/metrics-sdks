@@ -23,7 +23,8 @@ jobs:
         if: always()
         run: docker compose down
 
-  build:
+  build-dotnet:
+    name: build ${{ matrix.dotnet-version }}
     runs-on: ubuntu-latest
     defaults:
       run:
