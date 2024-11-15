@@ -15,7 +15,7 @@ import { describe, afterAll, beforeEach, afterEach, expect, it } from 'vitest';
 import pkg from '../package.json';
 import * as readmeio from '../src';
 import config from '../src/config';
-import { getCache } from '../src/lib/get-project-base-url';
+import { getCache, cache } from '../src/lib/get-project-base-url';
 import { setBackoff } from '../src/lib/metrics-log';
 
 import getReadMeApiMock from './helpers/getReadMeApiMock';
@@ -60,7 +60,7 @@ function doMetricsHeadersMatch(headers: Headers) {
 describe('#metrics', function () {
   beforeEach(function () {
     server.listen();
-    const cache = getCache(apiKey);
+    getCache(apiKey);
 
     cache.setKey('lastUpdated', Date.now());
     cache.setKey('baseUrl', 'https://docs.example.com');
@@ -69,7 +69,7 @@ describe('#metrics', function () {
 
   afterEach(function () {
     server.resetHandlers();
-    getCache(apiKey).destroy();
+    cache.destroy();
   });
 
   // Close server after all tests
@@ -146,7 +146,7 @@ describe('#metrics', function () {
       app = express();
       app.use((req, res, next) => {
         const logId = readmeio.log(apiKey, req, res, incomingGroup, { logger: mockLogger });
-        res.setHeader('x-log-id', logId);
+        res.setHeader('x-log-id', logId!);
         return next();
       });
       app.get('/test', (req, res) => res.sendStatus(200));
@@ -531,7 +531,7 @@ describe('#metrics', function () {
     it('should fetch the `baseLogUrl` if not passed', function () {
       expect.assertions(1);
       // Invalidating the cache so we do a fetch from the API
-      const cache = getCache(apiKey);
+      getCache(apiKey);
       const lastUpdated = new Date();
       lastUpdated.setDate(lastUpdated.getDate() - 2);
       cache.setKey('lastUpdated', lastUpdated.getTime());
