@@ -20,7 +20,7 @@ services:
   integration_dotnet_metrics_v6.0:
     build:
       context: .
-      dockerfile: ./test/integrations/dotnet/v6.0.Dockerfile
+      dockerfile: ./test/integrations/dotnet/v8.0.Dockerfile
     ports:
       - 8000:8000
     extra_hosts: *default-extra_hosts
@@ -30,7 +30,7 @@ services:
   integration_dotnet_webhooks_v6.0:
     build:
       context: .
-      dockerfile: ./test/integrations/dotnet/v6.0-webhooks.Dockerfile
+      dockerfile: ./test/integrations/dotnet/v8.0-webhooks.Dockerfile
     ports:
       - 8000:8000
     extra_hosts: *default-extra_hosts
