@@ -2,7 +2,7 @@
 
 namespace ReadMe.HarJsonObjectModels
 {
-  class Log
+  public class Log
   {
     public Creator creator { get; set; }
 

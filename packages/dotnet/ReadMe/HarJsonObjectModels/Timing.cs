@@ -1,6 +1,6 @@
 ﻿namespace ReadMe.HarJsonObjectModels
 {
-  class Timing
+  public class Timing
   {
     public int wait { get; set; }
 

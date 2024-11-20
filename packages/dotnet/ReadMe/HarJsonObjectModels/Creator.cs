@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace ReadMe.HarJsonObjectModels
 {
   [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-  class Creator
+  public class Creator
   {
     public string name { get; set; }
 

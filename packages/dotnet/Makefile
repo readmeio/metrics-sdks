@@ -7,6 +7,9 @@ build: clean ## Build the library (and run code standard checks)
 clean: ## Clean out the currently built library
 	rm -rf ReadMe/bin/ ReadMe/obj
 
+test:
+	dotnet test ReadMe.Tests/
+
 install: ## Install the required dependencies to run .NET applications
 	brew install dotnet
 

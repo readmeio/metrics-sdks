@@ -3,7 +3,7 @@
 namespace ReadMe.HarJsonObjectModels
 {
   [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-  class Cookies
+  public class Cookies
   {
     public string name { get; set; }
 

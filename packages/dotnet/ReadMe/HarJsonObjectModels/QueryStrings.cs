@@ -3,7 +3,7 @@
 namespace ReadMe.HarJsonObjectModels
 {
   [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-  class QueryStrings
+  public class QueryStrings
   {
     public string name { get; set; }
 

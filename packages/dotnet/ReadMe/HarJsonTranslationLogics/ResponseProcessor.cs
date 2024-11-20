@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace ReadMe.HarJsonObjectModels
 {
-  class ResponseProcessor
+  public class ResponseProcessor
   {
     private readonly HttpResponse response;
     private readonly string responseBodyData;

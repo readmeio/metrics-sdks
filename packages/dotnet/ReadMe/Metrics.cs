@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using ReadMe.HarJsonObjectModels;
 using ReadMe.HarJsonTranslationLogics;
+using RestSharp;
 
 namespace ReadMe
 {
@@ -45,7 +46,9 @@ namespace ReadMe
             HarJsonBuilder harJsonBuilder = new HarJsonBuilder(this.next, context, this.configuration, configValues);
 
             string harJsonObj = await harJsonBuilder.BuildHar();
-            ReadMeApiCaller readmeApiCaller = new ReadMeApiCaller(harJsonObj, configValues.apiKey);
+            var client = new RestClient(ConstValues.ReadmeAPIEndpoints);
+
+            ReadMeApiCaller readmeApiCaller = new ReadMeApiCaller(harJsonObj, configValues.apiKey, client);
             readmeApiCaller.SendHarObjToReadMeApi();
           }
           else
