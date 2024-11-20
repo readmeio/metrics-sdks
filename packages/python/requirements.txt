@@ -2,3 +2,4 @@ Django==4.2.16
 Flask==3.0.3
 requests==2.32.3
 Werkzeug==3.0.6
+uvicorn==0.32.0

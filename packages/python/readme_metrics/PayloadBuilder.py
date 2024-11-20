@@ -75,10 +75,17 @@ class PayloadBuilder:
         if group is None:
             return None
 
+        if hasattr(request, "environ"):
+            client_ip_address = request.environ.get("REMOTE_ADDR")
+        else:
+            client_ip_address = (
+                request.scope["client"][0] if hasattr(request, "scope") else None
+            )
+
         payload = {
             "_id": logId,
             "group": group,
-            "clientIPAddress": request.environ.get("REMOTE_ADDR"),
+            "clientIPAddress": client_ip_address,
             "development": self.development_mode,
             "request": {
                 "log": {
@@ -164,7 +171,8 @@ class PayloadBuilder:
 
         Args:
             request (Request): Request object containing the request information, either
-                a `werkzeug.Request` or a `django.core.handlers.wsgi.WSGIRequest`.
+                a `werkzeug.Request`, `django.core.handlers.wsgi.WSGIRequest`, or
+                a `django.core.handlers.asgi.ASGIRequest`.
 
         Returns:
             dict: Wrapped request payload
@@ -214,10 +222,20 @@ class PayloadBuilder:
         if "Authorization" in headers:
             headers["Authorization"] = mask(headers["Authorization"])
 
+        if hasattr(request, "environ"):
+            http_version = request.environ["SERVER_PROTOCOL"]
+        elif hasattr(request, "scope"):
+            http_version = f'HTTP/{request.scope["http_version"]}'
+        else:
+            http_version = ""
+            self.logger.warning(
+                "Unable to detect the HTTP version. Setting default to 'HTTP/1.1'."
+            )
+
         payload = {
             "method": request.method,
             "url": self._build_base_url(request),
-            "httpVersion": request.environ["SERVER_PROTOCOL"],
+            "httpVersion": http_version,
             "headers": [{"name": k, "value": v} for (k, v) in headers.items()],
             "headersSize": -1,
             "queryString": [{"name": k, "value": v} for (k, v) in queryString],
@@ -276,9 +294,11 @@ class PayloadBuilder:
         if hasattr(request, "query_string"):
             # works for Werkzeug request objects only
             result = request.query_string
-        elif "QUERY_STRING" in request.environ:
+        elif hasattr(request, "environ") and "QUERY_STRING" in request.environ:
             # works for Django, and possibly other request objects too
             result = request.environ["QUERY_STRING"]
+        elif hasattr(request, "scope"):
+            result = request.scope["query_string"]
         else:
             raise QueryNotFound(
                 "Don't know how to retrieve query string from this type of request"
@@ -311,18 +331,24 @@ class PayloadBuilder:
 
         scheme, host, path = None, None, None
 
-        if "wsgi.url_scheme" in request.environ:
+        if hasattr(request, "environ") and "wsgi.url_scheme" in request.environ:
             scheme = request.environ["wsgi.url_scheme"]
+        elif hasattr(request, "scheme"):
+            scheme = request.scheme
 
         # pylint: disable=protected-access
         if hasattr(request, "_get_raw_host"):
             # Django request objects already have a properly formatted host field
             host = request._get_raw_host()
-        elif "HTTP_HOST" in request.environ:
+        elif hasattr(request, "environ") and "HTTP_HOST" in request.environ:
             host = request.environ["HTTP_HOST"]
+        elif hasattr(request, "scope"):
+            host = request.headers.get("host")
 
-        if "PATH_INFO" in request.environ:
+        if hasattr(request, "environ") and "PATH_INFO" in request.environ:
             path = request.environ["PATH_INFO"]
+        elif hasattr(request, "scope"):
+            path = request.scope["path"]
 
         if scheme and path and host:
             if len(query_string) > 0:
