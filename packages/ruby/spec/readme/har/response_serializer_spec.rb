@@ -62,7 +62,7 @@ RSpec.describe Readme::Har::ResponseSerializer do
       )
       json = serializer.as_json
 
-      expect(json.dig(:content, :text)).to eq({ keep: 'keep', reject: '[REDACTED 6]' }.to_json)
+      expect(json.dig(:content, :text)).to eq({ reject: '[REDACTED 6]', keep: 'keep' }.to_json)
       expect(json.dig(:content, :size)).to eq response.content_length
       expect(json.dig(:content, :mimeType)).to eq 'application/json'
     end
