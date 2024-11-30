@@ -1,6 +1,7 @@
 package com.readme.datatransfer;
 
-import com.readme.domain.RequestMetadata;
+import com.readme.config.CoreConfig;
+import com.readme.domain.RequestPayload;
 import com.readme.exception.EmptyRequestBodyException;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
@@ -19,13 +20,13 @@ public class HttpDataSenderTest {
         OkHttpClient client = mock(OkHttpClient.class);
         Call call = mock(Call.class);
         Response response = mockResponse();
-        RequestMetadata requestMetadata = mockRequestMetadata();
+        RequestPayload requestPayload = mockRequestMetadata();
 
         when(client.newCall(any(Request.class))).thenReturn(call);
         when(call.execute()).thenReturn(response);
-        HttpDataSender httpDataSender = new HttpDataSender(client);
+        HttpDataSender httpDataSender = new HttpDataSender(client, mockCoreConfig());
 
-        assertEquals(200, httpDataSender.send(requestMetadata));
+        assertEquals(200, httpDataSender.send(requestPayload));
     }
 
     @Test
@@ -33,13 +34,13 @@ public class HttpDataSenderTest {
         OkHttpClient client = mock(OkHttpClient.class);
         Call call = mock(Call.class);
         Response response = mockResponse();
-        RequestMetadata requestMetadata = RequestMetadata.builder().build();
+        RequestPayload requestPayload = RequestPayload.builder().build();
 
         when(client.newCall(any(Request.class))).thenReturn(call);
         when(call.execute()).thenReturn(response);
-        HttpDataSender httpDataSender = new HttpDataSender(client);
+        HttpDataSender httpDataSender = new HttpDataSender(client, mockCoreConfig());
 
-        assertThrows(EmptyRequestBodyException.class, () -> httpDataSender.send(requestMetadata));
+        assertThrows(EmptyRequestBodyException.class, () -> httpDataSender.send(requestPayload));
     }
 
     @NotNull
@@ -53,10 +54,17 @@ public class HttpDataSenderTest {
                 .build();
     }
 
-    // TODO move to separate class
-    private static RequestMetadata mockRequestMetadata() {
-        return RequestMetadata.builder()
+    // TODO move to separate class   V V V V V
+
+    private static RequestPayload mockRequestMetadata() {
+        return RequestPayload.builder()
                 .body("body")
+                .build();
+    }
+
+    private static CoreConfig mockCoreConfig() {
+        return CoreConfig.builder()
+                .readmeAPIKey("apikey")
                 .build();
     }
 }
