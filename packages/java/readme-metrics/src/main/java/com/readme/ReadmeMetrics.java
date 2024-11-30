@@ -1,19 +1,28 @@
 package com.readme;
 
+import com.readme.config.CoreConfig;
 import com.readme.datatransfer.DataSender;
 import com.readme.datatransfer.HttpDataSender;
-import com.readme.domain.RequestMetadata;
+import com.readme.domain.RequestPayload;
 import okhttp3.OkHttpClient;
 
 public class ReadmeMetrics {
 
+    //TODO Don't forget to refactor all this mess
     public static void main(String[] args) {
 
         OkHttpClient okHttpClient = new OkHttpClient();
-        DataSender d = new HttpDataSender(okHttpClient);
 
-        //TODO collect the real body from a real request
-        RequestMetadata r = RequestMetadata.builder()
+        CoreConfig coreConfig = CoreConfig.builder()
+                .readmeAPIKey("apikey")
+                .build();
+
+        DataSender d = new HttpDataSender(okHttpClient, coreConfig);
+
+        //TODO List of work to build the body dinamically:
+        // 1. Generate the logID
+        // 2. Initialize startTime
+        RequestPayload r = RequestPayload.builder()
                 .body("[{\"_id\":\"ff783c0a-d49c-4930-8bbd-2e8937b35bad\",\"_version\":3,\"group\":{\n" +
                         "  \"id\":\"sha512-u2GbQ83jIqNa+a8v110+8IDztQQr4joL1xSE+wFH51zSOA1qQKPwOC8t2n2LWJQA1mX4ZLZ45SEokITzLed/ow==?-key\",\n" +
                         "  \"label\":\"Owlbertic\",\"email\":\"owlbertic@example.com\"},\n" +

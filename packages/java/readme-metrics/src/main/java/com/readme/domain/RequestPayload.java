@@ -3,14 +3,11 @@ package com.readme.domain;
 import lombok.Builder;
 import lombok.Value;
 
-import java.util.Map;
 
 @Value
 @Builder
-public class RequestMetadata {
+public class RequestPayload {
 
-    String encodedToken;
-    Map<String, String> headers;
     String body;
 
 }
