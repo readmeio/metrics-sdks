@@ -59,4 +59,11 @@ return [
      * will is cached into `$COMPOSER_HOME/cache`.
      */
     'base_log_url' => null,
+
+    /**
+     * This value should be a number representing the amount of requests to group up
+     * before sending them over the network. Increasing this value will increase performance
+     *  but delay the time until logs show up in the dashboard. The default value is 1.
+     */
+    'buffer_length' => 1
 ];

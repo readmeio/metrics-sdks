@@ -23,6 +23,9 @@ class Metrics
     private array $denylist = [];
     private array $allowlist = [];
     private string|null $base_log_url = null;
+    private int $buffer_length = 1;
+
+    private array $queue = [];
 
     private CurlMultiHandler $curl_handler;
     private Client $client;
@@ -60,6 +63,10 @@ class Metrics
         if (!empty($options['base_log_url'])) {
             $this->base_log_url = $options['base_log_url'];
         }
+
+        $this->buffer_length = array_key_exists('buffer_length', $options)
+            ? (int)$options['buffer_length']
+            : 0;
 
         // In development mode, requests are sent asynchronously (as well as PHP can without directly invoking
         // shell cURL commands), so a very small timeout here ensures that the Metrics code will finish as fast as
@@ -108,58 +115,63 @@ class Metrics
 
         $payload = (new Payload($this))->create($log_id, $request, $response);
 
+        array_push($this->queue, $payload);
+
         $headers = [
             'Authorization' => 'Basic ' . $this->api_key,
             'User-Agent' => $this->user_agent
         ];
 
-        // If not in development mode, all requests should be async.
-        if (!$this->development_mode) {
-            try {
-                $promise = $this->client->postAsync('/v1/request', [
-                    'headers' => $headers,
-                    'json' => [$payload]
-                ]);
+        if (count($this->queue) >= $this->buffer_length) {
+            // If not in development mode, all requests should be async.
+            if (!$this->development_mode) {
+                try {
+                    $promise = $this->client->postAsync('/v1/request', [
+                        'headers' => $headers,
+                        'json' => $this->queue
+                    ]);
 
-                $this->curl_handler->execute();
-            } catch (\Exception $e) {
-                // Usually this'll happen from a connection timeout exception from Guzzle trying to wait for us to
-                // resolve the promise we set up, but since we just want this to be a fire and forget request, we don't
-                // actually care about the response coming back from the Metrics API and all exceptions here can be
-                // discarded.
-                //
-                // @todo we should log this somewhere
+                    $this->curl_handler->execute();
+                } catch (\Exception $e) {
+                    // Usually this'll happen from a connection timeout exception from Guzzle trying to wait for us to
+                    // resolve the promise we set up, but since we just want this to be a fire and forget request, we
+                    // don't actually care about the response coming back from the Metrics API and all exceptions here
+                    // can be discarded.
+                    //
+                    // @todo we should log this somewhere
+                }
+                $this->queue = [];
+                return;
             }
 
-            return;
-        }
+            try {
+                $metrics_response = $this->client->post('/v1/request', [
+                    'headers' => $headers,
+                    'json' => $this->queue
+                ]);
+            } catch (\Exception $e) {
+                throw $e;
+            }
+            $this->queue = [];
 
-        try {
-            $metrics_response = $this->client->post('/v1/request', [
-                'headers' => $headers,
-                'json' => [$payload]
-            ]);
-        } catch (\Exception $e) {
-            throw $e;
-        }
+            $json = (string) $metrics_response->getBody();
+            if ($json === 'OK') {
+                return;
+            }
 
-        $json = (string) $metrics_response->getBody();
-        if ($json === 'OK') {
-            return;
-        }
+            $json = json_decode($json);
+            if (!isset($json->errors)) {
+                // If we didn't get any errors back from the Metrics API, but didn't get an `OK` response, then
+                // something must be up with it so don't worry about communicating that here since there isn't
+                // anything actionable for the user.
+                return;
+            }
 
-        $json = json_decode($json);
-        if (!isset($json->errors)) {
-            // If we didn't get any errors back from the Metrics API, but didn't get an `OK` response, then something
-            // must be up with it so don't worry about communicating that here since there isn't anything actionable
-            // for the user.
-            return;
+            /** @psalm-suppress PossiblyInvalidArgument */
+            $ex = new MetricsException(str_replace($json->_message, $json->name, $json->message));
+            $ex->setErrors((array)$json->errors);
+            throw $ex;
         }
-
-        /** @psalm-suppress PossiblyInvalidArgument */
-        $ex = new MetricsException(str_replace($json->_message, $json->name, $json->message));
-        $ex->setErrors((array)$json->errors);
-        throw $ex;
     }
 
 
