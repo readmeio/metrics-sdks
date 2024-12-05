@@ -46,7 +46,7 @@ namespace ReadMe
 
             string harJsonObj = await harJsonBuilder.BuildHar();
             ReadMeApiCaller readmeApiCaller = new ReadMeApiCaller(harJsonObj, configValues.apiKey);
-            readmeApiCaller.SendHarObjToReadMeApi();
+            readmeApiCaller.SendHarObjToReadMeApi(configValues.options.fireAndForget);
           }
           else
           {
@@ -112,6 +112,11 @@ namespace ReadMe
       if (options.GetSection("baseLogUrl").Value != null)
       {
         optionsObj.baseLogUrl = options.GetSection("baseLogUrl").Value;
+      }
+
+      if (options.GetSection("fireAndForget").Value != null)
+      {
+        optionsObj.fireAndForget = bool.Parse(options.GetSection("fireAndForget").Value);
       }
 
       configValues.options = optionsObj;
