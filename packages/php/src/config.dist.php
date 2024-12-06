@@ -26,7 +26,7 @@ return [
      * enabling this option so you can see any possible error that may be
      * present in your payload before you deploy to production.
      */
-    'development_mode' => true,
+    'fire_and_forget' => true,
 
     /**
      * An array of keys from your API requests and responses that you wish to

@@ -367,7 +367,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->metrics = new Metrics($this->readme_api_key, $this->group_handler, [
-            'development_mode' => false,
+            'fire_and_forget' => true,
             'client' => new Client(['handler' => $handlers->metrics]),
             'client_readme' => new Client(['handler' => $handlers->readme])
         ]);

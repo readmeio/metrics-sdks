@@ -20,6 +20,7 @@ class Metrics
     protected const README_API = 'https://dash.readme.com';
 
     private bool $development_mode = false;
+    private bool $fire_and_forget = true;
     private array $denylist = [];
     private array $allowlist = [];
     private string|null $base_log_url = null;
@@ -45,6 +46,10 @@ class Metrics
             ? (bool)$options['development_mode']
             : false;
 
+        $this->development = array_key_exists('fire_and_forget', $options)
+            ? (bool)$options['fire_and_forget']
+            : false;
+
         if (isset($options['denylist']) && is_array($options['denylist'])) {
             $this->denylist = $options['denylist'];
         } elseif (isset($options['blacklist']) && is_array($options['blacklist'])) {
@@ -65,7 +70,7 @@ class Metrics
         // shell cURL commands), so a very small timeout here ensures that the Metrics code will finish as fast as
         // possible, send the POST request to the background and continue on with whatever else the application
         // needs to execute.
-        $curl_timeout = (!$this->development_mode) ? 0.2 : 0;
+        $curl_timeout = (!$this->fire_and_forget) ? 0.2 : 0;
 
         $this->curl_handler = new CurlMultiHandler();
         $this->client = (isset($options['client'])) ? $options['client'] : new Client([
@@ -113,8 +118,8 @@ class Metrics
             'User-Agent' => $this->user_agent
         ];
 
-        // If not in development mode, all requests should be async.
-        if (!$this->development_mode) {
+        // If fire and forget is true, all requests should be async.
+        if ($this->fire_and_forget) {
             try {
                 $promise = $this->client->postAsync('/v1/request', [
                     'headers' => $headers,
@@ -204,7 +209,7 @@ class Metrics
                 //
                 // These errors will likely be from invalid API keys, so it'll be good to surface those to users before
                 // it hits production.
-                if ($this->development_mode) {
+                if (!$this->fire_and_forget) {
                     try {
                         // If we don't have a ClientException here, throw again so we end up below and handle this
                         // exception as a non-HTTP response problem.
