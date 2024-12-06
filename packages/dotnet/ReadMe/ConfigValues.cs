@@ -27,5 +27,7 @@ namespace ReadMe
     public int bufferLength { get; set; } = 1;
 
     public string baseLogUrl { get; set; } = "https://example.readme.com";
+
+    public bool fireAndForget { get; set; } = true;
   }
 }
