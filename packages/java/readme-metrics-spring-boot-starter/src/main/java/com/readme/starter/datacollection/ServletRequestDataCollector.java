@@ -1,4 +1,4 @@
-package com.readme.dataextraction.servlets.jakarta;
+package com.readme.starter.datacollection;
 
 import com.readme.config.CoreConfig;
 import com.readme.dataextraction.RequestDataCollector;
@@ -8,13 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @AllArgsConstructor
-public class JakartaServletRequestDataCollector implements RequestDataCollector<JakartaHttpServletDataPayload> {
+public class ServletRequestDataCollector implements RequestDataCollector<HttpServletDataPayload> {
 
     private CoreConfig coreConfig;
 
-    //TODO do we really need UserData here as a parameter?
     @Override
-    public void collect(JakartaHttpServletDataPayload dataPayload, UserData userData) {
+    public void collect(HttpServletDataPayload dataPayload, UserData userData) {
         String readmeAPIKey = coreConfig.getReadmeAPIKey();
 
         log.info(">>>>>>>> Sending data to the server....");

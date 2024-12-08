@@ -1,6 +1,6 @@
-package com.readme.dataextraction.servlets.jakarta;
+package com.readme.starter.datacollection;
 
-import com.readme.dataextraction.servlets.HttpServletDataPayload;
+import com.readme.dataextraction.DataPayload;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 
 @AllArgsConstructor
-public class JakartaHttpServletDataPayload implements HttpServletDataPayload {
+public class HttpServletDataPayload implements DataPayload {
 
     private HttpServletRequest request;
     private HttpServletResponse response;

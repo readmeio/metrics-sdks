@@ -1,4 +1,4 @@
-package com.readme.dataextraction.servlets;
+package com.readme.dataextraction;
 
 import java.util.Enumeration;
 
@@ -19,7 +19,7 @@ import java.util.Enumeration;
  * <p>This approach eliminates the need for duplicate logic and makes it easier to maintain compatibility
  * with both `javax.servlet` and `jakarta.servlet` in the same library.
  */
-public interface HttpServletDataPayload {
+public interface DataPayload {
 
     String getRequestBody();
     Enumeration<String> getRequestHeaders();

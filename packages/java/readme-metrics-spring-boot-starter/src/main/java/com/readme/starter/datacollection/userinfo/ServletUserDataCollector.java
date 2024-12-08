@@ -1,14 +1,13 @@
-package com.readme.dataextraction.servlets.jakarta.userinfo;
+package com.readme.starter.datacollection.userinfo;
 
 import com.readme.config.FieldMapping;
 import com.readme.config.UserDataConfig;
 import com.readme.dataextraction.UserDataCollector;
-import com.readme.dataextraction.servlets.HttpServletDataPayload;
 import com.readme.dataextraction.UserDataExtractor;
 import com.readme.dataextraction.UserDataField;
 import com.readme.dataextraction.UserDataSource;
-import com.readme.dataextraction.servlets.jakarta.JakartaHttpServletDataPayload;
 import com.readme.domain.UserData;
+import com.readme.starter.datacollection.HttpServletDataPayload;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,14 +24,14 @@ import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
 @Slf4j
-public class JakartaUserDataCollector implements UserDataCollector<JakartaHttpServletDataPayload> {
+public class ServletUserDataCollector implements UserDataCollector<HttpServletDataPayload> {
 
     private UserDataConfig userDataConfig;
 
-    private final UserDataExtractor<JakartaHttpServletDataPayload> extractionService;
+    private final UserDataExtractor<HttpServletDataPayload> extractionService;
 
     @Override
-    public UserData collect(JakartaHttpServletDataPayload payload) {
+    public UserData collect(HttpServletDataPayload payload) {
 
         String apiKey = getApiKey(payload);
         String email = getEmail(payload);
@@ -46,7 +45,7 @@ public class JakartaUserDataCollector implements UserDataCollector<JakartaHttpSe
 
     }
 
-    private String getApiKey(JakartaHttpServletDataPayload payload) {
+    private String getApiKey(HttpServletDataPayload payload) {
         FieldMapping apiKey = userDataConfig.getApiKey();
         if (apiKey == null) {
             log.error("api-key extraction is not configured properly");
@@ -55,7 +54,7 @@ public class JakartaUserDataCollector implements UserDataCollector<JakartaHttpSe
         return extractFieldValue(payload, apiKey);
     }
 
-    private String getEmail(JakartaHttpServletDataPayload payload) {
+    private String getEmail(HttpServletDataPayload payload) {
         FieldMapping apiKey = userDataConfig.getEmail();
         if (apiKey == null) {
             log.error("email extraction is not configured properly");
@@ -64,7 +63,7 @@ public class JakartaUserDataCollector implements UserDataCollector<JakartaHttpSe
         return extractFieldValue(payload, apiKey);
     }
 
-    private String getLabel(JakartaHttpServletDataPayload payload) {
+    private String getLabel(HttpServletDataPayload payload) {
         FieldMapping apiKey = userDataConfig.getLabel();
         if (apiKey == null) {
             log.error("label extraction is not configured properly");
@@ -73,7 +72,7 @@ public class JakartaUserDataCollector implements UserDataCollector<JakartaHttpSe
         return extractFieldValue(payload, apiKey);
     }
 
-    private String extractFieldValue(JakartaHttpServletDataPayload payload, FieldMapping fieldMapping) {
+    private String extractFieldValue(HttpServletDataPayload payload, FieldMapping fieldMapping) {
         if (fieldMapping.getSource().equals(UserDataSource.HEADER.name())) {
             UserDataField fieldName = UserDataField.valueOf(fieldMapping.getFieldName());
             return extractionService.extractFromHeader(payload, fieldName);
