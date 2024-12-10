@@ -55,7 +55,7 @@ namespace ReadMe
               {
                 string serializaedHars = JsonConvert.SerializeObject(this.harQueue);
                 ReadMeApiCaller readmeApiCaller = new ReadMeApiCaller(serializaedHars, configValues.apiKey);
-                readmeApiCaller.SendHarObjToReadMeApi();
+                readmeApiCaller.SendHarObjToReadMeApi(configValues.options.fireAndForget);
                 this.harQueue.Clear();
               }
             }
@@ -124,6 +124,11 @@ namespace ReadMe
       if (options.GetSection("baseLogUrl").Value != null)
       {
         optionsObj.baseLogUrl = options.GetSection("baseLogUrl").Value;
+      }
+
+      if (options.GetSection("fireAndForget").Value != null)
+      {
+        optionsObj.fireAndForget = bool.Parse(options.GetSection("fireAndForget").Value);
       }
 
       configValues.options = optionsObj;
