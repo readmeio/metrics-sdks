@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using ReadMe.HarJsonObjectModels;
 using ReadMe.HarJsonTranslationLogics;
 
@@ -11,12 +12,14 @@ namespace ReadMe
   {
     private readonly RequestDelegate next;
     private readonly IConfiguration configuration;
+    private readonly List<Root> harQueue;
     private Group group;
 
     public Metrics(RequestDelegate next, IConfiguration configuration)
     {
       this.next = next;
       this.configuration = configuration;
+      this.harQueue = new List<Root>();
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -44,9 +47,18 @@ namespace ReadMe
             context.Request.EnableBuffering();
             HarJsonBuilder harJsonBuilder = new HarJsonBuilder(this.next, context, this.configuration, configValues);
 
-            string harJsonObj = await harJsonBuilder.BuildHar();
-            ReadMeApiCaller readmeApiCaller = new ReadMeApiCaller(harJsonObj, configValues.apiKey);
-            readmeApiCaller.SendHarObjToReadMeApi(configValues.options.fireAndForget);
+            var harObj = await harJsonBuilder.BuildHar();
+            lock (this.harQueue)
+            {
+              this.harQueue.Add(harObj);
+              if (this.harQueue.Count >= configValues.options.bufferLength)
+              {
+                string serializaedHars = JsonConvert.SerializeObject(this.harQueue);
+                ReadMeApiCaller readmeApiCaller = new ReadMeApiCaller(serializaedHars, configValues.apiKey);
+                readmeApiCaller.SendHarObjToReadMeApi(configValues.options.fireAndForget);
+                this.harQueue.Clear();
+              }
+            }
           }
           else
           {

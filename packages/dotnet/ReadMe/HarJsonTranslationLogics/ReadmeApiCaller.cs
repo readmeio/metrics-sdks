@@ -7,12 +7,12 @@ namespace ReadMe.HarJsonTranslationLogics
 {
   class ReadMeApiCaller
   {
-    private readonly string harJsonObject;
+    private readonly string harJsonObjects;
     private readonly string apiKey;
 
-    public ReadMeApiCaller(string harJsonObject, string apiKey)
+    public ReadMeApiCaller(string harJsonObjects, string apiKey)
     {
-      this.harJsonObject = harJsonObject;
+      this.harJsonObjects = harJsonObjects;
       this.apiKey = apiKey;
     }
 
@@ -25,7 +25,7 @@ namespace ReadMe.HarJsonTranslationLogics
         request.AddHeader("Content-Type", "application/json");
         string apiKey = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(this.apiKey + ":"));
         request.AddHeader("Authorization", apiKey);
-        request.AddParameter("application/json", this.harJsonObject, ParameterType.RequestBody);
+        request.AddParameter("application/json", this.harJsonObjects, ParameterType.RequestBody);
         if (fireAndForget)
         {
           client.ExecuteAsync(request);
