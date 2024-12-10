@@ -16,7 +16,7 @@ namespace ReadMe.HarJsonTranslationLogics
       this.apiKey = apiKey;
     }
 
-    public void SendHarObjToReadMeApi()
+    public void SendHarObjToReadMeApi(bool fireAndForget)
     {
       try
       {
@@ -26,7 +26,14 @@ namespace ReadMe.HarJsonTranslationLogics
         string apiKey = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(this.apiKey + ":"));
         request.AddHeader("Authorization", apiKey);
         request.AddParameter("application/json", this.harJsonObject, ParameterType.RequestBody);
-        client.ExecuteAsync(request);
+        if (fireAndForget)
+        {
+          client.ExecuteAsync(request);
+        }
+        else
+        {
+          client.Execute(request);
+        }
       }
       catch (Exception)
       {
