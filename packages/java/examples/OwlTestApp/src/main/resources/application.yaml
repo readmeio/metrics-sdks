@@ -1,0 +1,12 @@
+readme:
+  readmeApiKey: ${README_API_KEY}
+  userdata:
+    apiKey:
+      source: header
+      fieldName: X-User-Name
+    email:
+      source: header
+      fieldName: X-User-Email
+    label:
+      source: header
+      fieldName: X-User-Id

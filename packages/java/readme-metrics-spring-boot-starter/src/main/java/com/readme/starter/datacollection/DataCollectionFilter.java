@@ -7,6 +7,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
@@ -23,21 +24,29 @@ import java.io.IOException;
  * compatibility with modern Servlet API versions.</p>
  */
 @AllArgsConstructor
+@Slf4j
 public class DataCollectionFilter implements Filter {
 
-    private RequestDataCollector<HttpServletDataPayload> requestDataCollector;
+    private RequestDataCollector<ServletDataPayloadAdapter> requestDataCollector;
 
-    private UserDataCollector<HttpServletDataPayload> userDataCollector;
+    private UserDataCollector<ServletDataPayloadAdapter> userDataCollector;
 
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        HttpServletDataPayload payload =
-                new HttpServletDataPayload((HttpServletRequest) request, (HttpServletResponse) response);
+        try {
+            ServletDataPayloadAdapter payload =
+                    new ServletDataPayloadAdapter((HttpServletRequest) request,
+                            (HttpServletResponse) response);
+            UserData userData = userDataCollector.collect(payload);
 
-        UserData userData = userDataCollector.collect(payload);
-        //TODO: Validate user data. Collect request data only if user data is valid ?
-        requestDataCollector.collect(payload, userData);
+            //TODO: Validate user data. Collect request data only if user data is valid ?
+            requestDataCollector.collect(payload, userData);
+        } catch (Exception e){
+            log.error("Error occurred while processing request by readme metrics-sdk: {}", e.getMessage());
+        } finally {
+            chain.doFilter(request, response);
+        }
     }
 
 }

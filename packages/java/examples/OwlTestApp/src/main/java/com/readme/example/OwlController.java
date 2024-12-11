@@ -1,5 +1,6 @@
 package com.readme.example;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -13,6 +14,9 @@ import java.util.UUID;
 @RestController
 public class OwlController {
 
+    @Value("${readme.readmeApiKey}")
+    private String readmeApiKey;
+
     private final Map<String, String> owlStorage = new HashMap<>();
 
     public OwlController() {
@@ -21,7 +25,7 @@ public class OwlController {
 
     @GetMapping("/owl/{id}")
     public String getOwlById(@PathVariable String id) {
-        return "Owl with id " + id;
+        return "Owl with id " + id + " and key is " + readmeApiKey;
     }
 
     @GetMapping("/owls")

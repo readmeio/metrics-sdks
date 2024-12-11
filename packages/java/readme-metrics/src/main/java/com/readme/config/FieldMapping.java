@@ -1,6 +1,9 @@
 package com.readme.config;
 
-import lombok.Data; /**
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+/**
  * Represents a mapping source for extracting data from HTTP requests.
  * <p>
  * A FieldMapping consists of a source type (e.g., header, jwtClaim, or jsonBody)
@@ -8,6 +11,7 @@ import lombok.Data; /**
  * </p>
  */
 @Data
+@AllArgsConstructor
 public class FieldMapping {
 
     private String source;

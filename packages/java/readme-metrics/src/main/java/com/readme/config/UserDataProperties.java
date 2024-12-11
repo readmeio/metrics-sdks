@@ -5,7 +5,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class UserDataConfig {
+public class UserDataProperties {
 
     FieldMapping apiKey;
     FieldMapping email;

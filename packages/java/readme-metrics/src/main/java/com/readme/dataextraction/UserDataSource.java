@@ -7,12 +7,12 @@ public enum UserDataSource {
 
     HEADER("header"),
     BODY("jsonBody"),
-    JWT("jwtClaim");
+    JWT("jwt");
 
-    private final String source;
+    private final String value;
 
-    UserDataSource(String source) {
-        this.source = source;
+    UserDataSource(String value) {
+        this.value = value;
     }
 
 }

@@ -19,27 +19,27 @@ public interface UserDataExtractor<T> {
      * Extracts requested data from request header
      *
      * @param payload the type of request object from which user data will be extracted.
-     * @param fieldName is the enumeration to identify which field to extract
+     * @param fieldName is the source field name to extract the data
      * @return extracted value as a String
      */
-    String extractFromHeader(T payload, UserDataField fieldName);
+    String extractFromHeader(T payload, String fieldName);
 
     /**
      * Extracts requested data from JSON body
      *
      * @param payload the type of request object from which user data will be extracted.
-     * @param fieldName is the enumeration to identify which field to extract
+     * @param fieldName is the source field name to extract the data
      * @return extracted value as a String
      */
-    String extractFromBody(T payload, UserDataField fieldName);
+    String extractFromBody(T payload, String fieldName);
 
     /**
      * Extracts requested data from JWT token
      *
      * @param payload the type of request object from which user data will be extracted.
-     * @param fieldName is the enumeration to identify which field to extract
+     * @param fieldName is the source field name to extract the data
      * @return extracted value as a String
      */
-    String extractFromJwt(T payload, UserDataField fieldName);
+    String extractFromJwt(T payload, String fieldName);
 
 }
