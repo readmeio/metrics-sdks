@@ -2,6 +2,7 @@ package com.readme.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Represents a mapping source for extracting data from HTTP requests.
@@ -12,6 +13,7 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class FieldMapping {
 
     private String source;

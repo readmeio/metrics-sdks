@@ -2,11 +2,26 @@ readme:
   readmeApiKey: ${README_API_KEY}
   userdata:
     apiKey:
-      source: header
-      fieldName: X-User-Name
+      source: jwt
+      fieldName: name
     email:
-      source: header
-      fieldName: X-User-Email
+      source: jwt
+      fieldName: aud
     label:
-      source: header
-      fieldName: X-User-Id
+      source: jwt
+      fieldName: user_id
+
+#readme:
+#  readmeApiKey: ${README_API_KEY}
+#  userdata:
+#    apiKey:
+#      source: header
+#      fieldName: X-User-Name
+#    email:
+#      source: header
+#      fieldName: X-User-Email
+#    label:
+#      source: header
+#      fieldName: X-User-Id
+
+

@@ -1,19 +1,24 @@
 package com.readme.starter.datacollection.userinfo;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.readme.dataextraction.UserDataExtractor;
 import com.readme.starter.datacollection.ServletDataPayloadAdapter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import com.auth0.jwt.JWT;
+
 
 import java.util.Map;
+
 
 @AllArgsConstructor
 @Component
 @Slf4j
 public class ServletUserDataExtractor implements UserDataExtractor<ServletDataPayloadAdapter> {
 
-    //TODO: Consider possibility to extract the data from the header multiple value
+    //TODO: Consider possibility to extract the data from the header`s multiple value
+    // Is there any practical sense?
     @Override
     public String extractFromHeader(ServletDataPayloadAdapter payload, String fieldName) {
         Map<String, String> requestHeaders = payload.getRequestHeaders();
@@ -31,7 +36,24 @@ public class ServletUserDataExtractor implements UserDataExtractor<ServletDataPa
 
     @Override
     public String extractFromJwt(ServletDataPayloadAdapter payload, String fieldName) {
-        return "Field value from jwt";
+        try {
+            Map<String, String> requestHeaders = payload.getRequestHeaders();
+            String jwtToken = requestHeaders.get("authorization");
+
+            if (jwtToken == null) {
+                log.error("The JWT token is not provided as Authorization header.");
+                return "";
+            }
+            if (jwtToken.startsWith("Bearer ")) {
+                jwtToken = jwtToken.substring(7);
+            }
+
+            DecodedJWT decodedJWT = JWT.decode(jwtToken);
+            return decodedJWT.getClaim(fieldName).asString();
+        } catch (Exception e) {
+            log.error("The Authorization token is invalid. {}", e.getMessage());
+        }
+        return "";
     }
 
 }

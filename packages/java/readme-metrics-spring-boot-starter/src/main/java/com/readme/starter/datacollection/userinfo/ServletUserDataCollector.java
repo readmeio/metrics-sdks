@@ -9,6 +9,7 @@ import com.readme.starter.config.UserDataProperties;
 import com.readme.starter.datacollection.ServletDataPayloadAdapter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 /**
@@ -107,7 +108,7 @@ public class ServletUserDataCollector implements UserDataCollector<ServletDataPa
     private void validate(ServletDataPayloadAdapter payload, String fieldName) {
         String fieldValue = extractionService.extractFromHeader(payload, fieldName);
         if (fieldValue == null || fieldValue.isEmpty()) {
-            log.error("header {} value extraction is not configured properly. The value is empty", fieldName);
+            log.error("The {} extraction is not configured properly. The value is empty", fieldName);
         }
     }
 

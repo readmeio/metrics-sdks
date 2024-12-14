@@ -47,10 +47,8 @@ class ServletUserDataCollectorTest {
         when(extractionService.extractFromBody(payload, "email")).thenReturn("test@example.com");
         when(extractionService.extractFromJwt(payload, "label")).thenReturn("user-label");
 
-        // Act
         UserData result = userDataCollector.collect(payload);
 
-        // Assert
         assertThat(result).isNotNull();
         assertThat(result.getApiKey()).isEqualTo("test-api-key");
         assertThat(result.getEmail()).isEqualTo("test@example.com");
@@ -59,13 +57,10 @@ class ServletUserDataCollectorTest {
 
     @Test
     void collect_MissingApiKeyConfiguration() {
-        // Arrange
         when(userDataProperties.getApiKey()).thenReturn(null);
 
-        // Act
         UserData result = userDataCollector.collect(payload);
 
-        // Assert
         assertThat(result).isNotNull();
         assertThat(result.getApiKey()).isEmpty();
         verify(extractionService, never()).extractFromHeader(any(), anyString());
@@ -73,16 +68,13 @@ class ServletUserDataCollectorTest {
 
     @Test
     void collect_EmptyHeaderValue() {
-        // Arrange
         FieldMapping apiKeyMapping = new FieldMapping(UserDataSource.HEADER.getValue(), "x-api-key");
         when(userDataProperties.getApiKey()).thenReturn(apiKeyMapping);
 
         when(extractionService.extractFromHeader(payload, "x-api-key")).thenReturn("");
 
-        // Act
         UserData result = userDataCollector.collect(payload);
 
-        // Assert
         assertThat(result).isNotNull();
         assertThat(result.getApiKey()).isEmpty();
         verify(extractionService).extractFromHeader(payload, "x-api-key");
@@ -90,24 +82,19 @@ class ServletUserDataCollectorTest {
 
     @Test
     void collect_UnknownFieldSource() {
-        // Arrange
         FieldMapping unknownMapping = new FieldMapping("UNKNOWN", "field");
         when(userDataProperties.getApiKey()).thenReturn(unknownMapping);
 
-        // Act
         UserData result = userDataCollector.collect(payload);
 
-        // Assert
         assertThat(result).isNotNull();
         assertThat(result.getApiKey()).isEmpty();
     }
 
     @Test
     void collect_NullPayload() {
-        // Act
         UserData result = userDataCollector.collect(null);
 
-        // Assert
         assertThat(result).isNotNull();
         assertThat(result.getApiKey()).isEmpty();
         assertThat(result.getEmail()).isEmpty();

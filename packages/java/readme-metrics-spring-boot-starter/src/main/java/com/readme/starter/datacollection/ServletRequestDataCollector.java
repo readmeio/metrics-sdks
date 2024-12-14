@@ -19,6 +19,6 @@ public class ServletRequestDataCollector implements RequestDataCollector<Servlet
         String readmeAPIKey = readmeProperties.getReadmeApiKey();
 
         log.info(">>>>>>>> Sending data to the server with key {}", readmeAPIKey);
-        log.info(">>>>>>>> and user data data: {}", userData);
+        log.info(">>>>>>>> and user data: {}", userData);
     }
 }
