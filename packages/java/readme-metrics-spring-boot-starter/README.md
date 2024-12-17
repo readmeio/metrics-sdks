@@ -20,13 +20,13 @@ Each field (`apiKey`, `email`, `label`) requires two sub-properties:
 ### Example Configuration (YAML)
 ```yaml
 readme:
-  readmeApiKey: a11b33b2c44de78f7a
+  readmeApiKey: ${readmeApiKey}
   userdata:
     apiKey:
       source: header
       fieldName: X-User-Id
     email:
-      source: jwtClaim
+      source: jwt
       fieldName: aud
     label:
       source: jsonBody
