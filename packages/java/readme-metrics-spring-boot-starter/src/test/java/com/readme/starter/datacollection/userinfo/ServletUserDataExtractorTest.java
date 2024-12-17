@@ -2,6 +2,7 @@ package com.readme.starter.datacollection.userinfo;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.readme.starter.datacollection.ServletDataPayloadAdapter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -27,9 +29,10 @@ class ServletUserDataExtractorTest {
     @Mock
     private ServletDataPayloadAdapter payload;
 
+
     @BeforeEach
     void setUp() {
-        extractor = new ServletUserDataExtractor();
+        extractor = new ServletUserDataExtractor(new ObjectMapper());
     }
 
     @Test
@@ -38,7 +41,6 @@ class ServletUserDataExtractorTest {
         String expectedValue = "Parrot";
         Map<String, String> headers = Map.of(headerName, expectedValue);
         Mockito.when(payload.getRequestHeaders()).thenReturn(headers);
-
         String result = extractor.extractFromHeader(payload, headerName);
 
         assertEquals(expectedValue, result);
@@ -50,7 +52,6 @@ class ServletUserDataExtractorTest {
         String expectedValue = "";
         Map<String, String> headers = Map.of();
         Mockito.when(payload.getRequestHeaders()).thenReturn(headers);
-
         String result = extractor.extractFromHeader(payload, headerName);
 
         assertEquals(expectedValue, result);
@@ -62,7 +63,6 @@ class ServletUserDataExtractorTest {
         String expectedValue = "Parrot,Owl,Chicken";
         Map<String, String> headers = Map.of(headerName, expectedValue);
         Mockito.when(payload.getRequestHeaders()).thenReturn(headers);
-
         String result = extractor.extractFromHeader(payload, headerName);
 
         assertEquals(expectedValue, result);
@@ -79,7 +79,6 @@ class ServletUserDataExtractorTest {
                 .sign(signingKeyPair);
         Map<String, String> headers = Map.of("authorization", "Bearer " + jwt);
         Mockito.when(payload.getRequestHeaders()).thenReturn(headers);
-
         String result = extractor.extractFromJwt(payload, claimName);
 
         assertEquals(expectedValue, result);
@@ -96,7 +95,6 @@ class ServletUserDataExtractorTest {
                 .sign(signingKeyPair);
         Map<String, String> headers = Map.of("authorization", jwt);
         Mockito.when(payload.getRequestHeaders()).thenReturn(headers);
-
         String result = extractor.extractFromJwt(payload, claimName);
 
         assertEquals(expectedValue, result);
@@ -109,7 +107,6 @@ class ServletUserDataExtractorTest {
 
         Map<String, String> headers = Map.of();
         Mockito.when(payload.getRequestHeaders()).thenReturn(headers);
-
         String result = extractor.extractFromJwt(payload, claimName);
 
         assertEquals(expectedValue, result);
@@ -122,48 +119,49 @@ class ServletUserDataExtractorTest {
 
         Map<String, String> headers = Map.of("authorization", "Bearer invalidToken");
         Mockito.when(payload.getRequestHeaders()).thenReturn(headers);
-
         String result = extractor.extractFromJwt(payload, claimName);
 
         assertEquals(expectedValue, result);
     }
-//
-//    @Test
-//    void extractFromBody_happyPath() throws IOException {
-//        String fieldName = "userName";
-//        String expectedValue = "Owl";
-//
-//        String body = "{\"" + fieldName + "\":\"" + expectedValue + "\",\"anotherField\":\"anotherValue\"}";
-//        Mockito.when(payload.getRequestBody()).thenReturn(body);
-//
-//        String result = extractor.extractFromBody(payload, fieldName);
-//
-//        assertEquals(expectedValue, result);
-//    }
-//
-//    @Test
-//    void extractFromBody_fieldNotFound() throws IOException {
-//        String fieldName = "userName";
-//        String expectedValue = "";
-//
-//        String body = "{\"anotherField\":\"anotherValue\"}";
-//        Mockito.when(payload.getRequestBody()).thenReturn(body);
-//
-//        String result = extractor.extractFromBody(payload, fieldName);
-//
-//        assertEquals("", result);
-//    }
-//
-//    @Test
-//    void extractFromBody_invalidJson() throws IOException {
-//        String body = "invalid-json-body";
-//        Mockito.when(payload.getRequestBody()).thenReturn(body);
-//
-//        String result = extractor.extractFromBody(payload, "fieldName");
-//
-//        assertEquals("", result);
-//    }
-//
+
+    @Test
+    void extractFromBody_happyPath() throws IOException {
+        String fieldName = "userName";
+        String expectedValue = "Owl";
+
+        String body = "{\"" + fieldName + "\":\"" + expectedValue + "\",\"anotherField\":\"anotherValue\"}";
+        Mockito.when(payload.getRequestBody()).thenReturn(body);
+        Mockito.when(payload.getRequestContentType()).thenReturn("application/json");
+        String result = extractor.extractFromBody(payload, fieldName);
+
+        assertEquals(expectedValue, result);
+    }
+
+    @Test
+    void extractFromBody_fieldNotFound() {
+        String fieldName = "userName";
+        String expectedValue = "";
+
+        String body = "{\"anotherField\":\"anotherValue\"}";
+        Mockito.when(payload.getRequestBody()).thenReturn(body);
+        Mockito.when(payload.getRequestContentType()).thenReturn("application/json");
+        String result = extractor.extractFromBody(payload, fieldName);
+
+        assertEquals(expectedValue, result);
+    }
+
+    @Test
+    void extractFromBody_invalidJson() {
+        String body = "invalid-json-body";
+        String expectedValue = "";
+
+        Mockito.when(payload.getRequestBody()).thenReturn(body);
+        Mockito.when(payload.getRequestContentType()).thenReturn("application/json");
+        String result = extractor.extractFromBody(payload, "fieldName");
+
+        assertEquals(expectedValue, result);
+    }
+
 
     private Algorithm createSigningKeyPair() throws NoSuchAlgorithmException {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");

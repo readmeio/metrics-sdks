@@ -58,7 +58,6 @@ class ServletUserDataCollectorTest {
     @Test
     void collect_MissingApiKeyConfiguration() {
         when(userDataProperties.getApiKey()).thenReturn(null);
-
         UserData result = userDataCollector.collect(payload);
 
         assertThat(result).isNotNull();
@@ -70,7 +69,6 @@ class ServletUserDataCollectorTest {
     void collect_EmptyHeaderValue() {
         FieldMapping apiKeyMapping = new FieldMapping(UserDataSource.HEADER.getValue(), "x-api-key");
         when(userDataProperties.getApiKey()).thenReturn(apiKeyMapping);
-
         when(extractionService.extractFromHeader(payload, "x-api-key")).thenReturn("");
 
         UserData result = userDataCollector.collect(payload);

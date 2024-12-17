@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -31,6 +34,9 @@ class ServletDataPayloadAdapterTest {
         adapter = new ServletDataPayloadAdapter(requestMock, responseMock);
     }
 
+
+    // --------------------------- REQUEST --------------------------------
+
     @Test
     void getRequestHeaders_HappyPath_ReturnsAllHeaders() {
         String usernameHeader = "X-User-Name".toLowerCase();
@@ -51,12 +57,44 @@ class ServletDataPayloadAdapterTest {
     @Test
     void getRequestHeaders_NoHeaders_ReturnsEmptyMap() {
         when(requestMock.getHeaderNames()).thenReturn(Collections.emptyEnumeration());
-
         Map<String, String> headers = adapter.getRequestHeaders();
+
         assertTrue(headers.isEmpty());
     }
 
+    @Test
+    void getRequestMethod_HappyPath_ReturnsCorrectMethod() {
+        when(requestMock.getMethod()).thenReturn("POST");
+        String method = adapter.getRequestMethod();
 
+        assertEquals("POST", method);
+    }
+
+    @Test
+    void getRequestContentType_HappyPath_ReturnsContentType() {
+        when(requestMock.getContentType()).thenReturn("application/json");
+        String contentType = adapter.getRequestContentType();
+
+        assertEquals("application/json", contentType);
+    }
+
+    @Test
+    void getRequestBody_HappyPath_ReturnsRequestBody() throws IOException {
+        String requestBody = "{\"bird\": \"Owl\"}";
+        BufferedReader bufferedReader = new BufferedReader(new StringReader(requestBody));
+        when(requestMock.getReader()).thenReturn(bufferedReader);
+        String result = adapter.getRequestBody();
+
+        assertEquals(requestBody, result);
+    }
+
+    @Test
+    void getRequestBody_WhenIOExceptionOccurs_ReturnsEmptyString() throws IOException {
+        when(requestMock.getReader()).thenThrow(new IOException("Failed to read request"));
+        String result = adapter.getRequestBody();
+
+        assertEquals("", result);
+    }
 
     // --------------------------- RESPONSE --------------------------------
     @Test
@@ -75,11 +113,24 @@ class ServletDataPayloadAdapterTest {
         assertEquals("parrot@birdfact0ry.abc", headers.get(userIdHeader));
     }
 
+    // TODO implement this, once it fails
+    @Test
+    void getResponseBody_ThrowsUnsupportedOperationException() {
+        UnsupportedOperationException exception = assertThrows(
+                UnsupportedOperationException.class,
+                adapter::getResponseBody
+        );
+
+        assertEquals("Not implemented yet", exception.getMessage());
+    }
+
     @Test
     void getResponseHeaders_NoHeaders_ReturnsEmptyMap() {
         when(responseMock.getHeaderNames()).thenReturn(Collections.emptyList());
-
         Map<String, String> headers = adapter.getResponseHeaders();
+
         assertTrue(headers.isEmpty());
     }
+
+
 }

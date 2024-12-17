@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -20,8 +21,25 @@ public class ServletDataPayloadAdapter implements DataPayloadAdapter {
     //TODO Do I need a separate method to get request parameters?
 
     @Override
+    public String getRequestMethod() {
+        return request.getMethod();
+    }
+
+    @Override
+    public String getRequestContentType() {
+        return request.getContentType();
+    }
+
+    @Override
     public String getRequestBody() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        try {
+            return request.getReader()
+                    .lines()
+                    .collect(Collectors.joining(System.lineSeparator()));
+        } catch (IOException e) {
+            log.error("Error when trying to get request body: {}", e.getMessage());
+        }
+        return "";
     }
 
     /**

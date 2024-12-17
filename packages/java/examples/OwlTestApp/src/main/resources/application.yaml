@@ -2,14 +2,27 @@ readme:
   readmeApiKey: ${README_API_KEY}
   userdata:
     apiKey:
-      source: jsonBody
-      fieldName: /owl-creator/name
+      source: header
+      fieldName: X-User-Name
     email:
-      source: jsonBody
-      fieldName: /owl-creator/contacts/email
+      source: header
+      fieldName: X-User-Email
     label:
-      source: jsonBody
-      fieldName: owl-creator/label
+      source: header
+      fieldName: X-User-Id
+
+#readme:
+#  readmeApiKey: ${README_API_KEY}
+#  userdata:
+#    apiKey:
+#      source: jsonBody
+#      fieldName: /owl-creator/name
+#    email:
+#      source: jsonBody
+#      fieldName: /owl-creator/contacts/email
+#    label:
+#      source: jsonBody
+#      fieldName: owl-creator/label
 
 #readme:
 #  readmeApiKey: ${README_API_KEY}
@@ -24,17 +37,5 @@ readme:
 #      source: jwt
 #      fieldName: user_id
 
-#readme:
-#  readmeApiKey: ${README_API_KEY}
-#  userdata:
-#    apiKey:
-#      source: header
-#      fieldName: X-User-Name
-#    email:
-#      source: header
-#      fieldName: X-User-Email
-#    label:
-#      source: header
-#      fieldName: X-User-Id
 
 
