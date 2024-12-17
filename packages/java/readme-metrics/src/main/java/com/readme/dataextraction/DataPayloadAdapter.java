@@ -16,6 +16,9 @@ import java.util.Map;
  */
 public interface DataPayloadAdapter {
 
+    String getRequestMethod();
+    String getRequestContentType();
+
     String getRequestBody();
     Map<String, String> getRequestHeaders();
 

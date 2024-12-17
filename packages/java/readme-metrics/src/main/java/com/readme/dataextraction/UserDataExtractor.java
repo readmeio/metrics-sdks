@@ -31,7 +31,7 @@ public interface UserDataExtractor<T> {
      * @param fieldName is the source field name to extract the data
      * @return extracted value as a String
      */
-    String extractFromBody(T payload, String fieldName);
+    String extractFromBody(T payload, String fieldPath);
 
     /**
      * Extracts requested data from JWT token
