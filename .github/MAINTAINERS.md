@@ -22,7 +22,7 @@ To publish a new version of the Ruby [package](https://rubygems.org/gems/readme-
 
 If you're not a maintainer of `readme-metrics` on [PyPI](https://pypi.org), [register for an account](https://pypi.org/account/register/), enable two-factor auth on your [account settings](https://pypi.org/manage/account/), and ask someone to add you as a maintainer.
 
-You may also want to create a `.pypirc` file in your home directory ([example](https://gist.github.com/RyanGWU82/893fb63e6d182f90ef227fd1fd4e9da5)).
+You may also want to create a `.pypirc` file in your home directory ([example](https://gist.github.com/RyanGWU82/893fb63e6d182f90ef227fd1fd4e9da5)). `.pypirc` now uses API keys so you will need to generate one. See PyPI's [help guide](https://pypi.org/help/) on how to generate it.
 
 To publish a new version:
 
@@ -40,11 +40,12 @@ NEW_VERSION="x.x.x"; sed -i '' "s/\(__version__ = \)\"\([^\"]*\)\"/\1\"$NEW_VERS
    - If you get errors about `invalid command 'bdist_wheel'`, install the wheel package: `pip3 install wheel`
 5. `python3 -m twine upload dist/*`
    - If you get errors about `twine` not being installed, install it with `pip3 install twine`.
+   - If you get errors about `setuptools` not being installed, install it with `pip3 install setuptools`.
    - On the first run you'll be asked to log into PyPi, so if you don't have access to `readme-metrics` there ask someone to hook you up with access.
 
 ### .NET
 
-If you're not a maintainer of [`ReadMe.Metrics`](https://www.nuget.org/packages/ReadMe.Metrics/) on [NuGet](https://www.nuget.org/), [register for a Microsoft account by going through this flow](https://www.nuget.org/users/account/LogOn), enable two-factor auth on your [account settings](https://account.live.com/proofs/manage/additional), and ask someone to add you as a maintainer.
+If you're not a maintainer of [`ReadMe.Metrics`](https://www.nuget.org/packages/ReadMe.Metrics/) on [NuGet](https://www.nuget.org/), [register for a Microsoft account by going through this flow](https://www.nuget.org/users/account/LogOn), enable two-factor auth on your [account settings](https://account.live.com/proofs/manage/additional), and ask someone to add you as a maintainer. Also ensure that you have [.Net CLI](https://dotnet.microsoft.com/en-us/download) installed.
 
 To publish a new version:
 
@@ -66,7 +67,7 @@ NEW_VERSION="x.x.x"; sed -i '' "s/\(Version = \)\"\([^\"]*\)\"/\1\"$NEW_VERSION\
 6. Publish!
 
 ```sh
-dotnet nuget push ./bin/Debug/ReadMe.Metrics.<version>.nupkg --api-key <apiKey> --source https://api.nuget.org/v3/index.json
+dotnet nuget push ./bin/Release/ReadMe.Metrics.<version>.nupkg --api-key <apiKey> --source https://api.nuget.org/v3/index.json
 ```
 
 ### Tag-based release management
