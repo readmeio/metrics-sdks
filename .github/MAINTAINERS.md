@@ -22,7 +22,7 @@ To publish a new version of the Ruby [package](https://rubygems.org/gems/readme-
 
 If you're not a maintainer of `readme-metrics` on [PyPI](https://pypi.org), [register for an account](https://pypi.org/account/register/), enable two-factor auth on your [account settings](https://pypi.org/manage/account/), and ask someone to add you as a maintainer.
 
-You may also want to create a `.pypirc` file in your home directory ([example](https://gist.github.com/RyanGWU82/893fb63e6d182f90ef227fd1fd4e9da5)).  `.pypirc` now uses API keys so you will need to generate one.  See PyPI's [help guide](https://pypi.org/help/) on how to generate  it.
+You may also want to create a `.pypirc` file in your home directory ([example](https://gist.github.com/RyanGWU82/893fb63e6d182f90ef227fd1fd4e9da5)). `.pypirc` now uses API keys so you will need to generate one. See PyPI's [help guide](https://pypi.org/help/) on how to generate it.
 
 To publish a new version:
 
@@ -45,7 +45,7 @@ NEW_VERSION="x.x.x"; sed -i '' "s/\(__version__ = \)\"\([^\"]*\)\"/\1\"$NEW_VERS
 
 ### .NET
 
-If you're not a maintainer of [`ReadMe.Metrics`](https://www.nuget.org/packages/ReadMe.Metrics/) on [NuGet](https://www.nuget.org/), [register for a Microsoft account by going through this flow](https://www.nuget.org/users/account/LogOn), enable two-factor auth on your [account settings](https://account.live.com/proofs/manage/additional), and ask someone to add you as a maintainer.  Also ensure that you have [.Net CLI](https://dotnet.microsoft.com/en-us/download) installed.
+If you're not a maintainer of [`ReadMe.Metrics`](https://www.nuget.org/packages/ReadMe.Metrics/) on [NuGet](https://www.nuget.org/), [register for a Microsoft account by going through this flow](https://www.nuget.org/users/account/LogOn), enable two-factor auth on your [account settings](https://account.live.com/proofs/manage/additional), and ask someone to add you as a maintainer. Also ensure that you have [.Net CLI](https://dotnet.microsoft.com/en-us/download) installed.
 
 To publish a new version:
 
