@@ -3,7 +3,7 @@ package com.readme.starter.config;
 import com.readme.config.FieldMapping;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 /**
  * Configuration properties for monitoring library.
@@ -14,12 +14,12 @@ import org.springframework.context.annotation.Configuration;
  * (e.g., header, jwtClaim, or jsonBody) and its corresponding value.
  * </p>
  */
-@Configuration
-@ConfigurationProperties(prefix = "readme.userdata")
-@Data
-public class MonitoringProperties {
 
-    private String readmeApiKey;
+@Data
+@Component
+@ConfigurationProperties(prefix = "readme.userdata")
+public class UserDataProperties {
+
     private FieldMapping apiKey;
     private FieldMapping email;
     private FieldMapping label;
