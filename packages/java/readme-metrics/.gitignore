@@ -5,10 +5,7 @@ target/
 ../*
 
 ### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -27,3 +24,4 @@ target/
 
 ### Mac OS ###
 *.DS_Store
+/.idea/

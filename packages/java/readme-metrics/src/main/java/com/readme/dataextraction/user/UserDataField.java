@@ -1,4 +1,4 @@
-package com.readme.dataextraction;
+package com.readme.dataextraction.user;
 
 import lombok.Getter;
 

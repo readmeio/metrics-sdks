@@ -18,11 +18,16 @@ public interface DataPayloadAdapter {
 
     String getRequestMethod();
     String getRequestContentType();
-
-    String getRequestBody();
     Map<String, String> getRequestHeaders();
+    String getRequestBody();
+    String getRoutePath();
+    String getAddress();
+    String getProtocol();
+    String getUrl();
 
-    String getResponseBody();
+
     Map<String, String> getResponseHeaders();
-
+    String getResponseBody();
+    Integer getStatusCode();
+    String getStatusMessage();
 }

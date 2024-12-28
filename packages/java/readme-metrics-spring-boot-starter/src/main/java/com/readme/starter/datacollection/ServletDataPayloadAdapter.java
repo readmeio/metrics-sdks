@@ -6,8 +6,12 @@ import lombok.AllArgsConstructor;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -15,8 +19,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ServletDataPayloadAdapter implements DataPayloadAdapter {
 
-    private HttpServletRequest request;
-    private HttpServletResponse response;
+    private ContentCachingRequestWrapper request;
+    private ContentCachingResponseWrapper response;
 
     //TODO Do I need a separate method to get request parameters?
 
@@ -33,13 +37,31 @@ public class ServletDataPayloadAdapter implements DataPayloadAdapter {
     @Override
     public String getRequestBody() {
         try {
-            return request.getReader()
-                    .lines()
-                    .collect(Collectors.joining(System.lineSeparator()));
-        } catch (IOException e) {
+            return request.getContentAsString();
+        } catch (Exception e) {
             log.error("Error when trying to get request body: {}", e.getMessage());
         }
         return "";
+    }
+
+    @Override
+    public String getRoutePath() {
+        return request.getPathInfo();
+    }
+
+    @Override
+    public String getAddress() {
+        return request.getRemoteAddr();
+    }
+
+    @Override
+    public String getProtocol() {
+        return request.getProtocol();
+    }
+
+    @Override
+    public String getUrl() {
+        return request.getRequestURL().toString();
     }
 
     /**
@@ -86,7 +108,24 @@ public class ServletDataPayloadAdapter implements DataPayloadAdapter {
 
     @Override
     public String getResponseBody() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        try {
+            byte[] contentAsByteArray = response.getContentAsByteArray();
+            return new String(contentAsByteArray);
+        } catch (Exception e) {
+            log.error("Error when trying to get response body: {}", e.getMessage());
+        }
+        return "";
+    }
+
+    @Override
+    public Integer getStatusCode() {
+        return response.getStatus();
+    }
+
+    @Override
+    public String getStatusMessage() {
+        HttpStatus httpStatus = HttpStatus.resolve(response.getStatus());
+        return httpStatus != null ? httpStatus.getReasonPhrase() : "";
     }
 
     /**

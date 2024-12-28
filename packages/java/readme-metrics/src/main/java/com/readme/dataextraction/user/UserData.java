@@ -1,4 +1,4 @@
-package com.readme.domain;
+package com.readme.dataextraction.user;
 
 import lombok.Builder;
 import lombok.Value;

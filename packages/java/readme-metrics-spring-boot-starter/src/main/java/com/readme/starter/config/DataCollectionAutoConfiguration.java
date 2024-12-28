@@ -1,11 +1,21 @@
 package com.readme.starter.config;
 
-import com.readme.dataextraction.RequestDataCollector;
-import com.readme.dataextraction.UserDataCollector;
+import com.readme.config.CoreConfig;
+
+import com.readme.dataextraction.payload.RequestDataCollector;
+import com.readme.dataextraction.user.UserDataCollector;
+import com.readme.dataextraction.user.UserDataExtractor;
+import com.readme.datatransfer.DataSender;
+import com.readme.datatransfer.HttpDataSender;
+import com.readme.datatransfer.PayloadDataDispatcher;
+import com.readme.datatransfer.har.OutgoingLogConstructor;
 import com.readme.starter.datacollection.DataCollectionFilter;
 import com.readme.starter.datacollection.ServletDataPayloadAdapter;
+import com.readme.starter.datacollection.userinfo.ServletUserDataCollector;
 import lombok.AllArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import lombok.extern.slf4j.Slf4j;
+import okhttp3.OkHttpClient;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -24,20 +34,52 @@ import org.springframework.core.Ordered;
  * </ul>
  */
 @Configuration
-@ConditionalOnClass({UserDataProperties.class})
 @ComponentScan(basePackages = {"com.readme.starter"})
 @AllArgsConstructor
+@Slf4j
 public class DataCollectionAutoConfiguration {
+
+    private ReadmeConfigurationProperties readmeProperties;
 
     @Bean
     public FilterRegistrationBean<DataCollectionFilter> metricsFilter(
             RequestDataCollector<ServletDataPayloadAdapter> requestDataCollector,
-            UserDataCollector<ServletDataPayloadAdapter> userDataCollector) {
+            UserDataCollector<ServletDataPayloadAdapter> userDataCollector,
+            PayloadDataDispatcher payloadDataDispatcher) {
         FilterRegistrationBean<DataCollectionFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new DataCollectionFilter(requestDataCollector, userDataCollector));
+        registrationBean.setFilter(new DataCollectionFilter(userDataCollector, requestDataCollector, payloadDataDispatcher));
         registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         registrationBean.addUrlPatterns("/*");
         return registrationBean;
     }
 
+    @Bean
+    @ConditionalOnMissingBean(UserDataCollector.class)
+    public UserDataCollector<ServletDataPayloadAdapter> userDataCollector(UserDataProperties userDataProperties,
+                                                                          UserDataExtractor<ServletDataPayloadAdapter> extractionService) {
+        log.info("readme-metrics: Creating of default user data collector");
+        return new ServletUserDataCollector(userDataProperties, extractionService);
+    }
+
+    @Bean
+    public DataSender dataSender() {
+        String readmeApiKey = readmeProperties.getReadmeApiKey();
+        CoreConfig coreConfig = CoreConfig.builder()
+                .readmeAPIKey(readmeApiKey)
+                .build();
+        OkHttpClient okHttpClient = new OkHttpClient();
+
+        return new HttpDataSender(okHttpClient, coreConfig);
+    }
+
+    @Bean
+    public OutgoingLogConstructor outgoingPayloadConstructor() {
+        return new OutgoingLogConstructor();
+    }
+
+    @Bean
+    public PayloadDataDispatcher payloadDataDispatcher(DataSender dataSender,
+                                                       OutgoingLogConstructor outgoingLogConstructor) {
+        return new PayloadDataDispatcher(dataSender, outgoingLogConstructor);
+    }
 }
