@@ -45,11 +45,6 @@ public class ServletDataPayloadAdapter implements DataPayloadAdapter {
     }
 
     @Override
-    public String getRoutePath() {
-        return request.getPathInfo();
-    }
-
-    @Override
     public String getAddress() {
         return request.getRemoteAddr();
     }

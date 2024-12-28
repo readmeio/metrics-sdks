@@ -20,7 +20,6 @@ public interface DataPayloadAdapter {
     String getRequestContentType();
     Map<String, String> getRequestHeaders();
     String getRequestBody();
-    String getRoutePath();
     String getAddress();
     String getProtocol();
     String getUrl();

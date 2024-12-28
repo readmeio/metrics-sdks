@@ -32,7 +32,7 @@ public class ServletRequestDataCollector implements RequestDataCollector<Servlet
                 .remoteAddress(dataPayload.getAddress())
                 .headers(dataPayload.getRequestHeaders())
                 .body(dataPayload.getRequestBody())
-                .routePath(dataPayload.getRoutePath())
+                .routePath(dataPayload.getUrl())
                 .build();
     }
 

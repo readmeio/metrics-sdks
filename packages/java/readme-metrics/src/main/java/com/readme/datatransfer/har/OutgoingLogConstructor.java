@@ -81,12 +81,14 @@ public class OutgoingLogConstructor {
     private HarRequest processRequest(RequestData requestData, LogOptions logOptions) {
         Map<String, String> headers = requestData.getHeaders();
         String requestBody = requestData.getBody();
+        String protocol = requestData.getProtocol();
 
         return HarRequest.builder()
+                .httpVersion(protocol)
                 .method(HttpMethod.valueOf(requestData.getMethod()))
                 .url(requestData.getUrl())
                 .headers(convertHeaders(headers))
-                .postData(convertBodyToHar(requestBody, headers.get("Content-Type")))
+                .postData(convertBodyToHar(requestBody, headers.get("content-type")))
                 .build();
     }
 
@@ -101,9 +103,12 @@ public class OutgoingLogConstructor {
         Map<String, String> headers = responseData.getHeaders();
         String body = responseData.getBody();
 
+        String contentType = headers.get("content-type");
+        String contentLength = headers.get("content-length");
         HarContent content = HarContent.builder()
-                .mimeType(headers.get("Content-Type"))
+                .mimeType(contentType)
                 .text(body)
+                .size(Long.valueOf(contentLength))
                 .build();
         return HarResponse.builder()
                 .status(responseData.getStatusCode())

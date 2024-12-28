@@ -34,7 +34,7 @@ public class OwlController {
     public String createOwl(@PathVariable String owlName, @RequestBody String body) {
         UUID owlUuid = UUID.randomUUID();
         owlStorage.put(owlUuid.toString(), owlName);
-        return "Owl " + owlName + " is created wit id: " + owlUuid + "\n" +
+        return "Owl " + owlName + " is created with id: " + owlUuid + "\n" +
                 " Creation request body: \n" + body;
     }
 }
