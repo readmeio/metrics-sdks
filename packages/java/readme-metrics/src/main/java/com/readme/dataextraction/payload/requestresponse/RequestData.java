@@ -18,6 +18,7 @@ public class RequestData {
     String url;
     String method;
     Map<String, String> headers;
+    Map<String, String> requestParameters;
 
 
 }

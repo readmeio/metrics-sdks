@@ -7,6 +7,7 @@ import com.readme.dataextraction.payload.requestresponse.RequestData;
 import com.readme.dataextraction.payload.requestresponse.ResponseData;
 import com.readme.dataextraction.user.UserData;
 import com.readme.datatransfer.OutgoingLogBody;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -83,13 +84,33 @@ public class OutgoingLogConstructor {
         String requestBody = requestData.getBody();
         String protocol = requestData.getProtocol();
 
+        String requestParams = getRequestParametersAsString(requestData.getRequestParameters());
+        List<HarQueryParam> harQueryParameterList = getHarQueryParameterList(requestData.getRequestParameters());
+
         return HarRequest.builder()
                 .httpVersion(protocol)
                 .method(HttpMethod.valueOf(requestData.getMethod()))
-                .url(requestData.getUrl())
+                .url(requestData.getUrl() + "?" + requestParams)
+                .queryString(harQueryParameterList)
                 .headers(convertHeaders(headers))
                 .postData(convertBodyToHar(requestBody, headers.get("content-type")))
                 .build();
+    }
+
+    private static List<HarQueryParam> getHarQueryParameterList(Map<String, String> requestParameters) {
+        return requestParameters.entrySet().stream()
+                .map(entry -> HarQueryParam.builder()
+                        .name(entry.getKey())
+                        .value(entry.getValue())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    private static String getRequestParametersAsString(Map<String, String> requestParameters) {
+        return requestParameters.entrySet()
+                .stream()
+                .map(entry -> entry.getKey() + "=" + entry.getValue())
+                .collect(Collectors.joining("&"));
     }
 
     private HarPostData convertBodyToHar(String body, String mimeType) {

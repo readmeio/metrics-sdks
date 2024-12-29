@@ -33,6 +33,7 @@ public class ServletRequestDataCollector implements RequestDataCollector<Servlet
                 .headers(dataPayload.getRequestHeaders())
                 .body(dataPayload.getRequestBody())
                 .routePath(dataPayload.getUrl())
+                .requestParameters(dataPayload.getRequestParameters())
                 .build();
     }
 

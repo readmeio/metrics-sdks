@@ -59,6 +59,16 @@ public class ServletDataPayloadAdapter implements DataPayloadAdapter {
         return request.getRequestURL().toString();
     }
 
+    @Override
+    public Map<String, String> getRequestParameters() {
+        return request.getParameterMap()
+                .entrySet()
+                .stream()
+                .collect(Collectors
+                        .toMap(Map.Entry::getKey,
+                                e -> String.join("", e.getValue())));
+    }
+
     /**
      * Retrieves all request headers from the {@link HttpServletRequest} and returns them
      * as a map where the header names are normalized to lowercase.

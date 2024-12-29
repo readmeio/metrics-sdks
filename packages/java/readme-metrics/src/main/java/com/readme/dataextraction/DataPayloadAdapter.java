@@ -23,6 +23,7 @@ public interface DataPayloadAdapter {
     String getAddress();
     String getProtocol();
     String getUrl();
+    Map<String, String> getRequestParameters();
 
 
     Map<String, String> getResponseHeaders();
