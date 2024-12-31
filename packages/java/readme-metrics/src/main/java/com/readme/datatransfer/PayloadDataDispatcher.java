@@ -1,8 +1,7 @@
 package com.readme.datatransfer;
 
-import com.readme.dataextraction.payload.LogOptions;
+import com.readme.dataextraction.LogOptions;
 import com.readme.dataextraction.payload.PayloadData;
-import com.readme.datatransfer.har.OutgoingLogConstructor;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,14 +13,13 @@ public class PayloadDataDispatcher {
 
     private DataSender dataSender;
 
-    private OutgoingLogConstructor payloadConstructor;
+    private OutgoingLogBodyConstructor payloadConstructor;
 
     public void dispatch(PayloadData payloadData) {
 
         LogOptions logOptions = new LogOptions(); //TODO implement LogOptions
 
-        //TODO Fix group id value (apiKey)
-        OutgoingLogBody outgoingLogBody = payloadConstructor.constructPayload(payloadData, logOptions);
+        OutgoingLogBody outgoingLogBody = payloadConstructor.construct(payloadData, logOptions);
         dataSender.send(Collections.singletonList(outgoingLogBody));
     }
 

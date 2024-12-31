@@ -21,7 +21,7 @@ public class HarCache {
     private HarCacheInfo beforeRequest;
     private HarCacheInfo afterRequest;
     private String comment;
-    private final Map<String, Object> additional = new HashMap<>();
+    private Map<String, Object> additional;
 
     @JsonAnyGetter
     public Map<String, Object> getAdditional() {
@@ -30,6 +30,9 @@ public class HarCache {
 
     @JsonAnySetter
     public void setAdditionalField(String key, Object value) {
+        if (additional == null) {
+            additional = new HashMap<>(8);
+        }
         this.additional.put(key, value);
     }
 
@@ -42,7 +45,7 @@ public class HarCache {
         private Date expires;
         private Date lastAccess;
         private String eTag;
-        private Integer hitCount;
+        private int hitCount;
         private String comment;
         private final Map<String, Object> additional = new HashMap<>();
 

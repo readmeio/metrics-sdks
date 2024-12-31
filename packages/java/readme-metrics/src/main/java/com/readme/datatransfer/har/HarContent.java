@@ -16,13 +16,13 @@ import java.util.Map;
 @Data
 public class HarContent {
 
-    private Long size;
-    private Long compression;
+    private long size;
+    private long compression;
     private String mimeType;
     private String text;
     private String encoding;
     private String comment;
-    private final Map<String, Object> additional = new HashMap<>();
+    private Map<String, Object> additional;
 
     @JsonAnyGetter
     public Map<String, Object> getAdditional() {
@@ -31,6 +31,9 @@ public class HarContent {
 
     @JsonAnySetter
     public void setAdditionalField(String key, Object value) {
+        if (additional == null) {
+            additional = new HashMap<>(8);
+        }
         this.additional.put(key, value);
     }
 

@@ -25,7 +25,7 @@ public class HarCookie {
     private Boolean httpOnly;
     private Boolean secure;
     private String comment;
-    private final Map<String, Object> additional = new HashMap<>();
+    private Map<String, Object> additional;
 
     @JsonAnyGetter
     public Map<String, Object> getAdditional() {
@@ -34,6 +34,9 @@ public class HarCookie {
 
     @JsonAnySetter
     public void setAdditionalField(String key, Object value) {
+        if (additional == null) {
+            additional = new HashMap<>(8);
+        }
         this.additional.put(key, value);
     }
 

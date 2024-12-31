@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -20,9 +19,9 @@ import java.util.Map;
 @Builder
 public class HarEntry {
 
-    private String pageref;
+    private String pageRef;
     private Date startedDateTime;
-    private Integer time;
+    private int time;
     private HarRequest request;
     private HarResponse response;
     private HarCache cache;
@@ -30,7 +29,7 @@ public class HarEntry {
     private String serverIPAddress;
     private String connection;
     private String comment;
-    private final Map<String, Object> additional = new HashMap<>();
+    private Map<String, Object> additional;
 
     @JsonAnyGetter
     public Map<String, Object> getAdditional() {
@@ -39,6 +38,9 @@ public class HarEntry {
 
     @JsonAnySetter
     public void setAdditionalField(String key, Object value) {
+        if (additional == null) {
+            additional = new HashMap<>(8);
+        }
         this.additional.put(key, value);
     }
 

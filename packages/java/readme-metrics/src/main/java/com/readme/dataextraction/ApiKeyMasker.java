@@ -1,4 +1,4 @@
-package com.readme.dataextraction.payload;
+package com.readme.dataextraction;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

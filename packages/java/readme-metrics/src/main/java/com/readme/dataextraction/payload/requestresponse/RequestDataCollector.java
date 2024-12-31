@@ -1,6 +1,4 @@
-package com.readme.dataextraction.payload;
-
-import com.readme.dataextraction.payload.requestresponse.ApiCallLogData;
+package com.readme.dataextraction.payload.requestresponse;
 
 /**
  * A generic interface for collecting metrics from various frameworks or APIs.

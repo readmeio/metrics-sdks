@@ -2,16 +2,16 @@ package com.readme.starter.config;
 
 import com.readme.config.CoreConfig;
 
-import com.readme.dataextraction.payload.RequestDataCollector;
-import com.readme.dataextraction.user.UserDataCollector;
-import com.readme.dataextraction.user.UserDataExtractor;
+import com.readme.dataextraction.payload.requestresponse.RequestDataCollector;
+import com.readme.dataextraction.payload.user.UserDataCollector;
 import com.readme.datatransfer.DataSender;
 import com.readme.datatransfer.HttpDataSender;
+import com.readme.datatransfer.OutgoingLogBodyConstructor;
 import com.readme.datatransfer.PayloadDataDispatcher;
-import com.readme.datatransfer.har.OutgoingLogConstructor;
 import com.readme.starter.datacollection.DataCollectionFilter;
 import com.readme.starter.datacollection.ServletDataPayloadAdapter;
 import com.readme.starter.datacollection.userinfo.ServletUserDataCollector;
+import com.readme.starter.datacollection.userinfo.UserDataExtractor;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
@@ -73,13 +73,13 @@ public class DataCollectionAutoConfiguration {
     }
 
     @Bean
-    public OutgoingLogConstructor outgoingPayloadConstructor() {
-        return new OutgoingLogConstructor();
+    public OutgoingLogBodyConstructor outgoingPayloadConstructor() {
+        return new OutgoingLogBodyConstructor();
     }
 
     @Bean
     public PayloadDataDispatcher payloadDataDispatcher(DataSender dataSender,
-                                                       OutgoingLogConstructor outgoingLogConstructor) {
+                                                       OutgoingLogBodyConstructor outgoingLogConstructor) {
         return new PayloadDataDispatcher(dataSender, outgoingLogConstructor);
     }
 }

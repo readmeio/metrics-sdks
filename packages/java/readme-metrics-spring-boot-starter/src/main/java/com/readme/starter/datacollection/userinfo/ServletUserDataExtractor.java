@@ -3,7 +3,6 @@ package com.readme.starter.datacollection.userinfo;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.readme.dataextraction.user.UserDataExtractor;
 import com.readme.starter.datacollection.ServletDataPayloadAdapter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

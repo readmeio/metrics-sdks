@@ -16,17 +16,17 @@ import java.util.Map;
 @Builder
 public class HarTiming {
 
-    protected static final Integer DEFAULT_TIME = -1;
+    protected static final int DEFAULT_TIME = -1;
 
-    private Integer blocked;
-    private Integer dns;
-    private Integer connect;
-    private Integer send;
-    private Integer waitTime;
-    private Integer receive;
-    private Integer ssl;
+    private int blocked;
+    private int dns;
+    private int connect;
+    private int send;
+    private int waitTime;
+    private int receive;
+    private int ssl;
     private String comment;
-    private final Map<String, Object> additional = new HashMap<>();
+    private Map<String, Object> additional;
 
     @JsonAnyGetter
     public Map<String, Object> getAdditional() {
@@ -35,6 +35,9 @@ public class HarTiming {
 
     @JsonAnySetter
     public void setAdditionalField(String key, Object value) {
+        if (additional == null) {
+            additional = new HashMap<>(8);
+        }
         this.additional.put(key, value);
     }
 

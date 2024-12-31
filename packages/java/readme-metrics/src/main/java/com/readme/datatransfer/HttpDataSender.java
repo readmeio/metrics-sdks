@@ -44,7 +44,7 @@ public class HttpDataSender implements DataSender {
                 return response.code();
             } catch (JsonProcessingException e) {
                 log.error("Error while building outgoing payload: ", e);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.error("Error while sending collected data: ", e);
             } finally {
                 if (response != null) {

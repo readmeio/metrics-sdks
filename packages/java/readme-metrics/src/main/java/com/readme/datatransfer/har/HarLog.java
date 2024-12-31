@@ -20,15 +20,13 @@ import java.util.Map;
 @Data
 public class HarLog {
 
-    protected static final String DEFAULT_VERSION = "1.1";
-
-    private String version = DEFAULT_VERSION;
-    private HarCreatorBrowser creator = HarCreatorBrowser.builder().build();
-    private HarCreatorBrowser browser = HarCreatorBrowser.builder().build();
-    private List<HarPage> pages = new ArrayList<>();
-    private List<HarEntry> entries = new ArrayList<>();
+    private String version;
+    private HarCreatorBrowser creator;
+    private HarCreatorBrowser browser;
+    private List<HarPage> pages;
+    private List<HarEntry> entries;
     private String comment;
-    private final Map<String, Object> additional = new HashMap<>();
+    private Map<String, Object> additional;
 
     @JsonAnyGetter
     public Map<String, Object> getAdditional() {
@@ -37,6 +35,9 @@ public class HarLog {
 
     @JsonAnySetter
     public void setAdditionalField(String key, Object value) {
+        if (additional == null) {
+            additional = new HashMap<>(8);
+        }
         this.additional.put(key, value);
     }
 

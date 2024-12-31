@@ -17,10 +17,10 @@ import java.util.Map;
 @Builder
 public class HarCreatorBrowser {
 
-    String name;
-    String version;
-    String comment;
-    Map<String, Object> additional = new HashMap<>();
+    private String name;
+    private String version;
+    private String comment;
+    private Map<String, Object> additional;
 
     @JsonAnyGetter
     public Map<String, Object> getAdditional() {
@@ -29,6 +29,9 @@ public class HarCreatorBrowser {
 
     @JsonAnySetter
     public void setAdditionalField(String key, Object value) {
+        if (additional == null) {
+            additional = new HashMap<>(8);
+        }
         this.additional.put(key, value);
     }
 

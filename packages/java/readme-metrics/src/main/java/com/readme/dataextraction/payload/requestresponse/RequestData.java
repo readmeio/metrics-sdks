@@ -10,8 +10,6 @@ import java.util.Map;
 public class RequestData {
 
     String body;
-
-    //TODO fetch and refactor
     String routePath;
     String remoteAddress;
     String protocol;

@@ -10,8 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -123,7 +121,7 @@ public class ServletDataPayloadAdapter implements DataPayloadAdapter {
     }
 
     @Override
-    public Integer getStatusCode() {
+    public int getStatusCode() {
         return response.getStatus();
     }
 

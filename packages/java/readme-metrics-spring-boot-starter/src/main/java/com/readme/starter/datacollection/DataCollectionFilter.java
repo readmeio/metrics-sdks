@@ -1,10 +1,10 @@
 package com.readme.starter.datacollection;
 
 import com.readme.dataextraction.payload.PayloadData;
-import com.readme.dataextraction.payload.RequestDataCollector;
 import com.readme.dataextraction.payload.requestresponse.ApiCallLogData;
-import com.readme.dataextraction.user.UserData;
-import com.readme.dataextraction.user.UserDataCollector;
+import com.readme.dataextraction.payload.requestresponse.RequestDataCollector;
+import com.readme.dataextraction.payload.user.UserData;
+import com.readme.dataextraction.payload.user.UserDataCollector;
 import com.readme.datatransfer.PayloadDataDispatcher;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;

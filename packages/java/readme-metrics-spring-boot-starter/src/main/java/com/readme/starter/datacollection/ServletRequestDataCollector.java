@@ -1,9 +1,9 @@
 package com.readme.starter.datacollection;
 
 
-import com.readme.dataextraction.payload.RequestDataCollector;
 import com.readme.dataextraction.payload.requestresponse.ApiCallLogData;
 import com.readme.dataextraction.payload.requestresponse.RequestData;
+import com.readme.dataextraction.payload.requestresponse.RequestDataCollector;
 import com.readme.dataextraction.payload.requestresponse.ResponseData;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ public class ServletRequestDataCollector implements RequestDataCollector<Servlet
 
     private ResponseData buildResponseData(ServletDataPayloadAdapter dataPayload) {
         return ResponseData.builder()
-                .headers(dataPayload.getRequestHeaders())
+                .headers(dataPayload.getResponseHeaders())
                 .body(dataPayload.getResponseBody())
                 .statusCode(dataPayload.getStatusCode())
                 .statusMessage(dataPayload.getStatusMessage())

@@ -18,19 +18,21 @@ import java.util.Map;
 @Builder
 public class HarResponse {
 
-    protected static final Long DEFAULT_SIZE = -1L;
+    protected static final long DEFAULT_SIZE = -1L;
 
-    private Integer status;
+    private int status;
     private String statusText;
     private String httpVersion;
     private List<HarCookie> cookies;
     private List<HarHeader> headers;
     private HarContent content;
     private String redirectURL;
-    private Long headersSize = DEFAULT_SIZE;
-    private Long bodySize = DEFAULT_SIZE;
+    @Builder.Default
+    private long headersSize = DEFAULT_SIZE;
+    @Builder.Default
+    private long bodySize = DEFAULT_SIZE;
     private String comment;
-    private final Map<String, Object> additional = new HashMap<>();
+    private Map<String, Object> additional;
 
     @JsonAnyGetter
     public Map<String, Object> getAdditional() {
@@ -39,6 +41,9 @@ public class HarResponse {
 
     @JsonAnySetter
     public void setAdditionalField(String key, Object value) {
+        if (additional == null) {
+            additional = new HashMap<>(8);
+        }
         this.additional.put(key, value);
     }
 

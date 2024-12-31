@@ -1,4 +1,4 @@
-package com.readme.config;
+package com.readme.starter.datacollection.userinfo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,16 +1,14 @@
 package com.readme.starter.datacollection.userinfo;
 
-import com.readme.config.FieldMapping;
-import com.readme.dataextraction.user.UserData;
-import com.readme.dataextraction.user.UserDataCollector;
-import com.readme.dataextraction.user.UserDataExtractor;
-import com.readme.dataextraction.user.UserDataSource;
+
+import com.readme.dataextraction.payload.user.UserData;
+import com.readme.dataextraction.payload.user.UserDataCollector;
+import com.readme.dataextraction.payload.user.UserDataSource;
 import com.readme.starter.config.UserDataProperties;
 import com.readme.starter.datacollection.ServletDataPayloadAdapter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import static com.readme.dataextraction.payload.ApiKeyMasker.mask;
 
 /**
  * Responsible for selecting the appropriate {@link UserDataExtractor}
@@ -38,9 +36,8 @@ public class ServletUserDataCollector implements UserDataCollector<ServletDataPa
         String email = getEmail(payload);
         String label = getLabel(payload);
 
-        String maskedApiKey = mask(apiKey);
         return UserData.builder()
-                .apiKey(maskedApiKey)
+                .apiKey(apiKey)
                 .email(email)
                 .label(label)
                 .build();

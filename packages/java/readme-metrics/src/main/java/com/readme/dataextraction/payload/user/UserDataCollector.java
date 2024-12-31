@@ -1,4 +1,4 @@
-package com.readme.dataextraction.user;
+package com.readme.dataextraction.payload.user;
 
 /**
  * Interface for extracting user-related data, such as API key, label, and email,

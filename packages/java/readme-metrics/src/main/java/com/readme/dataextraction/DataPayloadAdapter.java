@@ -28,6 +28,6 @@ public interface DataPayloadAdapter {
 
     Map<String, String> getResponseHeaders();
     String getResponseBody();
-    Integer getStatusCode();
+    int getStatusCode();
     String getStatusMessage();
 }

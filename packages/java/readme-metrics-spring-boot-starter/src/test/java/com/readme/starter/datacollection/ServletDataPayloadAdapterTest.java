@@ -1,18 +1,13 @@
 package com.readme.starter.datacollection;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -21,7 +16,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@Disabled
+
 class ServletDataPayloadAdapterTest {
 
     @Mock
@@ -85,20 +80,12 @@ class ServletDataPayloadAdapterTest {
     @Test
     void getRequestBody_HappyPath_ReturnsRequestBody() throws IOException {
         String requestBody = "{\"bird\": \"Owl\"}";
-        byte[] bodyAsBytes = requestBody.getBytes();
-        when(requestMock.getContentAsByteArray()).thenReturn(bodyAsBytes);
+        when(requestMock.getContentAsString()).thenReturn(requestBody);
         String result = adapter.getRequestBody();
 
         assertEquals(requestBody, result);
     }
 
-    @Test
-    void getRequestBody_WhenIOExceptionOccurs_ReturnsEmptyString() throws IOException {
-        when(requestMock.getReader()).thenThrow(new IOException("Failed to read request"));
-        String result = adapter.getRequestBody();
-
-        assertEquals("", result);
-    }
 
     // --------------------------- RESPONSE --------------------------------
     @Test
@@ -117,16 +104,6 @@ class ServletDataPayloadAdapterTest {
         assertEquals("parrot@birdfact0ry.abc", headers.get(userIdHeader));
     }
 
-    // TODO implement this, once it fails
-    @Test
-    void getResponseBody_ThrowsUnsupportedOperationException() {
-        UnsupportedOperationException exception = assertThrows(
-                UnsupportedOperationException.class,
-                adapter::getResponseBody
-        );
-
-        assertEquals("Not implemented yet", exception.getMessage());
-    }
 
     @Test
     void getResponseHeaders_NoHeaders_ReturnsEmptyMap() {

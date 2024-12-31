@@ -11,7 +11,7 @@ public class ResponseData {
 
     String body;
     Map<String, String> headers;
-    Integer statusCode;
+    int statusCode;
     String statusMessage;
 
 

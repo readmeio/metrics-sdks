@@ -1,9 +1,8 @@
 package com.readme.starter.datacollection;
 
-import com.readme.dataextraction.payload.RequestDataCollector;
-import com.readme.dataextraction.user.UserData;
-import com.readme.dataextraction.user.UserDataCollector;
-import com.readme.datatransfer.DataSender;
+import com.readme.dataextraction.payload.requestresponse.RequestDataCollector;
+import com.readme.dataextraction.payload.user.UserData;
+import com.readme.dataextraction.payload.user.UserDataCollector;
 import com.readme.datatransfer.PayloadDataDispatcher;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

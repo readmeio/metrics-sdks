@@ -16,12 +16,14 @@ import java.util.Map;
 @Data
 public class HarPageTiming {
 
-    protected static final Integer DEFAULT_TIME = -1;
+    protected static final int DEFAULT_TIME = -1;
 
-    private Integer onContentLoad = DEFAULT_TIME;
-    private Integer onLoad = DEFAULT_TIME;
+    @Builder.Default
+    private int onContentLoad = DEFAULT_TIME;
+    @Builder.Default
+    private int onLoad = DEFAULT_TIME;
     private String comment;
-    private final Map<String, Object> additional = new HashMap<>();
+    private Map<String, Object> additional;
 
     @JsonAnyGetter
     public Map<String, Object> getAdditional() {
@@ -30,6 +32,9 @@ public class HarPageTiming {
 
     @JsonAnySetter
     public void setAdditionalField(String key, Object value) {
+        if (additional == null) {
+            additional = new HashMap<>(8);
+        }
         this.additional.put(key, value);
     }
 

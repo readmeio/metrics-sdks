@@ -1,4 +1,4 @@
-package com.readme.dataextraction.user;
+package com.readme.starter.datacollection.userinfo;
 
 /**
  * Defines a contract for extracting user-related data from an incoming request.

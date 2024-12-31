@@ -17,7 +17,7 @@ import java.util.Map;
 @Builder
 public class HarRequest {
 
-    protected static final Long DEFAULT_SIZE = -1L;
+    protected static final long DEFAULT_SIZE = -1L;
 
     private HttpMethod method;
     private String url;
@@ -26,10 +26,12 @@ public class HarRequest {
     private List<HarHeader> headers;
     private List<HarQueryParam> queryString;
     private HarPostData postData;
-    private Long headersSize = DEFAULT_SIZE;
-    private Long bodySize = DEFAULT_SIZE;
+    @Builder.Default
+    private long headersSize = DEFAULT_SIZE;
+    @Builder.Default
+    private long bodySize = DEFAULT_SIZE;
     private String comment;
-    private final Map<String, Object> additional = new HashMap<>();
+    private Map<String, Object> additional;
 
     @JsonAnyGetter
     public Map<String, Object> getAdditional() {
@@ -38,6 +40,9 @@ public class HarRequest {
 
     @JsonAnySetter
     public void setAdditionalField(String key, Object value) {
+        if (additional == null) {
+            additional = new HashMap<>(8);
+        }
         this.additional.put(key, value);
     }
 
