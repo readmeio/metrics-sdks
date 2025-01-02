@@ -17,10 +17,14 @@ public class PayloadDataDispatcher {
 
     public void dispatch(PayloadData payloadData) {
 
-        LogOptions logOptions = new LogOptions(); //TODO implement LogOptions
+        try {
+            LogOptions logOptions = new LogOptions(); //TODO implement LogOptions
 
-        OutgoingLogBody outgoingLogBody = payloadConstructor.construct(payloadData, logOptions);
-        dataSender.send(Collections.singletonList(outgoingLogBody));
+            OutgoingLogBody outgoingLogBody = payloadConstructor.construct(payloadData, logOptions);
+            dataSender.send(Collections.singletonList(outgoingLogBody));
+        } catch (Exception e) {
+            log.error("Error occurred on data dispatch phase: {}", e.getMessage());
+        }
     }
 
 
