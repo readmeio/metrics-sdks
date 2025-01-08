@@ -3,10 +3,10 @@ package com.readme.starter.datacollection.userinfo;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.readme.dataextraction.UserDataExtractor;
 import com.readme.starter.datacollection.ServletDataPayloadAdapter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import com.auth0.jwt.JWT;
 
@@ -21,8 +21,8 @@ public class ServletUserDataExtractor implements UserDataExtractor<ServletDataPa
 
     private ObjectMapper objectMapper;
 
-    //TODO: Consider possibility to extract the data from the header`s multiple value
-    // Is there any practical sense?
+    //TODO Consider possibility to extract the data from the header`s multiple value
+    // Does it make any practical sense?
     @Override
     public String extractFromHeader(ServletDataPayloadAdapter payload, String fieldName) {
         Map<String, String> requestHeaders = payload.getRequestHeaders();
@@ -35,19 +35,23 @@ public class ServletUserDataExtractor implements UserDataExtractor<ServletDataPa
 
     @Override
     public String extractFromBody(ServletDataPayloadAdapter payload, String fieldPath) {
-        if (payload.getRequestContentType().equalsIgnoreCase("application/json")) {
-            String requestBody = payload.getRequestBody();
-            try {
-                JsonNode currentNode = objectMapper.readTree(requestBody);
-                if (!fieldPath.startsWith("/")) {
-                    fieldPath = "/" + fieldPath;
+        if (!payload.getRequestMethod().equalsIgnoreCase(HttpMethod.GET.name())) {
+            if (payload.getRequestContentType().equalsIgnoreCase("application/json")) {
+                String requestBody = payload.getRequestBody();
+                try {
+                    JsonNode currentNode = objectMapper.readTree(requestBody);
+                    if (!fieldPath.startsWith("/")) {
+                        fieldPath = "/" + fieldPath;
+                    }
+                    return currentNode.at(fieldPath).asText();
+                } catch (Exception e) {
+                    log.error("Error when reading the user data from JSON body: {}", e.getMessage());
                 }
-                return currentNode.at(fieldPath).asText();
-            } catch (Exception e) {
-                log.error("Error when reading the user data from JSON body: {}", e.getMessage());
             }
+            log.error("The provided body content type {} is not supported to get user data.", payload.getRequestContentType());
+            return "";
         }
-        log.error("The provided body content type {} is not supported to get user data.", payload.getRequestContentType());
+        log.error("The HTTP method {} is not supported to get user data from body.", payload.getRequestMethod());
         return "";
     }
 

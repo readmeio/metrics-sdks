@@ -32,7 +32,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.readme</groupId>
-			<artifactId>readme-metrics</artifactId>
+			<artifactId>metrics-core</artifactId>
 			<version>${readme-metrics.version}</version>
 		</dependency>
 

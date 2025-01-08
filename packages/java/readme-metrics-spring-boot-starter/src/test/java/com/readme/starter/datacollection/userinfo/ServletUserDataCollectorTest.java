@@ -1,9 +1,7 @@
 package com.readme.starter.datacollection.userinfo;
 
-import com.readme.config.FieldMapping;
-import com.readme.dataextraction.UserDataExtractor;
-import com.readme.dataextraction.UserDataSource;
-import com.readme.domain.UserData;
+import com.readme.dataextraction.payload.user.UserData;
+import com.readme.dataextraction.payload.user.UserDataSource;
 import com.readme.starter.config.UserDataProperties;
 import com.readme.starter.datacollection.ServletDataPayloadAdapter;
 import org.junit.jupiter.api.BeforeEach;

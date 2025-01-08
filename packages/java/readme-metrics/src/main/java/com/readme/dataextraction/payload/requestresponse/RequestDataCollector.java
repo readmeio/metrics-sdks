@@ -1,6 +1,4 @@
-package com.readme.dataextraction;
-
-import com.readme.domain.UserData;
+package com.readme.dataextraction.payload.requestresponse;
 
 /**
  * A generic interface for collecting metrics from various frameworks or APIs.
@@ -19,10 +17,10 @@ import com.readme.domain.UserData;
 public interface RequestDataCollector<T> {
 
     /**
-     * <p>`collect` method is intended to be implemented to extract, process, and
-     * send metrics data from the given input object. The exact implementation
+     * <p>`collect` method is intended to be implemented to extract and process
+     * metrics data from the given input object. The exact implementation
      * will vary depending on the framework or API used.</p>
      */
-    void collect(T t, UserData userData);
+    ApiCallLogData collect(T t);
 
 }

@@ -1,12 +1,14 @@
 package com.readme.datatransfer;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.readme.config.CoreConfig;
-import com.readme.domain.RequestPayload;
-import com.readme.exception.EmptyRequestBodyException;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.List;
 
 /**
  * Implementation of the {@link DataSender} interface that sends metrics data to a remote server
@@ -17,6 +19,8 @@ import java.util.Base64;
  * <p>The default endpoint for sending metrics is {@code https://metrics.readme.io/v1/request}.
  *
  */
+
+@Slf4j
 public class HttpDataSender implements DataSender {
 
     public static final String APPLICATION_JSON_TYPE = "application/json";
@@ -30,22 +34,33 @@ public class HttpDataSender implements DataSender {
     }
 
     @Override
-    public int send(RequestPayload requestPayload) {
-        if (requestPayload != null && requestPayload.getBody() != null && !requestPayload.getBody().isEmpty()) {
+    public int send(List<OutgoingLogBody> payloadData) {
+        if (payloadData != null) {
             String encodedReadmeApiKey = getEncodedReadmeApiKey();
-            Request request = createRequest(requestPayload, encodedReadmeApiKey);
-
-            try (Response response = client.newCall(request).execute()) {
+            Response response = null;
+            try {
+                Request request = createRequest(payloadData, encodedReadmeApiKey);
+                response = client.newCall(request).execute();
                 return response.code();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            } catch (JsonProcessingException e) {
+                log.error("Error while building outgoing payload: ", e);
+            } catch (Exception e) {
+                log.error("Error while sending collected data: ", e);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
         }
-        throw new EmptyRequestBodyException();
+        return 0;
     }
 
-    private static Request createRequest(RequestPayload requestPayload, String encodedReadmeApiKey) {
-        RequestBody body = RequestBody.create(requestPayload.getBody(), MediaType.get(APPLICATION_JSON_TYPE));
+    private static Request createRequest(List<OutgoingLogBody> payloadData, String encodedReadmeApiKey) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String outgoingLogBody = objectMapper.writeValueAsString(payloadData);
+        RequestBody body = RequestBody
+                .create(outgoingLogBody, MediaType.get(APPLICATION_JSON_TYPE));
+
         return new Request.Builder()
                 .url(README_METRICS_URL)
                 .header("Accept", APPLICATION_JSON_TYPE)

@@ -1,15 +1,12 @@
 package com.readme.example;
 
+import com.readme.datatransfer.har.HttpStatus;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 public class OwlController {
@@ -34,9 +31,21 @@ public class OwlController {
     }
 
     @PutMapping("/owl/{owlName}")
-    public String createOwl(@PathVariable String owlName) {
-        UUID owlUuid = UUID.randomUUID();
-        owlStorage.put(owlUuid.toString(), owlName);
-        return "Owl " + owlName + " is created wit id: " + owlUuid;
+    public ResponseEntity<String> createOwl(@PathVariable String owlName, @RequestBody String body) {
+        UUID birdId = UUID.randomUUID();
+        owlStorage.put(birdId.toString(), owlName);
+
+        String responseBody = "Bird " + owlName + " created a bird with id: " + birdId + "\n" +
+                "Creation request body: \n" + body;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("bird-id", birdId.toString());
+        headers.add("bird-token", Base64.getEncoder()
+                .encodeToString(birdId.toString()
+                        .getBytes()));
+
+        return ResponseEntity.status(HttpStatus.CREATED.getCode())
+                .headers(headers)
+                .body(responseBody);
     }
 }

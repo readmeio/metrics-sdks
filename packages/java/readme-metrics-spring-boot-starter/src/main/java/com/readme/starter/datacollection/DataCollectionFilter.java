@@ -1,8 +1,11 @@
 package com.readme.starter.datacollection;
 
-import com.readme.dataextraction.RequestDataCollector;
-import com.readme.dataextraction.UserDataCollector;
-import com.readme.domain.UserData;
+import com.readme.dataextraction.payload.PayloadData;
+import com.readme.dataextraction.payload.requestresponse.ApiCallLogData;
+import com.readme.dataextraction.payload.requestresponse.RequestDataCollector;
+import com.readme.dataextraction.payload.user.UserData;
+import com.readme.dataextraction.payload.user.UserDataCollector;
+import com.readme.datatransfer.PayloadDataDispatcher;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -10,61 +13,67 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
-
 import java.io.IOException;
+import java.util.Date;
+import java.util.concurrent.CompletableFuture;
 
-import static org.springframework.http.HttpMethod.GET;
+import static com.readme.dataextraction.payload.PayloadData.*;
 import static org.springframework.http.HttpMethod.OPTIONS;
 
+
+//TODO Fix:
+// 1. Convert IpV6 to V4 ?????
+// 2. * Request.entries.pageref is empty
+// 5. * Add response content size and mime type
+// 6. Handle Basic tokens as well as Bearer ones
+// 7. Validate the collected data on readme dashboard
+// 8. Fix core and starter tests
+// 9. Consider to rename core-metrics (maybe just "core") and starter (maybe just "spring")
+// 10. Handle case if SDK user configured getting request user data from body, but GET req doesn't have it
+// 11. Validate user data. Collect request data only if user data is valid ?
 
 @AllArgsConstructor
 @Slf4j
 public class DataCollectionFilter implements Filter {
 
-    private RequestDataCollector<ServletDataPayloadAdapter> requestDataCollector;
-
     private UserDataCollector<ServletDataPayloadAdapter> userDataCollector;
 
-    //TODO
-    // 1. Research possibility to collect metrics in a separate thread, as it may produce
-    // race condition on reading body data stream.
-    // 2. Problem to solve: if we collect a request/response after doFilter(r,r), it means
-    // the request dataStream will be red by customer's business logic and will not be available to us.
-    // On the other hand, if we collect a request before doFilter, the response data is not available yet.
+    private RequestDataCollector<ServletDataPayloadAdapter> requestDataCollector;
+
+    private PayloadDataDispatcher payloadDispatcher;
+
     @Override
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
-        HttpServletRequest request = (HttpServletRequest) req;
-        HttpServletResponse response = (HttpServletResponse) resp;
+        ContentCachingRequestWrapper request = new ContentCachingRequestWrapper((HttpServletRequest) req);
+        ContentCachingResponseWrapper response = new ContentCachingResponseWrapper((HttpServletResponse) resp);
+
+        PayloadDataBuilder payloadDataBuilder = PayloadData.builder();
+        payloadDataBuilder.requestStartedDateTime(new Date());
 
         try {
             if (request.getMethod().equalsIgnoreCase(OPTIONS.name())) {
                 chain.doFilter(req, resp);
-            } else if (request.getMethod().equalsIgnoreCase(GET.name())) {
+            } else {
+                chain.doFilter(request, response);
                 ServletDataPayloadAdapter payload =
                         new ServletDataPayloadAdapter(request, response);
 
-                //TODO: Handle case if SDK user configured getting request user data from body, but GET req doesn't have it
                 UserData userData = userDataCollector.collect(payload);
-                //TODO: Validate user data. Collect request data only if user data is valid ?
-                requestDataCollector.collect(payload, userData);
-                chain.doFilter(req, resp);
-            } else {
-                ContentCachingRequestWrapper cacheableRequest =
-                        new ContentCachingRequestWrapper(request);
-                ContentCachingResponseWrapper cacheableResponse =
-                        new ContentCachingResponseWrapper(response);
+                payloadDataBuilder.userData(userData);
 
-                ServletDataPayloadAdapter payload =
-                        new ServletDataPayloadAdapter(cacheableRequest, cacheableResponse);
-                UserData userData = userDataCollector.collect(payload);
+                ApiCallLogData apiCallLogData = requestDataCollector.collect(payload);
+                payloadDataBuilder.apiCallLogData(apiCallLogData);
+                payloadDataBuilder.responseEndDateTime(new Date());
 
-                requestDataCollector.collect(payload, userData);
-                chain.doFilter(cacheableRequest, cacheableResponse);
+                PayloadData payloadData = payloadDataBuilder.build();
+                response.copyBodyToResponse();
+
+                CompletableFuture.runAsync(() -> {
+                    payloadDispatcher.dispatch(payloadData);
+                });
             }
         } catch (Exception e){
             log.error("Error occurred while processing request by readme metrics-sdk: {}", e.getMessage());
-        } finally {
-            chain.doFilter(req, resp);
         }
     }
 

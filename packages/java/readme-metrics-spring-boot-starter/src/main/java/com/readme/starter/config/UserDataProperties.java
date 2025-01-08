@@ -1,6 +1,6 @@
 package com.readme.starter.config;
 
-import com.readme.config.FieldMapping;
+import com.readme.starter.datacollection.userinfo.FieldMapping;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

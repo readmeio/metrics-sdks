@@ -1,6 +1,4 @@
-package com.readme.dataextraction;
-
-import com.readme.domain.UserData;
+package com.readme.dataextraction.payload.user;
 
 /**
  * Interface for extracting user-related data, such as API key, label, and email,

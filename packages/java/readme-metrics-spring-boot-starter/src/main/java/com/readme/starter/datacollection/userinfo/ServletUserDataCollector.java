@@ -1,29 +1,26 @@
 package com.readme.starter.datacollection.userinfo;
 
-import com.readme.config.FieldMapping;
-import com.readme.dataextraction.UserDataCollector;
-import com.readme.dataextraction.UserDataExtractor;
-import com.readme.dataextraction.UserDataSource;
-import com.readme.domain.UserData;
+
+import com.readme.dataextraction.payload.user.UserData;
+import com.readme.dataextraction.payload.user.UserDataCollector;
+import com.readme.dataextraction.payload.user.UserDataSource;
 import com.readme.starter.config.UserDataProperties;
 import com.readme.starter.datacollection.ServletDataPayloadAdapter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.stereotype.Component;
+
 
 /**
  * Responsible for selecting the appropriate {@link UserDataExtractor}
  * based on the provided configuration in the application settings.
- *
+ * <p>
  * This class acts as a bridge between YAML/Properties configuration and
  * the corresponding strategy for extracting user-related data
  * (e.g., from JSON body, headers, or JWT tokens).
- *
+ * <p>
  * Ensures flexibility and proper encapsulation of the strategy selection logic.
  */
 
-@Component
 @AllArgsConstructor
 @Slf4j
 public class ServletUserDataCollector implements UserDataCollector<ServletDataPayloadAdapter> {
@@ -79,7 +76,7 @@ public class ServletUserDataCollector implements UserDataCollector<ServletDataPa
             String fieldName = fieldMapping.getFieldName().toLowerCase();
             String fieldValue = extractionService.extractFromHeader(payload, fieldName);
 
-            validate(payload, fieldValue);
+            validate(fieldValue);
             return fieldValue;
         }
 
@@ -87,7 +84,7 @@ public class ServletUserDataCollector implements UserDataCollector<ServletDataPa
             String fieldName = fieldMapping.getFieldName().toLowerCase();
             String fieldValue = extractionService.extractFromBody(payload, fieldName);
 
-            validate(payload, fieldValue);
+            validate(fieldValue);
             return fieldValue;
         }
 
@@ -95,7 +92,7 @@ public class ServletUserDataCollector implements UserDataCollector<ServletDataPa
             String fieldName = fieldMapping.getFieldName().toLowerCase();
             String fieldValue = extractionService.extractFromJwt(payload, fieldName);
 
-            validate(payload, fieldValue);
+            validate(fieldValue);
             return fieldValue;
         }
 
@@ -105,10 +102,9 @@ public class ServletUserDataCollector implements UserDataCollector<ServletDataPa
         return "";
     }
 
-    private void validate(ServletDataPayloadAdapter payload, String fieldName) {
-        String fieldValue = extractionService.extractFromHeader(payload, fieldName);
+    private void validate(String fieldValue) {
         if (fieldValue == null || fieldValue.isEmpty()) {
-            log.error("The {} extraction is not configured properly. The value is empty", fieldName);
+            log.error("The {} extraction is not configured properly. The value is empty", fieldValue);
         }
     }
 

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpMethod;
 
 import java.io.IOException;
 import java.security.KeyPair;
@@ -20,6 +21,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ServletUserDataExtractorTest {
@@ -131,6 +133,7 @@ class ServletUserDataExtractorTest {
 
         String body = "{\"" + fieldName + "\":\"" + expectedValue + "\",\"anotherField\":\"anotherValue\"}";
         Mockito.when(payload.getRequestBody()).thenReturn(body);
+        Mockito.when(payload.getRequestMethod()).thenReturn("POST");
         Mockito.when(payload.getRequestContentType()).thenReturn("application/json");
         String result = extractor.extractFromBody(payload, fieldName);
 
@@ -144,6 +147,7 @@ class ServletUserDataExtractorTest {
 
         String body = "{\"anotherField\":\"anotherValue\"}";
         Mockito.when(payload.getRequestBody()).thenReturn(body);
+        Mockito.when(payload.getRequestMethod()).thenReturn("POST");
         Mockito.when(payload.getRequestContentType()).thenReturn("application/json");
         String result = extractor.extractFromBody(payload, fieldName);
 
@@ -156,12 +160,22 @@ class ServletUserDataExtractorTest {
         String expectedValue = "";
 
         Mockito.when(payload.getRequestBody()).thenReturn(body);
+        Mockito.when(payload.getRequestMethod()).thenReturn("POST");
         Mockito.when(payload.getRequestContentType()).thenReturn("application/json");
         String result = extractor.extractFromBody(payload, "fieldName");
 
         assertEquals(expectedValue, result);
     }
 
+    @Test
+    void extractFromBody_HttpMethodGet_ReturnsEmptyString() {
+        Mockito.when(payload.getRequestMethod()).thenReturn("GET");
+
+        String result = extractor.extractFromBody(payload, "/fieldName");
+
+        assertEquals("", result);
+        verifyNoMoreInteractions(payload);
+    }
 
     private Algorithm createSigningKeyPair() throws NoSuchAlgorithmException {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
