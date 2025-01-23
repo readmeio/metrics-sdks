@@ -45,4 +45,4 @@ def read_root():
 
 @app.post("/")
 def post_root():
-    return "13414"
+    return ""
