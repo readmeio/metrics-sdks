@@ -126,6 +126,16 @@ services:
     environment:
       <<: *server-config
 
+  integration_python_fastapi_metrics:
+    build:
+      context: .
+      dockerfile: ./test/integrations/python/fastapi.Dockerfile
+    ports:
+      - 8000:8000
+    extra_hosts: *default-extra_hosts
+    environment:
+      <<: *server-config
+
   #
   # Ruby
   #

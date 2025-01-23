@@ -24,6 +24,9 @@ serve-metrics-flask: ## Start the local Flask server to test Metrics
 serve-webhooks-flask: ## Start the local Flask server to test webhooks
 	README_API_KEY=$(API_KEY) python3 examples/flask/webhooks.py
 
+serve-metrics-fastapi:
+	cd examples/fastapi && README_API_KEY=$(API_KEY) uvicorn app:app --reload
+
 test: ## Run unit tests
 	pytest
 

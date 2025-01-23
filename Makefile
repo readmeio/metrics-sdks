@@ -86,6 +86,11 @@ test-webhooks-python-flask: ## Run webhooks tests against the Python SDK + Flask
 	SUPPORTS_HASHING=true npm run test:integration-webhooks || make cleanup-failure
 	@make cleanup
 
+test-metrics-python-fastapi: ## Run Metrics tests against the Python SDK + FastAPI
+	docker compose up --build --detach integration_python_fastapi_metrics
+	SUPPORTS_HASHING=true npm run test:integration-metrics || make cleanup-failure
+	@make cleanup
+
 ##
 ## Ruby
 ##
