@@ -20,6 +20,8 @@ jobs:
       - run: make test-metrics-python-django-asgi
       - run: make test-metrics-python-flask
       - run: make test-webhooks-python-flask
+      - run: make test-metrics-python-fastapi
+      - run: make test-webhooks-python-fastapi
 
       - name: Cleanup
         if: always()
