@@ -86,10 +86,20 @@ services:
   #
   # Python
   #
-  integration_metrics_python_django:
+  integration_metrics_python_django_wsgi:
     build:
       context: .
-      dockerfile: ./test/integrations/python/django.Dockerfile
+      dockerfile: ./test/integrations/python/django-wsgi.Dockerfile
+    ports:
+      - 8000:8000
+    extra_hosts: *default-extra_hosts
+    environment:
+      <<: *server-config
+
+  integration_metrics_python_django_asgi:
+    build:
+      context: .
+      dockerfile: ./test/integrations/python/django-asgi.Dockerfile
     ports:
       - 8000:8000
     extra_hosts: *default-extra_hosts
@@ -110,6 +120,26 @@ services:
     build:
       context: .
       dockerfile: ./test/integrations/python/flask-webhooks.Dockerfile
+    ports:
+      - 8000:8000
+    extra_hosts: *default-extra_hosts
+    environment:
+      <<: *server-config
+
+  integration_python_fastapi_metrics:
+    build:
+      context: .
+      dockerfile: ./test/integrations/python/fastapi.Dockerfile
+    ports:
+      - 8000:8000
+    extra_hosts: *default-extra_hosts
+    environment:
+      <<: *server-config
+
+  integration_python_fastapi_webhooks:
+    build:
+      context: .
+      dockerfile: ./test/integrations/python/fastapi-webhooks.Dockerfile
     ports:
       - 8000:8000
     extra_hosts: *default-extra_hosts

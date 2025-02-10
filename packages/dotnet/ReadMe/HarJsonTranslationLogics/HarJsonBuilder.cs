@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using ReadMe.HarJsonObjectModels;
 
 namespace ReadMe.HarJsonTranslationLogics
@@ -28,7 +27,7 @@ namespace ReadMe.HarJsonTranslationLogics
       this.configValues = configValues;
     }
 
-    public async Task<string> BuildHar()
+    internal async Task<Root> BuildHar()
     {
       Root harObj = new Root();
       harObj._id = Guid.NewGuid().ToString();
@@ -37,8 +36,7 @@ namespace ReadMe.HarJsonTranslationLogics
       harObj.clientIPAddress = this.context.Connection.RemoteIpAddress.ToString();
       harObj.group = this.BuildGroup();
       harObj.request = new RequestMain(await this.BuildLog());
-      string harJsonObj = JsonConvert.SerializeObject(new List<Root>() { harObj });
-      return harJsonObj;
+      return harObj;
     }
 
     private Group BuildGroup()

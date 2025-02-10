@@ -59,13 +59,18 @@ class Metrics:
         """Enqueues a request/response combination to be submitted the API.
 
         Args:
-            request (Request): Request object from your WSGI server
+            request (Request): Request object from your WSGI/ASGI server
             response (ResponseInfoWrapper): Response object
         """
-        if not self.host_allowed(request.environ["HTTP_HOST"]):
+        if hasattr(request, "environ"):
+            http_host = request.environ["HTTP_HOST"]
+        else:
+            http_host = request.headers.get("host")
+
+        if not self.host_allowed(http_host):
             # pylint: disable=C0301
             self.config.LOGGER.debug(
-                f"Not enqueueing request, host {request.environ['HTTP_HOST']} not in ALLOWED_HTTP_HOSTS"
+                f"Not enqueueing request, host {http_host} not in ALLOWED_HTTP_HOSTS"
             )
             return
 

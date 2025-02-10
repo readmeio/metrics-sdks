@@ -21,9 +21,23 @@ Route::post('/webhook', function (\Illuminate\Http\Request $request) use ($secre
     // $user = DB::table('users')->where('email', $request->input('email'))->limit(1)->get();
     return response()->json([
         // OAS Security variables
-        'api_key' => 'default-api_key-key',
-        'http_basic' => ['user' => 'user', 'pass' => 'pass'],
-        'http_bearer' => 'default-http_bearer-key',
-        'oauth2' => 'default-oauth2-key',
+        'keys' => [
+            [
+                'name' => 'api_key',
+                'apiKey' => 'default-api_key-key',
+            ],
+            [
+                'name' => 'http_basic',
+                'user' => 'user',
+                'pass' => 'pass',
+            ],
+            [
+                'name' => 'http_bearer',
+                'bearer' => 'default-http_bearer-key',
+            ],
+            [
+                'oauth2' => 'default-oauth2-key',
+            ],
+        ]
     ]);
 });
