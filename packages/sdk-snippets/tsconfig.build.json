@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "moduleResolution": "nodenext",
     "allowJs": true,
     "declaration": true,
     "downlevelIteration": true,
