@@ -13,10 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.readme.core.dataextraction.ApiKeyMasker.mask;
@@ -197,11 +194,11 @@ public class OutgoingLogBodyConstructor {
         ObjectMapper mapper = new ObjectMapper();
 
         String mimeType = parseContentType(req.getHeaders().get("content-type"));
+        String requestBody = "";
+
         if(mimeType.equalsIgnoreCase("application/json")) {
             try {
                 JsonNode requestBodyNode = mapper.readTree(req.getBody());
-                String requestBody = "";
-
                 if (denylist != null && !denylist.isEmpty()) {
                     requestBody = applyJsonBodyDenyList(requestBodyNode, denylist).toString();
                     req.setHeaders(applyHeadersDenyList(req.getHeaders(), denylist));
@@ -210,13 +207,20 @@ public class OutgoingLogBodyConstructor {
                     requestBody = applyJsonBodyAllowList(requestBodyNode, allowlist).toString();
                     req.setHeaders(applyHeadersAllowList(req.getHeaders(), allowlist));
                 }
-
-                req.setBody(requestBody);
             } catch (Exception e) {
                 log.error("Error parsing request body", e);
             }
+        } else if (mimeType.equalsIgnoreCase("application/x-www-form-urlencoded")) {
+            if (denylist != null && !denylist.isEmpty()) {
+                requestBody = applyFormUrlEncodedDenyList(req.getBody(), denylist);
+                req.setHeaders(applyHeadersDenyList(req.getHeaders(), denylist));
+            }
+            if (allowlist != null && !allowlist.isEmpty() && denylist == null) {
+                requestBody = applyFormUrlEncodedAllowList(req.getBody(), allowlist);
+                req.setHeaders(applyHeadersAllowList(req.getHeaders(), allowlist));
+            }
         }
-
+        req.setBody(requestBody);
     }
 
     private Map<String, String> applyHeadersDenyList(Map<String, String> headers, List<String> denylist) {
@@ -227,7 +231,10 @@ public class OutgoingLogBodyConstructor {
 
     private Map<String, String> applyHeadersAllowList(Map<String, String> headers, List<String> allowList) {
         return headers.entrySet().stream()
-                .filter(entry -> allowList.contains(entry.getKey()))
+                .filter(entry -> {
+                    return allowList.contains(entry.getKey()) ||
+                            entry.getKey().equalsIgnoreCase("content-type");
+                })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
@@ -257,6 +264,27 @@ public class OutgoingLogBodyConstructor {
             }
         });
         return newObj;
+    }
+
+    private String applyFormUrlEncodedDenyList(String body, List<String> deniedKeys) {
+        return Arrays.stream(body.split("&"))
+                .map(param -> {
+                    String[] keyValue = param.split("=");
+                    if (keyValue.length == 2 && deniedKeys.contains(keyValue[0])) {
+                        return keyValue[0] + "=[REDACTED]";
+                    }
+                    return param;
+                })
+                .collect(Collectors.joining("&"));
+    }
+
+    private String applyFormUrlEncodedAllowList(String body, List<String> allowedKeys) {
+        return Arrays.stream(body.split("&"))
+                .filter(param -> {
+                    String[] keyValue = param.split("=");
+                    return keyValue.length == 2 && allowedKeys.contains(keyValue[0]);
+                })
+                .collect(Collectors.joining("&"));
     }
 
 }

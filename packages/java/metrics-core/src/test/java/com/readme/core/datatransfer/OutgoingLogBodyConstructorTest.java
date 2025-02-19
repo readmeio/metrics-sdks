@@ -158,4 +158,52 @@ class OutgoingLogBodyConstructorTest {
                 .development(true)
                 .build();
     }
+
+    @Test
+    void construct_ShouldApplyFormUrlEncodedDenyList() {
+        PayloadData payloadData = createStubPayloadData();
+        payloadData.getApiCallLogData().getRequestData().setBody("username=owl&password=superSecret123&token=myToken");
+        payloadData.getApiCallLogData().getRequestData().getHeaders().put("content-type", "application/x-www-form-urlencoded");
+
+        LogOptions logOptions = LogOptions.builder()
+                .development(true)
+                .denylist(List.of("password", "token"))
+                .build();
+
+        OutgoingLogBody result = outgoingLogBodyConstructor.construct(payloadData, logOptions);
+
+        Har har = result.getRequest();
+        HarEntry entry = har.getLog().getEntries().get(0);
+        HarRequest request = entry.getRequest();
+        HarPostData postData = request.getPostData();
+
+        assertNotNull(postData);
+        assertTrue(postData.getText().contains("username=owl"));
+        assertTrue(postData.getText().contains("password=[REDACTED]"));
+        assertTrue(postData.getText().contains("token=[REDACTED]"));
+    }
+
+    @Test
+    void construct_ShouldApplyFormUrlEncodedAllowList() {
+        PayloadData payloadData = createStubPayloadData();
+        payloadData.getApiCallLogData().getRequestData().setBody("username=owl&password=superSecret123&token=myToken");
+        payloadData.getApiCallLogData().getRequestData().getHeaders().put("content-type", "application/x-www-form-urlencoded");
+
+        LogOptions logOptions = LogOptions.builder()
+                .development(false)
+                .allowlist(List.of("username"))
+                .build();
+
+        OutgoingLogBody result = outgoingLogBodyConstructor.construct(payloadData, logOptions);
+
+        Har har = result.getRequest();
+        HarEntry entry = har.getLog().getEntries().get(0);
+        HarRequest request = entry.getRequest();
+        HarPostData postData = request.getPostData();
+
+        assertNotNull(postData);
+        assertTrue(postData.getText().contains("username=owl"));
+        assertFalse(postData.getText().contains("password"));
+        assertFalse(postData.getText().contains("token"));
+    }
 }

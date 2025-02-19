@@ -1,6 +1,6 @@
 package com.readme.spring.datacollection;
 
-import com.readme.dataextraction.DataPayloadAdapter;
+import com.readme.core.dataextraction.DataPayloadAdapter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 

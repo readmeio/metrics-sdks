@@ -1,8 +1,8 @@
 package com.readme.spring.datacollection;
 
-import com.readme.dataextraction.payload.requestresponse.ApiCallLogData;
-import com.readme.dataextraction.payload.requestresponse.RequestData;
-import com.readme.dataextraction.payload.requestresponse.ResponseData;
+import com.readme.core.dataextraction.payload.requestresponse.ApiCallLogData;
+import com.readme.core.dataextraction.payload.requestresponse.RequestData;
+import com.readme.core.dataextraction.payload.requestresponse.ResponseData;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

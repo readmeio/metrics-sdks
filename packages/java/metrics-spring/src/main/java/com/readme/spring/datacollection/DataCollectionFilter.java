@@ -1,12 +1,12 @@
 package com.readme.spring.datacollection;
 
-import com.readme.dataextraction.LogOptions;
-import com.readme.dataextraction.payload.PayloadData;
-import com.readme.dataextraction.payload.requestresponse.ApiCallLogData;
-import com.readme.dataextraction.payload.requestresponse.RequestDataCollector;
-import com.readme.dataextraction.payload.user.UserData;
-import com.readme.dataextraction.payload.user.UserDataCollector;
-import com.readme.datatransfer.PayloadDataDispatcher;
+import com.readme.core.dataextraction.LogOptions;
+import com.readme.core.dataextraction.payload.PayloadData;
+import com.readme.core.dataextraction.payload.requestresponse.ApiCallLogData;
+import com.readme.core.dataextraction.payload.requestresponse.RequestDataCollector;
+import com.readme.core.dataextraction.payload.user.UserData;
+import com.readme.core.dataextraction.payload.user.UserDataCollector;
+import com.readme.core.datatransfer.PayloadDataDispatcher;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 
-import static com.readme.dataextraction.payload.PayloadData.*;
+import static com.readme.core.dataextraction.payload.PayloadData.*;
 import static org.springframework.http.HttpMethod.OPTIONS;
 
 

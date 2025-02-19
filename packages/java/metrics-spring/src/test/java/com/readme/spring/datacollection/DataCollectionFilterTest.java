@@ -1,10 +1,10 @@
 package com.readme.spring.datacollection;
 
-import com.readme.dataextraction.LogOptions;
-import com.readme.dataextraction.payload.requestresponse.RequestDataCollector;
-import com.readme.dataextraction.payload.user.UserData;
-import com.readme.dataextraction.payload.user.UserDataCollector;
-import com.readme.datatransfer.PayloadDataDispatcher;
+import com.readme.core.dataextraction.LogOptions;
+import com.readme.core.dataextraction.payload.requestresponse.RequestDataCollector;
+import com.readme.core.dataextraction.payload.user.UserData;
+import com.readme.core.dataextraction.payload.user.UserDataCollector;
+import com.readme.core.datatransfer.PayloadDataDispatcher;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

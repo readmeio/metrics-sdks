@@ -1,7 +1,7 @@
 package com.readme.spring.datacollection.userinfo;
 
-import com.readme.dataextraction.payload.user.UserData;
-import com.readme.dataextraction.payload.user.UserDataSource;
+import com.readme.core.dataextraction.payload.user.UserData;
+import com.readme.core.dataextraction.payload.user.UserDataSource;
 import com.readme.spring.config.UserDataProperties;
 import com.readme.spring.datacollection.ServletDataPayloadAdapter;
 import org.junit.jupiter.api.BeforeEach;

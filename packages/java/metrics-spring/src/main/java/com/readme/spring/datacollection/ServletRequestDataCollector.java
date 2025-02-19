@@ -1,10 +1,10 @@
 package com.readme.spring.datacollection;
 
 
-import com.readme.dataextraction.payload.requestresponse.ApiCallLogData;
-import com.readme.dataextraction.payload.requestresponse.RequestData;
-import com.readme.dataextraction.payload.requestresponse.RequestDataCollector;
-import com.readme.dataextraction.payload.requestresponse.ResponseData;
+import com.readme.core.dataextraction.payload.requestresponse.ApiCallLogData;
+import com.readme.core.dataextraction.payload.requestresponse.RequestData;
+import com.readme.core.dataextraction.payload.requestresponse.RequestDataCollector;
+import com.readme.core.dataextraction.payload.requestresponse.ResponseData;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

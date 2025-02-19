@@ -1,14 +1,14 @@
 package com.readme.spring.config;
 
-import com.readme.config.CoreConfig;
+import com.readme.core.config.CoreConfig;
 
-import com.readme.dataextraction.LogOptions;
-import com.readme.dataextraction.payload.requestresponse.RequestDataCollector;
-import com.readme.dataextraction.payload.user.UserDataCollector;
-import com.readme.datatransfer.DataSender;
-import com.readme.datatransfer.HttpDataSender;
-import com.readme.datatransfer.OutgoingLogBodyConstructor;
-import com.readme.datatransfer.PayloadDataDispatcher;
+import com.readme.core.dataextraction.LogOptions;
+import com.readme.core.dataextraction.payload.requestresponse.RequestDataCollector;
+import com.readme.core.dataextraction.payload.user.UserDataCollector;
+import com.readme.core.datatransfer.DataSender;
+import com.readme.core.datatransfer.HttpDataSender;
+import com.readme.core.datatransfer.OutgoingLogBodyConstructor;
+import com.readme.core.datatransfer.PayloadDataDispatcher;
 import com.readme.spring.datacollection.DataCollectionFilter;
 import com.readme.spring.datacollection.ServletDataPayloadAdapter;
 import com.readme.spring.datacollection.userinfo.ServletUserDataCollector;
