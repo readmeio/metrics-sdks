@@ -1,7 +1,6 @@
-package com.readme.example;
+package com.owl.example;
 
 import com.readme.datatransfer.har.HttpStatus;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,8 +10,8 @@ import java.util.*;
 @RestController
 public class OwlController {
 
-    @Value("${readme.readmeApiKey}")
-    private String readmeApiKey;
+//    @Value("${readme.readmeApiKey}")
+//    private String readmeApiKey;
 
     private final Map<String, String> owlStorage = new HashMap<>();
 
@@ -22,7 +21,7 @@ public class OwlController {
 
     @GetMapping("/owl/{id}")
     public String getOwlById(@PathVariable String id) {
-        return "Owl with id " + id + " and key is " + readmeApiKey;
+        return "Owl with id " + id;
     }
 
     @GetMapping("/owls")

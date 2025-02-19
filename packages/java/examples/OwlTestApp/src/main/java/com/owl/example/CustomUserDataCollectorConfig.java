@@ -1,5 +1,10 @@
-package com.readme.example;
+package com.owl.example;
 
+import com.readme.dataextraction.LogOptions;
+import com.readme.dataextraction.payload.user.UserData;
+import com.readme.dataextraction.payload.user.UserDataCollector;
+import com.readme.starter.datacollection.ServletDataPayloadAdapter;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -24,15 +29,23 @@ public class CustomUserDataCollectorConfig {
     //It automatically overrides the default one
 
 
-//    @Bean
-//    public UserDataCollector<ServletDataPayloadAdapter> customUserDataCollector() {
-//        return payloadAdapter -> {
-//            String apiKey = payloadAdapter.getRequestHeaders().get("x-user-name");
-//            return UserData.builder()
-//                    .apiKey(apiKey)
-//                    .email("owl@owlfactory.abc")
-//                    .label("owl-label")
-//                    .build();
-//        };
-//    }
+    @Bean
+    public UserDataCollector<ServletDataPayloadAdapter> customUserDataCollector() {
+        return payloadAdapter -> {
+            String apiKey = payloadAdapter.getRequestHeaders().get("x-user-name");
+            return UserData.builder()
+                    .apiKey(apiKey)
+                    .email("owl@owlfactory.abc")
+                    .label("owl-label")
+                    .build();
+        };
+    }
+
+    @Bean
+    public LogOptions logOptions() {
+        return LogOptions.builder()
+                .baseLogUrl("http://baseurl.abcd")
+                .bufferLength(1)
+                .build();
+    }
 }
