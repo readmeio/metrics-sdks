@@ -20,6 +20,7 @@ class Metrics
     protected const README_API = 'https://dash.readme.com';
 
     private bool $development_mode = false;
+    private bool $fire_and_forget = true;
     private array $denylist = [];
     private array $allowlist = [];
     private string|null $base_log_url = null;
@@ -44,6 +45,9 @@ class Metrics
         $this->development_mode = array_key_exists('development_mode', $options)
             ? (bool)$options['development_mode']
             : false;
+        $this->fire_and_forget = array_key_exists('fire_and_forget', $options)
+            ? (bool)$options['fire_and_forget']
+            : true;
 
         if (isset($options['denylist']) && is_array($options['denylist'])) {
             $this->denylist = $options['denylist'];
@@ -61,11 +65,11 @@ class Metrics
             $this->base_log_url = $options['base_log_url'];
         }
 
-        // In development mode, requests are sent asynchronously (as well as PHP can without directly invoking
+        // In fire_and_forget mode, requests are sent asynchronously (as well as PHP can without directly invoking
         // shell cURL commands), so a very small timeout here ensures that the Metrics code will finish as fast as
         // possible, send the POST request to the background and continue on with whatever else the application
         // needs to execute.
-        $curl_timeout = (!$this->development_mode) ? 0.2 : 0;
+        $curl_timeout = (!$this->fire_and_forget) ? 0.2 : 0;
 
         $this->curl_handler = new CurlMultiHandler();
         $this->client = (isset($options['client'])) ? $options['client'] : new Client([
@@ -113,8 +117,8 @@ class Metrics
             'User-Agent' => $this->user_agent
         ];
 
-        // If not in development mode, all requests should be async.
-        if (!$this->development_mode) {
+        // If not in fire_and_forget mode, all requests should be async.
+        if ($this->fire_and_forget) {
             try {
                 $promise = $this->client->postAsync('/v1/request', [
                     'headers' => $headers,
@@ -200,11 +204,11 @@ class Metrics
                 $cache->base_url = $json->baseUrl;
                 $cache->last_updated = time();
             } catch (\Exception $e) {
-                // If we're running in development mode, toss any errors that happen when we try to call the ReadMe API.
+                // If we're running in fire_and_forget mode, toss any errors that happen when we try to call the ReadMe API.
                 //
                 // These errors will likely be from invalid API keys, so it'll be good to surface those to users before
                 // it hits production.
-                if ($this->development_mode) {
+                if ($this->fire_and_forget) {
                     try {
                         // If we don't have a ClientException here, throw again so we end up below and handle this
                         // exception as a non-HTTP response problem.
@@ -276,6 +280,11 @@ class Metrics
     public function isInDevelopmentMode(): bool
     {
         return $this->development_mode;
+    }
+
+    public function isInFireAndForgetMode(): bool
+    {
+        return $this->fire_and_forget;
     }
 
     public function getDenylist(): array
