@@ -123,13 +123,13 @@ readme.userdata.label.source=jsonBody
 readme.userdata.label.fieldname=user/name
 ```
 
-While YAML and properties-based configuration offer a simple setup, **using a custom implementation provides more flexibility and customization**.
+While YAML and properties-based configuration offer a minimal setup, **using a custom implementation provides more flexibility and customization**.
 
 ---
 
 ## Logging Configuration
 
-By default, logging for the `com.readme` package is **disabled** to prevent unnecessary log clutter.
+By default, logging for the `com.readme` package is **inactive** to prevent unnecessary log clutter.
 
 If you want to enable logging for this library, you can set the logging level in your `application.properties` or `application.yaml` file:
 
