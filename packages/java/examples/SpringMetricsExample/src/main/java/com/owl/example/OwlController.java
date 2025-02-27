@@ -1,7 +1,6 @@
 package com.owl.example;
 
 import com.readme.core.datatransfer.har.HttpStatus;
-import jakarta.annotation.PostConstruct;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,9 +10,6 @@ import java.util.*;
 
 @RestController
 public class OwlController {
-
-//    @Value("${readme.readmeApiKey}")
-//    private String readmeApiKey;
 
     private final Map<String, String> owlStorage = new HashMap<>();
 

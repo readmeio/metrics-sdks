@@ -1,10 +1,11 @@
 ## Table of Contents
 1. [Overview](#overview)
-2. [User Data Configuration](#user-data-configuration)
+2. [Readme configuration](#readme-configuration)
+3. [User Data Configuration](#user-data-configuration)
     - [Custom User Data Collector](#custom-user-data-collector)
     - [YAML and Properties-based Configuration](#yaml-and-properties-based-configuration)
-3. [Logging Configuration](#logging-configuration)
-4. [Webhook Verification](#webhook-verification)
+4. [Logging Configuration](#logging-configuration)
+5. [Webhook Verification](#webhook-verification)
 
 ---
 
@@ -15,17 +16,27 @@ The SDK is designed to collect detailed information from HTTP requests and respo
 for better observability and insights into application behavior.
 
 ### Key Features:
-1. **Request and Response Data Logging**:
+**Request and Response Data Logging**:
 - Collects HTTP request and response details, including headers, body content, and HTTP status codes.
 - Ensures minimal impact on the application's core business logic by leveraging efficient wrappers for request and response processing.
 
-2. **User Data Extraction**:
+
+**User Data Extraction**:
 - Logs information about the user making the request, such as `api-key`, `email`, and `label`.
 - Supports multiple configurable data extraction methods:
     - **HTTP headers**
     - **JWT claims**
     - **JSON body fields**
 
+---
+
+## Readme configuration
+Metrics-spring expects you to add `readme.readmeApiKey` property to your application `yaml` or `properties` configuration.
+
+```yaml
+readme:
+  readmeApiKey: ${README_API_KEY}
+```  
 ---
 
 ## User Data Configuration

@@ -48,7 +48,6 @@ public class CustomUserDataCollectorConfig {
         return LogOptions.builder()
                 .baseLogUrl("http://baseurl.abcd")
                 .bufferLength(1)
-                .allowlist(List.of("urlencoded_param2"))
                 .build();
     }
 }
