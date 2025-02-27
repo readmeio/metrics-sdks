@@ -143,11 +143,11 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @group track
-     * @dataProvider providerDevelopmentModeToggle
+     * @dataProvider providerFireAndForgetModeToggle
      */
-    public function testTrackHandlesApiErrors(bool $development_mode): void
+    public function testTrackHandlesApiErrors(bool $fire_and_forget): void
     {
-        if ($development_mode) {
+        if (!$fire_and_forget) {
             $this->expectException(MetricsException::class);
             // `RequestModel` from the API response should get swapped out with `ValidationError`.
             $this->expectExceptionMessage('ValidationError: queryString.0.value: Path `value` is required.');
@@ -173,7 +173,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->metrics = new Metrics($this->readme_api_key, $this->group_handler, [
-            'development_mode' => $development_mode,
+            'fire_and_forget' => $fire_and_forget,
             'client' => new Client(['handler' => $handlers->metrics]),
             'client_readme' => new Client(['handler' => $handlers->readme])
         ]);
@@ -183,7 +183,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
         $this->metrics->track($request, $response);
 
-        if (!$development_mode) {
+        if ($fire_and_forget) {
             $this->assertTrue(
                 true,
                 'When not in development mode, exceptions should not have been thrown so this assertion should pass.'
@@ -193,12 +193,12 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @group track
-     * @dataProvider providerDevelopmentModeToggle
+     * @dataProvider providerFireAndForgetModeToggle
      */
-    public function testTrackHandlesApiServerUnavailability(bool $development_mode): void
+    public function testTrackHandlesApiServerUnavailability(bool $fire_and_forget): void
     {
         // Exceptions **should** be thrown under development mode!
-        if ($development_mode) {
+        if (!$fire_and_forget) {
             $this->expectException(ServerException::class);
             $this->expectExceptionMessageMatches('/500 Internal Server Error/');
         }
@@ -209,7 +209,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->metrics = new Metrics($this->readme_api_key, $this->group_handler, [
-            'development_mode' => $development_mode,
+            'fire_and_forget' => $fire_and_forget,
             'client' => new Client(['handler' => $handlers->metrics]),
             'client_readme' => new Client(['handler' => $handlers->readme])
         ]);
@@ -219,7 +219,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
 
         $this->metrics->track($request, $response);
 
-        if (!$development_mode) {
+        if ($fire_and_forget) {
             $this->assertTrue(
                 true,
                 'When not in development mode, exceptions should not be thrown which means this assertion should pass.'
@@ -351,7 +351,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group getProjectBaseUrl
      */
-    public function testProjectBaseUrlIsTemporarilyNullIfReadMeCallFailsWhileNotInDevelopmentMode(): void
+    public function testProjectBaseUrlIsTemporarilyNullIfReadMeCallFailsWhileNotInFireAndForgetMode(): void
     {
         $handlers = $this->getMockHandlers(
             new \GuzzleHttp\Psr7\Response(200),
@@ -367,7 +367,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->metrics = new Metrics($this->readme_api_key, $this->group_handler, [
-            'development_mode' => false,
+            'fire_and_forget' => false,
             'client' => new Client(['handler' => $handlers->metrics]),
             'client_readme' => new Client(['handler' => $handlers->readme])
         ]);
@@ -509,6 +509,14 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         return [
             'development mode on' => [true],
             'development mode off' => [false],
+        ];
+    }
+
+    public function providerFireAndForgetModeToggle(): array
+    {
+        return [
+            'fireAndForget mode on' => [true],
+            'fireAndForget mode off' => [false],
         ];
     }
 }
