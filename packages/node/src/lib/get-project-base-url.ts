@@ -1,13 +1,15 @@
 import crypto from 'crypto';
 
 import findCacheDir from 'find-cache-dir';
-import flatCache from 'flat-cache';
+import { FlatCache } from 'flat-cache';
 import timeoutSignal from 'timeout-signal';
 
 import pkg from '../../package.json';
 import config from '../config';
 
 import { logger } from './logger';
+
+export const cache = new FlatCache();
 
 export function getCache(readmeApiKey: string) {
   const encodedApiKey = Buffer.from(`${readmeApiKey}:`).toString('base64');
@@ -18,16 +20,16 @@ export function getCache(readmeApiKey: string) {
   // automatically get refreshed when the package is updated/installed.
   const cacheKey = `${pkg.name}-${pkg.version}-${fsSafeApikey}`;
 
-  return flatCache.load(cacheKey, cacheDir);
+  return cache.load(cacheKey, cacheDir);
 }
 
 export async function getProjectBaseUrl(readmeApiKey: string, requestTimeout = config.timeout): Promise<string> {
   const encodedApiKey = Buffer.from(`${readmeApiKey}:`).toString('base64');
 
-  const cache = getCache(readmeApiKey);
+  getCache(readmeApiKey);
   // Does the cache exist? If it doesn't, let's fill it. If it does, let's see if it's stale. Caches should have a TTL
   // of 1 day.
-  const lastUpdated = cache.getKey('lastUpdated');
+  const lastUpdated = cache.getKey<number>('lastUpdated');
 
   if (
     lastUpdated === undefined ||
@@ -76,7 +78,7 @@ export async function getProjectBaseUrl(readmeApiKey: string, requestTimeout = c
 
     return baseUrl;
   }
-  const cachedBaseUrl = cache.getKey('baseUrl');
+  const cachedBaseUrl = cache.getKey<string>('baseUrl');
   logger.verbose({ message: 'Retrieved baseUrl from cache.', args: { baseUrl: cachedBaseUrl } });
   return cachedBaseUrl;
 }

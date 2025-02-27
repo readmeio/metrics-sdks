@@ -1,3 +1,4 @@
+import type { VariableOptions } from '../../../../helpers/code-builder';
 import type { Client } from '../../../targets';
 
 import { CodeBuilder } from '../../../../helpers/code-builder';
@@ -89,30 +90,48 @@ export const dotnet6: Client = {
 
     if (security.length) {
       push('// OAS Security variables', 2);
+      push('keys = new[]', 2);
+      push('{', 2);
       security.forEach(data => {
-        if (data.type === 'http') {
-          // Only HTTP Basic auth has any special handling for supplying auth.
-          if (data.scheme === 'basic') {
-            pushVariable(`${escapeForObjectKey(data.name, true)} = new { user = "user", pass = "pass" },`, {
-              type: 'security',
-              name: data.name,
-              indentationLevel: 2,
-            });
-            return;
+        const variableOptions: VariableOptions = {
+          type: 'security',
+          name: data.name,
+          indentationLevel: 4,
+        };
+
+        push('new', 3);
+        push('{', 3);
+        if (data.type === 'http' || data.type === 'apiKey') {
+          pushVariable(`name = "${escapeForDoubleQuotes(data.name)}",`, variableOptions);
+
+          if (data.type === 'http') {
+            if (data.scheme === 'basic') {
+              push('user = "user",', 4);
+              push('pass = "pass",', 4);
+            } else if (data.scheme === 'bearer') {
+              pushVariable(
+                `bearer = "${escapeForDoubleQuotes(data.default || data.default === '' ? data.default : data.name)}",`,
+                variableOptions,
+              );
+            }
+          } else {
+            pushVariable(
+              `apiKey = "${escapeForDoubleQuotes(data.default || data.default === '' ? data.default : data.name)}",`,
+              variableOptions,
+            );
           }
+        } else {
+          pushVariable(
+            `${escapeForObjectKey(data.name, true)} = "${escapeForDoubleQuotes(
+              data.default || data.default === '' ? data.default : data.name,
+            )}",`,
+            variableOptions,
+          );
         }
 
-        pushVariable(
-          `${escapeForObjectKey(data.name, true)} = "${escapeForDoubleQuotes(
-            data.default || data.default === '' ? data.default : data.name,
-          )}",`,
-          {
-            type: 'security',
-            name: data.name,
-            indentationLevel: 2,
-          },
-        );
+        push('},', 3);
       });
+      push('}', 2);
     }
 
     push('});', 1);

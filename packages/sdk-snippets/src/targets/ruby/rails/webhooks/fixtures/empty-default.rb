@@ -30,7 +30,11 @@ class MetricsController < ApplicationController
       name: '',
 
       # OAS Security variables
-      petstore_auth: '',
+      keys: [
+        {
+          petstore_auth: '',
+        },
+      ]
     }
   end
 end
