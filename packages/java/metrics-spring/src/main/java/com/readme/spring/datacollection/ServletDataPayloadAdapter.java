@@ -20,7 +20,6 @@ public class ServletDataPayloadAdapter implements DataPayloadAdapter {
     private ContentCachingRequestWrapper request;
     private ContentCachingResponseWrapper response;
 
-    //TODO Do I need a separate method to get request parameters?
 
     @Override
     public String getRequestMethod() {

@@ -194,7 +194,7 @@ public class OutgoingLogBodyConstructor {
         ObjectMapper mapper = new ObjectMapper();
 
         String mimeType = parseContentType(req.getHeaders().get("content-type"));
-        String requestBody = "";
+        String requestBody = req.getBody();
 
         if(mimeType.equalsIgnoreCase("application/json")) {
             try {

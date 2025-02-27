@@ -20,7 +20,7 @@ public class WebhookController {
     public ResponseEntity<WebhookResponse> handleWebhook(@RequestBody String requestBody,
                                                          @RequestHeader("readme-signature") String signature) {
         WebhookVerifier.verifyWebhook(requestBody, signature, SECRET);
-        return ResponseEntity.ok(new WebhookResponse("Owl Bowl"));
+        return ResponseEntity.ok(new WebhookResponse("QaOwl"));
     }
 
     @Data

@@ -21,8 +21,6 @@ public class ServletUserDataExtractor implements UserDataExtractor<ServletDataPa
 
     private ObjectMapper objectMapper;
 
-    //TODO Consider possibility to extract the data from the header`s multiple value
-    // Does it make any practical sense?
     @Override
     public String extractFromHeader(ServletDataPayloadAdapter payload, String fieldName) {
         Map<String, String> requestHeaders = payload.getRequestHeaders();

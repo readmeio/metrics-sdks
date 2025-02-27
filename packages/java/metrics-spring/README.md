@@ -1,9 +1,10 @@
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Readme configuration](#readme-configuration)
 3. [User Data Configuration](#user-data-configuration)
-    - [Custom User Data Collector](#custom-user-data-collector)
-    - [YAML and Properties-based Configuration](#yaml-and-properties-based-configuration)
+   - [Custom User Data Collector](#custom-user-data-collector)
+   - [YAML and Properties-based Configuration](#yaml-and-properties-based-configuration)
 4. [Logging Configuration](#logging-configuration)
 5. [Webhook Verification](#webhook-verification)
 
@@ -16,32 +17,36 @@ The SDK is designed to collect detailed information from HTTP requests and respo
 for better observability and insights into application behavior.
 
 ### Key Features:
+
 **Request and Response Data Logging**:
+
 - Collects HTTP request and response details, including headers, body content, and HTTP status codes.
 - Ensures minimal impact on the application's core business logic by leveraging efficient wrappers for request and response processing.
 
-
 **User Data Extraction**:
+
 - Logs information about the user making the request, such as `api-key`, `email`, and `label`.
 - Supports multiple configurable data extraction methods:
-    - **HTTP headers**
-    - **JWT claims**
-    - **JSON body fields**
+  - **HTTP headers**
+  - **JWT claims**
+  - **JSON body fields**
 
 ---
 
 ## Readme configuration
+
 Metrics-spring expects you to add `readme.readmeApiKey` property to your application `yaml` or `properties` configuration.
 
 ```yaml
 readme:
   readmeApiKey: ${README_API_KEY}
-```  
+```
+
 ---
 
 ## User Data Configuration
 
-The library provides multiple ways to configure user data extraction. The recommended approach is to define a custom implementation of `UserDataCollector`. 
+The library provides multiple ways to configure user data extraction. The recommended approach is to define a custom implementation of `UserDataCollector`.
 However, you can also use YAML or properties-based configuration.
 
 ### Custom User Data Collector
@@ -81,14 +86,16 @@ As an alternative to implementing `UserDataCollector`, you can configure user da
 Using this approach, the library will try to get user data automatically based on provided properties.
 
 Each field (`apiKey`, `email`, `label`) requires two properties:
+
 - **`source`**: Specifies where to extract the data from.
-    - Possible values:
-        - `header`: Extracts data from an HTTP header.
-        - `jwtClaim`: Extracts data from a JWT token claim.
-        - `jsonBody`: Extracts data from the JSON body of a request.
+  - Possible values:
+    - `header`: Extracts data from an HTTP header.
+    - `jwtClaim`: Extracts data from a JWT token claim.
+    - `jsonBody`: Extracts data from the JSON body of a request.
 - **`fieldName`**: The key or field name corresponding to the specified source.
 
 #### Example YAML Configuration
+
 ```yaml
 readme:
   userdata:
@@ -104,6 +111,7 @@ readme:
 ```
 
 #### Example Properties Configuration
+
 ```properties
 readme.userdata.apikey.source=header
 readme.userdata.apikey.fieldname=X-User-Id
@@ -126,11 +134,13 @@ By default, logging for the `com.readme` package is **disabled** to prevent unne
 If you want to enable logging for this library, you can set the logging level in your `application.properties` or `application.yaml` file:
 
 **application.properties:**
+
 ```properties
 logging.level.com.readme=DEBUG
 ```
 
 **application.yaml:**
+
 ```yaml
 logging:
   level:

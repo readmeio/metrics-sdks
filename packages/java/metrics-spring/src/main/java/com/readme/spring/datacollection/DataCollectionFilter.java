@@ -23,15 +23,7 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 
 
 //TODO Fix:
-// 1. Convert IpV6 to V4 ?????
-// 2. * Request.entries.pageref is empty
-// 5. * Add response content size and mime type
-// 6. Handle Basic tokens as well as Bearer ones
-// 7. Validate the collected data on readme dashboard
-// 8. Fix core and starter tests
-// 9. Consider to rename core-metrics (maybe just "core") and starter (maybe just "spring")
-// 10. Handle case if SDK user configured getting request user data from body, but GET req doesn't have it
-// 11. Validate user data. Collect request data only if user data is valid ?
+// Handle Basic tokens as well as Bearer ones
 
 @AllArgsConstructor
 @Slf4j

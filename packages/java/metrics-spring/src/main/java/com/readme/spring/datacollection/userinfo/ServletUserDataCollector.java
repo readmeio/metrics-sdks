@@ -98,7 +98,6 @@ public class ServletUserDataCollector implements UserDataCollector<ServletDataPa
 
         log.error("unknown field source: {}", fieldMapping.getSource());
 
-        //TODO handle this
         return "";
     }
 

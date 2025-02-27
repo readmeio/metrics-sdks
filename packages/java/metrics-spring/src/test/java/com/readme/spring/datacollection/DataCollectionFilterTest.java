@@ -101,9 +101,6 @@ class DataCollectionFilterTest {
 
         verify(userDataCollector).collect(payloadCaptor.capture());
         verify(requestDataCollector).collect(eq(payloadCaptor.getValue()));
-
-        // TODO Verify response body is copied
-        // verify(response).getOutputStream();
     }
 
     private static UserData getMockedUserData() {
