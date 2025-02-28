@@ -351,7 +351,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
     /**
      * @group getProjectBaseUrl
      */
-    public function testProjectBaseUrlIsTemporarilyNullIfReadMeCallFailsWhileNotInFireAndForgetMode(): void
+    public function testProjectBaseUrlIsTemporarilyNullIfReadMeCallFailsWhileInFireAndForgetMode(): void
     {
         $handlers = $this->getMockHandlers(
             new \GuzzleHttp\Psr7\Response(200),
@@ -367,7 +367,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->metrics = new Metrics($this->readme_api_key, $this->group_handler, [
-            'fire_and_forget' => false,
+            'fire_and_forget' => true,
             'client' => new Client(['handler' => $handlers->metrics]),
             'client_readme' => new Client(['handler' => $handlers->readme])
         ]);
@@ -407,7 +407,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->metrics = new Metrics($this->readme_api_key, $this->group_handler, [
-            'development_mode' => true,
+            'fire_and_forget' => false,
             'client' => new Client(['handler' => $handlers->metrics]),
             'client_readme' => new Client(['handler' => $handlers->readme])
         ]);
@@ -432,7 +432,7 @@ class MetricsTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->metrics = new Metrics($this->readme_api_key, $this->group_handler, [
-            'development_mode' => true,
+            'fire_and_forget' => false,
             'client' => new Client(['handler' => $handlers->metrics]),
             'client_readme' => new Client(['handler' => $handlers->readme])
         ]);

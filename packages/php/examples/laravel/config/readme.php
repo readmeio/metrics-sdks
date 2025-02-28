@@ -1,4 +1,4 @@
-<?php
+q<?php
 
 return [
     /**
@@ -16,8 +16,8 @@ return [
 
     /**
      * Since ReadMe doesn't want to take your API down if you happen to be
-     * unable to send metrics to us, development mode is enabled by default and
-     * will do two things:
+     * unable to send metrics to us, fire and forget mode is enabled by default
+     * and will do two things:
      *
      *  - Make all API requests asynchronously.
      *  - Silence all possible errors in transit.
@@ -26,6 +26,12 @@ return [
      * enabling this option so you can see any possible error that may be
      * present in your payload before you deploy to production.
      */
+    'fire_and_forget' => true,
+
+    /**
+     * When true, the log will be marked as a development log. This is great for
+     * separating staging or test data from data coming from customers.
+    */
     'development_mode' => false,
 
     /**

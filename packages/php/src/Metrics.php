@@ -204,11 +204,11 @@ class Metrics
                 $cache->base_url = $json->baseUrl;
                 $cache->last_updated = time();
             } catch (\Exception $e) {
-                // If we're running in fire_and_forget mode, toss any errors that happen when we try to call the ReadMe API.
-                //
+                // If we're running in fire_and_forget mode, toss any errors that happen when we try to call the
+                // ReadMe API.
                 // These errors will likely be from invalid API keys, so it'll be good to surface those to users before
                 // it hits production.
-                if ($this->fire_and_forget) {
+                if (!$this->fire_and_forget) {
                     try {
                         // If we don't have a ClientException here, throw again so we end up below and handle this
                         // exception as a non-HTTP response problem.
