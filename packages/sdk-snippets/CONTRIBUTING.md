@@ -58,14 +58,14 @@ Clients are what _actually_ generate snippets. For Node, if you want to generate
 Once that's all done and your client is constructed you're ready to run unit tests.
 
 ```bash
-npx jest src/targets/targets.test.ts
+npx vitest src/targets/targets.test.ts
 ```
 
 - Running this on a brand new client will throw exceptions for missing fixture snapshots, add those to `src/targets/{TARGET}/{CLIENT}/{server|webhooks}/fixtures` as they come up.
-- If you happen to make changes to your client and it breaks your fixture snapshots you can re-run Jest with `OVERWRITE_EVERYTHING=true` update your fixtures.
+- If you happen to make changes to your client and it breaks your fixture snapshots you can re-run Vitest with `OVERWRITE_EVERYTHING=true` update your fixtures.
 
 ```bash
-OVERWRITE_EVERYTHING=true npx jest src/targets/targets.test.ts
+OVERWRITE_EVERYTHING=true npx vitest src/targets/targets.test.ts
 ```
 
 ### `client.ts`

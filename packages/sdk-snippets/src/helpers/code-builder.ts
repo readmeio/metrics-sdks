@@ -4,6 +4,12 @@ import { CodeBuilder as HTTPSnippetCodeBuilder } from '@readme/httpsnippet/helpe
 
 export type { CodeBuilderOptions };
 
+export interface VariableOptions {
+  indentationLevel?: number;
+  name: string;
+  type: 'security' | 'server';
+}
+
 export class CodeBuilder extends HTTPSnippetCodeBuilder {
   sections: {
     payload?: {
@@ -43,14 +49,7 @@ export class CodeBuilder extends HTTPSnippetCodeBuilder {
    * Push a dynamic piece of code to the snippet and record where in the snippet it was added.
    *
    */
-  pushVariable = (
-    line: string,
-    opts: {
-      indentationLevel?: number;
-      name: string;
-      type: 'security' | 'server';
-    },
-  ) => {
+  pushVariable = (line: string, opts: VariableOptions) => {
     this.push(line, opts.indentationLevel);
 
     // Record where in the snippet this variable is located.

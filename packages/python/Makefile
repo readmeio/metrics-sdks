@@ -12,14 +12,23 @@ lint: ## Run code standard checks
 lint-fix: ## Run code formatting checks
 	black .
 
-serve-metrics-django: ## Start the local Django server to test Metrics
-	README_API_KEY=$(API_KEY) python3 examples/metrics_django/manage.py runserver
+serve-metrics-django-wsgi: ## Start the local Django WSGI server to test Metrics
+	README_API_KEY=$(API_KEY) SERVER_TYPE="wsgi" python3 examples/metrics_django/manage.py runserver
+
+serve-metrics-django-asgi: ## Start the local Django ASGI server to test Metrics
+	README_API_KEY=$(API_KEY) SERVER_TYPE="asgi" python3 examples/metrics_django/manage.py runserver
 
 serve-metrics-flask: ## Start the local Flask server to test Metrics
 	README_API_KEY=$(API_KEY) python3 examples/flask/app.py
 
 serve-webhooks-flask: ## Start the local Flask server to test webhooks
 	README_API_KEY=$(API_KEY) python3 examples/flask/webhooks.py
+
+serve-metrics-fastapi: ## Start the local FastAPI server to test Metrics
+	cd examples/fastapi && README_API_KEY=$(API_KEY) uvicorn app:app --reload
+
+serve-webhooks-fastapi: ## Start the local FastAPI server to test webhooks
+	cd examples/fastapi && README_API_KEY=$(API_KEY) uvicorn webhooks:app --reload
 
 test: ## Run unit tests
 	pytest

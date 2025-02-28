@@ -440,7 +440,7 @@ exports[`webhooks > C# snippet generation > dotnet6 > request should match fixtu
 {
   "sections": {
     "payload": {
-      "end": 37,
+      "end": 43,
       "start": 27,
     },
     "verification": {
@@ -451,7 +451,7 @@ exports[`webhooks > C# snippet generation > dotnet6 > request should match fixtu
   "variables": {
     "security": {
       "petstore_auth": {
-        "line": 36,
+        "line": 40,
       },
     },
     "server": {
@@ -467,7 +467,7 @@ exports[`webhooks > C# snippet generation > dotnet6 > request should match fixtu
 {
   "sections": {
     "payload": {
-      "end": 42,
+      "end": 58,
       "start": 27,
     },
     "verification": {
@@ -478,13 +478,13 @@ exports[`webhooks > C# snippet generation > dotnet6 > request should match fixtu
   "variables": {
     "security": {
       "\\"petstore\\" auth": {
-        "line": 39,
+        "line": 43,
       },
       "basic-auth": {
-        "line": 40,
+        "line": 47,
       },
       "normal_security_var": {
-        "line": 41,
+        "line": 53,
       },
     },
     "server": {
@@ -509,7 +509,7 @@ exports[`webhooks > C# snippet generation > dotnet6 > request should match fixtu
 {
   "sections": {
     "payload": {
-      "end": 39,
+      "end": 50,
       "start": 27,
     },
     "verification": {
@@ -520,10 +520,10 @@ exports[`webhooks > C# snippet generation > dotnet6 > request should match fixtu
   "variables": {
     "security": {
       "basic_auth": {
-        "line": 38,
+        "line": 45,
       },
       "petstore_auth": {
-        "line": 37,
+        "line": 41,
       },
     },
     "server": {
@@ -542,7 +542,7 @@ exports[`webhooks > C# snippet generation > dotnet6 > request should match fixtu
 {
   "sections": {
     "payload": {
-      "end": 37,
+      "end": 56,
       "start": 27,
     },
     "verification": {
@@ -553,16 +553,16 @@ exports[`webhooks > C# snippet generation > dotnet6 > request should match fixtu
   "variables": {
     "security": {
       "api_key": {
-        "line": 33,
+        "line": 38,
       },
       "http_basic": {
-        "line": 34,
+        "line": 42,
       },
       "http_bearer": {
-        "line": 35,
+        "line": 49,
       },
       "oauth2": {
-        "line": 36,
+        "line": 53,
       },
     },
   },
@@ -573,7 +573,7 @@ exports[`webhooks > C# snippet generation > dotnet6 > request should match fixtu
 {
   "sections": {
     "payload": {
-      "end": 35,
+      "end": 46,
       "start": 27,
     },
     "verification": {
@@ -584,10 +584,10 @@ exports[`webhooks > C# snippet generation > dotnet6 > request should match fixtu
   "variables": {
     "security": {
       "basic_auth": {
-        "line": 34,
+        "line": 41,
       },
       "petstore_auth": {
-        "line": 33,
+        "line": 37,
       },
     },
   },
@@ -1059,7 +1059,7 @@ exports[`webhooks > Node.js snippet generation > express > request should match 
 {
   "sections": {
     "payload": {
-      "end": 28,
+      "end": 32,
       "start": 20,
     },
     "verification": {
@@ -1070,7 +1070,7 @@ exports[`webhooks > Node.js snippet generation > express > request should match 
   "variables": {
     "security": {
       "petstore_auth": {
-        "line": 27,
+        "line": 29,
       },
     },
     "server": {
@@ -1086,7 +1086,7 @@ exports[`webhooks > Node.js snippet generation > express > request should match 
 {
   "sections": {
     "payload": {
-      "end": 33,
+      "end": 45,
       "start": 20,
     },
     "verification": {
@@ -1097,13 +1097,13 @@ exports[`webhooks > Node.js snippet generation > express > request should match 
   "variables": {
     "security": {
       "\\"petstore\\" auth": {
-        "line": 30,
+        "line": 32,
       },
       "basic-auth": {
-        "line": 31,
+        "line": 35,
       },
       "normal_security_var": {
-        "line": 32,
+        "line": 40,
       },
     },
     "server": {
@@ -1128,7 +1128,7 @@ exports[`webhooks > Node.js snippet generation > express > request should match 
 {
   "sections": {
     "payload": {
-      "end": 30,
+      "end": 38,
       "start": 20,
     },
     "verification": {
@@ -1139,10 +1139,10 @@ exports[`webhooks > Node.js snippet generation > express > request should match 
   "variables": {
     "security": {
       "basic_auth": {
-        "line": 29,
+        "line": 33,
       },
       "petstore_auth": {
-        "line": 28,
+        "line": 30,
       },
     },
     "server": {
@@ -1161,7 +1161,7 @@ exports[`webhooks > Node.js snippet generation > express > request should match 
 {
   "sections": {
     "payload": {
-      "end": 28,
+      "end": 42,
       "start": 20,
     },
     "verification": {
@@ -1172,16 +1172,16 @@ exports[`webhooks > Node.js snippet generation > express > request should match 
   "variables": {
     "security": {
       "api_key": {
-        "line": 24,
+        "line": 27,
       },
       "http_basic": {
-        "line": 25,
+        "line": 30,
       },
       "http_bearer": {
-        "line": 26,
+        "line": 36,
       },
       "oauth2": {
-        "line": 27,
+        "line": 39,
       },
     },
   },
@@ -1192,7 +1192,7 @@ exports[`webhooks > Node.js snippet generation > express > request should match 
 {
   "sections": {
     "payload": {
-      "end": 26,
+      "end": 34,
       "start": 20,
     },
     "verification": {
@@ -1203,10 +1203,10 @@ exports[`webhooks > Node.js snippet generation > express > request should match 
   "variables": {
     "security": {
       "basic_auth": {
-        "line": 25,
+        "line": 29,
       },
       "petstore_auth": {
-        "line": 24,
+        "line": 26,
       },
     },
   },
@@ -1258,7 +1258,7 @@ exports[`webhooks > PHP snippet generation > laravel > request should match fixt
 {
   "sections": {
     "payload": {
-      "end": 28,
+      "end": 32,
       "start": 20,
     },
     "verification": {
@@ -1269,7 +1269,7 @@ exports[`webhooks > PHP snippet generation > laravel > request should match fixt
   "variables": {
     "security": {
       "petstore_auth": {
-        "line": 27,
+        "line": 29,
       },
     },
     "server": {
@@ -1285,7 +1285,7 @@ exports[`webhooks > PHP snippet generation > laravel > request should match fixt
 {
   "sections": {
     "payload": {
-      "end": 33,
+      "end": 45,
       "start": 20,
     },
     "verification": {
@@ -1296,13 +1296,13 @@ exports[`webhooks > PHP snippet generation > laravel > request should match fixt
   "variables": {
     "security": {
       "\\"petstore\\" auth": {
-        "line": 30,
+        "line": 32,
       },
       "basic-auth": {
-        "line": 31,
+        "line": 35,
       },
       "normal_security_var": {
-        "line": 32,
+        "line": 40,
       },
     },
     "server": {
@@ -1327,7 +1327,7 @@ exports[`webhooks > PHP snippet generation > laravel > request should match fixt
 {
   "sections": {
     "payload": {
-      "end": 30,
+      "end": 38,
       "start": 20,
     },
     "verification": {
@@ -1338,10 +1338,10 @@ exports[`webhooks > PHP snippet generation > laravel > request should match fixt
   "variables": {
     "security": {
       "basic_auth": {
-        "line": 29,
+        "line": 33,
       },
       "petstore_auth": {
-        "line": 28,
+        "line": 30,
       },
     },
     "server": {
@@ -1360,7 +1360,7 @@ exports[`webhooks > PHP snippet generation > laravel > request should match fixt
 {
   "sections": {
     "payload": {
-      "end": 28,
+      "end": 42,
       "start": 20,
     },
     "verification": {
@@ -1371,16 +1371,16 @@ exports[`webhooks > PHP snippet generation > laravel > request should match fixt
   "variables": {
     "security": {
       "api_key": {
-        "line": 24,
+        "line": 27,
       },
       "http_basic": {
-        "line": 25,
+        "line": 30,
       },
       "http_bearer": {
-        "line": 26,
+        "line": 36,
       },
       "oauth2": {
-        "line": 27,
+        "line": 39,
       },
     },
   },
@@ -1391,7 +1391,7 @@ exports[`webhooks > PHP snippet generation > laravel > request should match fixt
 {
   "sections": {
     "payload": {
-      "end": 26,
+      "end": 34,
       "start": 20,
     },
     "verification": {
@@ -1402,10 +1402,10 @@ exports[`webhooks > PHP snippet generation > laravel > request should match fixt
   "variables": {
     "security": {
       "basic_auth": {
-        "line": 25,
+        "line": 29,
       },
       "petstore_auth": {
-        "line": 24,
+        "line": 26,
       },
     },
   },
@@ -1877,7 +1877,7 @@ exports[`webhooks > Python snippet generation > flask > request should match fix
 {
   "sections": {
     "payload": {
-      "end": 43,
+      "end": 47,
       "start": 31,
     },
     "verification": {
@@ -1888,7 +1888,7 @@ exports[`webhooks > Python snippet generation > flask > request should match fix
   "variables": {
     "security": {
       "petstore_auth": {
-        "line": 39,
+        "line": 41,
       },
     },
     "server": {
@@ -1904,7 +1904,7 @@ exports[`webhooks > Python snippet generation > flask > request should match fix
 {
   "sections": {
     "payload": {
-      "end": 48,
+      "end": 60,
       "start": 31,
     },
     "verification": {
@@ -1915,13 +1915,13 @@ exports[`webhooks > Python snippet generation > flask > request should match fix
   "variables": {
     "security": {
       "\\"petstore\\" auth": {
-        "line": 42,
+        "line": 44,
       },
       "basic-auth": {
-        "line": 43,
+        "line": 47,
       },
       "normal_security_var": {
-        "line": 44,
+        "line": 52,
       },
     },
     "server": {
@@ -1946,7 +1946,7 @@ exports[`webhooks > Python snippet generation > flask > request should match fix
 {
   "sections": {
     "payload": {
-      "end": 45,
+      "end": 53,
       "start": 31,
     },
     "verification": {
@@ -1957,10 +1957,10 @@ exports[`webhooks > Python snippet generation > flask > request should match fix
   "variables": {
     "security": {
       "basic_auth": {
-        "line": 41,
+        "line": 45,
       },
       "petstore_auth": {
-        "line": 40,
+        "line": 42,
       },
     },
     "server": {
@@ -1979,7 +1979,7 @@ exports[`webhooks > Python snippet generation > flask > request should match fix
 {
   "sections": {
     "payload": {
-      "end": 43,
+      "end": 57,
       "start": 31,
     },
     "verification": {
@@ -1990,16 +1990,16 @@ exports[`webhooks > Python snippet generation > flask > request should match fix
   "variables": {
     "security": {
       "api_key": {
-        "line": 36,
+        "line": 39,
       },
       "http_basic": {
-        "line": 37,
+        "line": 42,
       },
       "http_bearer": {
-        "line": 38,
+        "line": 48,
       },
       "oauth2": {
-        "line": 39,
+        "line": 51,
       },
     },
   },
@@ -2010,7 +2010,7 @@ exports[`webhooks > Python snippet generation > flask > request should match fix
 {
   "sections": {
     "payload": {
-      "end": 41,
+      "end": 49,
       "start": 31,
     },
     "verification": {
@@ -2021,10 +2021,10 @@ exports[`webhooks > Python snippet generation > flask > request should match fix
   "variables": {
     "security": {
       "basic_auth": {
-        "line": 37,
+        "line": 41,
       },
       "petstore_auth": {
-        "line": 36,
+        "line": 38,
       },
     },
   },
@@ -2496,7 +2496,7 @@ exports[`webhooks > Ruby snippet generation > rails > request should match fixtu
 {
   "sections": {
     "payload": {
-      "end": 34,
+      "end": 38,
       "start": 26,
     },
     "verification": {
@@ -2507,7 +2507,7 @@ exports[`webhooks > Ruby snippet generation > rails > request should match fixtu
   "variables": {
     "security": {
       "petstore_auth": {
-        "line": 33,
+        "line": 35,
       },
     },
     "server": {
@@ -2523,7 +2523,7 @@ exports[`webhooks > Ruby snippet generation > rails > request should match fixtu
 {
   "sections": {
     "payload": {
-      "end": 39,
+      "end": 51,
       "start": 26,
     },
     "verification": {
@@ -2534,13 +2534,13 @@ exports[`webhooks > Ruby snippet generation > rails > request should match fixtu
   "variables": {
     "security": {
       "\\"petstore\\" auth": {
-        "line": 36,
+        "line": 38,
       },
       "basic-auth": {
-        "line": 37,
+        "line": 41,
       },
       "normal_security_var": {
-        "line": 38,
+        "line": 46,
       },
     },
     "server": {
@@ -2565,7 +2565,7 @@ exports[`webhooks > Ruby snippet generation > rails > request should match fixtu
 {
   "sections": {
     "payload": {
-      "end": 36,
+      "end": 44,
       "start": 26,
     },
     "verification": {
@@ -2576,10 +2576,10 @@ exports[`webhooks > Ruby snippet generation > rails > request should match fixtu
   "variables": {
     "security": {
       "basic_auth": {
-        "line": 35,
+        "line": 39,
       },
       "petstore_auth": {
-        "line": 34,
+        "line": 36,
       },
     },
     "server": {
@@ -2598,7 +2598,7 @@ exports[`webhooks > Ruby snippet generation > rails > request should match fixtu
 {
   "sections": {
     "payload": {
-      "end": 34,
+      "end": 48,
       "start": 26,
     },
     "verification": {
@@ -2609,16 +2609,16 @@ exports[`webhooks > Ruby snippet generation > rails > request should match fixtu
   "variables": {
     "security": {
       "api_key": {
-        "line": 30,
+        "line": 33,
       },
       "http_basic": {
-        "line": 31,
+        "line": 36,
       },
       "http_bearer": {
-        "line": 32,
+        "line": 42,
       },
       "oauth2": {
-        "line": 33,
+        "line": 45,
       },
     },
   },
@@ -2629,7 +2629,7 @@ exports[`webhooks > Ruby snippet generation > rails > request should match fixtu
 {
   "sections": {
     "payload": {
-      "end": 32,
+      "end": 40,
       "start": 26,
     },
     "verification": {
@@ -2640,10 +2640,10 @@ exports[`webhooks > Ruby snippet generation > rails > request should match fixtu
   "variables": {
     "security": {
       "basic_auth": {
-        "line": 31,
+        "line": 35,
       },
       "petstore_auth": {
-        "line": 30,
+        "line": 32,
       },
     },
   },
