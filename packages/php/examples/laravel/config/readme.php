@@ -59,4 +59,6 @@ return [
      * will is cached into `$COMPOSER_HOME/cache`.
      */
     'base_log_url' => null,
+
+    'buffer_length' => 2,
 ];
