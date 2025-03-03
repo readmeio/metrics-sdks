@@ -13,7 +13,12 @@ module Readme
       end
 
       def to_a
-        filtered_hash.map { |name, value| { name: name, value: value.is_a?(Hash) ? value.to_json : value } }
+        filtered_hash.map do |name, value|
+          {
+            name: name,
+            value: value.is_a?(Hash) ? value.to_json : value
+          }
+        end
       end
 
       private
