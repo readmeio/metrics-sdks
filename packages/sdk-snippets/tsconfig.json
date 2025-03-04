@@ -1,12 +1,17 @@
 {
-  "extends": "./tsconfig.build.json",
   "compilerOptions": {
-    "rootDir": ".",
+    "allowJs": true,
+    "declaration": true,
+    "downlevelIteration": true,
+    "esModuleInterop": true,
+    "module": "Node16",
+    "outDir": "dist",
+    "skipLibCheck": true,
 
     // Allows us to not have to typeguard in catches.
     // https://bobbyhadz.com/blog/typescript-object-is-of-type-unknown
     "useUnknownInCatchVariables": false
   },
-  "exclude": ["dist"],
-  "include": ["src"]
+  "include": ["./src/**/*"],
+  "exclude": ["dist", "./src/fixtures/", "./src/**/fixtures", "**/*.test.ts"]
 }
