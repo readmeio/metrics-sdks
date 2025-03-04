@@ -1,6 +1,6 @@
-import type { CodeBuilderOptions } from '@readme/httpsnippet/dist/helpers/code-builder';
+import type { CodeBuilderOptions } from '@readme/httpsnippet/helpers/code-builder';
 
-import { CodeBuilder as HTTPSnippetCodeBuilder } from '@readme/httpsnippet/dist/helpers/code-builder';
+import { CodeBuilder as HTTPSnippetCodeBuilder } from '@readme/httpsnippet/helpers/code-builder';
 
 export type { CodeBuilderOptions };
 
