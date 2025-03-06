@@ -178,7 +178,6 @@ class PayloadBuilder:
             dict: Wrapped request payload
         """
         headers = self.redact_dict(request.headers)
-
         queryString = parse.parse_qsl(self._get_query_string(request))
 
         content_type = self._get_content_type(headers)
@@ -187,9 +186,9 @@ class PayloadBuilder:
             request, "rm_content_length", None
         ):
             if content_type == "application/x-www-form-urlencoded":
-                # Flask creates `request.form` but Django puts that data in `request.body`, and
-                # then our `request.rm_body` store, instead.
-                if hasattr(request, "form"):
+                # Flask creates `request.form` and does not have a `body` property but Django
+                # puts that data in `request.body`, and then our `request.rm_body` store, instead.
+                if hasattr(request, "form") and not hasattr(request, "body"):
                     params = [
                         # Reason this is not mixed in with the `rm_body` parsing if we don't have
                         # `request.form` is that if we attempt to do `str(var, 'utf-8)` on data
@@ -219,8 +218,9 @@ class PayloadBuilder:
 
         headers = dict(headers)
 
-        if "Authorization" in headers:
-            headers["Authorization"] = mask(headers["Authorization"])
+        for key in ["Authorization", "authorization"]:
+            if key in headers:
+                headers[key] = mask(headers[key])
 
         if hasattr(request, "environ"):
             http_version = request.environ["SERVER_PROTOCOL"]
@@ -324,7 +324,7 @@ class PayloadBuilder:
         query_string = self._get_query_string(request)
         if hasattr(request, "base_url"):
             # Werkzeug request objects already have exactly what we need
-            base_url = request.base_url
+            base_url = str(request.base_url)
             if len(query_string) > 0:
                 base_url += f"?{query_string}"
             return base_url
