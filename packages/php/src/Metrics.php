@@ -9,6 +9,7 @@ use GuzzleHttp\Handler\CurlMultiHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Ramsey\Uuid\Uuid;
 use ReadMe\HAR\Payload;
 use Symfony\Component\HttpFoundation\Response;
@@ -67,6 +68,10 @@ class Metrics
             $this->buffer_length = max(1, min($options['buffer_length'], 30));
         }
 
+        if (Cache::has('Readme/queue')) {
+            $this->queue = Cache::get('Readme/queue');
+        }
+
         // In development mode, requests are sent asynchronously (as well as PHP can without directly invoking
         // shell cURL commands), so a very small timeout here ensures that the Metrics code will finish as fast as
         // possible, send the POST request to the background and continue on with whatever else the application
@@ -114,6 +119,7 @@ class Metrics
 
         $payload = (new Payload($this))->create($log_id, $request, $response);
         array_push($this->queue, $payload);
+
         if (count($this->queue) >= $this->buffer_length) {
             $headers = [
                 'Authorization' => 'Basic ' . $this->api_key,
@@ -139,7 +145,7 @@ class Metrics
                 }
 
                 $this->queue = [];
-                app()->instance('queue', $this->queue);
+                Cache::put('Readme/queue', $this->queue);
                 return;
             }
     
@@ -153,6 +159,8 @@ class Metrics
             }
     
             $this->queue = [];
+            Cache::put('Readme/queue', $this->queue);
+
             $json = (string) $metrics_response->getBody();
             if ($json === 'OK') {
                 return;
@@ -171,6 +179,8 @@ class Metrics
             $ex->setErrors((array)$json->errors);
             throw $ex;
         }
+
+        Cache::put('Readme/queue', $this->queue);
     }
 
 

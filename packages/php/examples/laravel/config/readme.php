@@ -60,5 +60,5 @@ return [
      */
     'base_log_url' => null,
 
-    'buffer_length' => 2,
+    'buffer_length' => 1
 ];
