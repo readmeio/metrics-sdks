@@ -9,7 +9,6 @@ use GuzzleHttp\Handler\CurlMultiHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Ramsey\Uuid\Uuid;
 use ReadMe\HAR\Payload;
 use Symfony\Component\HttpFoundation\Response;
@@ -68,10 +67,6 @@ class Metrics
             $this->buffer_length = max(1, min($options['buffer_length'], 30));
         }
 
-        if (Cache::has('Readme/queue')) {
-            $this->queue = Cache::get('Readme/queue');
-        }
-
         // In development mode, requests are sent asynchronously (as well as PHP can without directly invoking
         // shell cURL commands), so a very small timeout here ensures that the Metrics code will finish as fast as
         // possible, send the POST request to the background and continue on with whatever else the application
@@ -111,6 +106,8 @@ class Metrics
             $this->base_log_url = $this->getProjectBaseUrl();
         }
 
+        $this->queue = $this->getQueue();
+
         $log_id = Uuid::uuid4()->toString();
         if (!is_null($this->base_log_url)) {
             // Only set the header if we have a fully-formed log URL to give to users.
@@ -125,7 +122,7 @@ class Metrics
                 'Authorization' => 'Basic ' . $this->api_key,
                 'User-Agent' => $this->user_agent
             ];
-    
+
             // If not in development mode, all requests should be async.
             if (!$this->development_mode) {
                 try {
@@ -133,22 +130,21 @@ class Metrics
                         'headers' => $headers,
                         'json' => $this->queue
                     ]);
-    
+
                     $this->curl_handler->execute();
                 } catch (\Exception $e) {
                     // Usually this'll happen from a connection timeout exception from Guzzle trying to wait for us to
-                    // resolve the promise we set up, but since we just want this to be a fire and forget request, we don't
-                    // actually care about the response coming back from the Metrics API and all exceptions here can be
-                    // discarded.
+                    // resolve the promise we set up, but since we just want this to be a fire and forget request, we
+                    // don't actually care about the response coming back from the Metrics API and all exceptions here
+                    // can be discarded.
                     //
                     // @todo we should log this somewhere
                 }
 
-                $this->queue = [];
-                Cache::put('Readme/queue', $this->queue);
+                $this->putQueue([]);
                 return;
             }
-    
+
             try {
                 $metrics_response = $this->client->post('/v1/request', [
                     'headers' => $headers,
@@ -157,39 +153,33 @@ class Metrics
             } catch (\Exception $e) {
                 throw $e;
             }
-    
+
             $this->queue = [];
-            Cache::put('Readme/queue', $this->queue);
+            $this->putQueue([]);
 
             $json = (string) $metrics_response->getBody();
             if ($json === 'OK') {
                 return;
             }
-    
+
             $json = json_decode($json);
             if (!isset($json->errors)) {
-                // If we didn't get any errors back from the Metrics API, but didn't get an `OK` response, then something
-                // must be up with it so don't worry about communicating that here since there isn't anything actionable
-                // for the user.
+                // If we didn't get any errors back from the Metrics API, but didn't get an `OK` response, then
+                // something must be up with it so don't worry about communicating that here since there isn't
+                // anything actionable for the user.
                 return;
             }
-    
+
             /** @psalm-suppress PossiblyInvalidArgument */
             $ex = new MetricsException(str_replace($json->_message, $json->name, $json->message));
             $ex->setErrors((array)$json->errors);
             throw $ex;
         }
 
-        Cache::put('Readme/queue', $this->queue);
+        $this->putQueue($this->queue);
     }
 
-
-    /**
-     * Make an API request to ReadMe to retrieve the base log URL that'll be used to populate the `x-documentation-url`
-     * header.
-     *
-     */
-    private function getProjectBaseUrl(): ?string
+    private function getCacheContents(): object
     {
         $cache_file = $this->getCacheFile();
         $cache = new \stdClass();
@@ -201,7 +191,31 @@ class Metrics
                 // If we can't decode the cache then we should act as if it doesn't exist and let it rehydrate itself.
             }
         }
+        return $cache;
+    }
 
+    private function getQueue(): array
+    {
+        $cache = $this->getCacheContents();
+        return property_exists($cache, 'queue') ? $cache->queue : [];
+    }
+
+    private function putQueue(array $queue): void
+    {
+        $cache = $this->getCacheContents();
+        $cache->queue = $queue;
+        file_put_contents($this->getCacheFile(), json_encode($cache));
+    }
+
+
+    /**
+     * Make an API request to ReadMe to retrieve the base log URL that'll be used to populate the `x-documentation-url`
+     * header.
+     *
+     */
+    private function getProjectBaseUrl(): ?string
+    {
+        $cache = $this->getCacheContents();
         // Does the cache exist? If it doesn't, let's fill it. If it does, let's see if it's stale. Caches should have
         // a TTL of 1 day.
         $last_updated = property_exists($cache, 'last_updated') ? $cache->last_updated : null;
@@ -250,7 +264,7 @@ class Metrics
                 $cache->last_updated = (time() - 86400) + 120;
             }
 
-            file_put_contents($cache_file, json_encode($cache));
+            file_put_contents($this->getCacheFile(), json_encode($cache));
         }
 
         return $cache->base_url;
