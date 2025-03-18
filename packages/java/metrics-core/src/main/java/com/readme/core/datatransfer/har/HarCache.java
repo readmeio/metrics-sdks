@@ -11,6 +11,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.readme.core.datatransfer.har.MemoryOptimisationConstants.DEFAULT_MAP_INIT_CAPACITY;
+
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -31,7 +33,7 @@ public class HarCache {
     @JsonAnySetter
     public void setAdditionalField(String key, Object value) {
         if (additional == null) {
-            additional = new HashMap<>(8);
+            additional = new HashMap<>(DEFAULT_MAP_INIT_CAPACITY);
         }
         this.additional.put(key, value);
     }

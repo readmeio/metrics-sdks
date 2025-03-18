@@ -66,7 +66,7 @@ public class OutgoingLogBodyConstructor {
                 .time(serverTime)
                 .request(processRequest(requestData, logOptions))
                 .response(processResponse(responseData, logOptions))
-                .cache(HarCache.builder().build()) //TODO Decide if it is required to do something here
+                .cache(HarCache.builder().build())
                 .timings(HarTiming.builder()
                         .waitTime(0)
                         .receive(serverTime)
@@ -83,14 +83,15 @@ public class OutgoingLogBodyConstructor {
                 .append(System.getProperty("java.version"))
                 .toString();
 
+
         HarCreatorBrowser harCreatorBrowser = HarCreatorBrowser.builder()
                 .name("readme-metrics (java)")
-                .version("1.0.0") //TODO correct version from POM
+                .version(SdkVersionUtil.getVersion())
                 .comment(systemInformation)
                 .build();
 
         return HarLog.builder()
-                .version("1.2") //TODO check if correct
+                .version("1.2")
                 .creator(harCreatorBrowser)
                 .entries(Collections.singletonList(harEntry))
                 .build();
@@ -133,7 +134,7 @@ public class OutgoingLogBodyConstructor {
     private static String getRequestParametersAsString(Map<String, String> requestParameters) {
         return requestParameters.entrySet()
                 .stream()
-                .map(entry -> entry.getKey() + "=" + entry.getValue())
+                .map(entry -> entry.getKey() + "=" + (entry.getValue() != null ? entry.getValue() : ""))
                 .collect(Collectors.joining("&"));
     }
 

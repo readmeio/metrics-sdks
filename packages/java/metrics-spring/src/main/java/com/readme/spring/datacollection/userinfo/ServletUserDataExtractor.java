@@ -33,23 +33,26 @@ public class ServletUserDataExtractor implements UserDataExtractor<ServletDataPa
 
     @Override
     public String extractFromBody(ServletDataPayloadAdapter payload, String fieldPath) {
-        if (!payload.getRequestMethod().equalsIgnoreCase(HttpMethod.GET.name())) {
-            if (payload.getRequestContentType().equalsIgnoreCase("application/json")) {
-                String requestBody = payload.getRequestBody();
-                try {
-                    JsonNode currentNode = objectMapper.readTree(requestBody);
-                    if (!fieldPath.startsWith("/")) {
-                        fieldPath = "/" + fieldPath;
-                    }
-                    return currentNode.at(fieldPath).asText();
-                } catch (Exception e) {
-                    log.error("Error when reading the user data from JSON body: {}", e.getMessage());
-                }
-            }
+        if (payload.getRequestMethod().equalsIgnoreCase(HttpMethod.GET.name())) {
+            log.error("The HTTP method {} is not supported to get user data from body.", payload.getRequestMethod());
+            return "";
+        }
+
+        if (!payload.getRequestContentType().equalsIgnoreCase("application/json")) {
             log.error("The provided body content type {} is not supported to get user data.", payload.getRequestContentType());
             return "";
         }
-        log.error("The HTTP method {} is not supported to get user data from body.", payload.getRequestMethod());
+
+        try {
+            String requestBody = payload.getRequestBody();
+            JsonNode currentNode = objectMapper.readTree(requestBody);
+            if (!fieldPath.startsWith("/")) {
+                fieldPath = "/" + fieldPath;
+            }
+            return currentNode.at(fieldPath).asText();
+        } catch (Exception e) {
+            log.error("Error when reading the user data from JSON body: {}", e.getMessage());
+        }
         return "";
     }
 

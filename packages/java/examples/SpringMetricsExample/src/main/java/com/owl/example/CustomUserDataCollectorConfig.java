@@ -27,10 +27,6 @@ import java.util.List;
 @Configuration
 public class CustomUserDataCollectorConfig {
 
-    //Uncomment the code below to have a custom user data collection configuration.
-    //It automatically overrides the default one
-
-
     @Bean
     public UserDataCollector<ServletDataPayloadAdapter> customUserDataCollector() {
         return payloadAdapter -> {
