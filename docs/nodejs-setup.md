@@ -1,7 +1,8 @@
 ---
 title: Node.js Setup
 slug: sending-logs-to-readme-with-nodejs
-category: 62292aea889520008ed0113b
+category:
+  uri: project-setup
 ---
 
 > 🚀 Upgrading to v6.0?

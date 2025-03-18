@@ -1,7 +1,8 @@
 ---
 title: Using Amazon API Gateway with the Personalized Docs Webhook
 slug: amazon-api-gateway-webhook
-category: 62292aea889520008ed0113b
+category:
+  uri: project-setup
 ---
 
 > 📘 Don't use Amazon API Gateway?

@@ -1,7 +1,8 @@
 ---
 title: Ruby (Rails/Rack) Setup
 slug: ruby-api-metrics-set-up
-category: 62292aea889520008ed0113b
+category:
+  uri: project-setup
 ---
 
 > 🚧 Any issues?

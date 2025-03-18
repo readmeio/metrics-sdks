@@ -1,7 +1,8 @@
 ---
 title: PHP (Laravel) Setup
 slug: sending-logs-to-readme-with-php-laravel
-category: 62292aea889520008ed0113b
+category:
+  uri: project-setup
 ---
 
 > 🚀 Upgrading to v2.0?
