@@ -380,10 +380,10 @@ class PayloadBuilder:
         if hasattr(request, "base_url"):
             # Werkzeug request objects already have exactly what we need
             base_url = str(request.base_url)
-            if hasattr(request, "scope") and hasattr(request.scope, "path"):
+            if hasattr(request, "url") and hasattr(request.url, "path"):
                 base_url = base_url[:-1]
-                if len(request.scope.path) > 1:
-                    base_url += request.scope.path
+                if len(request.url.path) > 1:
+                    base_url += request.url.path
             if len(query_string) > 0:
                 base_url += f"?{query_string}"
             return base_url
