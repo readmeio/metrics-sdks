@@ -309,6 +309,61 @@ class PayloadBuilder:
 
         return result
 
+    def _get_scheme(self, request):
+        """Helper function to get the scheme string for a request, translating fields from
+        either ASGIRequest or WSGIRequest object.
+
+        Args:
+            request (Request): Request object containing the request information, either
+                a ASGIRequest or WSGIRequest`.
+
+        Returns:
+            str: Scheme string, for example "http"
+        """
+        if hasattr(request, "environ") and "wsgi.url_scheme" in request.environ:
+            return request.environ["wsgi.url_scheme"]
+        if hasattr(request, "scheme"):
+            return request.scheme
+        return None
+
+    def _get_host(self, request):
+        """Helper function to get the host string for a request, translating fields from
+        either ASGIRequest or WSGIRequest object.
+
+        Args:
+            request (Request): Request object containing the request information, either
+                a ASGIRequest or WSGIRequest`.
+
+        Returns:
+            str: Host string, for example "localhost:8080"
+        """
+        # pylint: disable=protected-access
+        if hasattr(request, "_get_raw_host"):
+            # Django request objects already have a properly formatted host field
+            return request._get_raw_host()
+        if hasattr(request, "environ") and "HTTP_HOST" in request.environ:
+            return request.environ["HTTP_HOST"]
+        if hasattr(request, "scope"):
+            return request.headers.get("host")
+        return None
+
+    def _get_path(self, request):
+        """Helper function to get the path string for a request, translating fields from
+        either ASGIRequest or WSGIRequest object.
+
+        Args:
+            request (Request): Request object containing the request information, either
+                a ASGIRequest or WSGIRequest`.
+
+        Returns:
+            str: Path string, for example "/hello/world"
+        """
+        if hasattr(request, "environ") and "PATH_INFO" in request.environ:
+            return request.environ["PATH_INFO"]
+        if hasattr(request, "scope"):
+            return request.scope["path"]
+        return None
+
     def _build_base_url(self, request):
         """Helper function to get the base URL for a request (full URL excluding the
         query string), translating fields from either a Werkzeug Request object or a
@@ -325,34 +380,19 @@ class PayloadBuilder:
         if hasattr(request, "base_url"):
             # Werkzeug request objects already have exactly what we need
             base_url = str(request.base_url)
-            if hasattr(request, "url"):
+            if hasattr(request, "scope") and hasattr(request.scope, "path"):
                 base_url = base_url[:-1]
-                if hasattr(request.url, "path") and len(request.url.path) > 1:
-                    base_url += request.url.path
+                if len(request.scope.path) > 1:
+                    base_url += request.scope.path
             if len(query_string) > 0:
                 base_url += f"?{query_string}"
             return base_url
 
         scheme, host, path = None, None, None
 
-        if hasattr(request, "environ") and "wsgi.url_scheme" in request.environ:
-            scheme = request.environ["wsgi.url_scheme"]
-        elif hasattr(request, "scheme"):
-            scheme = request.scheme
-
-        # pylint: disable=protected-access
-        if hasattr(request, "_get_raw_host"):
-            # Django request objects already have a properly formatted host field
-            host = request._get_raw_host()
-        elif hasattr(request, "environ") and "HTTP_HOST" in request.environ:
-            host = request.environ["HTTP_HOST"]
-        elif hasattr(request, "scope"):
-            host = request.headers.get("host")
-
-        if hasattr(request, "environ") and "PATH_INFO" in request.environ:
-            path = request.environ["PATH_INFO"]
-        elif hasattr(request, "scope"):
-            path = request.scope["path"]
+        scheme = self._get_scheme(request)
+        host = self._get_host(request)
+        path = self._get_path(request)
 
         if scheme and path and host:
             if len(query_string) > 0:
