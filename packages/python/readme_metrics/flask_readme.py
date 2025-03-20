@@ -27,7 +27,7 @@ class ReadMeMetrics:
         app.after_request(self.after_request)
 
     def before_request(self):
-        if request.method == "OPTIONS":
+        if request.method == "OPTIONS" or self.config.GROUPING_FUNCTION is None:
             return
 
         try:

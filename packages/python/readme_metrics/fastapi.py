@@ -58,7 +58,7 @@ class ReadMeMetricsMiddleware(BaseHTTPMiddleware):
             self.config.LOGGER.exception(e)
 
     async def dispatch(self, request: Request, call_next):
-        if request.method == "OPTIONS":
+        if request.method == "OPTIONS" or self.config.GROUPING_FUNCTION is None:
             return await call_next(request)
 
         await self.preamble(request)

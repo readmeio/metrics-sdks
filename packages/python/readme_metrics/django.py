@@ -58,7 +58,7 @@ class MetricsMiddleware:
             self.config.LOGGER.exception(e)
 
     def sync_process(self, request):
-        if request.method == "OPTIONS":
+        if request.method == "OPTIONS" or self.config.GROUPING_FUNCTION is None:
             return self.get_response(request)
         self.preamble(request)
         response = self.get_response(request)
@@ -66,7 +66,7 @@ class MetricsMiddleware:
         return response
 
     async def async_process(self, request):
-        if request.method == "OPTIONS":
+        if request.method == "OPTIONS" or self.config.GROUPING_FUNCTION is None:
             return await self.get_response(request)
         self.preamble(request)
         response = await self.get_response(request)
