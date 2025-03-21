@@ -1,7 +1,8 @@
 ---
 title: .NET Setup
 slug: net-setup
-category: 62292aea889520008ed0113b
+category:
+  uri: project-setup
 ---
 
 > 🚧 Any issues?

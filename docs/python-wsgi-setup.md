@@ -1,7 +1,8 @@
 ---
 title: Python (Flask) Setup
 slug: python-wsgi-api-metrics
-category: 62292aea889520008ed0113b
+category:
+  uri: project-setup
 ---
 
 > 🚧 Any issues?
