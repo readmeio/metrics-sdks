@@ -1,7 +1,8 @@
 ---
 title: Cloudflare Workers
 slug: sending-logs-to-readme-with-cloudflare
-category: 62292aea889520008ed0113b
+category:
+  uri: project-setup
 ---
 
 > 🚧 Any issues?
