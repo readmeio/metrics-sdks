@@ -8,6 +8,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+/**
+ * OwlController is a sample REST controller intended for demonstration and testing purposes.
+ * <p>
+ * It simulates typical HTTP requests and responses to showcase how the ReadMe Metrics SDK
+ * integrates into a Spring Boot application.
+ * <p>
+ * This controller is not intended for production use and serves only as an example endpoint
+ * to test how the SDK logs and processes different request types.
+ */
 @RestController
 public class OwlController {
 

@@ -6,7 +6,8 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.3.4</version>
-		<relativePath/> <!-- lookup parent from repository -->
+<!--		<version>2.7.18</version>-->
+		<relativePath/>
 	</parent>
 	<groupId>com.readme</groupId>
 	<artifactId>spring-metrics-example</artifactId>
@@ -22,6 +23,7 @@
 		<dependency>
 			<groupId>com.readme</groupId>
 			<artifactId>metrics-spring</artifactId>
+<!--			<artifactId>metrics-spring2</artifactId>-->
 			<version>0.1.0</version>
 		</dependency>
 		<dependency>
