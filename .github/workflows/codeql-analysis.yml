@@ -22,6 +22,8 @@ jobs:
           - javascript
           - python
           - ruby
+          - java
+          - kotlin
 
     steps:
       - name: Checkout repository
