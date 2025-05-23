@@ -110,19 +110,18 @@ export function metricsAPICall(readmeAPIKey: string, body: OutgoingLogBody[], op
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       signal: AbortSignal.timeout(config.timeout),
-    })
-      .then(response => {
-        if (shouldBackoff(response)) {
-          // backoff for a few seconds, but not if another callback has already started backing off
-          if (!backoffExpiresAt) {
-            backoffExpiresAt = new Date();
-            backoffExpiresAt.setSeconds(backoffExpiresAt.getSeconds() + BACKOFF_SECONDS);
-          }
+    }).then(response => {
+      if (shouldBackoff(response)) {
+        // backoff for a few seconds, but not if another callback has already started backing off
+        if (!backoffExpiresAt) {
+          backoffExpiresAt = new Date();
+          backoffExpiresAt.setSeconds(backoffExpiresAt.getSeconds() + BACKOFF_SECONDS);
         }
-        const logLevel = response.ok ? 'info' : 'error';
-        logger[logLevel]({ message: `Service responded with status ${response.status}: ${response.statusText}.` });
-        return response;
-      });
+      }
+      const logLevel = response.ok ? 'info' : 'error';
+      logger[logLevel]({ message: `Service responded with status ${response.status}: ${response.statusText}.` });
+      return response;
+    });
   };
 
   if (options.fireAndForget) {
