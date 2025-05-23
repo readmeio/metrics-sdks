@@ -2,7 +2,6 @@ import crypto from 'crypto';
 
 import findCacheDir from 'find-cache-dir';
 import { FlatCache } from 'flat-cache';
-import timeoutSignal from 'timeout-signal';
 
 import pkg from '../../package.json';
 import config from '../config';
@@ -35,8 +34,6 @@ export async function getProjectBaseUrl(readmeApiKey: string, requestTimeout = c
     lastUpdated === undefined ||
     (lastUpdated !== undefined && Math.abs(lastUpdated - Math.round(Date.now() / 1000)) >= 86400)
   ) {
-    const signal = timeoutSignal(requestTimeout);
-
     let baseUrl = '';
     await fetch(`${config.readmeApiUrl}/v1/`, {
       method: 'get',
@@ -46,7 +43,7 @@ export async function getProjectBaseUrl(readmeApiKey: string, requestTimeout = c
       },
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      signal,
+      signal: AbortSignal.timeout(requestTimeout),
     })
       .then(res => {
         if (res.status >= 400 && res.status <= 599) {
@@ -69,9 +66,6 @@ export async function getProjectBaseUrl(readmeApiKey: string, requestTimeout = c
         // now yesterday so that in 2 minutes we'll automatically make another attempt.
         cache.setKey('baseUrl', null);
         cache.setKey('lastUpdated', Math.round(Date.now() / 1000) - 86400 + 120);
-      })
-      .finally(() => {
-        timeoutSignal.clear(signal);
       });
 
     cache.save();

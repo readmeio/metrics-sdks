@@ -2,8 +2,6 @@ import type { Options } from './log';
 import type { Har } from 'har-format';
 import type { UUID } from 'node:crypto';
 
-import timeoutSignal from 'timeout-signal';
-
 import pkg from '../../package.json';
 import config from '../config';
 
@@ -90,7 +88,6 @@ function getLogIds(body: OutgoingLogBody | OutgoingLogBody[]): LogId {
 }
 
 export function metricsAPICall(readmeAPIKey: string, body: OutgoingLogBody[], options: Options): Promise<LogResponse> {
-  const signal = timeoutSignal(config.timeout);
   const encodedKey = Buffer.from(`${readmeAPIKey}:`).toString('base64');
 
   const makeRequest = () => {
@@ -112,7 +109,7 @@ export function metricsAPICall(readmeAPIKey: string, body: OutgoingLogBody[], op
       },
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      signal,
+      signal: AbortSignal.timeout(config.timeout),
     })
       .then(response => {
         if (shouldBackoff(response)) {
@@ -125,9 +122,6 @@ export function metricsAPICall(readmeAPIKey: string, body: OutgoingLogBody[], op
         const logLevel = response.ok ? 'info' : 'error';
         logger[logLevel]({ message: `Service responded with status ${response.status}: ${response.statusText}.` });
         return response;
-      })
-      .finally(() => {
-        timeoutSignal.clear(signal);
       });
   };
 
