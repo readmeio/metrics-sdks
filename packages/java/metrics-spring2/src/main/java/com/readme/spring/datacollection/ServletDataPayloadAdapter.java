@@ -13,6 +13,12 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * An implementation of {@link DataPayloadAdapter} that adapts a servlet-based HTTP request and response.
+ * <p>
+ * This class wraps {@link ContentCachingRequestWrapper} and {@link ContentCachingResponseWrapper}
+ * to allow capturing the full content of HTTP requests and responses for logging and monitoring.
+ */
 @Slf4j
 @AllArgsConstructor
 public class ServletDataPayloadAdapter implements DataPayloadAdapter {
@@ -20,17 +26,27 @@ public class ServletDataPayloadAdapter implements DataPayloadAdapter {
     private ContentCachingRequestWrapper request;
     private ContentCachingResponseWrapper response;
 
-
+    /**
+     * Returns the HTTP method of the request (e.g., GET, POST).
+     */
     @Override
     public String getRequestMethod() {
         return request.getMethod();
     }
 
+    /**
+     * Returns the value of the Content-Type header from the request.
+     */
     @Override
     public String getRequestContentType() {
         return request.getContentType();
     }
 
+    /**
+     * Retrieves the body of the request as a string.
+     * <p>
+     * If an error occurs while reading the request body, an empty string is returned and an error is logged.
+     */
     @Override
     public String getRequestBody() {
         try {
@@ -41,21 +57,37 @@ public class ServletDataPayloadAdapter implements DataPayloadAdapter {
         return "";
     }
 
+    /**
+     * Returns the remote address (client IP) of the incoming request.
+     */
     @Override
     public String getAddress() {
         return request.getRemoteAddr();
     }
 
+    /**
+     * Returns the protocol used for the request (e.g., HTTP/1.1).
+     */
     @Override
     public String getProtocol() {
         return request.getProtocol();
     }
 
+
+    /**
+     * Returns the full URL that was requested.
+     */
     @Override
     public String getUrl() {
         return request.getRequestURL().toString();
     }
 
+
+    /**
+     * Returns a map of request parameters where each parameter name is mapped to its joined value string.
+     * <p>
+     * Multi-valued parameters are joined using an empty string.
+     */
     @Override
     public Map<String, String> getRequestParameters() {
         return request.getParameterMap()
@@ -72,9 +104,9 @@ public class ServletDataPayloadAdapter implements DataPayloadAdapter {
      *
      * <p>This method ensures consistent header name formatting by converting all
      * header names to lowercase, which is particularly useful for avoiding case-sensitivity
-     * issues when accessing HTTP headers.</p>
+     * issues when accessing HTTP headers.
      *
-     * <p>Example:
+     * Example:
      * If the request contains headers:
      * <ul>
      *     <li>Authorization: Bearer token</li>
@@ -87,7 +119,6 @@ public class ServletDataPayloadAdapter implements DataPayloadAdapter {
      *         "x-user-id": "12345"
      *     }
      * </pre>
-     * </p>
      *
      * @return a map of request header names (lowercased) and their corresponding values.
      * If no headers are present or provided request is null, returns an empty map.
@@ -108,6 +139,11 @@ public class ServletDataPayloadAdapter implements DataPayloadAdapter {
         return Collections.emptyMap();
     }
 
+    /**
+     * Retrieves the response body as a string.
+     * <p>
+     * If an error occurs while reading the response body, an empty string is returned and an error is logged.
+     */
     @Override
     public String getResponseBody() {
         try {
@@ -119,11 +155,20 @@ public class ServletDataPayloadAdapter implements DataPayloadAdapter {
         return "";
     }
 
+    /**
+     * Returns the HTTP status code of the response (e.g., 200, 404).
+     */
     @Override
     public int getStatusCode() {
         return response.getStatus();
     }
 
+    /**
+     * Returns the standard reason phrase for the response status code.
+     * <p>
+     * For example, 200 returns "OK", 404 returns "Not Found".
+     * Returns an empty string if the status code is unrecognized.
+     */
     @Override
     public String getStatusMessage() {
         HttpStatus httpStatus = HttpStatus.resolve(response.getStatus());
@@ -135,9 +180,9 @@ public class ServletDataPayloadAdapter implements DataPayloadAdapter {
      * as a map where the header names are preserved in their original case.
      *
      * <p>This method iterates through all header names provided by the {@link HttpServletResponse}
-     * and maps each header name to its corresponding value.</p>
+     * and maps each header name to its corresponding value.
      *
-     * <p>Example:
+     * Example:
      * If the response contains headers:
      * <ul>
      *     <li>Content-Type: application/json</li>
@@ -150,7 +195,6 @@ public class ServletDataPayloadAdapter implements DataPayloadAdapter {
      *         "X-Custom-Header": "custom-value"
      *     }
      * </pre>
-     * </p>
      *
      * @return a map of response header names and their corresponding values.
      * If no headers are present or provided response is null, returns an empty map.

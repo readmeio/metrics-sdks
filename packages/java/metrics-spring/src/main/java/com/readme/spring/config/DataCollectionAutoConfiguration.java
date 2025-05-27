@@ -50,12 +50,20 @@ public class DataCollectionAutoConfiguration {
 
     private final Environment environment;
 
+    /**
+     * Configures logging level for ReadMe SDK based on application properties.
+     */
     @PostConstruct
     public void configureLogging() {
         String logLevel = environment.getProperty("com.readme.logging.level", "OFF");
         loggingSystem.setLogLevel("com.readme", LogLevel.valueOf(logLevel));
     }
 
+    /**
+     * Registers the {@link DataCollectionFilter} as a servlet filter to intercept HTTP requests.
+     *
+     * @return a configured {@link FilterRegistrationBean} for data collection.
+     */
     @Bean
     public FilterRegistrationBean<DataCollectionFilter> metricsFilter(
             RequestDataCollector<ServletDataPayloadAdapter> requestDataCollector,
@@ -69,6 +77,11 @@ public class DataCollectionAutoConfiguration {
         return registrationBean;
     }
 
+    /**
+     * Provides a default implementation of {@link UserDataCollector} if none is defined in the context.
+     *
+     * @return an instance of {@link ServletUserDataCollector}.
+     */
     @Bean
     @ConditionalOnMissingBean(UserDataCollector.class)
     public UserDataCollector<ServletDataPayloadAdapter> userDataCollector(UserDataProperties userDataProperties,
@@ -77,6 +90,11 @@ public class DataCollectionAutoConfiguration {
         return new ServletUserDataCollector(userDataProperties, extractionService);
     }
 
+    /**
+     * Creates and configures the component responsible for sending log data to ReadMe API.
+     *
+     * @return an instance of {@link DataSender}.
+     */
     @Bean
     public DataSender dataSender() {
         String readmeApiKey = readmeProperties.getReadmeApiKey();
@@ -88,17 +106,32 @@ public class DataCollectionAutoConfiguration {
         return new HttpDataSender(okHttpClient, coreConfig);
     }
 
+    /**
+     * Provides the component that transforms request/response/user data into HAR format.
+     *
+     * @return an instance of {@link OutgoingLogBodyConstructor}.
+     */
     @Bean
     public OutgoingLogBodyConstructor outgoingPayloadConstructor() {
         return new OutgoingLogBodyConstructor();
     }
 
+    /**
+     * Instantiates the dispatcher responsible for buffering and sending payloads.
+     *
+     * @return a configured {@link PayloadDataDispatcher}.
+     */
     @Bean
     public PayloadDataDispatcher payloadDataDispatcher(DataSender dataSender,
                                                        OutgoingLogBodyConstructor outgoingLogConstructor) {
         return new PayloadDataDispatcher(dataSender, outgoingLogConstructor);
     }
 
+    /**
+     * Provides default logging configuration options if none is defined.
+     *
+     * @return an instance of {@link LogOptions}.
+     */
     @Bean
     @ConditionalOnMissingBean(LogOptions.class)
     public LogOptions logOptions() {

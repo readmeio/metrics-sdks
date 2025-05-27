@@ -28,7 +28,7 @@ public interface UserDataExtractor<T> {
      * Extracts requested data from JSON body
      *
      * @param payload the type of request object from which user data will be extracted.
-     * @param fieldName is the source field name to extract the data
+     * @param fieldPath is the source field name to extract the data
      * @return extracted value as a String
      */
     String extractFromBody(T payload, String fieldPath);

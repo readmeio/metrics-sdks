@@ -21,10 +21,12 @@ import java.util.concurrent.CompletableFuture;
 import static com.readme.core.dataextraction.payload.PayloadData.*;
 import static org.springframework.http.HttpMethod.OPTIONS;
 
-
-//TODO Fix:
-// Handle Basic tokens as well as Bearer ones
-
+/**
+ * Servlet filter for collecting HTTP request and response data to be sent to ReadMe Metrics.
+ * <p>
+ * This filter wraps incoming requests and responses to capture relevant metadata, user info,
+ * payload content, and asynchronously dispatches the structured data to the configured destination.
+ */
 @AllArgsConstructor
 @Slf4j
 public class DataCollectionFilter implements Filter {
@@ -37,6 +39,18 @@ public class DataCollectionFilter implements Filter {
 
     private LogOptions logOptions;
 
+    /**
+     * Intercepts HTTP requests and responses to extract structured log data for ReadMe metrics.
+     * <p>
+     * For non-OPTIONS requests, this method wraps the request/response, collects user and API call data,
+     * and asynchronously sends it via {@link PayloadDataDispatcher}.
+     *
+     * @param req   the incoming {@link ServletRequest}
+     * @param resp  the outgoing {@link ServletResponse}
+     * @param chain the {@link FilterChain} to continue request processing
+     * @throws IOException      in case of I/O errors
+     * @throws ServletException in case of servlet processing errors
+     */
     @Override
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
         ContentCachingRequestWrapper request = new ContentCachingRequestWrapper((HttpServletRequest) req);

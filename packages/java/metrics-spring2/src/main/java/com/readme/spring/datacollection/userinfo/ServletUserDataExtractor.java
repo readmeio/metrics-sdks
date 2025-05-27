@@ -10,10 +10,15 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import com.auth0.jwt.JWT;
 
-
 import java.util.Map;
 
-
+/**
+ * Default implementation of {@link UserDataExtractor} for servlet-based applications.
+ * <p>
+ * This class is responsible for extracting user-specific information from incoming HTTP requests.
+ * It supports multiple extraction strategies, including HTTP headers, JSON request bodies,
+ * and JWT tokens (from the Authorization header).
+ */
 @AllArgsConstructor
 @Component
 @Slf4j
