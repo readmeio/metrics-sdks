@@ -62,7 +62,11 @@ public class DataCollectionAutoConfiguration {
     /**
      * Registers the {@link DataCollectionFilter} as a servlet filter to intercept HTTP requests.
      *
-     * @return a configured {@link FilterRegistrationBean} for data collection.
+     * @param requestDataCollector  component to extract request details
+     * @param userDataCollector     component to extract user-specific data
+     * @param payloadDataDispatcher component responsible for sending collected data
+     * @param logOptions            configuration options for logging
+     * @return a configured {@link FilterRegistrationBean} for data collection
      */
     @Bean
     public FilterRegistrationBean<DataCollectionFilter> metricsFilter(
@@ -80,7 +84,9 @@ public class DataCollectionAutoConfiguration {
     /**
      * Provides a default implementation of {@link UserDataCollector} if none is defined in the context.
      *
-     * @return an instance of {@link ServletUserDataCollector}.
+     * @param userDataProperties   configuration properties for user data extraction
+     * @param extractionService    service used to extract user info from requests
+     * @return an instance of {@link ServletUserDataCollector}
      */
     @Bean
     @ConditionalOnMissingBean(UserDataCollector.class)
@@ -119,7 +125,9 @@ public class DataCollectionAutoConfiguration {
     /**
      * Instantiates the dispatcher responsible for buffering and sending payloads.
      *
-     * @return a configured {@link PayloadDataDispatcher}.
+     * @param dataSender             component to send data over HTTP
+     * @param outgoingLogConstructor component to build HAR-like logs from payload data
+     * @return a configured {@link PayloadDataDispatcher}
      */
     @Bean
     public PayloadDataDispatcher payloadDataDispatcher(DataSender dataSender,
