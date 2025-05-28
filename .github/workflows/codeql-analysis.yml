@@ -22,6 +22,7 @@ jobs:
           - javascript
           - python
           - ruby
+          - java
 
     steps:
       - name: Checkout repository
@@ -34,7 +35,15 @@ jobs:
           languages: ${{ matrix.language }}
 
       - name: Autobuild
+        if: matrix.language != 'java'
         uses: github/codeql-action/autobuild@v3
+
+      - name: Build for Java and Kotlin
+        if: matrix.language == 'java'
+        run: |
+          mvn clean install -f packages/java/metrics-core/pom.xml
+          mvn clean install -f packages/java/metrics-spring/pom.xml
+          mvn clean install -f packages/java/metrics-spring2/pom.xml
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
