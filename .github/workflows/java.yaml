@@ -23,7 +23,9 @@ jobs:
           java-version: '17'
 
       - name: Configure Maven settings.xml
-        run: echo "${{ secrets.MAVEN_SETTINGS }}" > ~/.m2/settings.xml
+        run: |
+          mkdir -p ~/.m2
+          echo "${{ secrets.MAVEN_SETTINGS_BASE64 }}" | base64 --decode > ~/.m2/settings.xml
 
       - name: Build & Test metrics-core
         working-directory: packages/java
