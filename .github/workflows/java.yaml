@@ -27,7 +27,7 @@ jobs:
       - name: Configure Maven settings.xml
         run: |
           mkdir -p ~/.m2
-          echo "${{ secrets.MAVEN_SETTINGS_BASE64 }}" | base64 --decode > ~/.m2/settings.xml
+          echo "${{ secrets.MAVEN_SETTINGS }}" | base64 --decode > ~/.m2/settings.xml
 
       - name: Debug settings.xml content
         run: |
