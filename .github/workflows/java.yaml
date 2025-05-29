@@ -29,14 +29,14 @@ jobs:
           mkdir -p ~/.m2
           echo "${{ secrets.MAVEN_SETTINGS }}" | base64 --decode > ~/.m2/settings.xml
 
-      - name: Debug settings.xml content
-        run: |
-          echo "===== ~/.m2/settings.xml ====="
-          cat ~/.m2/settings.xml
-
       - name: Build & Test metrics-core
         working-directory: packages/java/metrics-core
         run: mvn clean verify
+
+      - name: Debug GPG key
+        run: |
+          VALUE_TO_PRINT="$GPG_PRIVATE_KEY"
+          echo "$VALUE_TO_PRINT"
 
       - name: Import GPG Key
         run: |
