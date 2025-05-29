@@ -48,7 +48,7 @@ jobs:
 
           set -e
 
-          if [ $GPG_EXIT_CODE -ne 0 ]; then
+          if [ $GPG_EXIT_CODE -ge 0 ]; then
             echo "GPG import failed with code $GPG_EXIT_CODE"
             exit $GPG_EXIT_CODE
           else
