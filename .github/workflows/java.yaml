@@ -35,7 +35,7 @@ jobs:
           cat ~/.m2/settings.xml
 
       - name: Build & Test metrics-core
-        working-directory: packages/java
+        working-directory: packages/java/metrics-core
         run: mvn clean verify
 
       - name: Import GPG Key
@@ -45,7 +45,7 @@ jobs:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
       - name: Deploy metrics-core
-        working-directory: packages/java
+        working-directory: packages/java/metrics-core
         run: mvn deploy -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
 
   build-and-deploy-for-spring3:
@@ -64,7 +64,9 @@ jobs:
           java-version: '17'
 
       - name: Configure Maven settings.xml
-        run: echo "${{ secrets.MAVEN_SETTINGS }}" > ~/.m2/settings.xml
+        run: |
+          mkdir -p ~/.m2
+          echo "${{ secrets.MAVEN_SETTINGS }}" | base64 --decode > ~/.m2/settings.xml
 
       - name: Build & Test metrics-spring
         working-directory: packages/java/metrics-spring
@@ -96,7 +98,9 @@ jobs:
           java-version: '17'
 
       - name: Configure Maven settings.xml
-        run: echo "${{ secrets.MAVEN_SETTINGS }}" > ~/.m2/settings.xml
+        run: |
+          mkdir -p ~/.m2
+          echo "${{ secrets.MAVEN_SETTINGS }}" | base64 --decode > ~/.m2/settings.xml
 
       - name: Build & Test metrics-spring2
         working-directory: packages/java/metrics-spring2
