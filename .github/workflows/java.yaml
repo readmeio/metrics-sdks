@@ -33,8 +33,20 @@ jobs:
         working-directory: packages/java/metrics-core
         run: mvn clean verify
 
-      - name: Import GPG Key
-        run: echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+#      - name: Import GPG Key
+#        run: echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+#        env:
+#          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+
+      - name: Clean and import GPG key
+        run: |
+          echo "$GPG_PRIVATE_KEY" | sed '/^\s*$/d' | sed 's/^[ \t]*//;s/[ \t]*$//' > clean_gpg_key.asc
+          
+          echo "===== START OF KEY ====="
+          cat clean_gpg_key.asc
+          echo "===== END OF KEY ====="
+          
+          gpg --batch --import clean_gpg_key.asc
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
