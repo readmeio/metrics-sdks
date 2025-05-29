@@ -33,14 +33,8 @@ jobs:
         working-directory: packages/java/metrics-core
         run: mvn clean verify
 
-      - name: Debug GPG key
-        run: |
-          echo "$GPG_PRIVATE_KEY" > raw_gpg_key.txt
-          cat raw_gpg_key.txt
-
       - name: Import GPG Key
-        run: |
-          echo "$GPG_PRIVATE_KEY" | base64 --decode | gpg --batch --import
+        run: echo "$GPG_PRIVATE_KEY" | gpg --batch --import
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
