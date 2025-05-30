@@ -31,8 +31,8 @@
     <description>Core library for Readme.io JVM related SDKs</description>
 
     <properties>
-<!--        <gpg.keyname>D3DAA0E037DED686</gpg.keyname>-->
-<!--        <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>-->
+        <gpg.keyname>D3DAA0E037DED686</gpg.keyname>
+        <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
 
         <maven.compiler.release>11</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

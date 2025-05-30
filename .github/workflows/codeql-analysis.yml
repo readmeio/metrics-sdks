@@ -41,9 +41,9 @@ jobs:
       - name: Build for Java and Kotlin
         if: matrix.language == 'java'
         run: |
-          mvn clean install -f packages/java/metrics-core/pom.xml
-          mvn clean install -f packages/java/metrics-spring/pom.xml
-          mvn clean install -f packages/java/metrics-spring2/pom.xml
+          mvn clean install -f packages/java/metrics-core/pom.xml -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
+          mvn clean install -f packages/java/metrics-spring/pom.xml -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
+          mvn clean install -f packages/java/metrics-spring2/pom.xml -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3

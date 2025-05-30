@@ -31,7 +31,7 @@ jobs:
 
       - name: Build & Test metrics-core
         working-directory: packages/java/metrics-core
-        run: mvn clean verify
+        run: mvn clean verify -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
 
       - name: Clean and import GPG key
         run: |
@@ -86,7 +86,7 @@ jobs:
 
       - name: Build & Test metrics-spring
         working-directory: packages/java/metrics-spring
-        run: mvn clean verify
+        run: mvn clean verify -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
 
       - name: Import GPG Key
         run: |
@@ -120,7 +120,7 @@ jobs:
 
       - name: Build & Test metrics-spring2
         working-directory: packages/java/metrics-spring2
-        run: mvn clean verify
+        run: mvn clean verify -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
 
       - name: Import GPG Key
         run: |

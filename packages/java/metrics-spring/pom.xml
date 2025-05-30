@@ -38,6 +38,9 @@
 	<description>Readme metrics SDK for Spring Boot 3+</description>
 
 	<properties>
+		<gpg.keyname>D3DAA0E037DED686</gpg.keyname>
+		<gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
+
 		<java.version>17</java.version>
 		<readme-metrics.version>0.1.0</readme-metrics.version>
 	</properties>
