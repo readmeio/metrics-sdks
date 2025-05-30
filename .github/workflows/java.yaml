@@ -45,10 +45,7 @@ jobs:
 
       - name: Build & Test metrics-core
         working-directory: packages/java/metrics-core
-        run: mvn clean install -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
-
-      - name: List signed artifacts
-        run: ls -l packages/java/target/*.asc || echo "No .asc files"
+        run: mvn clean verify -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
 
       - name: Deploy metrics-core
         working-directory: packages/java/metrics-core
@@ -90,6 +87,10 @@ jobs:
           fi
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+
+      - name: Build metrics-core for dependency
+        working-directory: packages/java/metrics-core
+        run: mvn clean install -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
 
       - name: Build & Test metrics-spring
         working-directory: packages/java/metrics-spring
@@ -135,6 +136,10 @@ jobs:
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
+      - name: Build metrics-core for dependency
+        working-directory: packages/java/metrics-core
+        run: mvn clean install -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
+
       - name: Build & Test metrics-spring2
         working-directory: packages/java/metrics-spring2
         run: mvn clean verify -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
@@ -142,4 +147,3 @@ jobs:
       - name: Deploy metrics-spring2
         working-directory: packages/java/metrics-spring2
         run: mvn deploy -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
-
