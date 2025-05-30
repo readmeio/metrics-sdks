@@ -29,25 +29,17 @@ jobs:
           mkdir -p ~/.m2
           echo "${{ secrets.MAVEN_SETTINGS }}" | base64 --decode > ~/.m2/settings.xml
 
-      - name: Build & Test metrics-core
-        working-directory: packages/java/metrics-core
-        run: mvn clean verify -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
+      - name: List GPG secret keys
+        run: gpg --list-secret-keys --keyid-format LONG
 
-      - name: Clean and import GPG key
+      - name: Import GPG key
         run: |
           set +e 
-          
           echo "$GPG_PRIVATE_KEY" | tr -d '\r' | sed '1s/^\xEF\xBB\xBF//' | sed '/^\s*$/d' | sed 's/^[ \t]*//;s/[ \t]*$//' > clean_gpg_key.asc
-          
-          echo "===== START OF KEY ====="
-          cat clean_gpg_key.asc
-          echo "===== END OF KEY ====="
-          
           gpg --batch --import clean_gpg_key.asc
           GPG_EXIT_CODE=$?
 
           set -e
-
           if [ $GPG_EXIT_CODE -ge 3 ]; then
             echo "GPG import failed with code $GPG_EXIT_CODE"
             exit $GPG_EXIT_CODE
@@ -56,6 +48,10 @@ jobs:
           fi
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+
+      - name: Build & Test metrics-core
+        working-directory: packages/java/metrics-core
+        run: mvn clean verify -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
 
       - name: List signed artifacts
         run: ls -l packages/java/target/*.asc || echo "No .asc files"
@@ -84,15 +80,26 @@ jobs:
           mkdir -p ~/.m2
           echo "${{ secrets.MAVEN_SETTINGS }}" | base64 --decode > ~/.m2/settings.xml
 
+      - name: Import GPG Key
+        run: |
+          set +e 
+          echo "$GPG_PRIVATE_KEY" | tr -d '\r' | sed '1s/^\xEF\xBB\xBF//' | sed '/^\s*$/d' | sed 's/^[ \t]*//;s/[ \t]*$//' > clean_gpg_key.asc
+          gpg --batch --import clean_gpg_key.asc
+          GPG_EXIT_CODE=$?
+
+          set -e
+          if [ $GPG_EXIT_CODE -ge 3 ]; then
+            echo "GPG import failed with code $GPG_EXIT_CODE"
+            exit $GPG_EXIT_CODE
+          else
+            echo "GPG key imported successfully"
+          fi
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+
       - name: Build & Test metrics-spring
         working-directory: packages/java/metrics-spring
         run: mvn clean verify -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
-
-      - name: Import GPG Key
-        run: |
-          echo "$GPG_PRIVATE_KEY" | base64 --decode | gpg --batch --import
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
       - name: Deploy metrics-spring
         working-directory: packages/java/metrics-spring
@@ -118,15 +125,25 @@ jobs:
           mkdir -p ~/.m2
           echo "${{ secrets.MAVEN_SETTINGS }}" | base64 --decode > ~/.m2/settings.xml
 
+      - name: Import GPG Key
+        run: |
+          set +e 
+          echo "$GPG_PRIVATE_KEY" | tr -d '\r' | sed '1s/^\xEF\xBB\xBF//' | sed '/^\s*$/d' | sed 's/^[ \t]*//;s/[ \t]*$//' > clean_gpg_key.asc
+          gpg --batch --import clean_gpg_key.asc          GPG_EXIT_CODE=$?
+
+          set -e
+          if [ $GPG_EXIT_CODE -ge 3 ]; then
+            echo "GPG import failed with code $GPG_EXIT_CODE"
+            exit $GPG_EXIT_CODE
+          else
+            echo "GPG key imported successfully"
+          fi
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+
       - name: Build & Test metrics-spring2
         working-directory: packages/java/metrics-spring2
         run: mvn clean verify -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
-
-      - name: Import GPG Key
-        run: |
-          echo "$GPG_PRIVATE_KEY" | base64 --decode | gpg --batch --import
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
       - name: Deploy metrics-spring2
         working-directory: packages/java/metrics-spring2
