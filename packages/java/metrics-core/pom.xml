@@ -25,13 +25,14 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.readme</groupId>
+    <name>metrics-core</name>
     <artifactId>metrics-core</artifactId>
     <version>0.1.0</version>
     <description>Core library for Readme.io JVM related SDKs</description>
 
     <properties>
-        <gpg.keyname>D3DAA0E037DED686</gpg.keyname>
-        <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
+<!--        <gpg.keyname>D3DAA0E037DED686</gpg.keyname>-->
+<!--        <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>-->
 
         <maven.compiler.release>11</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -166,7 +167,7 @@
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
-                        <phase>deploy</phase>
+                        <phase>verify</phase>
                         <goals>
                             <goal>sign</goal>
                         </goals>
