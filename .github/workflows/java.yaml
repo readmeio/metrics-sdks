@@ -57,6 +57,9 @@ jobs:
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
+      - name: List signed artifacts
+        run: ls -l packages/java/target/*.asc || echo "No .asc files"
+
       - name: Deploy metrics-core
         working-directory: packages/java/metrics-core
         run: mvn deploy -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
