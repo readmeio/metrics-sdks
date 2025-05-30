@@ -38,6 +38,23 @@ jobs:
         if: matrix.language != 'java'
         uses: github/codeql-action/autobuild@v3
 
+      - name: Import GPG key
+        run: |
+          set +e 
+          echo "$GPG_PRIVATE_KEY" | tr -d '\r' | sed '1s/^\xEF\xBB\xBF//' | sed '/^\s*$/d' | sed 's/^[ \t]*//;s/[ \t]*$//' > clean_gpg_key.asc
+          gpg --batch --import clean_gpg_key.asc
+          GPG_EXIT_CODE=$?
+
+          set -e
+          if [ $GPG_EXIT_CODE -ge 3 ]; then
+            echo "GPG import failed with code $GPG_EXIT_CODE"
+            exit $GPG_EXIT_CODE
+          else
+            echo "GPG key imported successfully"
+          fi
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+
       - name: Build for Java and Kotlin
         if: matrix.language == 'java'
         run: |
