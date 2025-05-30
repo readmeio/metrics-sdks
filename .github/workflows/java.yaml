@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - 1153_finish_ci-cd_configuration
     paths:
       - 'packages/java/**'
       - '.github/**'
