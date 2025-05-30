@@ -5,9 +5,8 @@ on:
     branches:
       - main
       - 1153_finish_ci-cd_configuration
-  pull_request:
-    branches:
-      - main
+    paths:
+      - 'packages/java/**'
 
 jobs:
   build-and-deploy-core:
@@ -51,7 +50,7 @@ jobs:
 
       - name: Build & Test metrics-core
         working-directory: packages/java/metrics-core
-        run: mvn clean verify -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
+        run: mvn clean install -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
 
       - name: List signed artifacts
         run: ls -l packages/java/target/*.asc || echo "No .asc files"
