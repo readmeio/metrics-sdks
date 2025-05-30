@@ -38,7 +38,8 @@ jobs:
         if: matrix.language != 'java'
         uses: github/codeql-action/autobuild@v3
 
-      - name: Import GPG key
+      - name: Import Java GPG key
+        #This step will be removed from here once we add build profile for java. Let's keep it here for now :)
         run: |
           set +e 
           echo "$GPG_PRIVATE_KEY" | tr -d '\r' | sed '1s/^\xEF\xBB\xBF//' | sed '/^\s*$/d' | sed 's/^[ \t]*//;s/[ \t]*$//' > clean_gpg_key.asc
