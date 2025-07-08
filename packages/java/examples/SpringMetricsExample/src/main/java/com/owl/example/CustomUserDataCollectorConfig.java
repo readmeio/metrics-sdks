@@ -42,9 +42,8 @@ public class CustomUserDataCollectorConfig {
     @Bean
     public LogOptions logOptions() {
         return LogOptions.builder()
-                .baseLogUrl("http://docs.readme.abcd")
+                .baseLogUrl("http://base.log.url")
                 .bufferLength(1)
-                .denylist(List.of("Bird-id"))
                 .build();
     }
 }
