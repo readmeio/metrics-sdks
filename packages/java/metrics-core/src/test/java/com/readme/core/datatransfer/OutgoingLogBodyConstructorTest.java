@@ -78,7 +78,7 @@ class OutgoingLogBodyConstructorTest {
 
         ResponseData responseData = ResponseData.builder()
                 .body("{\"response\":\"ok\"}")
-                .headers(Map.of("content-type", "application/json", "content-length", "100"))
+                .headers(new HashMap<>(Map.of("host", "owl-bowl.abc", "content-type", "application/json")))
                 .statusCode(200)
                 .statusMessage("OK")
                 .build();
@@ -126,7 +126,7 @@ class OutgoingLogBodyConstructorTest {
     void construct_ShouldApplyLogOptionsAllowList() {
         PayloadData payloadData = createStubPayloadData();
         payloadData.getApiCallLogData().getRequestData().setBody("{\"keep\":\"abc\", \"drop\":\"xyz\"}");
-        payloadData.getApiCallLogData().getRequestData().getHeaders().put("Keep-Header", "keepValue");
+        payloadData.getApiCallLogData().getRequestData().getHeaders().put("Keep-header", "keepValue");
         payloadData.getApiCallLogData().getRequestData().getHeaders().put("Drop-Header", "dropValue");
 
         LogOptions logOptions = LogOptions.builder()
@@ -145,7 +145,7 @@ class OutgoingLogBodyConstructorTest {
         assertFalse(postData.getText().contains("drop"));
 
         boolean keepHeaderExists = request.getHeaders().stream()
-                .anyMatch(hdr -> hdr.getName().equals("Keep-Header"));
+                .anyMatch(hdr -> hdr.getName().equals("Keep-header"));
         assertTrue(keepHeaderExists);
 
         boolean dropHeaderExists = request.getHeaders().stream()
@@ -164,6 +164,8 @@ class OutgoingLogBodyConstructorTest {
         PayloadData payloadData = createStubPayloadData();
         payloadData.getApiCallLogData().getRequestData().setBody("username=owl&password=superSecret123&token=myToken");
         payloadData.getApiCallLogData().getRequestData().getHeaders().put("content-type", "application/x-www-form-urlencoded");
+        payloadData.getApiCallLogData().getResponseData().setBody("username=owl&password=superSecret123&token=myToken");
+        payloadData.getApiCallLogData().getResponseData().getHeaders().put("content-type", "application/x-www-form-urlencoded");
 
         LogOptions logOptions = LogOptions.builder()
                 .development(true)
@@ -174,13 +176,20 @@ class OutgoingLogBodyConstructorTest {
 
         Har har = result.getRequest();
         HarEntry entry = har.getLog().getEntries().get(0);
+
         HarRequest request = entry.getRequest();
+        HarResponse response = entry.getResponse();
+
         HarPostData postData = request.getPostData();
 
         assertNotNull(postData);
         assertTrue(postData.getText().contains("username=owl"));
         assertTrue(postData.getText().contains("password=[REDACTED]"));
         assertTrue(postData.getText().contains("token=[REDACTED]"));
+
+        assertTrue(response.getContent().getText().contains("username=owl"));
+        assertTrue(response.getContent().getText().contains("password=[REDACTED]"));
+        assertTrue(response.getContent().getText().contains("token=[REDACTED]"));
     }
 
     @Test

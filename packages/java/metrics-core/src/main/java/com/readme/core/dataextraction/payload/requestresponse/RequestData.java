@@ -1,9 +1,7 @@
 package com.readme.core.dataextraction.payload.requestresponse;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.Setter;
-import lombok.Value;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.Map;
 
@@ -13,13 +11,9 @@ import java.util.Map;
  * request body, and metadata related to the request.
  */
 @Data
-@Builder
-public class RequestData {
-
-    /**
-     * Request body prepared for logging
-     */
-    private String body;
+@SuperBuilder
+@EqualsAndHashCode
+public class RequestData extends BaseRequestResponseData {
 
     /**
      * The route path associated with the request (e.g., "/api/v1/resource").
@@ -47,14 +41,8 @@ public class RequestData {
     private String method;
 
     /**
-     * A map of HTTP headers included in the request.
-     */
-    private Map<String, String> headers;
-
-    /**
      * A map of query parameters extracted from the request URL.
      */
     private Map<String, String> requestParameters;
-
 
 }

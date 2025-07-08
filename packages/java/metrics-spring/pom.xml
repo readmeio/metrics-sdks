@@ -33,7 +33,7 @@
 
 	<groupId>com.readme</groupId>
 	<artifactId>metrics-spring</artifactId>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<name>metrics-spring</name>
 	<description>Readme metrics SDK for Spring Boot 3+</description>
 
@@ -42,7 +42,7 @@
 		<gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
 
 		<java.version>17</java.version>
-		<readme-metrics.version>0.1.0</readme-metrics.version>
+		<readme-metrics.version>0.1.1</readme-metrics.version>
 	</properties>
 
 	<dependencies>
@@ -126,20 +126,20 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<version>3.2.7</version>
-				<executions>
-					<execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-gpg-plugin</artifactId>-->
+<!--				<version>3.2.7</version>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<id>sign-artifacts</id>-->
+<!--						<phase>verify</phase>-->
+<!--						<goals>-->
+<!--							<goal>sign</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
 		</plugins>
 	</build>
 </project>

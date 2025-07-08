@@ -75,7 +75,7 @@ public class DataCollectionAutoConfiguration {
             PayloadDataDispatcher payloadDataDispatcher,
             LogOptions logOptions) {
         FilterRegistrationBean<DataCollectionFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new DataCollectionFilter(userDataCollector, requestDataCollector, payloadDataDispatcher, logOptions));
+        registrationBean.setFilter(new DataCollectionFilter(readmeProperties, userDataCollector, requestDataCollector, payloadDataDispatcher, logOptions));
         registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         registrationBean.addUrlPatterns("/*");
         return registrationBean;
