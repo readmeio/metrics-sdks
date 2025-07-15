@@ -1,6 +1,8 @@
 {
   "extends": "./tsconfig.build.json",
   "compilerOptions": {
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "rootDir": ".",
 
     // Allows us to not have to typeguard in catches.
