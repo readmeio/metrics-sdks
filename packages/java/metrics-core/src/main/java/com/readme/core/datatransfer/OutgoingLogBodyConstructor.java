@@ -191,43 +191,87 @@ public class OutgoingLogBodyConstructor {
         return (int) (payloadData.getResponseEndDateTime().getTime() - payloadData.getRequestStartedDateTime().getTime());
     }
 
+    boolean isJson(String body) {
+        if (body == null) return false;
+        String trimmed = body.trim();
+        return (trimmed.startsWith("{") && trimmed.endsWith("}"))
+                || (trimmed.startsWith("[") && trimmed.endsWith("]"));
+    }
 
+    boolean isFormUrlEncoded(String body) {
+        if (body == null) return false;
+        return body.matches("([\\w+%.-]+=[^&]*&?)+");
+    }
 
     public void filterDataByLogOptions(LogOptions options, BaseRequestResponseData reqRespData) {
-        Set<String> denylist = options.getDenylist();
-        Set<String> allowlist = options.getAllowlist();
-        ObjectMapper mapper = new ObjectMapper();
+        Set<String> denyList = options.getDenylist();
+        Set<String> allowList = options.getAllowlist();
+        String body = reqRespData.getBody();
 
-        String mimeType = parseContentType(reqRespData.getHeaders().get("content-type"));
-        String requestBody = reqRespData.getBody();
+        if (!isPresent(allowList) && !isPresent(denyList)) return;
 
-        if(mimeType.equalsIgnoreCase("application/json")) {
-            try {
-                JsonNode requestBodyNode = mapper.readTree(reqRespData.getBody());
-                boolean hasAllowList = allowlist != null && !allowlist.isEmpty();
-                boolean hasDenyList = denylist != null && !denylist.isEmpty();
-
-                if (hasAllowList) {
-                    requestBody = applyJsonBodyAllowList(requestBodyNode, allowlist).toString();
-                    reqRespData.setHeaders(applyHeadersAllowList(reqRespData.getHeaders(), allowlist));
-                } else if (hasDenyList) {
-                    requestBody = applyJsonBodyDenyList(requestBodyNode, denylist).toString();
-                    reqRespData.setHeaders(applyHeadersDenyList(reqRespData.getHeaders(), denylist));
-                }
-            } catch (Exception e) {
-                log.error("Error parsing request body", e);
-            }
-        } else if (mimeType.equalsIgnoreCase("application/x-www-form-urlencoded")) {
-            if (denylist != null && !denylist.isEmpty()) {
-                requestBody = applyFormUrlEncodedDenyList(reqRespData.getBody(), denylist);
-                reqRespData.setHeaders(applyHeadersDenyList(reqRespData.getHeaders(), denylist));
-            }
-            if (allowlist != null && !allowlist.isEmpty() && denylist == null) {
-                requestBody = applyFormUrlEncodedAllowList(reqRespData.getBody(), allowlist);
-                reqRespData.setHeaders(applyHeadersAllowList(reqRespData.getHeaders(), allowlist));
+        if (isJson(body)) {
+            body = handleJsonRequestResponseData(reqRespData, allowList, denyList);
+        } else if (isFormUrlEncoded(body)) {
+            body = handleFormRequestResponseData(reqRespData, allowList, denyList);
+        } else {
+            if (isPresent(allowList)) {
+                updateHeaders(reqRespData, allowList, true);
+            } else if (isPresent(denyList)) {
+                updateHeaders(reqRespData, denyList, false);
             }
         }
-        reqRespData.setBody(requestBody);
+        reqRespData.setBody(body);
+        if (reqRespData instanceof ResponseData) {
+            addResponseContentHeaders(reqRespData.getHeaders(), body);
+        }
+    }
+
+    private void addResponseContentHeaders(Map<String,String> headers, String body) {
+        if (isJson(body)) {
+            headers.put("Content-Type", "application/json");
+        } else if (isFormUrlEncoded(body)) {
+            headers.put("Content-Type", "application/x-www-form-urlencoded");
+        }
+    }
+
+    private String handleJsonRequestResponseData(BaseRequestResponseData data, Set<String> allowList, Set<String> denyList) {
+        try {
+            JsonNode node = new ObjectMapper().readTree(data.getBody());
+            if (isPresent(allowList)) {
+                updateHeaders(data, allowList, true);
+                return applyJsonBodyAllowList(node, allowList).toString();
+            } else if (isPresent(denyList)) {
+                updateHeaders(data, denyList, false);
+                return applyJsonBodyDenyList(node, denyList).toString();
+            }
+        } catch (Exception e) {
+            log.error("Error parsing JSON body", e);
+        }
+        return data.getBody();
+    }
+
+    private String handleFormRequestResponseData(BaseRequestResponseData data, Set<String> allowList, Set<String> denyList) {
+        if (isPresent(allowList)) {
+            updateHeaders(data, allowList, true);
+            return applyFormUrlEncodedAllowList(data.getBody(), allowList);
+        } else if (isPresent(denyList)) {
+            updateHeaders(data, denyList, false);
+            return applyFormUrlEncodedDenyList(data.getBody(), denyList);
+        }
+        return data.getBody();
+    }
+
+    private void updateHeaders(BaseRequestResponseData data, Set<String> list, boolean isAllow) {
+        Map<String, String> updated = isAllow
+                ? applyHeadersAllowList(data.getHeaders(), list)
+                : applyHeadersDenyList(data.getHeaders(), list);
+
+        data.setHeaders(updated);
+    }
+
+    private boolean isPresent(Set<String> optionList){
+        return optionList != null && !optionList.isEmpty();
     }
 
     private Map<String, String> applyHeadersDenyList(Map<String, String> headers, Set<String> denylist) {

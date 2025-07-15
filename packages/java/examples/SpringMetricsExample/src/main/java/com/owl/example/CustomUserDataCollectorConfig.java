@@ -44,6 +44,7 @@ public class CustomUserDataCollectorConfig {
         return LogOptions.builder()
                 .baseLogUrl("http://base.log.url")
                 .bufferLength(1)
+                .denylist(List.of("denied-param"))
                 .build();
     }
 }

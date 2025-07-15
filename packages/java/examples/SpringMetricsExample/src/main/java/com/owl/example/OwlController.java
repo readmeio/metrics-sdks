@@ -41,18 +41,17 @@ public class OwlController {
         UUID birdId = UUID.randomUUID();
         owlStorage.put(birdId.toString(), owlName);
 
-        String responseBody = "Bird " + owlName + " created a bird with id: " + birdId + "\n" +
-                "Creation request body: \n" + body;
-
         HttpHeaders headers = new HttpHeaders();
         headers.add("bird-id", birdId.toString());
         headers.add("bird-token", Base64.getEncoder()
                 .encodeToString(birdId.toString()
                         .getBytes()));
+        headers.add("denied-param", "test");
 
         return ResponseEntity.status(HttpStatus.CREATED.getCode())
                 .headers(headers)
-                .body(responseBody);
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(body);
     }
 
     @PutMapping(value = "/owl/urlencoded/{owlName}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)

@@ -6,8 +6,6 @@ import com.readme.core.dataextraction.payload.requestresponse.ApiCallLogData;
 import com.readme.core.dataextraction.payload.requestresponse.RequestData;
 import com.readme.core.dataextraction.payload.requestresponse.ResponseData;
 import com.readme.core.dataextraction.payload.user.UserData;
-import com.readme.core.datatransfer.OutgoingLogBody;
-import com.readme.core.datatransfer.OutgoingLogBodyConstructor;
 import com.readme.core.datatransfer.har.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,13 +70,13 @@ class OutgoingLogBodyConstructorTest {
                 .protocol("HTTP/1.1")
                 .url("http://owl-bowl.abc/api")
                 .method("POST")
-                .headers(new HashMap<>(Map.of("host", "owl-bowl.abc", "content-type", "application/json")))
+                .headers(new HashMap<>(Map.of("host", "owl-bowl.abc")))
                 .requestParameters(Map.of("param1", "value1"))
                 .build();
 
         ResponseData responseData = ResponseData.builder()
                 .body("{\"response\":\"ok\"}")
-                .headers(new HashMap<>(Map.of("host", "owl-bowl.abc", "content-type", "application/json")))
+                .headers(new HashMap<>(Map.of("host", "owl-bowl.abc")))
                 .statusCode(200)
                 .statusMessage("OK")
                 .build();
@@ -101,6 +99,11 @@ class OutgoingLogBodyConstructorTest {
         PayloadData payloadData = createStubPayloadData();
         payloadData.getApiCallLogData().getRequestData().setBody("{\"key\":\"value\", \"secret\":\"mySecret\"}");
         payloadData.getApiCallLogData().getRequestData().getHeaders().put("X-Secret-Header", "SuperSecret");
+        payloadData.getApiCallLogData().getRequestData().getHeaders().put("content-type", "application/json");
+
+        payloadData.getApiCallLogData().getResponseData().setBody("{\"key\":\"value\", \"secret\":\"mySecret\"}");
+        payloadData.getApiCallLogData().getResponseData().getHeaders().put("X-Secret-Header", "SuperSecret");
+        payloadData.getApiCallLogData().getResponseData().getHeaders().put("content-type", "application/json");
 
         LogOptions logOptions = LogOptions.builder()
                 .development(true)
@@ -112,10 +115,15 @@ class OutgoingLogBodyConstructorTest {
         Har har = result.getRequest();
         HarEntry entry = har.getLog().getEntries().get(0);
         HarRequest request = entry.getRequest();
+        HarResponse response = entry.getResponse();
 
-        HarPostData postData = request.getPostData();
-        assertNotNull(postData);
-        assertTrue(postData.getText().contains("\"secret\":\"[REDACTED]\""));
+        String requestBody = request.getPostData().getText();
+        assertNotNull(requestBody);
+        assertTrue(requestBody.contains("\"secret\":\"[REDACTED]\""));
+
+        String responseBody = response.getContent().getText();
+        assertNotNull(responseBody);
+        assertTrue(responseBody.contains("\"secret\":\"[REDACTED]\""));
 
         boolean anySecretHeader = request.getHeaders().stream()
                 .anyMatch(hdr -> hdr.getName().equals("X-Secret-Header"));
@@ -128,6 +136,12 @@ class OutgoingLogBodyConstructorTest {
         payloadData.getApiCallLogData().getRequestData().setBody("{\"keep\":\"abc\", \"drop\":\"xyz\"}");
         payloadData.getApiCallLogData().getRequestData().getHeaders().put("Keep-header", "keepValue");
         payloadData.getApiCallLogData().getRequestData().getHeaders().put("Drop-Header", "dropValue");
+        payloadData.getApiCallLogData().getRequestData().getHeaders().put("content-type", "application/json");
+
+        payloadData.getApiCallLogData().getResponseData().setBody("{\"keep\":\"abc\", \"drop\":\"xyz\"}");
+        payloadData.getApiCallLogData().getResponseData().getHeaders().put("Keep-header", "keepValue");
+        payloadData.getApiCallLogData().getResponseData().getHeaders().put("Drop-Header", "dropValue");
+        payloadData.getApiCallLogData().getResponseData().getHeaders().put("content-type", "application/json");
 
         LogOptions logOptions = LogOptions.builder()
                 .development(false)
@@ -139,10 +153,15 @@ class OutgoingLogBodyConstructorTest {
         Har har = result.getRequest();
         HarEntry entry = har.getLog().getEntries().get(0);
         HarRequest request = entry.getRequest();
-        HarPostData postData = request.getPostData();
+        HarResponse response = entry.getResponse();
+        String requestBody = request.getPostData().getText();
+        String responseBody = response.getContent().getText();
 
-        assertTrue(postData.getText().contains("\"keep\":\"abc\""));
-        assertFalse(postData.getText().contains("drop"));
+        assertTrue(requestBody.contains("\"keep\":\"abc\""));
+        assertFalse(requestBody.contains("drop"));
+
+        assertTrue(responseBody.contains("\"keep\":\"abc\""));
+        assertFalse(responseBody.contains("drop"));
 
         boolean keepHeaderExists = request.getHeaders().stream()
                 .anyMatch(hdr -> hdr.getName().equals("Keep-header"));
@@ -177,19 +196,24 @@ class OutgoingLogBodyConstructorTest {
         Har har = result.getRequest();
         HarEntry entry = har.getLog().getEntries().get(0);
 
-        HarRequest request = entry.getRequest();
-        HarResponse response = entry.getResponse();
+        String requestBody = entry.getRequest().getPostData().getText();
+        String responseBody = entry.getResponse().getContent().getText();
 
-        HarPostData postData = request.getPostData();
+        boolean dropHeaderExistsInRequest = entry.getRequest().getHeaders().stream()
+                .anyMatch(hdr -> hdr.getName().equals("Drop-Header"));
+        assertFalse(dropHeaderExistsInRequest);
 
-        assertNotNull(postData);
-        assertTrue(postData.getText().contains("username=owl"));
-        assertTrue(postData.getText().contains("password=[REDACTED]"));
-        assertTrue(postData.getText().contains("token=[REDACTED]"));
+        boolean dropHeaderExistsInResponse = entry.getResponse().getHeaders().stream()
+                .anyMatch(hdr -> hdr.getName().equals("Drop-Header"));
+        assertFalse(dropHeaderExistsInResponse);
 
-        assertTrue(response.getContent().getText().contains("username=owl"));
-        assertTrue(response.getContent().getText().contains("password=[REDACTED]"));
-        assertTrue(response.getContent().getText().contains("token=[REDACTED]"));
+        assertTrue(requestBody.contains("username=owl"));
+        assertTrue(requestBody.contains("password=[REDACTED]"));
+        assertTrue(requestBody.contains("token=[REDACTED]"));
+
+        assertTrue(responseBody.contains("username=owl"));
+        assertTrue(responseBody.contains("password=[REDACTED]"));
+        assertTrue(responseBody.contains("token=[REDACTED]"));
     }
 
     @Test
@@ -197,6 +221,8 @@ class OutgoingLogBodyConstructorTest {
         PayloadData payloadData = createStubPayloadData();
         payloadData.getApiCallLogData().getRequestData().setBody("username=owl&password=superSecret123&token=myToken");
         payloadData.getApiCallLogData().getRequestData().getHeaders().put("content-type", "application/x-www-form-urlencoded");
+        payloadData.getApiCallLogData().getResponseData().setBody("username=owl&password=superSecret123&token=myToken");
+        payloadData.getApiCallLogData().getResponseData().getHeaders().put("content-type", "application/x-www-form-urlencoded");
 
         LogOptions logOptions = LogOptions.builder()
                 .development(false)
@@ -207,12 +233,75 @@ class OutgoingLogBodyConstructorTest {
 
         Har har = result.getRequest();
         HarEntry entry = har.getLog().getEntries().get(0);
-        HarRequest request = entry.getRequest();
-        HarPostData postData = request.getPostData();
+        String requestBody = entry.getRequest().getPostData().getText();
+        String responseBody = entry.getResponse().getContent().getText();
 
-        assertNotNull(postData);
-        assertTrue(postData.getText().contains("username=owl"));
-        assertFalse(postData.getText().contains("password"));
-        assertFalse(postData.getText().contains("token"));
+        assertTrue(requestBody.contains("username=owl"));
+        assertFalse(requestBody.contains("password"));
+        assertFalse(requestBody.contains("token"));
+
+        assertTrue(responseBody.contains("username=owl"));
+        assertFalse(responseBody.contains("password"));
+        assertFalse(responseBody.contains("token"));
+    }
+
+
+    @Test
+    void construct_ShouldApplyLogOptionsDenyList_WhenContentTypeIsMissing() {
+        PayloadData payloadData = createStubPayloadData();
+        payloadData.getApiCallLogData().getRequestData().getHeaders().put("X-Secret-Header", "SuperSecret");
+        payloadData.getApiCallLogData().getResponseData().getHeaders().put("X-Secret-Header", "SuperSecret");
+
+        LogOptions logOptions = LogOptions.builder()
+                .development(true)
+                .denylist(List.of("X-Secret-Header", "secret"))
+                .build();
+
+        OutgoingLogBody result = outgoingLogBodyConstructor.construct(payloadData, logOptions);
+
+        Har har = result.getRequest();
+        HarEntry entry = har.getLog().getEntries().get(0);
+
+        HarRequest request = entry.getRequest();
+        HarResponse response = entry.getResponse();
+
+        boolean anySecretHeaderInRequest = request.getHeaders().stream()
+                .anyMatch(hdr -> hdr.getName().equalsIgnoreCase("X-Secret-Header"));
+        assertFalse(anySecretHeaderInRequest);
+
+        boolean anySecretHeaderInResponse = response.getHeaders().stream()
+                .anyMatch(hdr -> hdr.getName().equalsIgnoreCase("X-Secret-Header"));
+        assertFalse(anySecretHeaderInResponse);
+    }
+
+    @Test
+    void construct_ShouldApplyLogOptionsAllowList_WhenContentTypeIsMissing() {
+        PayloadData payloadData = createStubPayloadData();
+        payloadData.getApiCallLogData().getRequestData().getHeaders().put("Keep-Header", "keepValue");
+        payloadData.getApiCallLogData().getRequestData().getHeaders().put("Drop-Header", "dropValue");
+        payloadData.getApiCallLogData().getResponseData().getHeaders().put("Keep-Header", "keepValue");
+        payloadData.getApiCallLogData().getResponseData().getHeaders().put("Drop-Header", "dropValue");
+
+        LogOptions logOptions = LogOptions.builder()
+                .development(true)
+                .allowlist(List.of("Keep-Header", "keep"))
+                .build();
+
+        OutgoingLogBody result = outgoingLogBodyConstructor.construct(payloadData, logOptions);
+
+        Har har = result.getRequest();
+        HarEntry entry = har.getLog().getEntries().get(0);
+
+        HarRequest request = entry.getRequest();
+        HarResponse response = entry.getResponse();
+
+        boolean dropHeaderExistsInRequest = entry.getRequest().getHeaders().stream()
+                .anyMatch(hdr -> hdr.getName().equals("Drop-Header"));
+        assertFalse(dropHeaderExistsInRequest);
+
+        boolean dropHeaderExistsInResponse = entry.getResponse().getHeaders().stream()
+                .anyMatch(hdr -> hdr.getName().equals("Drop-Header"));
+        assertFalse(dropHeaderExistsInResponse);
+
     }
 }
