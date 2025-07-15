@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Value;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * Represents the complete payload for logging an API interaction, combining user-specific data, detailed API request
@@ -34,5 +35,10 @@ public class PayloadData {
      * Timestamp indicating the exact moment when the API response processing completed.
      */
     Date responseEndDateTime;
+
+    /**
+     * Log ID - randomly generated during collecting request/response data
+     */
+    UUID logId;
 
 }
