@@ -191,16 +191,22 @@ public class OutgoingLogBodyConstructor {
         return (int) (payloadData.getResponseEndDateTime().getTime() - payloadData.getRequestStartedDateTime().getTime());
     }
 
-    boolean isJson(String body) {
+    private boolean isJson(String body) {
         if (body == null) return false;
         String trimmed = body.trim();
         return (trimmed.startsWith("{") && trimmed.endsWith("}"))
                 || (trimmed.startsWith("[") && trimmed.endsWith("]"));
     }
 
-    boolean isFormUrlEncoded(String body) {
-        if (body == null) return false;
-        return body.matches("([\\w+%.-]+=[^&]*&?)+");
+    private boolean isFormUrlEncoded(String body) {
+        if (body == null || body.isEmpty()) return false;
+        String[] pairs = body.split("&");
+        for (String pair : pairs) {
+            if (!pair.contains("=")) return false;
+            String[] kv = pair.split("=", 2);
+            if (kv[0].isEmpty()) return false;
+        }
+        return true;
     }
 
     public void filterDataByLogOptions(LogOptions options, BaseRequestResponseData reqRespData) {
