@@ -63,7 +63,7 @@ exports[`webhooks > C# snippet generation > aws > AWS snippet generation with au
   },
   "variables": {
     "security": {
-      "\\"petstore\\" auth": {
+      ""petstore" auth": {
         "line": 109,
       },
       "basic-auth": {
@@ -273,7 +273,7 @@ exports[`webhooks > C# snippet generation > aws > request should match fixture f
   },
   "variables": {
     "security": {
-      "\\"petstore\\" auth": {
+      ""petstore" auth": {
         "line": 88,
       },
       "basic-auth": {
@@ -477,7 +477,7 @@ exports[`webhooks > C# snippet generation > dotnet6 > request should match fixtu
   },
   "variables": {
     "security": {
-      "\\"petstore\\" auth": {
+      ""petstore" auth": {
         "line": 43,
       },
       "basic-auth": {
@@ -682,7 +682,7 @@ exports[`webhooks > Node.js snippet generation > aws > AWS snippet generation wi
   },
   "variables": {
     "security": {
-      "\\"petstore\\" auth": {
+      ""petstore" auth": {
         "line": 72,
       },
       "basic-auth": {
@@ -892,7 +892,7 @@ exports[`webhooks > Node.js snippet generation > aws > request should match fixt
   },
   "variables": {
     "security": {
-      "\\"petstore\\" auth": {
+      ""petstore" auth": {
         "line": 45,
       },
       "basic-auth": {
@@ -1096,7 +1096,7 @@ exports[`webhooks > Node.js snippet generation > express > request should match 
   },
   "variables": {
     "security": {
-      "\\"petstore\\" auth": {
+      ""petstore" auth": {
         "line": 32,
       },
       "basic-auth": {
@@ -1295,7 +1295,7 @@ exports[`webhooks > PHP snippet generation > laravel > request should match fixt
   },
   "variables": {
     "security": {
-      "\\"petstore\\" auth": {
+      ""petstore" auth": {
         "line": 32,
       },
       "basic-auth": {
@@ -1500,7 +1500,7 @@ exports[`webhooks > Python snippet generation > aws > AWS snippet generation wit
   },
   "variables": {
     "security": {
-      "\\"petstore\\" auth": {
+      ""petstore" auth": {
         "line": 64,
       },
       "basic-auth": {
@@ -1710,7 +1710,7 @@ exports[`webhooks > Python snippet generation > aws > request should match fixtu
   },
   "variables": {
     "security": {
-      "\\"petstore\\" auth": {
+      ""petstore" auth": {
         "line": 49,
       },
       "basic-auth": {
@@ -1914,7 +1914,7 @@ exports[`webhooks > Python snippet generation > flask > request should match fix
   },
   "variables": {
     "security": {
-      "\\"petstore\\" auth": {
+      ""petstore" auth": {
         "line": 44,
       },
       "basic-auth": {
@@ -2119,7 +2119,7 @@ exports[`webhooks > Ruby snippet generation > aws > AWS snippet generation with 
   },
   "variables": {
     "security": {
-      "\\"petstore\\" auth": {
+      ""petstore" auth": {
         "line": 68,
       },
       "basic-auth": {
@@ -2329,7 +2329,7 @@ exports[`webhooks > Ruby snippet generation > aws > request should match fixture
   },
   "variables": {
     "security": {
-      "\\"petstore\\" auth": {
+      ""petstore" auth": {
         "line": 51,
       },
       "basic-auth": {
@@ -2533,7 +2533,7 @@ exports[`webhooks > Ruby snippet generation > rails > request should match fixtu
   },
   "variables": {
     "security": {
-      "\\"petstore\\" auth": {
+      ""petstore" auth": {
         "line": 38,
       },
       "basic-auth": {
