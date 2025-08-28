@@ -11,10 +11,11 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([
             'api_key',
             'group_handler',
+            'fire_and_forget',
             'development_mode',
             'denylist',
             'allowlist',
-            'base_log_url'
+            'base_log_url',
         ], array_keys($config));
     }
 }
