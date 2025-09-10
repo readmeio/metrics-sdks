@@ -2,7 +2,7 @@ asgiref==3.8.1
 certifi==2024.7.4
 chardet==5.2.0
 click==8.1.7
-Django==4.2.18
+Django==4.2.24
 Flask==3.0.3
 idna==3.7
 itsdangerous==2.2.0
