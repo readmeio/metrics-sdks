@@ -389,8 +389,8 @@ class PayloadBuilder:
                         # In FastAPI, when the root_path is configured,
                         # it's included both in the base_url and in the path:
                         # e.g. root_path = "/api/v1"
-                        #      base_url  = "https://acme.com/api/v1/
-                        #      path      = "/api/v1/my/endpoint
+                        #      base_url  = "https://acme.com/api/v1/"
+                        #      path      = "/api/v1/my/endpoint"
                         # To avoid reporting "https://acme.com/api/v1/api/v1/my_endpoint
                         # we trim the redundant root_path.
                         path = path[len(root_path):]
