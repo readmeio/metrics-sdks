@@ -1,4 +1,4 @@
-Django==4.2.16
+Django==5.2.7
 Flask==3.0.3
 fastapi==0.115.6
 requests==2.32.3
