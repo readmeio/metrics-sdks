@@ -38,11 +38,11 @@ function doSend(readmeApiKey: string, options: Options) {
 }
 
 // Make sure we flush the queue if the process is exited
+// eslint-disable-next-line consistent-return
 process.on('exit', () => {
   if (sdkAPIKey && sdkOptions) {
     return doSend(sdkAPIKey, sdkOptions);
   }
-  return;
 });
 
 /* eslint-disable typescript-sort-keys/interface */
