@@ -16,6 +16,7 @@ class Middleware
                 'blacklist' => config('readme.blacklist', []),
                 'whitelist' => config('readme.whitelist', []),
                 'base_log_url' => config('readme.base_log_url'),
+                'fire_and_forget' => config('readme.fire_and_forget', true),
             ]
         );
     }
