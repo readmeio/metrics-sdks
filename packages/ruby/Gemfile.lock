@@ -16,7 +16,7 @@ GEM
       bigdecimal
       rexml
     csv (3.3.0)
-    diff-lcs (1.5.1)
+    diff-lcs (1.6.2)
     hashdiff (1.1.1)
     httparty (0.22.0)
       csv
@@ -45,19 +45,19 @@ GEM
     rake (13.2.1)
     regexp_parser (2.10.0)
     rexml (3.3.9)
-    rspec (3.13.0)
+    rspec (3.13.1)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
       rspec-mocks (~> 3.13.0)
-    rspec-core (3.13.0)
+    rspec-core (3.13.4)
       rspec-support (~> 3.13.0)
-    rspec-expectations (3.13.2)
+    rspec-expectations (3.13.5)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
-    rspec-mocks (3.13.1)
+    rspec-mocks (3.13.5)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
-    rspec-support (3.13.1)
+    rspec-support (3.13.4)
     rubocop (1.75.1)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
@@ -96,7 +96,7 @@ DEPENDENCIES
   rack-test
   rake (~> 13.2)
   readme-metrics!
-  rspec (~> 3.0)
+  rspec (~> 3.13)
   rubocop
   rubocop-performance
   rubocop-rspec
