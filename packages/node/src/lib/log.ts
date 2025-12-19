@@ -17,6 +17,8 @@ import { metricsAPICall } from './metrics-log';
 import { patchRequest } from './patch-request';
 import { patchResponse } from './patch-response';
 
+let sdkAPIKey: string;
+let sdkOptions: Options;
 let queue: OutgoingLogBody[] = [];
 function doSend(readmeApiKey: string, options: Options) {
   // Copy the queue so we can send all the requests in one batch
@@ -34,8 +36,14 @@ function doSend(readmeApiKey: string, options: Options) {
 
   logger.debug({ message: 'Queue flushed.', args: { queue } });
 }
+
 // Make sure we flush the queue if the process is exited
-process.on('exit', doSend);
+// eslint-disable-next-line consistent-return
+process.on('exit', () => {
+  if (sdkAPIKey && sdkOptions) {
+    return doSend(sdkAPIKey, sdkOptions);
+  }
+});
 
 /* eslint-disable typescript-sort-keys/interface */
 export interface ExtendedIncomingMessage extends IncomingMessage {
@@ -115,6 +123,11 @@ export function log(
   if (options.logger) {
     if (typeof options.logger === 'boolean') logger.configure({ isLoggingEnabled: true });
     else logger.configure({ isLoggingEnabled: true, strategy: options.logger });
+  }
+
+  if (!sdkAPIKey || !sdkOptions) {
+    sdkAPIKey = readmeApiKey;
+    sdkOptions = options;
   }
 
   // Ensures the buffer length is between 1 and 30
