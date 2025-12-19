@@ -17,8 +17,9 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - 18
-          - 20
+          - lts/-1
+          - lts/*
+          - latest
 
     steps:
       - uses: actions/checkout@v6
@@ -27,18 +28,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - run: npm ci --ignore-scripts
+      - run: npm run lint
       - run: npm run build
       - run: npm test
-
-  # This is being run separately since it's not playing nicely with Node 14.
-  # Once we drop Node 14 support we can probably consolidate this again.
-  lint:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/cloudflare-worker
-
-    steps:
-      - uses: actions/checkout@v6
-      - run: npm ci --ignore-scripts
-      - run: npm run lint
