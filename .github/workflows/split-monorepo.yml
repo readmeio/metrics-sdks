@@ -1,4 +1,4 @@
-name: "Split monorepo into git mirrors"
+name: 'Split monorepo into git mirrors'
 
 on:
   push:
@@ -10,14 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
-    - name: Split repository into git mirrors
-      env:
-        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        METRICS_SDK_PHP_PRIVATE_KEY: ${{ secrets.METRICS_SDK_PHP_PRIVATE_KEY }}
-      run: ./bin/split.sh
-      shell: bash
+      - name: Split repository into git mirrors
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+          METRICS_SDK_PHP_PRIVATE_KEY: ${{ secrets.METRICS_SDK_PHP_PRIVATE_KEY }}
+        run: ./bin/split.sh
+        shell: bash
