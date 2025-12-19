@@ -10,7 +10,7 @@ install: ## Install all dependencies
 lint: ## Run code standard checks
 	npx eslint .
 
-lint-fix: ## Attempt to automatically fix any code standard violations
+format: ## Attempt to automatically fix any code standard violations
 	npx eslint --fix .
 
 serve-metrics-express: ## Start the local Express server to test Metrics
