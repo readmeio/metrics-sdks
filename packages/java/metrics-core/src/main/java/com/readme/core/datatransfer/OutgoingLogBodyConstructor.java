@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.readme.core.dataextraction.LogOptions;
 import com.readme.core.dataextraction.payload.PayloadData;
+import com.readme.core.dataextraction.payload.requestresponse.BaseRequestResponseData;
 import com.readme.core.dataextraction.payload.requestresponse.RequestData;
 import com.readme.core.dataextraction.payload.requestresponse.ResponseData;
 import com.readme.core.dataextraction.payload.user.UserData;
@@ -26,10 +27,12 @@ public class OutgoingLogBodyConstructor {
             LogOptions logOptions
     ) {
         UserData userData = payloadData.getUserData();
-        RequestData requestData = payloadData.getApiCallLogData().getRequestData();
-        ResponseData responseData = payloadData.getApiCallLogData().getResponseData();
 
+        RequestData requestData = payloadData.getApiCallLogData().getRequestData();
         filterDataByLogOptions(logOptions, requestData);
+
+        ResponseData responseData = payloadData.getApiCallLogData().getResponseData();
+        filterDataByLogOptions(logOptions, responseData);
 
         HarEntry harEntry = assembleHarEntry(payloadData, logOptions, requestData, responseData);
         HarLog harLog = assembleHarLog(harEntry);
@@ -99,6 +102,7 @@ public class OutgoingLogBodyConstructor {
 
     private HarRequest processRequest(RequestData requestData, LogOptions logOptions) {
         Map<String, String> headers = requestData.getHeaders();
+
         String requestBody = requestData.getBody();
         String protocol = requestData.getProtocol();
 
@@ -187,53 +191,105 @@ public class OutgoingLogBodyConstructor {
         return (int) (payloadData.getResponseEndDateTime().getTime() - payloadData.getRequestStartedDateTime().getTime());
     }
 
-
-
-    public void filterDataByLogOptions(LogOptions options, RequestData req) {
-        List<String> denylist = options.getDenylist();
-        List<String> allowlist = options.getAllowlist();
-        ObjectMapper mapper = new ObjectMapper();
-
-        String mimeType = parseContentType(req.getHeaders().get("content-type"));
-        String requestBody = req.getBody();
-
-        if(mimeType.equalsIgnoreCase("application/json")) {
-            try {
-                JsonNode requestBodyNode = mapper.readTree(req.getBody());
-                if (denylist != null && !denylist.isEmpty()) {
-                    requestBody = applyJsonBodyDenyList(requestBodyNode, denylist).toString();
-                    req.setHeaders(applyHeadersDenyList(req.getHeaders(), denylist));
-                }
-                if (allowlist != null && !allowlist.isEmpty() && denylist == null) {
-                    requestBody = applyJsonBodyAllowList(requestBodyNode, allowlist).toString();
-                    req.setHeaders(applyHeadersAllowList(req.getHeaders(), allowlist));
-                }
-            } catch (Exception e) {
-                log.error("Error parsing request body", e);
-            }
-        } else if (mimeType.equalsIgnoreCase("application/x-www-form-urlencoded")) {
-            if (denylist != null && !denylist.isEmpty()) {
-                requestBody = applyFormUrlEncodedDenyList(req.getBody(), denylist);
-                req.setHeaders(applyHeadersDenyList(req.getHeaders(), denylist));
-            }
-            if (allowlist != null && !allowlist.isEmpty() && denylist == null) {
-                requestBody = applyFormUrlEncodedAllowList(req.getBody(), allowlist);
-                req.setHeaders(applyHeadersAllowList(req.getHeaders(), allowlist));
-            }
-        }
-        req.setBody(requestBody);
+    private boolean isJson(String body) {
+        if (body == null) return false;
+        String trimmed = body.trim();
+        return (trimmed.startsWith("{") && trimmed.endsWith("}"))
+                || (trimmed.startsWith("[") && trimmed.endsWith("]"));
     }
 
-    private Map<String, String> applyHeadersDenyList(Map<String, String> headers, List<String> denylist) {
+    private boolean isFormUrlEncoded(String body) {
+        if (body == null || body.isEmpty()) return false;
+        String[] pairs = body.split("&");
+        for (String pair : pairs) {
+            if (!pair.contains("=")) return false;
+            String[] kv = pair.split("=", 2);
+            if (kv[0].isEmpty()) return false;
+        }
+        return true;
+    }
+
+    public void filterDataByLogOptions(LogOptions options, BaseRequestResponseData reqRespData) {
+        Set<String> denyList = options.getDenylist();
+        Set<String> allowList = options.getAllowlist();
+        String body = reqRespData.getBody();
+
+        if (!isPresent(allowList) && !isPresent(denyList)) return;
+
+        if (isJson(body)) {
+            body = handleJsonRequestResponseData(reqRespData, allowList, denyList);
+        } else if (isFormUrlEncoded(body)) {
+            body = handleFormRequestResponseData(reqRespData, allowList, denyList);
+        } else {
+            if (isPresent(allowList)) {
+                updateHeaders(reqRespData, allowList, true);
+            } else if (isPresent(denyList)) {
+                updateHeaders(reqRespData, denyList, false);
+            }
+        }
+        reqRespData.setBody(body);
+        if (reqRespData instanceof ResponseData) {
+            addResponseContentHeaders(reqRespData.getHeaders(), body);
+        }
+    }
+
+    private void addResponseContentHeaders(Map<String,String> headers, String body) {
+        if (isJson(body)) {
+            headers.put("Content-Type", "application/json");
+        } else if (isFormUrlEncoded(body)) {
+            headers.put("Content-Type", "application/x-www-form-urlencoded");
+        }
+    }
+
+    private String handleJsonRequestResponseData(BaseRequestResponseData data, Set<String> allowList, Set<String> denyList) {
+        try {
+            JsonNode node = new ObjectMapper().readTree(data.getBody());
+            if (isPresent(allowList)) {
+                updateHeaders(data, allowList, true);
+                return applyJsonBodyAllowList(node, allowList).toString();
+            } else if (isPresent(denyList)) {
+                updateHeaders(data, denyList, false);
+                return applyJsonBodyDenyList(node, denyList).toString();
+            }
+        } catch (Exception e) {
+            log.error("Error parsing JSON body", e);
+        }
+        return data.getBody();
+    }
+
+    private String handleFormRequestResponseData(BaseRequestResponseData data, Set<String> allowList, Set<String> denyList) {
+        if (isPresent(allowList)) {
+            updateHeaders(data, allowList, true);
+            return applyFormUrlEncodedAllowList(data.getBody(), allowList);
+        } else if (isPresent(denyList)) {
+            updateHeaders(data, denyList, false);
+            return applyFormUrlEncodedDenyList(data.getBody(), denyList);
+        }
+        return data.getBody();
+    }
+
+    private void updateHeaders(BaseRequestResponseData data, Set<String> list, boolean isAllow) {
+        Map<String, String> updated = isAllow
+                ? applyHeadersAllowList(data.getHeaders(), list)
+                : applyHeadersDenyList(data.getHeaders(), list);
+
+        data.setHeaders(updated);
+    }
+
+    private boolean isPresent(Set<String> optionList){
+        return optionList != null && !optionList.isEmpty();
+    }
+
+    private Map<String, String> applyHeadersDenyList(Map<String, String> headers, Set<String> denylist) {
         return headers.entrySet().stream()
-                .filter(entry -> !denylist.contains(entry.getKey()))
+                .filter(entry -> !denylist.contains(entry.getKey().toLowerCase()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private Map<String, String> applyHeadersAllowList(Map<String, String> headers, List<String> allowList) {
+    private Map<String, String> applyHeadersAllowList(Map<String, String> headers, Set<String> allowList) {
         return headers.entrySet().stream()
                 .filter(entry -> {
-                    return allowList.contains(entry.getKey()) ||
+                    return allowList.contains(entry.getKey().toLowerCase()) ||
                             entry.getKey().equalsIgnoreCase("content-type");
                 })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -246,7 +302,7 @@ public class OutgoingLogBodyConstructor {
         return contentTypeHeader.split(";")[0];
     }
 
-    private ObjectNode applyJsonBodyDenyList(JsonNode json, List<String> deniedPaths) {
+    private ObjectNode applyJsonBodyDenyList(JsonNode json, Set<String> deniedPaths) {
         ObjectNode newJson = json.deepCopy();
         deniedPaths.forEach(path -> {
             if (newJson.has(path)) {
@@ -256,7 +312,7 @@ public class OutgoingLogBodyConstructor {
         return newJson;
     }
 
-    private ObjectNode applyJsonBodyAllowList(JsonNode obj, List<String> allowedPaths) {
+    private ObjectNode applyJsonBodyAllowList(JsonNode obj, Set<String> allowedPaths) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode newObj = mapper.createObjectNode();
         allowedPaths.forEach(path -> {
@@ -267,7 +323,7 @@ public class OutgoingLogBodyConstructor {
         return newObj;
     }
 
-    private String applyFormUrlEncodedDenyList(String body, List<String> deniedKeys) {
+    private String applyFormUrlEncodedDenyList(String body, Set<String> deniedKeys) {
         return Arrays.stream(body.split("&"))
                 .map(param -> {
                     String[] keyValue = param.split("=");
@@ -279,7 +335,7 @@ public class OutgoingLogBodyConstructor {
                 .collect(Collectors.joining("&"));
     }
 
-    private String applyFormUrlEncodedAllowList(String body, List<String> allowedKeys) {
+    private String applyFormUrlEncodedAllowList(String body, Set<String> allowedKeys) {
         return Arrays.stream(body.split("&"))
                 .filter(param -> {
                     String[] keyValue = param.split("=");

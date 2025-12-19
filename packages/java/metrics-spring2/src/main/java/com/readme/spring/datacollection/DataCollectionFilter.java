@@ -10,15 +10,20 @@ import com.readme.core.datatransfer.PayloadDataDispatcher;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.readme.core.datatransfer.ReadmeApiKeyEncoder;
+import com.readme.spring.config.ReadmeConfigurationProperties;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 import java.io.IOException;
 import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import static com.readme.core.dataextraction.payload.PayloadData.*;
+import static com.readme.core.datatransfer.BaseLogUrlFetcher.fetchBaseLogUrl;
 import static org.springframework.http.HttpMethod.OPTIONS;
 
 /**
@@ -30,6 +35,8 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 @AllArgsConstructor
 @Slf4j
 public class DataCollectionFilter implements Filter {
+
+    private ReadmeConfigurationProperties readmeProperties;
 
     private UserDataCollector<ServletDataPayloadAdapter> userDataCollector;
 
@@ -63,6 +70,7 @@ public class DataCollectionFilter implements Filter {
             if (request.getMethod().equalsIgnoreCase(OPTIONS.name())) {
                 chain.doFilter(req, resp);
             } else {
+                setDocumentationUrl(payloadDataBuilder, response);
                 chain.doFilter(request, response);
                 ServletDataPayloadAdapter payload =
                         new ServletDataPayloadAdapter(request, response);
@@ -91,4 +99,13 @@ public class DataCollectionFilter implements Filter {
         }
     }
 
+    private void setDocumentationUrl(PayloadDataBuilder payloadDataBuilder, ContentCachingResponseWrapper response) {
+        UUID logId = UUID.randomUUID();
+        payloadDataBuilder.logId(logId);
+        String encodedReadmeApiKey = ReadmeApiKeyEncoder.encode(readmeProperties.getReadmeApiKey());
+        String baseLogUrl = logOptions.getBaseLogUrl() != null ? logOptions.getBaseLogUrl() : fetchBaseLogUrl(encodedReadmeApiKey);
+        if (baseLogUrl != null && !baseLogUrl.isEmpty()) {
+            response.setHeader("x-documentation-url", baseLogUrl + "/logs/" + logId);
+        }
+    }
 }
