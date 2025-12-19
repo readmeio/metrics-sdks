@@ -10,8 +10,8 @@ jobs:
   integration:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 20
 
@@ -40,23 +40,12 @@ jobs:
           - latest
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
 
       - run: npm ci --ignore-scripts
-      - run: npm test
-
-  # This is being run separately since it's not playing nicely with Node 14.
-  # Once we drop Node 14 support we can probably consolidate this again.
-  lint:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/node
-
-    steps:
-      - uses: actions/checkout@v4
-      - run: npm ci --ignore-scripts
       - run: npm run lint
+      - run: npm run build
+      - run: npm test
