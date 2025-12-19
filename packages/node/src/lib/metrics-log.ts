@@ -2,8 +2,6 @@ import type { Options } from './log';
 import type { Har } from 'har-format';
 import type { UUID } from 'node:crypto';
 
-import timeoutSignal from 'timeout-signal';
-
 import pkg from '../../package.json';
 import config from '../config';
 
@@ -90,7 +88,7 @@ function getLogIds(body: OutgoingLogBody | OutgoingLogBody[]): LogId {
 }
 
 export function metricsAPICall(readmeAPIKey: string, body: OutgoingLogBody[], options: Options): Promise<LogResponse> {
-  const signal = timeoutSignal(config.timeout);
+  const signal = AbortSignal.timeout(config.timeout);
   const encodedKey = Buffer.from(`${readmeAPIKey}:`).toString('base64');
 
   const makeRequest = () => {
@@ -110,25 +108,19 @@ export function metricsAPICall(readmeAPIKey: string, body: OutgoingLogBody[], op
         'Content-Type': 'application/json',
         'User-Agent': `${pkg.name}/${pkg.version}`,
       },
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       signal,
-    })
-      .then(response => {
-        if (shouldBackoff(response)) {
-          // backoff for a few seconds, but not if another callback has already started backing off
-          if (!backoffExpiresAt) {
-            backoffExpiresAt = new Date();
-            backoffExpiresAt.setSeconds(backoffExpiresAt.getSeconds() + BACKOFF_SECONDS);
-          }
+    }).then(response => {
+      if (shouldBackoff(response)) {
+        // backoff for a few seconds, but not if another callback has already started backing off
+        if (!backoffExpiresAt) {
+          backoffExpiresAt = new Date();
+          backoffExpiresAt.setSeconds(backoffExpiresAt.getSeconds() + BACKOFF_SECONDS);
         }
-        const logLevel = response.ok ? 'info' : 'error';
-        logger[logLevel]({ message: `Service responded with status ${response.status}: ${response.statusText}.` });
-        return response;
-      })
-      .finally(() => {
-        timeoutSignal.clear(signal);
-      });
+      }
+      const logLevel = response.ok ? 'info' : 'error';
+      logger[logLevel]({ message: `Service responded with status ${response.status}: ${response.statusText}.` });
+      return response;
+    });
   };
 
   if (options.fireAndForget) {
