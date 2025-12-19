@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import type { Log, ErrorLog, LoggerStrategy } from './logger';
 
 /**
