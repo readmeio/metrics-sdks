@@ -29,14 +29,14 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           config-file: ./.github/codeql/config.yml
           languages: ${{ matrix.language }}
 
       - name: Autobuild
         if: matrix.language != 'java'
-        uses: github/codeql-action/autobuild@v3
+        uses: github/codeql-action/autobuild@v4
 
       - name: Import Java GPG key
         #This step will be removed from here once we add build profile for java. Let's keep it here for now :)
@@ -64,4 +64,4 @@ jobs:
           mvn clean install -f packages/java/metrics-spring2/pom.xml -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
