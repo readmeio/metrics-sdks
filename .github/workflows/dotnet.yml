@@ -23,15 +23,22 @@ jobs:
         if: always()
         run: docker compose down
 
-  build:
+  build-dotnet:
+    name: build ${{ matrix.dotnet-version }}
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: packages/dotnet
 
+    strategy:
+      matrix:
+        dotnet-version:
+          - 6.x
+          - 8.x
+
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-dotnet@v4
-        # with:
-        #   dotnet-version: '3.1.x' # SDK Version to use; x will use the latest version of the 3.1 channel
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
       - run: make build
