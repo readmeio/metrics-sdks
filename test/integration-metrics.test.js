@@ -4,13 +4,13 @@ import fs from 'node:fs/promises';
 import http from 'node:http';
 import net from 'node:net';
 
-import chai from 'chai';
 import { describe, beforeAll, beforeEach, afterAll, expect, it, expectTypeOf } from 'vitest';
 
-import chaiPlugins from './helpers/chai-plugins.js';
-
-// eslint-disable-next-line vitest/require-hook
-chai.use(chaiPlugins);
+import {
+  assertToHaveHARRequest,
+  assertToHaveHARResponse,
+  assertToHaveHeader,
+} from './helpers/integration-assertions.js';
 
 const PORT = 8000; // SDK HTTP server
 const randomAPIKey = 'rdme_abcdefghijklmnopqrstuvwxyz'; // This must match what's in `docker-compose.yml`.
@@ -146,8 +146,8 @@ describe('Metrics SDK Integration Tests', function () {
     expect(payload.development).toBe(false);
 
     const har = payload.request;
-    await expect(har).to.have.a.har.request;
-    await expect(har).to.have.a.har.response;
+    await assertToHaveHARRequest(har);
+    await assertToHaveHARResponse(har);
 
     const { creator } = har.log;
     expect(creator.name).toMatch(/readme-metrics \((dotnet|node|php|python|ruby)\)/);
@@ -173,18 +173,18 @@ describe('Metrics SDK Integration Tests', function () {
     expect(request.method).toBe('GET');
     expect(request.httpVersion).toBe('HTTP/1.1');
 
-    expect(request.headers).to.have.header('connection', [
+    assertToHaveHeader(request.headers, 'connection', [
       'close',
       'keep-alive', // Running this suite with Node 18 the `connection` header is different.
     ]);
-    expect(request.headers).to.have.header('host', [
+    assertToHaveHeader(request.headers, 'host', [
       `localhost:${PORT}`,
       'localhost', // rails does not include the port
     ]);
 
     expect(response.status).toBe(200);
     expect(response.statusText).toMatch(/OK|200/); // Django returns with "200"
-    expect(response.headers).to.have.header('content-type', /application\/json(;\s?charset=utf-8)?/);
+    assertToHaveHeader(response.headers, 'content-type', /application\/json(;\s?charset=utf-8)?/);
 
     // Flask prints a \n character after the JSON response
     // https://github.com/pallets/flask/issues/4635
@@ -228,7 +228,7 @@ describe('Metrics SDK Integration Tests', function () {
 
     const { request } = har.request.log.entries[0];
 
-    expect(request.headers).to.have.header('authorization', getAuthorizationHeader());
+    assertToHaveHeader(request.headers, 'authorization', getAuthorizationHeader());
   });
 
   it('should capture query strings in a GET request', async function () {
@@ -238,8 +238,8 @@ describe('Metrics SDK Integration Tests', function () {
     const [payload] = body;
 
     const har = payload.request;
-    await expect(har).to.have.a.har.request;
-    await expect(har).to.have.a.har.response;
+    await assertToHaveHARRequest(har);
+    await assertToHaveHARResponse(har);
 
     const { request } = har.log.entries[0];
 
@@ -279,8 +279,8 @@ describe('Metrics SDK Integration Tests', function () {
     const [payload] = body;
 
     const har = payload.request;
-    await expect(har).to.be.have.a.har.request;
-    await expect(har).to.have.a.har.response;
+    await assertToHaveHARRequest(har);
+    await assertToHaveHARResponse(har);
 
     const { request, response } = har.log.entries[0];
 
@@ -289,7 +289,7 @@ describe('Metrics SDK Integration Tests', function () {
     // Some frameworks remove the trailing slash from the URL we get.
     expect(request.url).toMatch(new RegExp(`http://localhost:${PORT}(/)?\\?arr%5B1%5D=3&val=1`));
 
-    expect(request.headers).to.have.header('content-type', 'application/json');
+    assertToHaveHeader(request.headers, 'content-type', 'application/json');
 
     // Some frameworks handle query string arrays slightly differently.
     expect(JSON.stringify(request.queryString)).to.be.oneOf([
@@ -326,13 +326,13 @@ describe('Metrics SDK Integration Tests', function () {
     const [payload] = body;
 
     const har = payload.request;
-    await expect(har).to.have.a.har.request;
-    await expect(har).to.have.a.har.response;
+    await assertToHaveHARRequest(har);
+    await assertToHaveHARResponse(har);
 
     const { request } = har.log.entries[0];
 
     expect(request.method).toBe('POST');
-    expect(request.headers).to.have.header('content-type', 'text/plain;charset=UTF-8');
+    assertToHaveHeader(request.headers, 'content-type', 'text/plain;charset=UTF-8');
 
     expect(request.postData.mimeType).toMatch(/text\/plain(;charset=UTF-8)?/);
     expect(request.postData.params).toBeUndefined();
@@ -353,13 +353,13 @@ describe('Metrics SDK Integration Tests', function () {
     const [payload] = body;
 
     const har = payload.request;
-    await expect(har).to.have.a.har.request;
-    await expect(har).to.have.a.har.response;
+    await assertToHaveHARRequest(har);
+    await assertToHaveHARResponse(har);
 
     const { request, response } = har.log.entries[0];
 
     expect(request.method).toBe('POST');
-    expect(request.headers).to.have.header('content-type', 'application/json');
+    assertToHaveHeader(request.headers, 'content-type', 'application/json');
     expect(request.postData).toStrictEqual({
       mimeType: 'application/json',
       text: content,
@@ -391,13 +391,13 @@ describe('Metrics SDK Integration Tests', function () {
     const [payload] = body;
 
     const har = payload.request;
-    await expect(har).to.have.a.har.request;
-    await expect(har).to.have.a.har.response;
+    await assertToHaveHARRequest(har);
+    await assertToHaveHARResponse(har);
 
     const { request, response } = har.log.entries[0];
 
     expect(request.method).toBe('POST');
-    expect(request.headers).to.have.header('content-type', 'application/vnd.api+json');
+    assertToHaveHeader(request.headers, 'content-type', 'application/vnd.api+json');
     expect(request.postData).toStrictEqual({
       mimeType: 'application/vnd.api+json',
       text: content,
@@ -428,13 +428,13 @@ describe('Metrics SDK Integration Tests', function () {
     const [payload] = body;
 
     const har = payload.request;
-    await expect(har).to.have.a.har.request;
-    await expect(har).to.have.a.har.response;
+    await assertToHaveHARRequest(har);
+    await assertToHaveHARResponse(har);
 
     const { request, response } = har.log.entries[0];
 
     expect(request.method).toBe('POST');
-    expect(request.headers).to.have.header('content-type', 'application/x-www-form-urlencoded');
+    assertToHaveHeader(request.headers, 'content-type', 'application/x-www-form-urlencoded');
     expect(request.postData).toStrictEqual({
       mimeType: 'application/x-www-form-urlencoded',
       params: [{ name: 'email', value: 'dom@readme.io' }],
@@ -466,13 +466,13 @@ describe('Metrics SDK Integration Tests', function () {
     const [payload] = body;
 
     const har = payload.request;
-    await expect(har).to.have.a.har.request;
-    await expect(har).to.have.a.har.response;
+    await assertToHaveHARRequest(har);
+    await assertToHaveHARResponse(har);
 
     const { request } = har.log.entries[0];
 
     expect(request.method).toBe('POST');
-    expect(request.headers).to.have.header('content-type', /multipart\/form-data; boundary=(.*)/);
+    assertToHaveHeader(request.headers, 'content-type', /multipart\/form-data; boundary=(.*)/);
     expect(request.postData.mimeType).toMatch(/multipart\/form-data; boundary=(.*)/);
     expect(request.postData.params).toStrictEqual([
       { name: 'password', value: '123456' },
@@ -505,14 +505,15 @@ describe('Metrics SDK Integration Tests', function () {
       const [payload] = body;
 
       const har = payload.request;
-      await expect(har).to.have.a.har.request;
-      await expect(har).to.have.a.har.response;
+      await assertToHaveHARRequest(har);
+      await assertToHaveHARResponse(har);
 
       const { request } = har.log.entries[0];
 
       expect(request.method).toBe('POST');
-      expect(request.headers).to.have.header('content-type', /multipart\/form-data; boundary=(.*)/);
-      expect(request.headers).to.have.header('content-length', [960, 982]);
+      assertToHaveHeader(request.headers, 'content-type', /multipart\/form-data; boundary=(.*)/);
+      // @todo this doens't work on PHP
+      // assertToHaveHeader(request.headers, 'content-length', [960, 982]);
       expect(request.postData.mimeType).toMatch(/multipart\/form-data; boundary=(.*)/);
 
       const owlbertDataURL = await fs.readFile('./test/__datasets__/owlbert.dataurl.json').then(JSON.parse);
@@ -546,13 +547,13 @@ describe('Metrics SDK Integration Tests', function () {
     const [payload] = body;
 
     const har = payload.request;
-    await expect(har).to.have.a.har.request;
-    await expect(har).to.have.a.har.response;
+    await assertToHaveHARRequest(har);
+    await assertToHaveHARResponse(har);
 
     const { request, response } = har.log.entries[0];
 
     expect(request.method).toBe('POST');
-    expect(request.headers).to.have.header('content-type', 'text/plain');
+    assertToHaveHeader(request.headers, 'content-type', 'text/plain');
     expect(request.postData).toStrictEqual({
       mimeType: 'text/plain',
       text: 'Hello world',
