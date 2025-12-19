@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable no-console */
 import type { ErrorLog, Log } from 'src/lib/logger';
 
 import { describe, beforeEach, afterEach, vi, expect, it } from 'vitest';
