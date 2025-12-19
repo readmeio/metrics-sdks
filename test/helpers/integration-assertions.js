@@ -31,14 +31,17 @@ export function assertToHaveHeader(headers, header, expected) {
   const caselessHeaders = caseless(arrayToObject(headers));
 
   if (expected.constructor.name === 'RegExp') {
-    assert(caselessHeaders.get(header).match(expected), `Expected ${header} to match ${expected}`);
+    const actual = caselessHeaders.get(header).match(expected);
+    assert(caselessHeaders.get(header).match(expected), `Expected ${header} to match ${expected}, received ${actual}`);
   } else if (Array.isArray(expected)) {
-    assert(
-      expected.some(e => caselessHeaders.get(header).toString() === e.toString()),
-      `Expected ${header} to be one of ${expected}`,
-    );
+    const actual = expected.some(e => caselessHeaders.get(header).toString() === e.toString());
+    assert(actual, `Expected ${header} to be one of ${expected}, received ${actual}`);
   } else {
-    assert(caselessHeaders.get(header).toString() === expected.toString(), `Expected ${header} to be ${expected}`);
+    const actual = caselessHeaders.get(header).toString();
+    assert(
+      caselessHeaders.get(header).toString() === expected.toString(),
+      `Expected ${header} to be ${expected}, received ${actual}`,
+    );
   }
 }
 
