@@ -27,7 +27,7 @@
     <groupId>com.readme</groupId>
     <name>metrics-core</name>
     <artifactId>metrics-core</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
     <description>Core library for Readme.io JVM related SDKs</description>
 
     <properties>

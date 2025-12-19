@@ -9,6 +9,8 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.readme.spring.config.ReadmeConfigurationProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -39,12 +41,15 @@ class DataCollectionFilterTest {
     @Mock
     private PayloadDataDispatcher payloadDataDispatcher;
 
+    @Mock
+    private ReadmeConfigurationProperties readmeProperties;
+
     private DataCollectionFilter filter;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        filter = new DataCollectionFilter(userDataCollector, requestDataCollector, payloadDataDispatcher, LogOptions.builder().build());
+        filter = new DataCollectionFilter(readmeProperties, userDataCollector, requestDataCollector, payloadDataDispatcher, LogOptions.builder().build());
     }
 
     @Test

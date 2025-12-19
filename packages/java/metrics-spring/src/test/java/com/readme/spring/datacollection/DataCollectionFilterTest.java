@@ -5,6 +5,7 @@ import com.readme.core.dataextraction.payload.requestresponse.RequestDataCollect
 import com.readme.core.dataextraction.payload.user.UserData;
 import com.readme.core.dataextraction.payload.user.UserDataCollector;
 import com.readme.core.datatransfer.PayloadDataDispatcher;
+import com.readme.spring.config.ReadmeConfigurationProperties;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,12 +40,16 @@ class DataCollectionFilterTest {
     @Mock
     private PayloadDataDispatcher payloadDataDispatcher;
 
+    @Mock
+    private ReadmeConfigurationProperties readmeProperties;
+
     private DataCollectionFilter filter;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        filter = new DataCollectionFilter(userDataCollector, requestDataCollector, payloadDataDispatcher, LogOptions.builder().build());
+        filter = new DataCollectionFilter(readmeProperties, userDataCollector,
+                requestDataCollector, payloadDataDispatcher, LogOptions.builder().build());
     }
 
     @Test

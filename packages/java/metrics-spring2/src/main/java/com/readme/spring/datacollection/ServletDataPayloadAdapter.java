@@ -204,7 +204,7 @@ public class ServletDataPayloadAdapter implements DataPayloadAdapter {
         if (response != null) {
             return response.getHeaderNames().stream()
                     .collect(Collectors.toMap(
-                            headerName -> headerName,
+                            headerName -> headerName.toLowerCase(),
                             headerName -> response.getHeader(headerName)));
         }
         log.error("The provided response is null");

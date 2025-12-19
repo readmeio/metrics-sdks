@@ -42,8 +42,9 @@ public class CustomUserDataCollectorConfig {
     @Bean
     public LogOptions logOptions() {
         return LogOptions.builder()
-                .baseLogUrl("http://baseurl.abcd")
+                .baseLogUrl("http://base.log.url")
                 .bufferLength(1)
+                .denylist(List.of("denied-param"))
                 .build();
     }
 }

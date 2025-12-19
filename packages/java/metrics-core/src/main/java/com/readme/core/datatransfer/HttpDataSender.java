@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.readme.core.config.ReadmeApiConfig.README_METRICS_URL;
-import static com.readme.core.datatransfer.BaseLogUrlFetcher.fetchBaseLogUrl;
 import static com.readme.core.datatransfer.ReadmeApiKeyEncoder.encode;
 
 /**
@@ -84,15 +83,11 @@ public class HttpDataSender implements DataSender {
         RequestBody body = RequestBody
                 .create(outgoingLogBody, MediaType.get(APPLICATION_JSON_TYPE));
 
-        String baseLogUrl = logOptions.getBaseLogUrl() != null ? logOptions.getBaseLogUrl() : fetchBaseLogUrl(encodedReadmeApiKey);
-
-
         return new Request.Builder()
                 .url(README_METRICS_URL)
                 .header("Accept", APPLICATION_JSON_TYPE)
                 .header("Content-Type", APPLICATION_JSON_TYPE)
                 .header("Authorization", encodedReadmeApiKey)
-                .header("x-documentation-url", baseLogUrl)
                 .method("POST", body)
                 .build();
     }
