@@ -10,8 +10,8 @@ jobs:
   integration:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 20
 
@@ -30,7 +30,7 @@ jobs:
         working-directory: packages/dotnet
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: actions/setup-dotnet@v4
         # with:
         #   dotnet-version: '3.1.x' # SDK Version to use; x will use the latest version of the 3.1 channel

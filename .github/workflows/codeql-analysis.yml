@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -41,7 +41,7 @@ jobs:
       - name: Import Java GPG key
         #This step will be removed from here once we add build profile for java. Let's keep it here for now :)
         run: |
-          set +e 
+          set +e
           echo "$GPG_PRIVATE_KEY" | tr -d '\r' | sed '1s/^\xEF\xBB\xBF//' | sed '/^\s*$/d' | sed 's/^[ \t]*//;s/[ \t]*$//' > clean_gpg_key.asc
           gpg --batch --import clean_gpg_key.asc
           GPG_EXIT_CODE=$?
