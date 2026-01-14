@@ -366,8 +366,8 @@ class PayloadBuilder:
 
     def _build_base_url(self, request):
         """Helper function to get the base URL for a request (full URL excluding the
-        query string), translating fields from either a Werkzeug Request object or a
-        Django WSGIRequest object.
+        query string), translating fields from a Werkzeug Request object,
+        a Django WSGIRequest object, or a FastAPI Request object.
 
         Args:
             request (Request): Request object containing the request information, either
@@ -378,12 +378,25 @@ class PayloadBuilder:
         """
         query_string = self._get_query_string(request)
         if hasattr(request, "base_url"):
-            # Werkzeug request objects already have exactly what we need
+            # Werkzeug and FastAPI request objects already have exactly what we need
             base_url = str(request.base_url)
             if hasattr(request, "url") and hasattr(request.url, "path"):
                 base_url = base_url[:-1]
-                if len(request.url.path) > 1:
-                    base_url += request.url.path
+                path = request.url.path
+                if hasattr(request, "scope"):
+                    root_path = request.scope.get("root_path")
+                    if root_path and path.startswith(root_path):
+                        # In FastAPI, when the root_path is configured,
+                        # it's included both in the base_url and in the path:
+                        # e.g. root_path = "/api/v1"
+                        #      base_url  = "https://acme.com/api/v1/"
+                        #      path      = "/api/v1/my/endpoint"
+                        # To avoid reporting "https://acme.com/api/v1/api/v1/my_endpoint
+                        # we trim the redundant root_path.
+                        path = path[len(root_path):]
+
+                if len(path) > 1:
+                    base_url += path
             if len(query_string) > 0:
                 base_url += f"?{query_string}"
             return base_url
