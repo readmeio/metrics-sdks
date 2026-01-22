@@ -16,6 +16,7 @@ class Middleware
                 'blacklist' => config('readme.blacklist', []),
                 'whitelist' => config('readme.whitelist', []),
                 'base_log_url' => config('readme.base_log_url'),
+                'buffer_length' => config('readme.buffer_length')
             ]
         );
     }
