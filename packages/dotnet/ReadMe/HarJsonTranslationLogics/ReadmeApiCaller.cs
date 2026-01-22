@@ -1,7 +1,6 @@
 ﻿using System;
+using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
-using RestSharp;
 
 namespace ReadMe.HarJsonTranslationLogics
 {
@@ -20,19 +19,19 @@ namespace ReadMe.HarJsonTranslationLogics
     {
       try
       {
-        var client = new RestClient(ConstValues.ReadmeAPIEndpoints);
-        var request = new RestRequest(Method.POST);
-        request.AddHeader("Content-Type", "application/json");
+        var client = new HttpClient();
+
+        var request = new HttpRequestMessage(HttpMethod.Post, ConstValues.ReadmeAPIEndpoints);
         string apiKey = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(this.apiKey + ":"));
-        request.AddHeader("Authorization", apiKey);
-        request.AddParameter("application/json", this.harJsonObjects, ParameterType.RequestBody);
+        request.Headers.Add("Authorization", apiKey);
+        request.Content = new StringContent(this.harJsonObjects, Encoding.UTF8, "application/json");
         if (fireAndForget)
         {
-          client.ExecuteAsync(request);
+          client.SendAsync(request);
         }
         else
         {
-          client.Execute(request);
+          client.SendAsync(request).GetAwaiter().GetResult();
         }
       }
       catch (Exception)
