@@ -29,7 +29,7 @@
     "find-cache-dir": "^3.3.2",
     "flat-cache": "^6.1.1",
     "lodash": "^4.17.15",
-    "ssri": "^12.0.0",
+    "ssri": "^13.0.1",
     "type-is": "^1.6.18"
   },
   "devDependencies": {
