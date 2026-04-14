@@ -11,3 +11,4 @@ packages/*/node_modules/
 *.iml
 *.ipr
 
+config.bat
