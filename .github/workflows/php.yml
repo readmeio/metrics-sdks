@@ -37,6 +37,7 @@ jobs:
           - 8.1 # EOL: December 31th, 2025
           - 8.2 # EOL: December 31th, 2026
           - 8.3 # EOL: December 31th, 2027
+          - 8.4 # EOL: December 31th, 2028
         # https://endoflife.date/laravel
         laravel:
           - 10.* # EOL: February 4th, 2025
@@ -89,6 +90,7 @@ jobs:
         php:
           - 8.2 # EOL: December 31th, 2026
           - 8.3 # EOL: December 31th, 2027
+          - 8.4 # EOL: December 31th, 2028
         # https://endoflife.date/laravel
         laravel:
           - 11.* # EOL: March 12th, 2026
