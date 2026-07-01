@@ -10,7 +10,7 @@ jobs:
   integration:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
         with:
           node-version: 20
@@ -44,7 +44,7 @@ jobs:
     name: build (${{ matrix.php }} w/ Laravel ${{ matrix.laravel }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Cache dependencies
         uses: actions/cache@v5
@@ -96,7 +96,7 @@ jobs:
     name: build (${{ matrix.php }} w/ Laravel ${{ matrix.laravel }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Cache dependencies
         uses: actions/cache@v5
