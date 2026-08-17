@@ -11,6 +11,6 @@ MarkupSafe==2.1.5
 pytz==2024.1
 ../../
 requests==2.32.3
-sqlparse==0.5.1
+sqlparse==0.6.0
 urllib3==2.2.2
 Werkzeug==3.0.6
