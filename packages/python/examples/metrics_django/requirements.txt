@@ -1,5 +1,5 @@
 asgiref==3.8.1
-certifi==2024.7.4
+certifi==2026.10.18
 chardet==5.2.0
 click==8.1.7
 Django==4.2.18
