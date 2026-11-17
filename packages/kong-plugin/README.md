@@ -8,7 +8,7 @@
   Track usage of your API and troubleshoot issues faster.
 </p>
 
-With [ReadMe's Metrics API](https://readme.com/metrics) your team can get deep insights into your API's usage. If you're a developer, it takes a few small steps to send your API logs to [ReadMe](http://readme.com). Here's an overview of how the integration works:
+With [ReadMe's Metrics API](https://readme.com) your team can get deep insights into your API's usage. If you're a developer, it takes a few small steps to send your API logs to [ReadMe](http://readme.com). Here's an overview of how the integration works:
 
 - Install this plugin into your Kong Gateway by copying the `kong` directory into your Kong environment or use the provided Dockerfile. see [this](https://docs.konghq.com/gateway/latest/plugin-development/get-started/deploy/) for details.
 - The plugin runs during the log phase of the Kong pipeline and sends ReadMe the details of your API's incoming requests and outgoing responses, with the option for you to redact any private headers using the configuration options.

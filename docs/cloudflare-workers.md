@@ -8,7 +8,7 @@ category: 62292aea889520008ed0113b
 >
 > Integrations can be tricky! [Contact support](https://docs.readme.com/guides/docs/contact-support) if you have any questions/issues.
 
-If you'd rather not use one of our language-oriented SDKs for sending your API logs into [ReadMe](https://readme.com) so you can get deep insights on your API's usage with [ReadMe Metrics](https://readme.com/metrics), we have another option: Cloudflare Workers!
+If you'd rather not use one of our language-oriented SDKs for sending your API logs into [ReadMe](https://readme.com) so you can get deep insights on your API's usage with [ReadMe Metrics](https://readme.com), we have another option: Cloudflare Workers!
 
 ## Overview
 

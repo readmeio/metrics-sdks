@@ -3723,7 +3723,7 @@
                 "ISC"
             ],
             "description": "Track your API metrics within ReadMe.",
-            "homepage": "https://readme.com/metrics",
+            "homepage": "https://readme.com",
             "keywords": [
                 "api-metrics",
                 "readme"

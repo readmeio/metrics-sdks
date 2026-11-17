@@ -100,7 +100,7 @@ function setDocumentationHeader(res: ServerResponse, baseLogUrl: string, logId: 
 /**
  * This method will send supplied API requests to ReadMe Metrics.
  *
- * @see {@link https://readme.com/metrics}
+ * @see {@link https://readme.com}
  * @see {@link https://docs.readme.com/docs/sending-logs-to-readme-with-nodejs}
  * @param readmeApiKey The API key for your ReadMe project. This ensures your requests end up in
  *    your dashboard. You can read more about the API key in
