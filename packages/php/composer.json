@@ -19,7 +19,7 @@
     "illuminate/support": "^10.0 | ^11.0",
     "ramsey/uuid": "^4.7",
     "composer/composer": "^2.7",
-    "guzzlehttp/guzzle": "^7.9",
+    "guzzlehttp/guzzle": "^8.3",
     "composer-runtime-api": "^2.2",
     "phpoption/phpoption": "^1.9",
     "vlucas/phpdotenv": "^5.6"
