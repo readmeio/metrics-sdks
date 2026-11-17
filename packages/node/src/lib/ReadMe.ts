@@ -60,7 +60,7 @@ interface ReadMeVersion {
  * Initialize this class with the API Key for your ReadMe project and use the `express` method
  * to return middleware that will send supplied API requests to ReadMe Metrics and configure the ReadMe webhook.
  *
- * @see {@link https://readme.com/metrics}
+ * @see {@link https://readme.com}
  * @see {@link https://docs.readme.com/main/docs/unified-snippet-docs}
  */
 export default class ReadMe {

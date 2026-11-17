@@ -1,7 +1,7 @@
 {
   "name": "readme/metrics",
   "description": "Track your API metrics within ReadMe.",
-  "homepage": "https://readme.com/metrics",
+  "homepage": "https://readme.com",
   "license": "ISC",
   "support": {
     "docs": "https://docs.readme.com/docs/sending-api-logs-to-readme",

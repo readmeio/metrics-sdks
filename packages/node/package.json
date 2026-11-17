@@ -3,7 +3,7 @@
   "description": "Track your API metrics within ReadMe.",
   "version": "7.0.0-alpha.10",
   "license": "ISC",
-  "homepage": "https://readme.com/metrics",
+  "homepage": "https://readme.com",
   "bugs": {
     "email": "support@readme.io",
     "url": "https://github.com/readmeio/metrics-sdks/issues"

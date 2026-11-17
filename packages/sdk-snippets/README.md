@@ -6,7 +6,7 @@ Generate code snippets for ReadMe Metrics SDKs in multiple languages.
 
 [![](https://raw.githubusercontent.com/readmeio/.github/main/oss-header.png)](https://readme.io)
 
-This library was built for [ReadMe's Metrics](https://readme.com/metrics) onboarding flow.
+This library was built for [ReadMe's Metrics](https://readme.com) onboarding flow.
 
 ## Installation
 

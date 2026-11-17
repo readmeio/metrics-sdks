@@ -14,7 +14,7 @@ category: 62292aea889520008ed0113b
 
 ## Overview
 
-If you're a developer, it takes a few small steps to send your API logs to [ReadMe](http://readme.com/) so your team can get deep insights into your API's usage with [ReadMe Metrics](https://readme.com/metrics). Here's an overview of how the integration works:
+If you're a developer, it takes a few small steps to send your API logs to [ReadMe](http://readme.com/) so your team can get deep insights into your API's usage with [ReadMe Metrics](https://readme.com). Here's an overview of how the integration works:
 
 <!-- TODO: we should rename these options! -->
 <!--alex ignore blacklist whitelist-->
